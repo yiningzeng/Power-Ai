@@ -12,7 +12,7 @@ export const chinese: IAppStrings = {
         cancel: "取消",
         save: "保存",
         delete: "删除",
-        provider: "导出",
+        provider: "来源",
         homePage: "首页",
     },
     titleBar: {
