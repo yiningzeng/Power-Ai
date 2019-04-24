@@ -3,6 +3,7 @@ import { ExportProject } from "./react/components/toolbar/exportProject";
 import { SaveProject } from "./react/components/toolbar/saveProject";
 import { ToolbarItemType } from "./react/components/toolbar/toolbarItem";
 import { strings } from "./common/strings";
+import {TrainAi} from "./react/components/toolbar/trainAi";
 
 export enum ToolbarItemName {
     SelectCanvas = "selectCanvas",
@@ -18,6 +19,7 @@ export enum ToolbarItemName {
     SaveProject = "saveProject",
     ExportProject = "exportProject",
     ActiveLearning = "activeLearning",
+    TrainAi = "trainAi",
 }
 
 export enum ToolbarItemGroup {
@@ -25,6 +27,7 @@ export enum ToolbarItemGroup {
     Regions = "regions",
     Navigation = "navigation",
     Project = "project",
+    ai = "ai",
 }
 
 /**
@@ -147,4 +150,14 @@ export default function registerToolbar() {
         type: ToolbarItemType.Action,
         accelerators: ["CmdOrCtrl+E", "CmdOrCtrl+e"],
     }, ExportProject);
+
+    ToolbarItemFactory.register({
+        name: ToolbarItemName.TrainAi,
+        tooltip: strings.editorPage.toolbar.trainAi,
+        icon: "fa fa-train",
+        // icon: "fas fa-caret-square-right",
+        group: ToolbarItemGroup.ai,
+        type: ToolbarItemType.Action,
+        accelerators: ["CmdOrCtrl+T", "CmdOrCtrl+t"],
+    }, TrainAi);
 }

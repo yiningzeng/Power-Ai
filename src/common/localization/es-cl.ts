@@ -235,6 +235,7 @@ export const spanish: IAppStrings = {
             saveProject: "Guardar Proyecto",
             exportProject: "Exprtar Proyecto",
             activeLearning: "Aprendizaje Activo",
+            trainAi: "Start Learning",
         },
         videoPlayer: {
             previousTaggedFrame: {

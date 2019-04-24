@@ -233,6 +233,7 @@ export const english: IAppStrings = {
             saveProject: "Save Project",
             exportProject: "Export Project",
             activeLearning: "Active Learning",
+            trainAi: "Start Learning",
         },
         videoPlayer: {
             previousTaggedFrame: {
