@@ -385,6 +385,9 @@ export const english: IAppStrings = {
             cntk: {
                 displayName: "Microsoft Cognitive Toolkit (CNTK)",
             },
+            coco: {
+                displayName: "coco",
+            },
         },
         messages: {
             saveSuccess: "Successfully saved export settings",

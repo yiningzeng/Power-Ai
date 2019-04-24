@@ -12,6 +12,7 @@ import { strings } from "./common/strings";
 import { HostProcessType } from "./common/hostProcess";
 import { AzureCustomVisionProvider } from "./providers/export/azureCustomVision";
 import { CntkExportProvider } from "./providers/export/cntk";
+import {CocoExportProvider} from "./providers/export/coco";
 
 /**
  * Registers storage, asset and export providers, as well as all toolbar items
@@ -53,6 +54,11 @@ export default function registerProviders() {
         name: "vottJson",
         displayName: strings.export.providers.vottJson.displayName,
         factory: (project, options) => new VottJsonExportProvider(project, options),
+    });
+    ExportProviderFactory.register({
+        name: "coco",
+        displayName: strings.export.providers.coco.displayName,
+        factory: (project, options) => new CocoExportProvider(project, options),
     });
     ExportProviderFactory.register({
         name: "pascalVOC",

@@ -382,6 +382,9 @@ export interface IAppStrings {
             cntk: {
                 displayName: string,
             },
+            coco: {
+                displayName: string,
+            },
         },
         messages: {
             saveSuccess: string;
