@@ -38,16 +38,16 @@ export default function registerProviders() {
         platformSupport: HostProcessType.Electron,
         factory: (options) => new LocalFileSystemProxy(options),
     });
-    AssetProviderFactory.register({
-        name: "azureBlobStorage",
-        displayName: strings.connections.providers.azureBlob.title,
-        factory: (options) => new AzureBlobStorage(options),
-    });
-    AssetProviderFactory.register({
-        name: "bingImageSearch",
-        displayName: strings.connections.providers.bing.title,
-        factory: (options) => new BingImageSearch(options),
-    });
+    // AssetProviderFactory.register({
+    //     name: "azureBlobStorage",
+    //     displayName: strings.connections.providers.azureBlob.title,
+    //     factory: (options) => new AzureBlobStorage(options),
+    // });
+    // AssetProviderFactory.register({
+    //     name: "bingImageSearch",
+    //     displayName: strings.connections.providers.bing.title,
+    //     factory: (options) => new BingImageSearch(options),
+    // });
 
     // Export Providers
     ExportProviderFactory.register({

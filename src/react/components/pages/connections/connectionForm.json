@@ -15,7 +15,8 @@
         },
         "providerType": {
             "title": "${strings.common.provider}",
-            "type": "string"
+            "type": "string",
+            "default": "localFileSystemProxy"
         }
     }
 }

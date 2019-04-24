@@ -189,7 +189,7 @@ export class TitleBar extends React.Component<ITitleBarProps, ITitleBarState> {
 
     private syncTitle = (): void => {
         if (this.state.isElectron) {
-            this.currentWindow.setTitle(`${this.props.title} - VoTT`);
+            this.currentWindow.setTitle(`${this.props.title} - AI Power`);
         }
     }
 
