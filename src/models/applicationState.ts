@@ -111,6 +111,7 @@ export interface IProject {
     description?: string;
     tags: ITag[];
     sourceConnection: IConnection;
+    sourceListConnection: [];
     targetConnection: IConnection;
     exportFormat: IExportFormat;
     videoSettings: IProjectVideoSettings;

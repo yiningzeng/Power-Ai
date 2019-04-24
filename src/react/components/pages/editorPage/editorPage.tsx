@@ -51,6 +51,7 @@ export interface IEditorPageProps extends RouteComponentProps, React.Props<Edito
  * State for Editor Page
  */
 export interface IEditorPageState {
+    treeList: [];
     /** Array of assets in project */
     assets: IAsset[];
     /** The editor mode to set for canvas tools */
@@ -102,6 +103,7 @@ function mapDispatchToProps(dispatch) {
 @connect(mapStateToProps, mapDispatchToProps)
 export default class EditorPage extends React.Component<IEditorPageProps, IEditorPageState> {
     public state: IEditorPageState = {
+        treeList: [],
         selectedTag: null,
         lockedTags: [],
         selectionMode: SelectionMode.RECT,
@@ -132,7 +134,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
             const project = this.props.recentProjects.find((project) => project.id === projectId);
             await this.props.actions.loadProject(project);
         }
-
+        console.log("editorPage: project" + JSON.stringify(this.props.project));
         this.activeLearningService = new ActiveLearningService(this.props.project.activeLearningSettings);
     }
 
@@ -140,19 +142,20 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         if (this.props.project && this.state.assets.length === 0) {
             await this.loadProjectAssets();
         }
-
+        console.log("editorPage: componentDidUpdate this.props.project: " + JSON.stringify(this.props.project));
         // Navigating directly to the page via URL (ie, http://vott/projects/a1b2c3dEf/edit) sets the default state
         // before props has been set, this updates the project and additional settings to be valid once props are
         // retrieved.
         if (this.props.project && !prevProps.project) {
             this.setState({
+                treeList: this.props.project.sourceListConnection,
                 additionalSettings: {
                     videoSettings: (this.props.project) ? this.props.project.videoSettings : null,
                     activeLearningSettings: (this.props.project) ? this.props.project.activeLearningSettings : null,
                 },
             });
         }
-
+        console.log("editorPage: componentDidUpdate this.state" + JSON.stringify(this.state));
         if (this.props.project && prevProps.project && this.props.project.tags !== prevProps.project.tags) {
             this.updateRootAssets();
         }

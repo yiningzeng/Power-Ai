@@ -281,6 +281,7 @@ export default class MockFactory {
             assets: {},
             exportFormat: MockFactory.exportFormat(),
             sourceConnection: connection,
+            sourceListConnection: [],
             targetConnection: connection,
             tags: MockFactory.createTestTags(tagCount),
             videoSettings: MockFactory.createVideoSettings(),

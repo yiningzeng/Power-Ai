@@ -61,6 +61,7 @@ export default class ImportService implements IImportService {
             description: "Converted V1 Project",
             tags: parsedTags,
             sourceConnection: connection,
+            sourceListConnection: [],
             targetConnection: connection,
             exportFormat: null,
             videoSettings: {
