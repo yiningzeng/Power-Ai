@@ -202,6 +202,7 @@ export default class ProjectForm extends React.Component<IProjectFormProps, IPro
         const project: IProject = {
             ...args.formData,
         };
+        console.log("projectForm:" + JSON.stringify(project));
         this.props.onSubmit(project);
     }
 

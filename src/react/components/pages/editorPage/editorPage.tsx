@@ -31,7 +31,11 @@ import Alert from "../../common/alert/alert";
 import Confirm from "../../common/confirm/confirm";
 import { ActiveLearningService } from "../../../../services/activeLearningService";
 import { toast } from "react-toastify";
+import { Tree } from "antd";
+import "antd/lib/tree/style/css";
 
+const DirectoryTree = Tree.DirectoryTree;
+const { TreeNode } = Tree;
 /**
  * Properties for Editor Page
  * @member project - Project being edited
@@ -198,6 +202,21 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                     onChange={this.onSideBarResize}
                     onDragFinished={this.onSideBarResizeComplete}>
                     <div className="editor-page-sidebar bg-lighter-1">
+                        <DirectoryTree
+                            multiple
+                            defaultExpandAll
+                            // onSelect={this.onSelect}
+                            // onExpand={this.onExpand}
+                        >
+                            <TreeNode title="parent 0" key="0-0">
+                                <TreeNode title="leaf 0-0" key="0-0-0" isLeaf />
+                                <TreeNode title="leaf 0-1" key="0-0-1" isLeaf />
+                            </TreeNode>
+                            <TreeNode title="parent 1" key="0-1">
+                                <TreeNode title="leaf 1-0" key="0-1-0" isLeaf />
+                                <TreeNode title="leaf 1-1" key="0-1-1" isLeaf />
+                            </TreeNode>
+                        </DirectoryTree>
                         <EditorSideBar
                             assets={rootAssets}
                             selectedAsset={selectedAsset ? selectedAsset.asset : null}
