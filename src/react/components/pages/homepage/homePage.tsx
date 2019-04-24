@@ -84,19 +84,18 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                                     onError={this.onProjectFileUploadError} />
                             </li>
                         }
-                        <li>
-                            {/*Open Cloud Project*/}
-                            <a href="#" onClick={this.handleOpenCloudProjectClick} className="p-5 cloud-open-project">
-                                <i className="fas fa-cloud fa-9x"></i>
-                                <h6>{strings.homePage.openCloudProject.title}</h6>
-                            </a>
-                            <CloudFilePicker
-                                ref={this.cloudFilePicker}
-                                connections={this.props.connections}
-                                onSubmit={(content) => this.loadSelectedProject(JSON.parse(content))}
-                                fileExtension={constants.projectFileExtension}
-                            />
-                        </li>
+                        {/*<li>*/}
+                        {/*<a href="#" onClick={this.handleOpenCloudProjectClick} className="p-5 cloud-open-project">*/}
+                                {/*<i className="fas fa-cloud fa-9x"></i>*/}
+                                {/*<h6>{strings.homePage.openCloudProject.title}</h6>*/}
+                            {/*</a>*/}
+                            {/*<CloudFilePicker*/}
+                                {/*ref={this.cloudFilePicker}*/}
+                                {/*connections={this.props.connections}*/}
+                                {/*onSubmit={(content) => this.loadSelectedProject(JSON.parse(content))}*/}
+                                {/*fileExtension={constants.projectFileExtension}*/}
+                            {/*/>*/}
+                        {/*</li>*/}
                     </ul>
                 </div>
                 {(this.props.recentProjects && this.props.recentProjects.length > 0) &&
