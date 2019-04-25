@@ -14,6 +14,8 @@ export enum ToolbarItemName {
     CutRegions = "cutRegions",
     PasteRegions = "pasteRegions",
     RemoveAllRegions = "removeAllRegions",
+    ZoomInAsset = "zoomInAsset",
+    ZoomOutAsset = "zoomOutAsset",
     PreviousAsset = "navigatePreviousAsset",
     NextAsset = "navigateNextAsset",
     SaveProject = "saveProject",
@@ -27,7 +29,8 @@ export enum ToolbarItemGroup {
     Regions = "regions",
     Navigation = "navigation",
     Project = "project",
-    ai = "ai",
+    Zoom = "Zoom",
+    Ai = "ai",
 }
 
 /**
@@ -116,6 +119,24 @@ export default function registerToolbar() {
     });
 
     ToolbarItemFactory.register({
+        name: ToolbarItemName.ZoomOutAsset,
+        tooltip: "缩小",
+        icon: "fa fa-minus-square",
+        group: ToolbarItemGroup.Zoom,
+        type: ToolbarItemType.Action,
+        accelerators: ["O", "o"],
+    });
+
+    ToolbarItemFactory.register({
+        name: ToolbarItemName.ZoomInAsset,
+        tooltip: "放大",
+        icon: "fa fa-plus-square",
+        group: ToolbarItemGroup.Zoom,
+        type: ToolbarItemType.Action,
+        accelerators: ["I", "i"],
+    });
+
+    ToolbarItemFactory.register({
         name: ToolbarItemName.PreviousAsset,
         tooltip: strings.editorPage.toolbar.previousAsset,
         icon: "fas fa-arrow-circle-up",
@@ -156,7 +177,7 @@ export default function registerToolbar() {
         tooltip: strings.editorPage.toolbar.trainAi,
         icon: "fa fa-train",
         // icon: "fas fa-caret-square-right",
-        group: ToolbarItemGroup.ai,
+        group: ToolbarItemGroup.Ai,
         type: ToolbarItemType.Action,
         accelerators: ["CmdOrCtrl+T", "CmdOrCtrl+t"],
     }, TrainAi);

@@ -105,7 +105,7 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                             Component={RecentProjectItem}
                             items={this.props.recentProjects}
                             onClick={this.loadSelectedProject}
-                            onDelete={(project) => this.deleteConfirm.current.open(project)} />
+                            onDelete={(project) => this.deleteConfirm.current.open(project)}  showToolbar={false}/>
                     </div>
                 }
                 <Confirm title="Delete Project"

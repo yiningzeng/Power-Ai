@@ -31,8 +31,10 @@ import Alert from "../../common/alert/alert";
 import Confirm from "../../common/confirm/confirm";
 import { ActiveLearningService } from "../../../../services/activeLearningService";
 import { toast } from "react-toastify";
-import { Tree } from "antd";
-import "antd/lib/tree/style/css";
+import { Tree, Icon } from "antd";
+import CondensedList from "../../common/condensedList/condensedList";
+import SourceItem from "../../common/condensedList/sourceItem";
+// import "antd/lib/tree/style/css";
 
 const DirectoryTree = Tree.DirectoryTree;
 const { TreeNode } = Tree;
@@ -55,7 +57,7 @@ export interface IEditorPageProps extends RouteComponentProps, React.Props<Edito
  * State for Editor Page
  */
 export interface IEditorPageState {
-    treeList: [];
+    treeList: string[];
     /** Array of assets in project */
     assets: IAsset[];
     /** The editor mode to set for canvas tools */
@@ -138,6 +140,9 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
             const project = this.props.recentProjects.find((project) => project.id === projectId);
             await this.props.actions.loadProject(project);
         }
+        this.setState({
+            treeList: this.props.project.sourceListConnection,
+        });
         console.log("editorPage: project" + JSON.stringify(this.props.project));
         this.activeLearningService = new ActiveLearningService(this.props.project.activeLearningSettings);
     }
@@ -150,6 +155,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         // Navigating directly to the page via URL (ie, http://vott/projects/a1b2c3dEf/edit) sets the default state
         // before props has been set, this updates the project and additional settings to be valid once props are
         // retrieved.
+        console.log("editorPage: componentDidUpdate prevProps: " + JSON.stringify(prevProps));
         if (this.props.project && !prevProps.project) {
             this.setState({
                 treeList: this.props.project.sourceListConnection,
@@ -167,11 +173,28 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
 
     public render() {
         const { project } = this.props;
-        const { assets, selectedAsset } = this.state;
+        const { treeList, assets, selectedAsset } = this.state;
         const rootAssets = assets.filter((asset) => !asset.parent);
-
+        console.log("editorPage: render project ", project);
+        console.log("editorPage: render assets ", assets);
+        console.log("editorPage: render selectedAsset ", selectedAsset);
         if (!project) {
             return (<div>Loading...</div>);
+        }
+        const folderPath = project.sourceConnection.providerOptions["folderPath"];
+        console.log("editorPage: render folderPath ", folderPath);
+        console.log("editorPage: render treeList ", treeList);
+        try {
+            const lenth = treeList.filter((v) => v === folderPath).length;
+            if ( treeList.filter((v) => v === "已处理").length === 0) {
+                lenth === 0 ? treeList.unshift("已处理", folderPath) : treeList.unshift("已处理");
+            } else {
+                treeList.shift();
+                lenth === 0 ? treeList.unshift("已处理", folderPath) : treeList.unshift("已处理");
+            }
+        } catch (e) {
+            console.error(e);
+            this.setState({treeList: ["已处理", folderPath]});
         }
 
         return (
@@ -196,27 +219,28 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                 })}
                 <SplitPane split="vertical"
                     defaultSize={this.state.thumbnailSize.width}
-                    minSize={100}
+                    minSize={300}
                     maxSize={400}
                     paneStyle={{ display: "flex" }}
                     onChange={this.onSideBarResize}
                     onDragFinished={this.onSideBarResizeComplete}>
                     <div className="editor-page-sidebar bg-lighter-1">
-                        <DirectoryTree
-                            multiple
-                            defaultExpandAll
-                            // onSelect={this.onSelect}
-                            // onExpand={this.onExpand}
-                        >
-                            <TreeNode title="parent 0" key="0-0">
-                                <TreeNode title="leaf 0-0" key="0-0-0" isLeaf />
-                                <TreeNode title="leaf 0-1" key="0-0-1" isLeaf />
-                            </TreeNode>
-                            <TreeNode title="parent 1" key="0-1">
-                                <TreeNode title="leaf 1-0" key="0-1-0" isLeaf />
-                                <TreeNode title="leaf 1-1" key="0-1-1" isLeaf />
-                            </TreeNode>
-                        </DirectoryTree>
+                        <div className="editor-page-sidebar-tree bg-lighter-1">
+                            <CondensedList
+                                title="素材文件夹"
+                                Component={SourceItem}
+                                items={this.state.treeList}
+                                onClick={(item) => {
+                                    if ( item === "已处理") {
+                                        this.setState({
+                                            assets: [],
+                                        });
+                                        this.loadProjectAssets();
+                                    } else { this.loadProjectAssetsWithFolder(item.toString()); }
+                                }}
+                                onDelete={(item) => { console.log(item); }}
+                                showToolbar={true}/>
+                        </div>
                         <EditorSideBar
                             assets={rootAssets}
                             selectedAsset={selectedAsset ? selectedAsset.asset : null}
@@ -562,6 +586,12 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                     editorMode: EditorMode.Select,
                 });
                 break;
+            case ToolbarItemName.ZoomOutAsset:
+                await this.goToRootAsset(-1);
+                break;
+            case ToolbarItemName.ZoomInAsset:
+                await this.goToRootAsset(1);
+                break;
             case ToolbarItemName.PreviousAsset:
                 await this.goToRootAsset(-1);
                 break;
@@ -691,6 +721,40 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
             .uniqBy((asset) => asset.id)
             .value();
 
+        const lastVisited = rootAssets.find((asset) => asset.id === this.props.project.lastVisitedAssetId);
+
+        this.setState({
+            assets: rootAssets,
+        }, async () => {
+            if (rootAssets.length > 0) {
+                await this.selectAsset(lastVisited ? lastVisited : rootAssets[0]);
+            }
+            this.loadingProjectAssets = false;
+        });
+    }
+
+    private loadProjectAssetsWithFolder = async (folder): Promise<void> => {
+        if (this.loadingProjectAssets) {
+            return;
+        }
+        console.log("editorPage: loadProjectAssetsWithFolder: " + folder);
+
+        this.loadingProjectAssets = true;
+
+        // Get all root project assets
+        const rootProjectAssets = _.values(this.props.project.assets)
+            .filter((asset) => !asset.parent);
+        console.log("editorPage: loadProjectAssetsWithFolder: rootProjectAssets", rootProjectAssets);
+        // Get all root assets from source asset provider
+        const sourceAssets = await this.props.actions.loadAssetsWithFolder(this.props.project, folder);
+        console.log("editorPage: loadProjectAssetsWithFolder: sourceAssets", sourceAssets);
+        // Merge and uniquify
+        const rootAssets = sourceAssets;
+        _(rootProjectAssets)
+            .concat(sourceAssets)
+            .uniqBy((asset) => asset.id)
+            .value();
+        console.log("editorPage: loadProjectAssetsWithFolder: rootAssets", rootAssets);
         const lastVisited = rootAssets.find((asset) => asset.id === this.props.project.lastVisitedAssetId);
 
         this.setState({

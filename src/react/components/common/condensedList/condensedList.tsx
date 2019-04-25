@@ -1,6 +1,7 @@
 import React, { SyntheticEvent } from "react";
 import "./condensedList.scss";
 import { Link } from "react-router-dom";
+import FolderSideBarToolbar from "./folderSideBarToolbar";
 
 /**
  * Properties for Condensed List Component
@@ -15,16 +16,23 @@ interface ICondensedListProps {
     title: string;
     Component: any;
     items: any[];
+    showToolbar: boolean;
     newLinkTo?: string;
     onClick?: (item) => void;
     onDelete?: (item) => void;
 }
-
+interface IDirState {
+    openDir: string;
+}
 /**
  * @name - Condensed List
  * @description - Clickable, deletable and linkable list of items
  */
 export default class CondensedList extends React.Component<ICondensedListProps> {
+
+    public state: IDirState = {
+        openDir: "已处理",
+    };
     constructor(props, context) {
         super(props, context);
 
@@ -33,12 +41,14 @@ export default class CondensedList extends React.Component<ICondensedListProps> 
     }
 
     public render() {
-        const { title, items, newLinkTo, Component } = this.props;
+        const { title, items, newLinkTo, showToolbar, Component } = this.props;
 
         return (
             <div className="condensed-list">
                 <h6 className="condensed-list-header bg-darker-2 p-2">
                     <span>{title}</span>
+                    {showToolbar &&
+                        <FolderSideBarToolbar onAddFolder={() => {console.log("asdasdasdasdasdasdasd"); }}/>}
                     {newLinkTo &&
                         <Link to={newLinkTo} className="float-right">
                             <i className="fas fa-plus-square" />
@@ -58,6 +68,7 @@ export default class CondensedList extends React.Component<ICondensedListProps> 
                         <ul className="condensed-list-items">
                             {items.map((item) => <Component key={item.id}
                                 item={item}
+                                openDir={this.state.openDir}
                                 onClick={(e) => this.onItemClick(e, item)}
                                 onDelete={(e) => this.onItemDelete(e, item)} />)}
                         </ul>
@@ -70,6 +81,9 @@ export default class CondensedList extends React.Component<ICondensedListProps> 
     private onItemClick = (e, item) => {
         if (this.props.onClick) {
             this.props.onClick(item);
+            this.setState({
+                openDir: item,
+            });
         }
     }
 

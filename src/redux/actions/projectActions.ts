@@ -28,6 +28,7 @@ export default interface IProjectActions {
     closeProject(): void;
     exportProject(project: IProject): Promise<void> | Promise<IExportResults>;
     loadAssets(project: IProject): Promise<IAsset[]>;
+    loadAssetsWithFolder(project: IProject, folder: string): Promise<IAsset[]>;
     loadAssetMetadata(project: IProject, asset: IAsset): Promise<IAssetMetadata>;
     saveAssetMetadata(project: IProject, assetMetadata: IAssetMetadata): Promise<IAssetMetadata>;
     updateProjectTag(project: IProject, oldTagName: string, newTagName: string): Promise<IAssetMetadata[]>;
@@ -132,6 +133,21 @@ export function loadAssets(project: IProject): (dispatch: Dispatch) => Promise<I
     return async (dispatch: Dispatch) => {
         const assetService = new AssetService(project);
         const assets = await assetService.getAssets();
+        dispatch(loadProjectAssetsAction(assets));
+
+        return assets;
+    };
+}
+
+/**
+ * Gets assets from project, dispatches load assets action and returns assets
+ * @param project - Project from which to load assets
+ */
+export function loadAssetsWithFolder(project: IProject, folder: string): (dispatch: Dispatch) => Promise<IAsset[]> {
+    return async (dispatch: Dispatch) => {
+        console.log("加载素材用文件夹 loadAssetsWithFolder: "+folder);
+        const assetService = new AssetService(project);
+        const assets = await assetService.getAssetsWithFolder(folder);
         dispatch(loadProjectAssetsAction(assets));
 
         return assets;
