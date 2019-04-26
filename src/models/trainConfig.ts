@@ -1,40 +1,60 @@
-
 export interface IFasterRcnn {
-    MODEL: {
-            TYPE: "generalized_rcnn",
-            CONV_BODY: "FPN.add_fpn_ResNet50_conv5_body",
-            NUM_CLASSES: number,
-            FASTER_RCNN: true };
+    MODEL: IMODEL;
     NUM_GPUS: number;
-    SOLVER: {
-            WEIGHT_DECAY: 0.0001
-            LR_POLICY: "steps_with_decay",
-            BASE_LR: 0.0025,
-            GAMMA: 0.1,
-            MAX_ITER: 60000,
-            STEPS: [0, 30000, 40000] };
-    FPN: {
-            FPN_ON: true,
-            MULTILEVEL_ROIS: true,
-            MULTILEVEL_RPN: true };
-    FAST_RCNN: {
-            ROI_BOX_HEAD: "fast_rcnn_heads.add_roi_2mlp_head",
-            ROI_XFORM_METHOD: "RoIAlign",
-            ROI_XFORM_RESOLUTION: 7,
-            ROI_XFORM_SAMPLING_RATIO: 2 };
-    TRAIN: {
-            WEIGHTS: "/Detectron/models/R-50.pkl",
-            DATASETS: "('coco_2014_train',)",
-            SCALES: "(500,)",
-            MAX_SIZE: 833,
-            BATCH_SIZE_PER_IM: 256,
-            RPN_PRE_NMS_TOP_N: 2000 };
-    TEST: {
-            DATASETS: "('coco_2014_minival',)",
-            SCALE: 500,
-            MAX_SIZE: 833,
-            NMS: 0.5,
-            RPN_PRE_NMS_TOP_N: 1000,
-            RPN_POST_NMS_TOP_N: 1000 };
-    OUTPUT_DIR: ".";
+    SOLVER: ISOLVER;
+    FPN: IFPN;
+    FAST_RCNN: IFASTRCNN;
+    TRAIN: ITRAIN;
+    TEST: ITEST;
+    OUTPUT_DIR: string;
+    Data_Enhancement: boolean; // 数据增强
+    Multi_Scale: boolean; // 多尺度
+    Use_Flipped: boolean; // 图像旋转
+}
+
+export interface IMODEL {
+    TYPE: string;
+    CONV_BODY: string;
+    NUM_CLASSES: number;
+    FASTER_RCNN: true;
+}
+
+export interface ISOLVER {
+    WEIGHT_DECAY: number;
+    LR_POLICY: string;
+    BASE_LR: number;
+    GAMMA: number;
+    MAX_ITER: number;
+    STEPS: [number, number, number];
+}
+
+export interface IFPN {
+    FPN_ON: true;
+    MULTILEVEL_ROIS: true;
+    MULTILEVEL_RPN: true;
+}
+
+export interface IFASTRCNN {
+    ROI_BOX_HEAD: string;
+    ROI_XFORM_METHOD: string;
+    ROI_XFORM_RESOLUTION: number;
+    ROI_XFORM_SAMPLING_RATIO: number;
+}
+
+export interface ITRAIN {
+    WEIGHTS: string;
+    DATASETS: string;
+    SCALES: string;
+    MAX_SIZE: number;
+    BATCH_SIZE_PER_IM: number;
+    RPN_PRE_NMS_TOP_N: number;
+}
+
+export interface ITEST {
+    DATASETS: string;
+    SCALE: number;
+    MAX_SIZE: number;
+    NMS: number;
+    RPN_PRE_NMS_TOP_N: number;
+    RPN_POST_NMS_TOP_N: number;
 }

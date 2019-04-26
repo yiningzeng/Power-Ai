@@ -27,10 +27,10 @@
             "default": 50
         },
         "gpuNumb": {
-            "type": "integer",
+            "type": "number",
             "title": "GPU数量",
-            "default": 1,
-            "minimum": 1
+            "enum": [1, 2, 4, 8],
+            "default": 1
         },
         "dataEnhancement": {
             "title": "数据增强",
