@@ -3,7 +3,7 @@ import {
     AssetState, AssetType, IApplicationState, IAppSettings, IAsset, IAssetMetadata,
     IConnection, IExportFormat, IProject, ITag, StorageType, ISecurityToken,
     EditorMode, IAppError, IProjectVideoSettings, ErrorCode,
-    IPoint, IRegion, RegionType, ModelPathType,
+    IPoint, IRegion, RegionType, ModelPathType, NetModelType,
 } from "../models/applicationState";
 import { IV1Project, IV1Region } from "../models/v1Models";
 import { ExportAssetState } from "../providers/export/exportProvider";
@@ -291,6 +291,14 @@ export default class MockFactory {
                 modelUrl: "",
                 autoDetect: false,
                 predictTag: false,
+            },
+            trainSettings: {
+                netModelType: NetModelType.FasterRcnn,
+                layerNumbEnum: "50",
+                gpuNumb: 1,
+                dataEnhancement: true,
+                multiScale: true,
+                useFlipped: false,
             },
             autoSave: true,
         };

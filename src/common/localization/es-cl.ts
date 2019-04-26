@@ -397,6 +397,12 @@ export const spanish: IAppStrings = {
             saveSuccess: "Configuración de exportación guardada correctamente",
         },
     },
+    trainSettings: {
+        title: "Train Settings",
+        messages: {
+            saveSuccess: "Successfully saved train settings",
+        },
+    },
     activeLearning: {
         title: "Aprendizaje Activo",
         form: {

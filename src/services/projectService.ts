@@ -3,7 +3,7 @@ import shortid from "shortid";
 import { StorageProviderFactory } from "../providers/storage/storageProviderFactory";
 import {
     IProject, ISecurityToken, AppError,
-    ErrorCode, ModelPathType, IActiveLearningSettings,
+    ErrorCode, ModelPathType, IActiveLearningSettings, ITrainSettings, NetModelType,
 } from "../models/applicationState";
 import Guard from "../common/guard";
 import { constants } from "../common/constants";
@@ -29,6 +29,15 @@ const defaultActiveLearningSettings: IActiveLearningSettings = {
     autoDetect: false,
     predictTag: true,
     modelPathType: ModelPathType.Coco,
+};
+
+const defaultTrainSettings: ITrainSettings = {
+    netModelType: NetModelType.FasterRcnn,
+    layerNumbEnum: "50",
+    gpuNumb: 1,
+    dataEnhancement: true,
+    multiScale: true,
+    useFlipped: false,
 };
 
 const defaultExportOptions: IExportFormat = {
@@ -65,6 +74,11 @@ export default class ProjectService implements IProjectService {
                 loadedProject.activeLearningSettings = defaultActiveLearningSettings;
             }
 
+            // Initialize active learning settings if they don't exist
+            if (!loadedProject.trainSettings) {
+                loadedProject.trainSettings = defaultTrainSettings;
+            }
+
             // Initialize export settings if they don't exist
             if (!loadedProject.exportFormat) {
                 loadedProject.exportFormat = defaultExportOptions;
@@ -97,6 +111,11 @@ export default class ProjectService implements IProjectService {
         // Initialize active learning settings if they don't exist
         if (!project.activeLearningSettings) {
             project.activeLearningSettings = defaultActiveLearningSettings;
+        }
+
+        // Initialize active learning settings if they don't exist
+        if (!project.trainSettings) {
+            project.trainSettings = defaultTrainSettings;
         }
 
         // Initialize export settings if they don't exist

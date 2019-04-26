@@ -392,6 +392,12 @@ export interface IAppStrings {
             saveSuccess: string;
         },
     };
+    trainSettings: {
+        title: string;
+        messages: {
+            saveSuccess: string;
+        }
+    };
     activeLearning: {
         title: string;
         form: {

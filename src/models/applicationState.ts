@@ -116,6 +116,7 @@ export interface IProject {
     exportFormat: IExportFormat;
     videoSettings: IProjectVideoSettings;
     activeLearningSettings: IActiveLearningSettings;
+    trainSettings: ITrainSettings;
     autoSave: boolean;
     assets?: { [index: string]: IAsset };
     lastVisitedAssetId?: string;
@@ -238,6 +239,21 @@ export interface IActiveLearningSettings {
     modelUrl?: string;
     autoDetect: boolean;
     predictTag: boolean;
+}
+
+export enum NetModelType {
+    MaskRcnn = "maskRcnn",
+    RetinaNet = "retinaNet",
+    FasterRcnn = "fasterRcnn",
+}
+
+export interface ITrainSettings {
+    netModelType: NetModelType;
+    layerNumbEnum: string;
+    gpuNumb: number;
+    dataEnhancement: boolean;
+    multiScale: boolean;
+    useFlipped: boolean;
 }
 
 /**

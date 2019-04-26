@@ -53,7 +53,7 @@ export default function Sidebar({ project }) {
                     <ConditionalNavLink disabled={!projectId}
                                         title={"训练设置"}
                                         to={`/projects/${projectId}/train-settings`}>
-                        <i className="fas fa-graduation-cap"></i>
+                        <i className="fas fa-beer"></i>
                     </ConditionalNavLink>
                 </li>
                 <li>

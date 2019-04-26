@@ -2,20 +2,24 @@ import React from "react";
 import { connect } from "react-redux";
 import { RouteComponentProps } from "react-router";
 import { bindActionCreators } from "redux";
-import { IActiveLearningSettings, IProject, IApplicationState } from "../../../../models/applicationState";
+import {
+    IProject,
+    IApplicationState,
+    ITrainSettings,
+} from "../../../../models/applicationState";
 import IProjectActions, * as projectActions from "../../../../redux/actions/projectActions";
 import { strings } from "../../../../common/strings";
 import { TrainSettingsForm } from "./trainSettingsForm";
 import { toast } from "react-toastify";
 
-export interface IActiveLearningPageProps extends RouteComponentProps, React.Props<TrainSettingsPage> {
+export interface ITrainSettingsPageProps extends RouteComponentProps, React.Props<TrainSettingsPage> {
     project: IProject;
     recentProjects: IProject[];
     actions: IProjectActions;
 }
 
-export interface IActiveLearningPageState {
-    settings: IActiveLearningSettings;
+export interface ITrainSettingsPageState {
+    settings: ITrainSettings;
 }
 
 function mapStateToProps(state: IApplicationState) {
@@ -32,9 +36,9 @@ function mapDispatchToProps(dispatch) {
 }
 
 @connect(mapStateToProps, mapDispatchToProps)
-export default class TrainSettingsPage extends React.Component<IActiveLearningPageProps, IActiveLearningPageState> {
-    public state: IActiveLearningPageState = {
-        settings: this.props.project ? this.props.project.activeLearningSettings : null,
+export default class TrainSettingsPage extends React.Component<ITrainSettingsPageProps, ITrainSettingsPageState> {
+    public state: ITrainSettingsPageState = {
+        settings: this.props.project ? this.props.project.trainSettings : null,
     };
 
     public async componentDidMount() {
@@ -49,9 +53,9 @@ export default class TrainSettingsPage extends React.Component<IActiveLearningPa
         }
     }
 
-    public componentDidUpdate(prevProps: Readonly<IActiveLearningPageProps>) {
+    public componentDidUpdate(prevProps: Readonly<ITrainSettingsPageProps>) {
         if (prevProps.project !== this.props.project) {
-            this.setState({ settings: this.props.project.activeLearningSettings });
+            this.setState({ settings: this.props.project.trainSettings });
         }
     }
 
@@ -60,9 +64,9 @@ export default class TrainSettingsPage extends React.Component<IActiveLearningPa
             <div className="project-settings-page">
                 <div className="project-settings-page-settings m-3">
                     <h3>
-                        <i className="fas fa-graduation-cap" />
+                        <i className="fas fa-beer" />
                         <span className="px-2">
-                            {strings.activeLearning.title}
+                            {strings.trainSettings.title}
                         </span>
                     </h3>
                     <div className="m-3">
@@ -76,14 +80,14 @@ export default class TrainSettingsPage extends React.Component<IActiveLearningPa
         );
     }
 
-    private onFormSubmit = async (settings: IActiveLearningSettings): Promise<void> => {
+    private onFormSubmit = async (settings: ITrainSettings): Promise<void> => {
         const updatedProject: IProject = {
             ...this.props.project,
-            activeLearningSettings: settings,
+            trainSettings: settings,
         };
 
         await this.props.actions.saveProject(updatedProject);
-        toast.success(strings.activeLearning.messages.saveSuccess);
+        toast.success(strings.trainSettings.messages.saveSuccess);
         this.props.history.goBack();
     }
 

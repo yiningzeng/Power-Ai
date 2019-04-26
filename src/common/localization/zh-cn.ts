@@ -393,6 +393,12 @@ export const chinese: IAppStrings = {
             saveSuccess: "已成功保存导出设置",
         },
     },
+    trainSettings: {
+        title: "训练设置",
+        messages: {
+            saveSuccess: "已成功保存训练设置",
+        },
+    },
     activeLearning: {
         title: "Active Learning",
         form: {

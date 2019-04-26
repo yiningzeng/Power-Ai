@@ -1,6 +1,6 @@
 import React from "react";
 import Form, { ISubmitEvent, IChangeEvent, Widget } from "react-jsonschema-form";
-import { IActiveLearningSettings, ModelPathType } from "../../../../models/applicationState";
+import {ITrainSettings, ModelPathType} from "../../../../models/applicationState";
 import { strings, addLocValues } from "../../../../common/strings";
 import CustomFieldTemplate from "../../common/customField/customFieldTemplate";
 import LocalFolderPicker from "../../common/localFolderPicker/localFolderPicker";
@@ -13,21 +13,21 @@ const formSchema = addLocValues(require("./trainSettingsForm.json"));
 const uiSchema = addLocValues(require("./trainSettingsForm.ui.json"));
 
 export interface IActiveLearningFormProps extends React.Props<TrainSettingsForm> {
-    settings: IActiveLearningSettings;
-    onSubmit: (settings: IActiveLearningSettings) => void;
-    onChange?: (settings: IActiveLearningSettings) => void;
+    settings: ITrainSettings;
+    onSubmit: (settings: ITrainSettings) => void;
+    onChange?: (settings: ITrainSettings) => void;
     onCancel?: () => void;
 }
 
-export interface IActiveLearningFormState {
+export interface ITrainSettingsFormState {
     classNames: string[];
-    formData: IActiveLearningSettings;
+    formData: ITrainSettings;
     uiSchema: any;
     formSchema: any;
 }
 
-export class TrainSettingsForm extends React.Component<IActiveLearningFormProps, IActiveLearningFormState> {
-    public state: IActiveLearningFormState = {
+export class TrainSettingsForm extends React.Component<IActiveLearningFormProps, ITrainSettingsFormState> {
+    public state: ITrainSettingsFormState = {
         classNames: ["needs-validation"],
         uiSchema: { ...uiSchema },
         formSchema: { ...formSchema },
@@ -75,14 +75,18 @@ export class TrainSettingsForm extends React.Component<IActiveLearningFormProps,
         );
     }
 
-    private onFormChange = (changeEvent: IChangeEvent<IActiveLearningSettings>): void => {
+    private onFormChange = (changeEvent: IChangeEvent<ITrainSettings>): void => {
         let updatedSettings = changeEvent.formData;
 
-        if (changeEvent.formData.modelPathType !== this.state.formData.modelPathType) {
+        if (changeEvent.formData.netModelType !== this.state.formData.netModelType) {
             updatedSettings = {
                 ...changeEvent.formData,
-                modelPath: null,
-                modelUrl: null,
+                netModelType: null,
+                layerNumbEnum: null,
+                gpuNumb: 1,
+                dataEnhancement: null,
+                multiScale: null,
+                useFlipped: null,
             };
         }
 
@@ -95,8 +99,8 @@ export class TrainSettingsForm extends React.Component<IActiveLearningFormProps,
         });
     }
 
-    private onFormSubmit = (args: ISubmitEvent<IActiveLearningSettings>): void => {
-        const settings: IActiveLearningSettings = {
+    private onFormSubmit = (args: ISubmitEvent<ITrainSettings>): void => {
+        const settings: ITrainSettings = {
             ...args.formData,
         };
 

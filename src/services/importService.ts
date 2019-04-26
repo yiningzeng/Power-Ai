@@ -2,7 +2,7 @@ import shortid from "shortid";
 import {
     IProject, ITag, IConnection, AppError, ErrorCode,
     IAssetMetadata, IRegion, RegionType, AssetState, IFileInfo,
-    IAsset, AssetType, ModelPathType,
+    IAsset, AssetType, ModelPathType, NetModelType,
 } from "../models/applicationState";
 import { IV1Project, IV1Region } from "../models/v1Models";
 import packageJson from "../../package.json";
@@ -68,6 +68,7 @@ export default class ImportService implements IImportService {
                 frameExtractionRate: originalProject.framerate ? Number(originalProject.framerate) : 15,
             },
             activeLearningSettings: null,
+            trainSettings: null,
             autoSave: true,
         };
     }
