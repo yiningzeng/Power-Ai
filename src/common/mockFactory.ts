@@ -296,7 +296,7 @@ export default class MockFactory {
                 netModelType: NetModelType.FasterRcnn,
                 layerNumbEnum: "50",
                 gpuNumb: 1,
-                dataEnhancement: true,
+                augument: true,
                 multiScale: true,
                 useFlipped: false,
             },

@@ -251,7 +251,7 @@ export interface ITrainSettings {
     netModelType: NetModelType;
     layerNumbEnum: string;
     gpuNumb: number;
-    dataEnhancement: boolean;
+    augument: boolean;
     multiScale: boolean;
     useFlipped: boolean;
 }

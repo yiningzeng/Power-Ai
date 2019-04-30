@@ -35,7 +35,10 @@ const trainSettings: IFasterRcnn  =  {
         SCALES: "(500,)",
         MAX_SIZE: 833,
         BATCH_SIZE_PER_IM: 256,
-        RPN_PRE_NMS_TOP_N: 2000 },
+        RPN_PRE_NMS_TOP_N: 2000,
+        AUGUMENT: true, // 数据增强
+        MULTI_SCALE: true, // 多尺度
+        USE_FLIPPED: false },
     TEST: {
         DATASETS: "('coco_2014_minival',)",
         SCALE: 500,
@@ -44,9 +47,6 @@ const trainSettings: IFasterRcnn  =  {
         RPN_PRE_NMS_TOP_N: 1000,
         RPN_POST_NMS_TOP_N: 1000 },
     OUTPUT_DIR: ".",
-    Data_Enhancement: true, // 数据增强
-    Multi_Scale: true, // 多尺度
-    Use_Flipped: false, // 图像旋转
 };
 
 /**
@@ -63,9 +63,9 @@ export class CocoExportProvider extends ExportProvider {
      */
     public async export(): Promise<void> {
         trainSettings.MODEL.NUM_CLASSES = this.project.tags.length + 1;
-        trainSettings.Data_Enhancement = this.project.trainSettings.dataEnhancement;
-        trainSettings.Multi_Scale = this.project.trainSettings.multiScale;
-        trainSettings.Use_Flipped = this.project.trainSettings.useFlipped;
+        trainSettings.TRAIN.AUGUMENT = this.project.trainSettings.augument;
+        trainSettings.TRAIN.MULTI_SCALE = this.project.trainSettings.multiScale;
+        trainSettings.TRAIN.USE_FLIPPED = this.project.trainSettings.useFlipped;
         trainSettings.NUM_GPUS = this.project.trainSettings.gpuNumb;
         switch (this.project.trainSettings.layerNumbEnum) {
             case "50":

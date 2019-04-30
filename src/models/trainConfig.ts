@@ -7,9 +7,6 @@ export interface IFasterRcnn {
     TRAIN: ITRAIN;
     TEST: ITEST;
     OUTPUT_DIR: string;
-    Data_Enhancement: boolean; // 数据增强
-    Multi_Scale: boolean; // 多尺度
-    Use_Flipped: boolean; // 图像旋转
 }
 
 export interface IMODEL {
@@ -48,6 +45,9 @@ export interface ITRAIN {
     MAX_SIZE: number;
     BATCH_SIZE_PER_IM: number;
     RPN_PRE_NMS_TOP_N: number;
+    AUGUMENT: boolean; // 数据增强
+    MULTI_SCALE: boolean; // 多尺度
+    USE_FLIPPED: boolean; // 图像旋转
 }
 
 export interface ITEST {

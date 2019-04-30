@@ -12,7 +12,7 @@ const formSchema = addLocValues(require("./trainSettingsForm.json"));
 // tslint:disable-next-line:no-var-requires
 const uiSchema = addLocValues(require("./trainSettingsForm.ui.json"));
 
-export interface IActiveLearningFormProps extends React.Props<TrainSettingsForm> {
+export interface ITrainSettingsFormProps extends React.Props<TrainSettingsForm> {
     settings: ITrainSettings;
     onSubmit: (settings: ITrainSettings) => void;
     onChange?: (settings: ITrainSettings) => void;
@@ -26,7 +26,7 @@ export interface ITrainSettingsFormState {
     formSchema: any;
 }
 
-export class TrainSettingsForm extends React.Component<IActiveLearningFormProps, ITrainSettingsFormState> {
+export class TrainSettingsForm extends React.Component<ITrainSettingsFormProps, ITrainSettingsFormState> {
     public state: ITrainSettingsFormState = {
         classNames: ["needs-validation"],
         uiSchema: { ...uiSchema },
@@ -45,7 +45,7 @@ export class TrainSettingsForm extends React.Component<IActiveLearningFormProps,
         })),
     };
 
-    public componentDidUpdate(prevProps: Readonly<IActiveLearningFormProps>) {
+    public componentDidUpdate(prevProps: Readonly<ITrainSettingsFormProps>) {
         if (this.props.settings !== prevProps.settings) {
             this.setState({ formData: this.props.settings });
         }
@@ -84,7 +84,7 @@ export class TrainSettingsForm extends React.Component<IActiveLearningFormProps,
                 netModelType: null,
                 layerNumbEnum: null,
                 gpuNumb: 1,
-                dataEnhancement: null,
+                augument: null,
                 multiScale: null,
                 useFlipped: null,
             };

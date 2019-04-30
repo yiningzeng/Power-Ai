@@ -32,7 +32,7 @@
             "enum": [1, 2, 4, 8],
             "default": 1
         },
-        "dataEnhancement": {
+        "augument": {
             "title": "数据增强",
             "type": "boolean",
             "description": "训练的时候模拟大量数据训练",

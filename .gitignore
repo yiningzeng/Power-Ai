@@ -37,3 +37,5 @@ secrets.sh
 # complexity reports
 es6-src/
 report/
+
+all/

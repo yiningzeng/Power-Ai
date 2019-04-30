@@ -3,7 +3,9 @@ import React from "react";
 export default function SourceItem({ item, openDir, onClick, onDelete }) {
     const nameTemp = `${item}`;
     let name = nameTemp.slice(nameTemp.lastIndexOf("\\") + 1);
-    name = nameTemp.slice(nameTemp.lastIndexOf("/") + 1);
+    // console.log("name: windows" + name);
+    name = name.slice(name.lastIndexOf("/") + 1);
+    // console.log("name: linux" + name);
     return (
         <li className={openDir === item ? "editor-page-sidebar-tree-item" : ""}>
             <a onClick={onClick} title={item}>

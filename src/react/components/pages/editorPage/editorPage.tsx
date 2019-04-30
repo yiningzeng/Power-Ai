@@ -31,13 +31,10 @@ import Alert from "../../common/alert/alert";
 import Confirm from "../../common/confirm/confirm";
 import { ActiveLearningService } from "../../../../services/activeLearningService";
 import { toast } from "react-toastify";
-import { Tree, Icon } from "antd";
 import CondensedList from "../../common/condensedList/condensedList";
 import SourceItem from "../../common/condensedList/sourceItem";
 // import "antd/lib/tree/style/css";
 
-const DirectoryTree = Tree.DirectoryTree;
-const { TreeNode } = Tree;
 /**
  * Properties for Editor Page
  * @member project - Project being edited
