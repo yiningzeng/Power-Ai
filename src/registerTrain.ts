@@ -17,7 +17,7 @@ import {CocoExportProvider} from "./providers/export/coco";
 /**
  * Registers storage, asset and export providers, as well as all toolbar items
  */
-export default function registerProviders() {
+export default function registerTrain() {
     // Storage Providers
     StorageProviderFactory.register({
         name: "localFileSystemProxy",
