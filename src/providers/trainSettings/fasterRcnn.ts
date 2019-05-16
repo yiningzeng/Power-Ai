@@ -1,9 +1,8 @@
-import { ExportProvider } from "./exportProvider";
-import {IProject, IExportProviderOptions, IActiveLearningSettings} from "../../models/applicationState";
-import { IFasterRcnnCondig } from "../../models/trainConfig";
+import _ from "lodash";
+import { TrainProvider } from "./trainProvider";
+import { IProject, IAssetMetadata, ITag, IExportProviderOptions } from "../../models/applicationState";
 import Guard from "../../common/guard";
-import { constants } from "../../common/constants";
-import HtmlFileReader from "../../common/htmlFileReader";
+import { IFasterRcnnCondig } from "../../models/trainConfig";
 import YAML from "json2yaml";
 
 const trainSettings: IFasterRcnnCondig  = {
@@ -56,16 +55,28 @@ const trainSettings: IFasterRcnnCondig  = {
 };
 
 /**
- * @name - Vott Json Export Provider
- * @description - Exports a project into a single JSON file that include all configured assets
+ * Export options for Pascal VOC Export Provider
  */
-export class CocoExportProvider extends ExportProvider {
-    constructor(project: IProject, options: IExportProviderOptions) {
+export interface IFasterRcnnProviderOptions extends IExportProviderOptions {
+    /** The test / train split ratio for exporting data */
+    testTrainSplit?: number;
+    /** Whether or not to include unassigned tags in exported data */
+    exportUnassigned?: boolean;
+}
+
+/**
+ * @name - PascalVOC Export Provider
+ * @description - Exports a project into a Pascal VOC
+ */
+export class FasterRcnnProvider extends TrainProvider<IFasterRcnnProviderOptions> {
+
+    constructor(project: IProject, options: IFasterRcnnProviderOptions) {
         super(project, options);
         Guard.null(options);
     }
+
     /**
-     * Export project to Coco format
+     * Export project to PascalVOC
      */
     public async export(): Promise<void> {
         // trainSettings.MODEL.NUM_CLASSES = this.project.tags.length + 1;
@@ -103,27 +114,26 @@ export class CocoExportProvider extends ExportProvider {
         //         trainSettings.SOLVER.STEPS = [0, 3750, 5000];
         //         break;
         // }
-        // await this.storageProvider.writeText(`coco-json-export/train-config.yaml`,
-        //     YAML.stringify(trainSettings));
-        const results = await this.getAssetsForExport();
-        await results.forEachAsync(async (assetMetadata) => {
-            return new Promise<void>(async (resolve) => {
-                const blob = await HtmlFileReader.getAssetBlob(assetMetadata.asset);
-                const assetFilePath = `coco-json-export/${assetMetadata.asset.name}`;
-                const fileReader = new FileReader();
-                fileReader.onload = async () => {
-                    const buffer = Buffer.from(fileReader.result as ArrayBuffer);
-                    await this.storageProvider.writeBinary(assetFilePath, buffer);
-                    resolve();
-                };
-                fileReader.readAsArrayBuffer(blob);
-            });
-        });
-
-        // const exportObject: any = { ...this.project };
-        // exportObject.assets = _.keyBy(results, (assetMetadata) => assetMetadata.asset.id);
-
-        const fileName = `coco-json-export/${this.project.name.replace(" ", "-")}${constants.exportCoCoFileExtension}`;
-        await this.storageProvider.writeText(fileName, JSON.stringify(results, null, 4));
+        await this.storageProvider.writeText(`train-config/train-config.yaml`,
+            YAML.stringify(trainSettings));
     }
+
+    // private async exportPBTXT(exportFolderName: string, project: IProject) {
+    //     if (project.tags && project.tags.length > 0) {
+    //         // Save pascal_label_map.pbtxt
+    //         const pbtxtFileName = `${exportFolderName}/pascal_label_map.pbtxt`;
+    //
+    //         let id = 1;
+    //         const items = project.tags.map((element) => {
+    //             const params = {
+    //                 id: (id++).toString(),
+    //                 tag: element.name,
+    //             };
+    //
+    //             return interpolate(itemTemplate, params);
+    //         });
+    //
+    //         await this.storageProvider.writeText(pbtxtFileName, items.join(""));
+    //     }
+    // }
 }

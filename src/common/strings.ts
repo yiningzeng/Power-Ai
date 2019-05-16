@@ -17,6 +17,7 @@ export interface IAppStrings {
         save: string;
         delete: string;
         provider: string;
+        trainProvider: string;
         homePage: string;
     };
     titleBar: {
@@ -392,6 +393,19 @@ export interface IAppStrings {
             saveSuccess: string;
         },
     };
+    train: {
+        title: string;
+        settings: string;
+        saveSettings: string;
+        providers: {
+            fasterRcnn: {
+                displayName: string,
+            },
+            yolov3: {
+                displayName: string,
+            },
+        }
+    };
     trainSettings: {
         title: string;
         messages: {
@@ -450,6 +464,7 @@ export interface IAppStrings {
         importError: IErrorMetadata,
         pasteRegionTooBigError: IErrorMetadata,
         exportFormatNotFound: IErrorMetadata,
+        trainFormatNotFound: IErrorMetadata,
         activeLearningPredictionError: IErrorMetadata,
     };
 }

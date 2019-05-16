@@ -12,7 +12,8 @@ export const chinese: IAppStrings = {
         cancel: "取消",
         save: "保存",
         delete: "删除",
-        provider: "来源",
+        provider: "数据集",
+        trainProvider: "网络",
         homePage: "首页",
     },
     titleBar: {
@@ -393,6 +394,19 @@ export const chinese: IAppStrings = {
             saveSuccess: "已成功保存导出设置",
         },
     },
+    train: {
+        title: "训练设置",
+        settings: "",
+        saveSettings: "保存",
+        providers: {
+            fasterRcnn: {
+                displayName: "Faster Rcnn",
+            },
+            yolov3: {
+                displayName: "Yolo v3",
+            },
+        },
+    },
     trainSettings: {
         title: "训练设置",
         messages: {
@@ -485,7 +499,11 @@ export const chinese: IAppStrings = {
         },
         exportFormatNotFound: {
             title: "项目导出出错",
-            message: "项目缺少导出格式。请在导出设置页中选择导出格式。",
+            message: "项目缺少导出格式。请在导出设置页中配置。",
+        },
+        trainFormatNotFound: {
+            title: "导出训练配置出错",
+            message: "项目缺少训练配置格式。请在训练设置页中配置。",
         },
         activeLearningPredictionError: {
             title: "Active Learning Error",

@@ -18,6 +18,7 @@ import {
     ISaveAssetMetadataAction,
     ILoadAssetMetadataAction,
     IExportProjectAction,
+    IExportTrainConfigAction,
     IDeleteProjectAction,
 } from "./projectActions";
 import {
@@ -86,5 +87,6 @@ export type AnyAction = IOtherAction |
     ISaveAssetMetadataAction |
     ILoadAssetMetadataAction |
     IExportProjectAction |
+    IExportTrainConfigAction |
     IShowAppErrorAction |
     IClearErrorAction;

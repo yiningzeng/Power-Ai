@@ -12,11 +12,12 @@ import {
     IProject,
 } from "../../models/applicationState";
 import { createAction, createPayloadAction, IPayloadAction } from "./actionCreators";
-import { ExportAssetState, IExportResults } from "../../providers/export/exportProvider";
+import {ExportAssetState, IExportResults, ITrainConfigResults} from "../../providers/export/exportProvider";
 import { appInfo } from "../../common/appInfo";
 import { strings } from "../../common/strings";
 import { IExportFormat } from "vott-react";
 import { IVottJsonExportProviderOptions } from "../../providers/export/vottJson";
+import {TrainProviderFactory} from "../../providers/trainSettings/trainProviderFactory";
 
 /**
  * Actions to be performed in relation to projects
@@ -27,6 +28,7 @@ export default interface IProjectActions {
     deleteProject(project: IProject): Promise<void>;
     closeProject(): void;
     exportProject(project: IProject): Promise<void> | Promise<IExportResults>;
+    exportTrainConfig(project: IProject): Promise<void> | Promise<ITrainConfigResults>;
     loadAssets(project: IProject): Promise<IAsset[]>;
     loadAssetsWithFolder(project: IProject, folder: string): Promise<IAsset[]>;
     loadAssetMetadata(project: IProject, asset: IAsset): Promise<IAssetMetadata>;
@@ -145,7 +147,7 @@ export function loadAssets(project: IProject): (dispatch: Dispatch) => Promise<I
  */
 export function loadAssetsWithFolder(project: IProject, folder: string): (dispatch: Dispatch) => Promise<IAsset[]> {
     return async (dispatch: Dispatch) => {
-        console.log("加载素材用文件夹 loadAssetsWithFolder: "+folder);
+        console.log("加载素材用文件夹 loadAssetsWithFolder: " + folder);
         const assetService = new AssetService(project);
         const assets = await assetService.getAssetsWithFolder(folder);
         dispatch(loadProjectAssetsAction(assets));
@@ -276,6 +278,31 @@ export function exportProject(project: IProject): (dispatch: Dispatch) => Promis
 }
 
 /**
+ * Initialize export provider, get export data and dispatch export project action
+ * @param project - Project to export
+ */
+export function exportTrainConfig(project: IProject):
+    (dispatch: Dispatch) => Promise<void> | Promise<ITrainConfigResults> {
+    return async (dispatch: Dispatch) => {
+        if (!project.trainFormat) {
+            throw new AppError(ErrorCode.TrainFormatNotFound, strings.errors.trainFormatNotFound.message);
+        }
+
+        if (project.trainFormat && project.trainFormat.providerType) {
+            const trainProvider = TrainProviderFactory.create(
+                project.trainFormat.providerType,
+                project,
+                project.trainFormat.providerOptions);
+
+            const results = await trainProvider.export();
+            dispatch(exportTrainConfigAction(project));
+
+            return results as ITrainConfigResults;
+        }
+    };
+}
+
+/**
  * Load project action type
  */
 export interface ILoadProjectAction extends IPayloadAction<string, IProject> {
@@ -330,7 +357,12 @@ export interface ISaveAssetMetadataAction extends IPayloadAction<string, IAssetM
 export interface IExportProjectAction extends IPayloadAction<string, IProject> {
     type: ActionTypes.EXPORT_PROJECT_SUCCESS;
 }
-
+/**
+ * Export project action type
+ */
+export interface IExportTrainConfigAction extends IPayloadAction<string, IProject> {
+    type: ActionTypes.EXPORT_TRAIN_CONFIG_SUCCESS;
+}
 /**
  * Update Project Tag action type
  */
@@ -381,6 +413,11 @@ export const saveAssetMetadataAction =
  */
 export const exportProjectAction =
     createPayloadAction<IExportProjectAction>(ActionTypes.EXPORT_PROJECT_SUCCESS);
+/**
+ * Instance of Export Project action
+ */
+export const exportTrainConfigAction =
+    createPayloadAction<IExportTrainConfigAction>(ActionTypes.EXPORT_TRAIN_CONFIG_SUCCESS);
 /**
  * Instance of Update project tag action
  */

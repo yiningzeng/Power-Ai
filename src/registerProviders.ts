@@ -1,4 +1,5 @@
 import { ExportProviderFactory } from "./providers/export/exportProviderFactory";
+import { TrainProviderFactory } from "./providers/trainSettings/trainProviderFactory";
 import { PascalVOCExportProvider } from "./providers/export/pascalVOC";
 import { TFRecordsExportProvider } from "./providers/export/tensorFlowRecords";
 import { VottJsonExportProvider } from "./providers/export/vottJson";
@@ -13,6 +14,8 @@ import { HostProcessType } from "./common/hostProcess";
 import { AzureCustomVisionProvider } from "./providers/export/azureCustomVision";
 import { CntkExportProvider } from "./providers/export/cntk";
 import {CocoExportProvider} from "./providers/export/coco";
+import {Yolov3Provider} from "./providers/trainSettings/yolov3";
+import {FasterRcnnProvider} from "./providers/trainSettings/fasterRcnn";
 
 /**
  * Registers storage, asset and export providers, as well as all toolbar items
@@ -81,5 +84,16 @@ export default function registerProviders() {
     //     factory: (project, options) => new CntkExportProvider(project, options),
     // });
 
+    // treain
+    TrainProviderFactory.register({
+        name: "yolov3",
+        displayName: strings.train.providers.yolov3.displayName,
+        factory: (project, options) => new Yolov3Provider(project, options),
+    });
+    TrainProviderFactory.register({
+        name: "fasterRcnn",
+        displayName: strings.train.providers.fasterRcnn.displayName,
+        factory: (project, options) => new FasterRcnnProvider(project, options),
+    });
     registerToolbar();
 }

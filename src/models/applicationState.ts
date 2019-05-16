@@ -1,4 +1,5 @@
 import { ExportAssetState } from "../providers/export/exportProvider";
+import {IYoloV3, IDetectron} from "./trainConfig";
 import { IAssetPreviewSettings } from "../react/components/common/assetPreview/assetPreview";
 
 /**
@@ -48,6 +49,7 @@ export enum ErrorCode {
     ProjectDuplicateName = "projectDuplicateName",
     SecurityTokenNotFound = "securityTokenNotFound",
     ExportFormatNotFound = "exportFormatNotFound",
+    TrainFormatNotFound = "trainFormatNotFound",
     PasteRegionTooBig = "pasteRegionTooBig",
     OverloadedKeyBinding = "overloadedKeyBinding",
     ActiveLearningPredictionError = "activeLearningPredictionError",
@@ -114,9 +116,9 @@ export interface IProject {
     sourceListConnection: [];
     targetConnection: IConnection;
     exportFormat: IExportFormat;
+    trainFormat: ITrainFormat;
     videoSettings: IProjectVideoSettings;
     activeLearningSettings: IActiveLearningSettings;
-    trainSettings: ITrainSettings;
     autoSave: boolean;
     assets?: { [index: string]: IAsset };
     lastVisitedAssetId?: string;
@@ -241,19 +243,9 @@ export interface IActiveLearningSettings {
     predictTag: boolean;
 }
 
-export enum NetModelType {
-    MaskRcnn = "maskRcnn",
-    RetinaNet = "retinaNet",
-    FasterRcnn = "fasterRcnn",
-}
-
-export interface ITrainSettings {
-    netModelType: NetModelType;
-    layerNumbEnum: string;
-    gpuNumb: number;
-    augument: boolean;
-    multiScale: boolean;
-    useFlipped: boolean;
+export interface ITrainFormat {
+    providerType: string;
+    providerOptions: IYoloV3 | IDetectron;
 }
 
 /**
