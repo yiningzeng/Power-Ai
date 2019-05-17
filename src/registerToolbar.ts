@@ -40,7 +40,7 @@ export default function registerToolbar() {
     ToolbarItemFactory.register({
         name: ToolbarItemName.SelectCanvas,
         tooltip: strings.editorPage.toolbar.select,
-        icon: "fa-mouse-pointer",
+        icon: "fas fa-hand-rock",
         group: ToolbarItemGroup.Canvas,
         type: ToolbarItemType.State,
         accelerators: ["V", "v"],
@@ -64,14 +64,14 @@ export default function registerToolbar() {
         accelerators: ["P", "p"],
     });
 
-    ToolbarItemFactory.register({
-        name: ToolbarItemName.CopyRectangle,
-        tooltip: strings.editorPage.toolbar.copyRectangle,
-        icon: "far fa-clone",
-        group: ToolbarItemGroup.Canvas,
-        type: ToolbarItemType.State,
-        accelerators: ["CmdOrCtrl+W", "CmdOrCtrl+w"],
-    });
+    // ToolbarItemFactory.register({
+    //     name: ToolbarItemName.CopyRectangle,
+    //     tooltip: strings.editorPage.toolbar.copyRectangle,
+    //     icon: "far fa-clone",
+    //     group: ToolbarItemGroup.Canvas,
+    //     type: ToolbarItemType.State,
+    //     accelerators: ["CmdOrCtrl+W", "CmdOrCtrl+w"],
+    // });
 
     ToolbarItemFactory.register({
         name: ToolbarItemName.CopyRegions,
