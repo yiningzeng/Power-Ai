@@ -3,6 +3,7 @@ import { ExportProject } from "./react/components/toolbar/exportProject";
 import { SaveProject } from "./react/components/toolbar/saveProject";
 import { ToolbarItemType } from "./react/components/toolbar/toolbarItem";
 import { strings } from "./common/strings";
+import {TrainAi} from "./react/components/toolbar/trainAi";
 
 export enum ToolbarItemName {
     SelectCanvas = "selectCanvas",
@@ -13,11 +14,14 @@ export enum ToolbarItemName {
     CutRegions = "cutRegions",
     PasteRegions = "pasteRegions",
     RemoveAllRegions = "removeAllRegions",
+    ZoomInAsset = "zoomInAsset",
+    ZoomOutAsset = "zoomOutAsset",
     PreviousAsset = "navigatePreviousAsset",
     NextAsset = "navigateNextAsset",
     SaveProject = "saveProject",
     ExportProject = "exportProject",
     ActiveLearning = "activeLearning",
+    TrainAi = "trainAi",
 }
 
 export enum ToolbarItemGroup {
@@ -25,6 +29,8 @@ export enum ToolbarItemGroup {
     Regions = "regions",
     Navigation = "navigation",
     Project = "project",
+    Zoom = "Zoom",
+    Ai = "ai",
 }
 
 /**
@@ -103,13 +109,31 @@ export default function registerToolbar() {
         accelerators: ["CmdOrCtrl+Delete", "CmdOrCtrl+Backspace"],
     });
 
+    // ToolbarItemFactory.register({
+    //     name: ToolbarItemName.ActiveLearning,
+    //     tooltip: strings.editorPage.toolbar.activeLearning,
+    //     icon: "fas fa-graduation-cap",
+    //     group: ToolbarItemGroup.Canvas,
+    //     type: ToolbarItemType.Action,
+    //     accelerators: ["CmdOrCtrl+D", "CmdOrCtrl+d"],
+    // });
+
     ToolbarItemFactory.register({
-        name: ToolbarItemName.ActiveLearning,
-        tooltip: strings.editorPage.toolbar.activeLearning,
-        icon: "fas fa-graduation-cap",
-        group: ToolbarItemGroup.Canvas,
+        name: ToolbarItemName.ZoomOutAsset,
+        tooltip: "缩小",
+        icon: "fa fa-minus-square",
+        group: ToolbarItemGroup.Zoom,
         type: ToolbarItemType.Action,
-        accelerators: ["CmdOrCtrl+D", "CmdOrCtrl+d"],
+        accelerators: ["O", "o"],
+    });
+
+    ToolbarItemFactory.register({
+        name: ToolbarItemName.ZoomInAsset,
+        tooltip: "放大",
+        icon: "fa fa-plus-square",
+        group: ToolbarItemGroup.Zoom,
+        type: ToolbarItemType.Action,
+        accelerators: ["I", "i"],
     });
 
     ToolbarItemFactory.register({
@@ -147,4 +171,14 @@ export default function registerToolbar() {
         type: ToolbarItemType.Action,
         accelerators: ["CmdOrCtrl+E", "CmdOrCtrl+e"],
     }, ExportProject);
+
+    ToolbarItemFactory.register({
+        name: ToolbarItemName.TrainAi,
+        tooltip: strings.editorPage.toolbar.trainAi,
+        icon: "fa fa-train",
+        // icon: "fas fa-caret-square-right",
+        group: ToolbarItemGroup.Ai,
+        type: ToolbarItemType.Action,
+        accelerators: ["CmdOrCtrl+T", "CmdOrCtrl+t"],
+    }, TrainAi);
 }

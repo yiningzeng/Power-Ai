@@ -42,11 +42,25 @@ export default function Sidebar({ project }) {
                         <i className="fas fa-external-link-square-alt"></i>
                     </ConditionalNavLink>
                 </li>
+                {/*<li>*/}
+                    {/*<ConditionalNavLink disabled={!projectId}*/}
+                        {/*title={strings.activeLearning.title}*/}
+                        {/*to={`/projects/${projectId}/active-learning`}>*/}
+                        {/*<i className="fas fa-graduation-cap"></i>*/}
+                    {/*</ConditionalNavLink>*/}
+                {/*</li>*/}
+                {/*<li>*/}
+                    {/*<ConditionalNavLink disabled={!projectId}*/}
+                                        {/*title={"训练设置"}*/}
+                                        {/*to={`/projects/${projectId}/train-settings`}>*/}
+                        {/*<i className="fas fa-beer"></i>*/}
+                    {/*</ConditionalNavLink>*/}
+                {/*</li>*/}
                 <li>
                     <ConditionalNavLink disabled={!projectId}
-                        title={strings.activeLearning.title}
-                        to={`/projects/${projectId}/active-learning`}>
-                        <i className="fas fa-graduation-cap"></i>
+                                        title={"训练设置"}
+                                        to={`/projects/${projectId}/train`}>
+                        <i className="fas fa-beer"></i>
                     </ConditionalNavLink>
                 </li>
                 <li>
@@ -55,10 +69,10 @@ export default function Sidebar({ project }) {
                 </li>
             </ul>
             <div className="app-sidebar-fill"></div>
-            <ul>
-                <li><NavLink title={strings.appSettings.title}
-                    to={`/settings`}><i className="fas fa-cog"></i></NavLink></li>
-            </ul>
+            {/*<ul>*/}
+                {/*<li><NavLink title={strings.appSettings.title}*/}
+                    {/*to={`/settings`}><i className="fas fa-cog"></i></NavLink></li>*/}
+            {/*</ul>*/}
         </div>
     );
 }

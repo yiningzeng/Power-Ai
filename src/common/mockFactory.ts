@@ -3,7 +3,7 @@ import {
     AssetState, AssetType, IApplicationState, IAppSettings, IAsset, IAssetMetadata,
     IConnection, IExportFormat, IProject, ITag, StorageType, ISecurityToken,
     EditorMode, IAppError, IProjectVideoSettings, ErrorCode,
-    IPoint, IRegion, RegionType, ModelPathType,
+    IPoint, IRegion, RegionType, ModelPathType, ITrainFormat,
 } from "../models/applicationState";
 import { IV1Project, IV1Region } from "../models/v1Models";
 import { ExportAssetState } from "../providers/export/exportProvider";
@@ -34,6 +34,7 @@ import { IKeyboardBindingProps } from "../react/components/common/keyboardBindin
 import { KeyEventType } from "../react/components/common/keyboardManager/keyboardManager";
 import { IKeyboardRegistrations } from "../react/components/common/keyboardManager/keyboardRegistrationManager";
 import { IActiveLearningPageProps } from "../react/components/pages/activeLearning/activeLearningPage";
+import {IDetectron, NetModelType} from "../models/trainConfig";
 
 export default class MockFactory {
 
@@ -280,7 +281,9 @@ export default class MockFactory {
             securityToken: `Security-Token-${name}`,
             assets: {},
             exportFormat: MockFactory.exportFormat(),
+            trainFormat: MockFactory.trainFormat(),
             sourceConnection: connection,
+            sourceListConnection: [],
             targetConnection: connection,
             tags: MockFactory.createTestTags(tagCount),
             videoSettings: MockFactory.createVideoSettings(),
@@ -636,6 +639,23 @@ export default class MockFactory {
         };
     }
 
+    public static trainFormat(): ITrainFormat {
+        const defaultFastrcnn: IDetectron = {
+            detectron: {
+                netModelType: NetModelType.FasterRcnn,
+                layerNumbEnum: "50",
+                gpuNumb: 1,
+                augument: true,
+                multiScale: true,
+                useFlipped: false,
+            },
+        };
+        return {
+            providerType: "fasterRcnn",
+            providerOptions: defaultFastrcnn,
+        };
+    }
+
     /**
      * Creates array of IExportProviderRegistrationOptions for the different providers
      * vottJson, pascalVOC, azureCustomVision
@@ -823,7 +843,9 @@ export default class MockFactory {
             deleteProject: jest.fn(() => Promise.resolve()),
             closeProject: jest.fn(() => Promise.resolve()),
             loadAssets: jest.fn(() => Promise.resolve()),
+            loadAssetsWithFolder: jest.fn(() => Promise.resolve()),
             exportProject: jest.fn(() => Promise.resolve()),
+            exportTrainConfig: jest.fn(() => Promise.resolve()),
             loadAssetMetadata: jest.fn(() => Promise.resolve()),
             saveAssetMetadata: jest.fn(() => Promise.resolve()),
             updateProjectTag: jest.fn(() => Promise.resolve()),

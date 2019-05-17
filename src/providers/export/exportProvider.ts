@@ -33,6 +33,10 @@ export interface IExportResults {
     count: number;
 }
 
+export interface ITrainConfigResults {
+    success: boolean;
+}
+
 /**
  * @name - IExportProvider
  * @description - Defines the required interface for all VoTT export providers

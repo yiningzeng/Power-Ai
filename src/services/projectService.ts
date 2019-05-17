@@ -3,7 +3,7 @@ import shortid from "shortid";
 import { StorageProviderFactory } from "../providers/storage/storageProviderFactory";
 import {
     IProject, ISecurityToken, AppError,
-    ErrorCode, ModelPathType, IActiveLearningSettings,
+    ErrorCode, ModelPathType, IActiveLearningSettings, ITrainFormat,
 } from "../models/applicationState";
 import Guard from "../common/guard";
 import { constants } from "../common/constants";
@@ -12,6 +12,7 @@ import { decryptProject, encryptProject } from "../common/utils";
 import packageJson from "../../package.json";
 import { ExportAssetState } from "../providers/export/exportProvider";
 import { IExportFormat } from "vott-react";
+import {IDetectron, NetModelType} from "../models/trainConfig";
 
 /**
  * Functions required for a project service
@@ -29,6 +30,22 @@ const defaultActiveLearningSettings: IActiveLearningSettings = {
     autoDetect: false,
     predictTag: true,
     modelPathType: ModelPathType.Coco,
+};
+
+const defaultFastrcnn: IDetectron = {
+    detectron: {
+        netModelType: NetModelType.FasterRcnn,
+        layerNumbEnum: "50",
+        gpuNumb: 1,
+        augument: true,
+        multiScale: true,
+        useFlipped: false,
+    },
+};
+
+const defaultTrainOptions: ITrainFormat = {
+    providerType: "fasterRcnn",
+    providerOptions: defaultFastrcnn,
 };
 
 const defaultExportOptions: IExportFormat = {
@@ -70,6 +87,11 @@ export default class ProjectService implements IProjectService {
                 loadedProject.exportFormat = defaultExportOptions;
             }
 
+            // Initialize train settings if they don't exist
+            if (!loadedProject.trainFormat) {
+                loadedProject.trainFormat = defaultTrainOptions;
+            }
+
             return Promise.resolve({ ...loadedProject });
         } catch (e) {
             const error = new AppError(ErrorCode.ProjectInvalidSecurityToken, "Error decrypting project settings");
@@ -102,6 +124,11 @@ export default class ProjectService implements IProjectService {
         // Initialize export settings if they don't exist
         if (!project.exportFormat) {
             project.exportFormat = defaultExportOptions;
+        }
+
+        // Initialize train settings if they don't exist
+        if (!project.trainFormat) {
+            project.trainFormat = defaultTrainOptions;
         }
 
         project.version = packageJson.version;

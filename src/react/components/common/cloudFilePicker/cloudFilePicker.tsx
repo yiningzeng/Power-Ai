@@ -145,7 +145,7 @@ export class CloudFilePicker extends React.Component<ICloudFilePickerProps, IClo
             items={items}
             Component={ListItem}
             onClick={onClick}
-        />;
+         showToolbar={false}/>;
     }
 
     private isCloudConnection(connection: IConnection): boolean {

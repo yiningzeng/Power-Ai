@@ -8,6 +8,11 @@
     "sourceConnection": {
         "ui:field": "sourceConnection"
     },
+    "sourceListConnection": {
+        "items": {
+            "ui:widget": "localFolderPicker"
+        }
+    },
     "targetConnection": {
         "ui:field": "targetConnection"
     },

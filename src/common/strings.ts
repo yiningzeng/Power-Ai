@@ -1,4 +1,5 @@
 import LocalizedStrings, { LocalizedStringsMethods } from "react-localization";
+import { chinese } from "./localization/zh-cn";
 import { english } from "./localization/en-us";
 import { spanish } from "./localization/es-cl";
 
@@ -16,6 +17,7 @@ export interface IAppStrings {
         save: string;
         delete: string;
         provider: string;
+        trainProvider: string;
         homePage: string;
     };
     titleBar: {
@@ -232,6 +234,7 @@ export interface IAppStrings {
             saveProject: string;
             exportProject: string;
             activeLearning: string;
+            trainAi: string;
         }
         videoPlayer: {
             nextTaggedFrame: {
@@ -382,10 +385,32 @@ export interface IAppStrings {
             cntk: {
                 displayName: string,
             },
+            coco: {
+                displayName: string,
+            },
         },
         messages: {
             saveSuccess: string;
         },
+    };
+    train: {
+        title: string;
+        settings: string;
+        saveSettings: string;
+        providers: {
+            fasterRcnn: {
+                displayName: string,
+            },
+            yolov3: {
+                displayName: string,
+            },
+        }
+    };
+    trainSettings: {
+        title: string;
+        messages: {
+            saveSuccess: string;
+        }
     };
     activeLearning: {
         title: string;
@@ -439,6 +464,7 @@ export interface IAppStrings {
         importError: IErrorMetadata,
         pasteRegionTooBigError: IErrorMetadata,
         exportFormatNotFound: IErrorMetadata,
+        trainFormatNotFound: IErrorMetadata,
         activeLearningPredictionError: IErrorMetadata,
     };
 }
@@ -451,6 +477,7 @@ interface IErrorMetadata {
 interface IStrings extends LocalizedStringsMethods, IAppStrings { }
 
 export const strings: IStrings = new LocalizedStrings({
+    ch: chinese,
     en: english,
     es: spanish,
 });

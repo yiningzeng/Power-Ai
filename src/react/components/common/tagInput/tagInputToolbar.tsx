@@ -58,12 +58,12 @@ export default class TagInputToolbar extends React.Component<ITagInputToolbarPro
                 icon: "fa-plus-circle",
                 handler: this.handleAdd,
             },
-            {
-                displayName: strings.tags.toolbar.search,
-                className: "search",
-                icon: "fa-search",
-                handler: this.handleSearch,
-            },
+            // {
+            //     displayName: strings.tags.toolbar.search,
+            //     className: "search",
+            //     icon: "fa-search",
+            //     handler: this.handleSearch,
+            // },
             {
                 displayName: strings.tags.toolbar.lock,
                 className: "lock",

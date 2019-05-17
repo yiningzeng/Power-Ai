@@ -103,11 +103,11 @@ export default class ProjectSettingsPage extends React.Component<IProjectSetting
                             onCancel={this.onFormCancel} />
                     </div>
                 </div>
-                {this.props.project &&
-                    <div className="project-settings-page-metrics bg-lighter-1">
-                        <ProjectMetrics project={this.props.project} />
-                    </div>
-                }
+                {/*{this.props.project &&*/}
+                    {/*<div className="project-settings-page-metrics bg-lighter-1">*/}
+                        {/*<ProjectMetrics project={this.props.project} />*/}
+                    {/*</div>*/}
+                {/*}*/}
             </div>
         );
     }

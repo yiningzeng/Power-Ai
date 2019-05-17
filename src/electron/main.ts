@@ -4,6 +4,7 @@ import {
 } from "electron";
 import { IpcMainProxy } from "./common/ipcMainProxy";
 import LocalFileSystem from "./providers/storage/localFileSystem";
+import TrainingSystem from "./providers/training/trainingSystem";
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -50,7 +51,7 @@ function createWindow() {
     ipcMainProxy = new IpcMainProxy(ipcMain, mainWindow);
     ipcMainProxy.register("RELOAD_APP", onReloadApp);
     ipcMainProxy.register("TOGGLE_DEV_TOOLS", onToggleDevTools);
-
+    ipcMainProxy.registerProxy("TrainingSystem", new TrainingSystem(mainWindow));
     const localFileSystem = new LocalFileSystem(mainWindow);
     ipcMainProxy.registerProxy("LocalFileSystem", localFileSystem);
 }

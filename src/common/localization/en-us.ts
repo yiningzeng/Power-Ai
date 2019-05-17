@@ -13,6 +13,7 @@ export const english: IAppStrings = {
         save: "Save",
         delete: "Delete",
         provider: "Provider",
+        trainProvider: "net",
         homePage: "Home Page",
     },
     titleBar: {
@@ -233,6 +234,7 @@ export const english: IAppStrings = {
             saveProject: "Save Project",
             exportProject: "Export Project",
             activeLearning: "Active Learning",
+            trainAi: "Start Learning",
         },
         videoPlayer: {
             previousTaggedFrame: {
@@ -385,9 +387,31 @@ export const english: IAppStrings = {
             cntk: {
                 displayName: "Microsoft Cognitive Toolkit (CNTK)",
             },
+            coco: {
+                displayName: "coco",
+            },
         },
         messages: {
             saveSuccess: "Successfully saved export settings",
+        },
+    },
+    train: {
+        title: "Train Settings",
+        settings: "",
+        saveSettings: "save",
+        providers: {
+            fasterRcnn: {
+                displayName: "Faster Rcnn",
+            },
+            yolov3: {
+                displayName: "Yolo v3",
+            },
+        },
+    },
+    trainSettings: {
+        title: "Train Settings",
+        messages: {
+            saveSuccess: "Successfully saved train settings",
         },
     },
     activeLearning: {
@@ -478,6 +502,10 @@ export const english: IAppStrings = {
         exportFormatNotFound: {
             title: "Error exporting project",
             message: "Project is missing export format.  Please select an export format in the export setting page.",
+        },
+        trainFormatNotFound: {
+            title: "导出训练配置出错",
+            message: "项目缺少训练配置格式。请在训练设置页中配置。",
         },
         activeLearningPredictionError: {
             title: "Active Learning Error",

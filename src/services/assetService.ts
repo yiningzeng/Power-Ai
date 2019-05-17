@@ -135,6 +135,21 @@ export class AssetService {
     }
 
     /**
+     * Get assets from provider
+     */
+    public async getAssetsWithFolder(folder): Promise<IAsset[]> {
+        if (!this.assetProviderInstance) {
+            this.assetProviderInstance = AssetProviderFactory.create(
+                "localFileSystemProxy",
+                {
+                    folderPath: folder,
+                },
+            );
+        }
+        return await this.assetProviderInstance.getAssets();
+    }
+
+    /**
      * Get a list of child assets associated with the current asset
      * @param rootAsset The parent asset to search
      */

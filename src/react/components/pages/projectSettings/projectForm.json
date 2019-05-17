@@ -6,15 +6,17 @@
             "type": "string",
             "pattern": "^[^\\\\\\\\/:*?\\\\\\\"<>|]*$"
         },
-        "securityToken": {
-            "title": "${strings.projectSettings.securityToken.title}",
-            "description": "${strings.projectSettings.securityToken.description}",
-            "type": "string"
-        },
         "sourceConnection": {
             "title": "${strings.projectSettings.sourceConnection.title}",
             "description": "${strings.projectSettings.sourceConnection.description}",
             "type": "object"
+        },
+        "sourceListConnection": {
+            "title": "${strings.projectSettings.sourceConnection.title}",
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
         },
         "targetConnection": {
             "title": "${strings.projectSettings.targetConnection.title}",
@@ -25,22 +27,6 @@
             "title": "${strings.common.description}",
             "type": "string"
         },
-        "videoSettings": {
-            "title": "${strings.projectSettings.videoSettings.title}",
-            "type": "object",
-            "properties": {
-                "frameExtractionRate": {
-                    "title": "${strings.projectSettings.videoSettings.frameExtractionRate}",
-                    "description": "${strings.projectSettings.videoSettings.description}",
-                    "type": "integer",
-                    "default": 15,
-                    "minimum": 1
-                }
-            },
-            "required": [
-                "frameExtractionRate"
-            ]
-        },
         "tags": {
             "title": "${strings.tags.title}",
             "type": "array"
@@ -49,7 +35,6 @@
     "required": [
         "name",
         "sourceConnection",
-        "targetConnection",
-        "videoSettings"
+        "targetConnection"
     ]
 }

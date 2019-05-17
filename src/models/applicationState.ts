@@ -1,4 +1,5 @@
 import { ExportAssetState } from "../providers/export/exportProvider";
+import {IYoloV3, IDetectron} from "./trainConfig";
 import { IAssetPreviewSettings } from "../react/components/common/assetPreview/assetPreview";
 
 /**
@@ -48,6 +49,7 @@ export enum ErrorCode {
     ProjectDuplicateName = "projectDuplicateName",
     SecurityTokenNotFound = "securityTokenNotFound",
     ExportFormatNotFound = "exportFormatNotFound",
+    TrainFormatNotFound = "trainFormatNotFound",
     PasteRegionTooBig = "pasteRegionTooBig",
     OverloadedKeyBinding = "overloadedKeyBinding",
     ActiveLearningPredictionError = "activeLearningPredictionError",
@@ -111,8 +113,10 @@ export interface IProject {
     description?: string;
     tags: ITag[];
     sourceConnection: IConnection;
+    sourceListConnection: [];
     targetConnection: IConnection;
     exportFormat: IExportFormat;
+    trainFormat: ITrainFormat;
     videoSettings: IProjectVideoSettings;
     activeLearningSettings: IActiveLearningSettings;
     autoSave: boolean;
@@ -237,6 +241,11 @@ export interface IActiveLearningSettings {
     modelUrl?: string;
     autoDetect: boolean;
     predictTag: boolean;
+}
+
+export interface ITrainFormat {
+    providerType: string;
+    providerOptions: IYoloV3 | IDetectron;
 }
 
 /**

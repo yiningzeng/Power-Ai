@@ -82,7 +82,7 @@ export class TitleBar extends React.Component<ITitleBarProps, ITitleBarState> {
                         </Menu>
                     </div>
                 }
-                <div className="title-bar-main">{this.props.title || "Welcome"} - VoTT</div>
+                <div className="title-bar-main">{this.props.title || "欢迎"} - AI Power</div>
                 <div className="title-bar-controls">
                     {this.props.children}
                     {this.state.platform === PlatformType.Windows &&
@@ -189,7 +189,7 @@ export class TitleBar extends React.Component<ITitleBarProps, ITitleBarState> {
 
     private syncTitle = (): void => {
         if (this.state.isElectron) {
-            this.currentWindow.setTitle(`${this.props.title} - VoTT`);
+            this.currentWindow.setTitle(`${this.props.title} - AI Power`);
         }
     }
 

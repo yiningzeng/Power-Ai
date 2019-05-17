@@ -1,0 +1,21 @@
+{
+    "type": "object",
+    "title": "${strings.export.providers.coco.displayName}",
+    "properties": {
+        "assetState": {
+            "type": "string",
+            "title": "${strings.export.providers.common.properties.assetState.title}",
+            "enum": [
+                "all",
+                "visited",
+                "tagged"
+            ],
+            "default": "all",
+            "enumNames": [
+                "${strings.export.providers.common.properties.assetState.options.all}",
+                "${strings.export.providers.common.properties.assetState.options.visited}",
+                "${strings.export.providers.common.properties.assetState.options.tagged}"
+            ]
+        }
+    }
+}
