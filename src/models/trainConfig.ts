@@ -1,4 +1,52 @@
-export interface IFasterRcnn {
+// region 界面参数
+export interface IYoloV3 {
+    yolov3net: IYoloV3Net;
+}
+
+export interface IDetectron {
+    detectron: {
+        netModelType: NetModelType,
+        layerNumbEnum: string;
+        gpuNumb: number;
+        augument: boolean;
+        multiScale: boolean;
+        useFlipped: boolean;
+    };
+}
+// endregion
+
+// region yolov3
+export interface IYoloV3Net {
+    batch: number;
+    subdivisions: number;
+    width: number;
+    height: number;
+    channels: number;
+    momentum: number;
+    decay: number;
+    angle: number;
+    saturation: number;
+    exposure: number;
+    hue: number;
+    learning_rate: number; // 0.001;
+    burn_in: number; // 1000;
+    max_batches: number; // 500200;
+    policy: string; // steps;
+    steps: string; // 400000,450000;
+    scales: string; // .1,.1;
+}
+// endregion yolov3
+
+// region detectron
+export enum NetModelType {
+    MaskRcnn = "maskRcnn",
+    RetinaNet = "retinaNet",
+    FasterRcnn = "fasterRcnn",
+    YoloV3 = "yoloV3",
+}
+
+// fasterRcnn 配置文件的接口
+export interface IFasterRcnnCondig {
     MODEL: IMODEL;
     NUM_GPUS: number;
     SOLVER: ISOLVER;
@@ -58,3 +106,4 @@ export interface ITEST {
     RPN_PRE_NMS_TOP_N: number;
     RPN_POST_NMS_TOP_N: number;
 }
+// endregion detectron

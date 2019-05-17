@@ -49,10 +49,17 @@ export default function Sidebar({ project }) {
                         {/*<i className="fas fa-graduation-cap"></i>*/}
                     {/*</ConditionalNavLink>*/}
                 {/*</li>*/}
+                {/*<li>*/}
+                    {/*<ConditionalNavLink disabled={!projectId}*/}
+                                        {/*title={"训练设置"}*/}
+                                        {/*to={`/projects/${projectId}/train-settings`}>*/}
+                        {/*<i className="fas fa-beer"></i>*/}
+                    {/*</ConditionalNavLink>*/}
+                {/*</li>*/}
                 <li>
                     <ConditionalNavLink disabled={!projectId}
                                         title={"训练设置"}
-                                        to={`/projects/${projectId}/train-settings`}>
+                                        to={`/projects/${projectId}/train`}>
                         <i className="fas fa-beer"></i>
                     </ConditionalNavLink>
                 </li>

@@ -6,6 +6,7 @@ import HtmlFileReader from "../../common/htmlFileReader";
 import { itemTemplate, annotationTemplate, objectTemplate } from "./pascalVOC/pascalVOCTemplates";
 import { interpolate } from "../../common/strings";
 import os from "os";
+import {IYoloV3} from "../../models/trainConfig";
 
 interface IObjectInfo {
     name: string;
@@ -50,7 +51,7 @@ export class PascalVOCExportProvider extends ExportProvider<IPascalVOCExportProv
         const allAssets = await this.getAssetsForExport();
         const exportObject: any = { ...this.project };
         exportObject.assets = _.keyBy(allAssets, (assetMetadata) => assetMetadata.asset.id);
-
+        console.log("PascalVOC:" + JSON.stringify(this.project));
         // Create Export Folder
         const exportFolderName = `${this.project.name.replace(/\s/g, "-")}-PascalVOC-export`;
         await this.storageProvider.createContainer(exportFolderName);

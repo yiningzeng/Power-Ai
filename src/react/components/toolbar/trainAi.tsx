@@ -12,9 +12,13 @@ export class TrainAi extends ToolbarItem {
     protected onItemClick = async () => {
         const infoId = toast.info(`开始导出 ${this.props.project.name} ...`);
         const results = await this.props.actions.exportProject(this.props.project);
-
+        const resultsTrainConfig = await this.props.actions.exportTrainConfig(this.props.project);
         toast.dismiss(infoId);
 
+        if (!resultsTrainConfig || (resultsTrainConfig && resultsTrainConfig.success)) {
+            toast.success(`导出成功!`);
+        } else if (resultsTrainConfig && !resultsTrainConfig.success) {
+        }
         if (!results || (results && results.errors.length === 0)) {
             toast.success(`导出成功!`);
         } else if (results && results.errors.length > 0) {
