@@ -10,7 +10,7 @@ import { strings } from "../../../../common/strings";
 import {
     AssetState, AssetType, EditorMode, IApplicationState,
     IAppSettings, IAsset, IAssetMetadata, IProject, IRegion,
-    ISize, ITag, IAdditionalPageSettings, AppError, ErrorCode,
+    ISize, ITag, IAdditionalPageSettings, AppError, ErrorCode, IZoomMode,
 } from "../../../../models/applicationState";
 import { IToolbarItemRegistration, ToolbarItemFactory } from "../../../../providers/toolbar/toolbarItemFactory";
 import IApplicationActions, * as applicationActions from "../../../../redux/actions/applicationActions";
@@ -33,8 +33,20 @@ import { ActiveLearningService } from "../../../../services/activeLearningServic
 import { toast } from "react-toastify";
 import CondensedList from "../../common/condensedList/condensedList";
 import SourceItem from "../../common/condensedList/sourceItem";
+import {Rnd} from "react-rnd";
+import Zoom from "../../common/zoom/zoom";
+import zoom from "../../common/zoom/zoom";
+import {number} from "prop-types";
 // import "antd/lib/tree/style/css";
 
+const emptyZoomMode: IZoomMode = {
+    disableDrag: true,
+    x: 0,
+    y: 0,
+    miniWidth: 800,
+    width: "auto",
+    height: "auto",
+};
 /**
  * Properties for Editor Page
  * @member project - Project being edited
@@ -82,6 +94,7 @@ export interface IEditorPageState {
     isValid: boolean;
     /** Whether the show invalid region warning alert should display */
     showInvalidRegionWarning: boolean;
+    zoomMode: IZoomMode;
 }
 
 function mapStateToProps(state: IApplicationState) {
@@ -117,9 +130,10 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
             videoSettings: (this.props.project) ? this.props.project.videoSettings : null,
             activeLearningSettings: (this.props.project) ? this.props.project.activeLearningSettings : null,
         },
-        thumbnailSize: this.props.appSettings.thumbnailSize || { width: 175, height: 155 },
+        thumbnailSize: this.props.appSettings.thumbnailSize || { width: 100, height: 90 },
         isValid: true,
         showInvalidRegionWarning: false,
+        zoomMode: emptyZoomMode,
     };
 
     private activeLearningService: ActiveLearningService = null;
@@ -254,8 +268,45 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                     actions={this.props.actions}
                                     onToolbarItemSelected={this.onToolbarItemSelected} />
                             </div>
-                            <div className="editor-page-content-main-body">
+                            <div className="editor-page-content-main-body"
+                                 >
                                 {selectedAsset &&
+                                <Rnd
+                                    ref="editorDom"
+                                    disableDragging={this.state.zoomMode.disableDrag}
+                                    size={{ width: this.state.zoomMode.width,  height: this.state.zoomMode.height }}
+                                    position={{ x: this.state.zoomMode.x, y: this.state.zoomMode.y }}
+                                    onDragStop={(e, d) => {
+                                        this.setState({
+                                            zoomMode: {
+                                                ...this.state.zoomMode,
+                                                x: d.x,
+                                                y: d.y,
+                                            },
+                                        });
+                                    }}
+                                    onResize={(e, direction, ref, delta, position) => {
+                                        this.setState({
+                                            zoomMode: {
+                                                ...this.state.zoomMode,
+                                                ...position,
+                                                width: ref.offsetWidth,
+                                                height: ref.offsetHeight,
+                                            },
+                                        });
+                                    }}
+                                    onWheel={ (e) => Zoom(e, (deltaY) => {
+                                        const w = document.getElementById("ct-zone").offsetWidth;
+                                        if ((w - deltaY) < this.state.zoomMode.miniWidth) { return; }
+                                        this.setState({
+                                            zoomMode: {
+                                                ...this.state.zoomMode,
+                                                width: ( w - deltaY),
+                                            },
+                                        });
+                                        console.log("fuckaavva" + deltaY + "       " + this.state.zoomMode.width);
+                                    })}
+                                >
                                     <Canvas
                                         ref={this.canvas}
                                         selectedAsset={this.state.selectedAsset}
@@ -275,6 +326,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                             asset={this.state.selectedAsset.asset}
                                             childAssets={this.state.childAssets} />
                                     </Canvas>
+                                </Rnd>
                                 }
                             </div>
                         </div>
@@ -558,17 +610,27 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
     }
 
     private onToolbarItemSelected = async (toolbarItem: ToolbarItem): Promise<void> => {
+        let w;
+        let zoomDelta;
         switch (toolbarItem.props.name) {
             case ToolbarItemName.DrawRectangle:
                 this.setState({
                     selectionMode: SelectionMode.RECT,
                     editorMode: EditorMode.Rectangle,
+                    zoomMode: {
+                        ...this.state.zoomMode,
+                        disableDrag: true,
+                    },
                 });
                 break;
             case ToolbarItemName.DrawPolygon:
                 this.setState({
                     selectionMode: SelectionMode.POLYGON,
                     editorMode: EditorMode.Polygon,
+                    zoomMode: {
+                        ...this.state.zoomMode,
+                        disableDrag: true,
+                    },
                 });
                 break;
             case ToolbarItemName.CopyRectangle:
@@ -581,13 +643,42 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                 this.setState({
                     selectionMode: SelectionMode.NONE,
                     editorMode: EditorMode.Select,
+                    zoomMode: {
+                        ...this.state.zoomMode,
+                        disableDrag: false,
+                    },
                 });
                 break;
-            case ToolbarItemName.ZoomOutAsset:
-                await this.goToRootAsset(-1);
+            case ToolbarItemName.ZoomOutAsset: // 缩小
+                w = document.getElementById("ct-zone").offsetWidth;
+                zoomDelta = w - 100;
+                if ( zoomDelta < this.state.zoomMode.miniWidth) { return; }
+                this.setState({
+                    zoomMode: {
+                        ...this.state.zoomMode,
+                        width: zoomDelta,
+                    },
+                });
                 break;
-            case ToolbarItemName.ZoomInAsset:
-                await this.goToRootAsset(1);
+            case ToolbarItemName.ZoomInAsset: // 放大
+                w = document.getElementById("ct-zone").offsetWidth;
+                zoomDelta = w + 100;
+                if ( zoomDelta < this.state.zoomMode.miniWidth) { return; }
+                this.setState({
+                    zoomMode: {
+                        ...this.state.zoomMode,
+                        width: zoomDelta,
+                    },
+                });
+                break;
+            case ToolbarItemName.ZoomNormolAsset: // 正常
+                this.setState({
+                    ...this.state,
+                    zoomMode: {
+                        ...emptyZoomMode,
+                        disableDrag: this.state.zoomMode.disableDrag,
+                    },
+                });
                 break;
             case ToolbarItemName.PreviousAsset:
                 await this.goToRootAsset(-1);
@@ -650,6 +741,13 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
      * @param direction Number specifying asset navigation
      */
     private goToRootAsset = async (direction: number) => {
+        this.setState({
+            ...this.state,
+            zoomMode: {
+                ...emptyZoomMode,
+                disableDrag: this.state.zoomMode.disableDrag,
+            },
+        });
         const selectedRootAsset = this.state.selectedAsset.asset.parent || this.state.selectedAsset.asset;
         const currentIndex = this.state.assets
             .findIndex((asset) => asset.id === selectedRootAsset.id);

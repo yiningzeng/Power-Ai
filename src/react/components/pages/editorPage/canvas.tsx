@@ -4,7 +4,7 @@ import { CanvasTools } from "vott-ct";
 import { RegionData } from "vott-ct/lib/js/CanvasTools/Core/RegionData";
 import {
     EditorMode, IAssetMetadata,
-    IProject, IRegion, RegionType,
+    IProject, IRegion, IZoomMode, RegionType,
 } from "../../../../models/applicationState";
 import CanvasHelpers from "./canvasHelpers";
 import { AssetPreview, ContentSource } from "../../common/assetPreview/assetPreview";
@@ -74,15 +74,18 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
     }
 
     public componentDidUpdate = async (prevProps: Readonly<ICanvasProps>, prevState: Readonly<ICanvasState>) => {
+        console.log("fuck Component DID UPDATE!");
         // Handles asset changing
         if (this.props.selectedAsset !== prevProps.selectedAsset) {
             this.setState({ currentAsset: this.props.selectedAsset });
+            console.log("fuck 1");
         }
 
         // Handle selection mode changes
         if (this.props.selectionMode !== prevProps.selectionMode) {
             const options = (this.props.selectionMode === SelectionMode.COPYRECT) ? this.template : null;
             this.editor.AS.setSelectionMode({ mode: this.props.selectionMode, template: options });
+            console.log("fuck 2");
         }
 
         const assetIdChanged = this.state.currentAsset.asset.id !== prevState.currentAsset.asset.id;
@@ -90,11 +93,13 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
         // When the selected asset has changed but is still the same asset id
         if (!assetIdChanged && this.state.currentAsset !== prevState.currentAsset) {
             this.refreshCanvasToolsRegions();
+            console.log("fuck 3");
         }
 
         // When the project tags change re-apply tags to regions
         if (this.props.project.tags !== prevProps.project.tags) {
             this.updateCanvasToolsRegionTags();
+            console.log("fuck 3");
         }
 
         // Handles when the canvas is enabled & disabled
@@ -114,12 +119,13 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
                 this.clearAllRegions();
                 this.editor.AS.setSelectionMode(SelectionMode.NONE);
             }
+            console.log("fuck 5");
         }
+        this.positionCanvas(this.state.contentSource);
     }
 
     public render = () => {
         const className = this.state.enabled ? "canvas-enabled" : "canvas-disabled";
-
         return (
             <Fragment>
                 <Confirm title={strings.editorPage.canvas.removeAllRegions.title}
