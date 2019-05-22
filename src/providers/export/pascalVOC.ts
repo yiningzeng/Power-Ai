@@ -191,10 +191,10 @@ export class PascalVOCExportProvider extends ExportProvider<IPascalVOCExportProv
                 const objectsXML = imageInfo.objects.map((o) => {
                     const params = {
                         name: o.name,
-                        xmin: o.xmin.toString(),
-                        ymin: o.ymin.toString(),
-                        xmax: o.xmax.toString(),
-                        ymax: o.ymax.toString(),
+                        xmin: o.xmin.toFixed().toString(),
+                        ymin: o.ymin.toFixed().toString(),
+                        xmax: o.xmax.toFixed().toString(),
+                        ymax: o.ymax.toFixed().toString(),
                     };
 
                     return interpolate(objectTemplate, params);
