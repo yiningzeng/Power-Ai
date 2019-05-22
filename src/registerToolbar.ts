@@ -13,6 +13,8 @@ export enum ToolbarItemName {
     CopyRegions = "copyRegions",
     CutRegions = "cutRegions",
     PasteRegions = "pasteRegions",
+    HideAllRegions = "hideAllRegions",
+    ShowAllRegions = "showAllRegions",
     RemoveAllRegions = "removeAllRegions",
     ZoomInAsset = "zoomInAsset",
     ZoomOutAsset = "zoomOutAsset",
@@ -99,6 +101,24 @@ export default function registerToolbar() {
         group: ToolbarItemGroup.Regions,
         type: ToolbarItemType.Action,
         accelerators: ["CmdOrCtrl+V", "CmdOrCtrl+v"],
+    });
+
+    ToolbarItemFactory.register({
+        name: ToolbarItemName.ShowAllRegions,
+        tooltip: strings.editorPage.toolbar.removeAllRegions,
+        icon: "fa-eye",
+        group: ToolbarItemGroup.Regions,
+        type: ToolbarItemType.Action,
+        accelerators: ["CmdOrCtrl+Q", "CmdOrCtrl+q"],
+    });
+
+    ToolbarItemFactory.register({
+        name: ToolbarItemName.HideAllRegions,
+        tooltip: strings.editorPage.toolbar.removeAllRegions,
+        icon: "fa-eye-slash",
+        group: ToolbarItemGroup.Regions,
+        type: ToolbarItemType.Action,
+        accelerators: ["CmdOrCtrl+W", "CmdOrCtrl+w"],
     });
 
     ToolbarItemFactory.register({

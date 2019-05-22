@@ -639,6 +639,10 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                     editorMode: EditorMode.CopyRect,
                 });
                 break;
+            case ToolbarItemName.ShowAllRegions:
+                break;
+            case ToolbarItemName.HideAllRegions:
+                break;
             case ToolbarItemName.SelectCanvas:
                 this.setState({
                     selectionMode: SelectionMode.NONE,
