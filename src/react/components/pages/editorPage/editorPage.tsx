@@ -51,6 +51,8 @@ import Zoom from "../../common/zoom/zoom";
 import {LocalFileSystemProxy} from "../../../../providers/storage/localFileSystemProxy";
 // import "antd/lib/tree/style/css";
 
+let projectId;
+
 const emptyZoomMode: IZoomMode = {
     disableDrag: true,
     x: 0,
@@ -164,7 +166,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
     }
 
     public async componentDidMount() {
-        const projectId = this.props.match.params["projectId"];
+        projectId = this.props.match.params["projectId"];
         if (this.props.project) {
             await this.loadProjectAssets();
         } else if (projectId) {
@@ -603,7 +605,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         // The root asset can either be the actual asset being edited (ex: VideoFrame) or the top level / root
         // asset selected from the side bar (image/video).
         const rootAsset = { ...(assetMetadata.asset.parent || assetMetadata.asset) };
-        // console.log("assetMetadata: " + JSON.stringify(assetMetadata));
+        console.log("assetMetadata: " + JSON.stringify(assetMetadata));
         if (this.isTaggableAssetType(assetMetadata.asset)) {
             if (assetMetadata.asset.state === AssetState.OkTagged) {
                 assetMetadata.asset.state = AssetState.OkTagged;
@@ -784,7 +786,12 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                 await this.predictRegions();
                 break;
             case ToolbarItemName.ExportProject:
-                toast.error("开始到处");
+                // toast.error("开始到处");
+                this.props.history.push(`/projects/${projectId}/export`);
+                break;
+            case ToolbarItemName.TrainAi:
+                // toast.error("开始到处");
+                this.props.history.push(`/projects/${projectId}/train`);
                 break;
         }
     }

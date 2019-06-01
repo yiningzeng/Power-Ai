@@ -91,6 +91,23 @@ export default class ExportPage extends React.Component<IExportPageProps> {
 
         await this.props.actions.saveProject(projectToUpdate);
         toast.success(strings.export.messages.saveSuccess);
+
+        // region 导出
+        const infoId = toast.info(`Started export for ${this.props.project.name}...`, { autoClose: false });
+        const exportTrain = await this.props.actions.exportTrainConfig(this.props.project);
+        if (!exportTrain || exportTrain ) {
+            toast.success(`导出训练配置文件成功`);
+        }
+        const results = await this.props.actions.exportProject(this.props.project);
+        toast.dismiss(infoId);
+
+        if (!results || (results && results.errors.length === 0)) {
+            toast.success(`Export completed successfully!`);
+        } else if (results && results.errors.length > 0) {
+            toast.warn(`Successfully exported ${results.completed.length}/${results.count} assets`);
+        }
+        // endregion
+
         this.props.history.goBack();
     }
 
