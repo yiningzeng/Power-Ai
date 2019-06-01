@@ -33,6 +33,7 @@ export default interface IProjectActions {
     loadAssetsWithFolder(project: IProject, folder: string): Promise<IAsset[]>;
     loadAssetMetadata(project: IProject, asset: IAsset): Promise<IAssetMetadata>;
     saveAssetMetadata(project: IProject, assetMetadata: IAssetMetadata): Promise<IAssetMetadata>;
+    deleteAsset(project: IProject, filePath: string): Promise<void>;
     updateProjectTag(project: IProject, oldTagName: string, newTagName: string): Promise<IAssetMetadata[]>;
     deleteProjectTag(project: IProject, tagName): Promise<IAssetMetadata[]>;
 }
@@ -165,6 +166,7 @@ export function loadAssetMetadata(project: IProject, asset: IAsset): (dispatch: 
     return async (dispatch: Dispatch) => {
         const assetService = new AssetService(project);
         const assetMetadata = await assetService.getAssetMetadata(asset);
+        console.log(`loadAssetMetadata: ${JSON.stringify(assetMetadata)}`);
         dispatch(loadAssetMetadataAction(assetMetadata));
 
         return { ...assetMetadata };
@@ -187,6 +189,30 @@ export function saveAssetMetadata(
         dispatch(saveAssetMetadataAction(savedMetadata));
 
         return { ...savedMetadata };
+    };
+}
+
+/**
+ * Dispatches Delete Project action and resolves with project
+ * @param project - Project to delete
+ */
+export function deleteAsset(project: IProject, filePath: string)
+    : (dispatch: Dispatch) => Promise<void> {
+    return async (dispatch: Dispatch) => {
+        const projectService = new ProjectService();
+
+        // // Lookup security token used to decrypt project settings
+        // const projectToken = appState.appSettings.securityTokens
+        //     .find((securityToken) => securityToken.name === project.securityToken);
+        //
+        // if (!projectToken) {
+        //     throw new AppError(ErrorCode.SecurityTokenNotFound, "Security Token Not Found");
+        // }
+        //
+        // const decryptedProject = await projectService.load(project, projectToken);
+        //
+        // await projectService.delete(decryptedProject);
+        // dispatch(deleteProjectAction(decryptedProject));
     };
 }
 
@@ -262,7 +288,7 @@ export function exportProject(project: IProject): (dispatch: Dispatch) => Promis
         if (!project.exportFormat) {
             throw new AppError(ErrorCode.ExportFormatNotFound, strings.errors.exportFormatNotFound.message);
         }
-
+        console.log(`ExportProviderFactory exportProject: ${JSON.stringify(project)}`);
         if (project.exportFormat && project.exportFormat.providerType) {
             const exportProvider = ExportProviderFactory.create(
                 project.exportFormat.providerType,

@@ -275,6 +275,10 @@ export const english: IAppStrings = {
                 title: "Remove All Regions",
                 confirmation: "Are you sure you want to remove all regions?",
             },
+            deleteAsset: {
+                title: "Delete Asset",
+                confirmation: "Are you sure you want to Delete Asset?",
+            },
         },
         messages: {
             enforceTaggedRegions: {

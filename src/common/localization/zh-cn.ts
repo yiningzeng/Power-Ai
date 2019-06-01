@@ -274,6 +274,10 @@ export const chinese: IAppStrings = {
                 title: "删除所有的选框",
                 confirmation: "确定要删除所有的选框么？",
             },
+            deleteAsset: {
+                title: "删除素材",
+                confirmation: "确定要删除本地的素材文件么？",
+            },
         },
         messages: {
             enforceTaggedRegions: {

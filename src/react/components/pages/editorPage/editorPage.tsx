@@ -118,6 +118,7 @@ function mapDispatchToProps(dispatch) {
  */
 @connect(mapStateToProps, mapDispatchToProps)
 export default class EditorPage extends React.Component<IEditorPageProps, IEditorPageState> {
+
     public state: IEditorPageState = {
         treeList: [],
         selectedTag: null,
@@ -135,6 +136,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         showInvalidRegionWarning: false,
         zoomMode: emptyZoomMode,
     };
+    private localFileSystem: LocalFileSystemProxy;
 
     private activeLearningService: ActiveLearningService = null;
     private loadingProjectAssets: boolean = false;
@@ -142,6 +144,12 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
     private canvas: RefObject<Canvas> = React.createRef();
     private renameTagConfirm: React.RefObject<Confirm> = React.createRef();
     private deleteTagConfirm: React.RefObject<Confirm> = React.createRef();
+    private deleteConfirm: React.RefObject<Confirm> = React.createRef();
+
+    constructor(props, context) {
+        super(props, context);
+        this.localFileSystem = new LocalFileSystemProxy();
+    }
 
     public async componentDidMount() {
         const projectId = this.props.match.params["projectId"];
@@ -353,6 +361,11 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                             message={strings.editorPage.tags.delete.confirmation}
                             confirmButtonColor="danger"
                             onConfirm={this.onTagDeleted} />
+                        <Confirm title={strings.editorPage.canvas.deleteAsset.title}
+                                 ref={this.deleteConfirm as any}
+                                 message={strings.editorPage.canvas.deleteAsset.confirmation}
+                                 confirmButtonColor="danger"
+                                 onConfirm={this.onAssetDeleted}/>
                     </div>
                 </SplitPane>
                 <Alert show={this.state.showInvalidRegionWarning}
@@ -369,6 +382,17 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         this.setState({
             selectedRegions: [],
         });
+    }
+
+    /**
+     * Remove asset and projects and saves files
+     * @param tagName Name of tag to be deleted
+     */
+    private onAssetDeleted = async (): Promise<void> => {
+        const { selectedAsset } = this.state;
+        await this.localFileSystem.deleteDirectory(decodeURI(selectedAsset.asset.path.replace("file:", "")));
+        toast.success(`成功删除`);
+
     }
 
     /**

@@ -273,6 +273,10 @@ export interface IAppStrings {
                 title: string;
                 confirmation: string;
             },
+            deleteAsset: {
+                title: string;
+                confirmation: string;
+            },
         },
         messages: {
             enforceTaggedRegions: {
