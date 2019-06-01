@@ -113,7 +113,7 @@ export interface IProject {
     description?: string;
     tags: ITag[];
     sourceConnection: IConnection;
-    sourceListConnection: [];
+    sourceListConnection: string[];
     targetConnection: IConnection;
     exportFormat: IExportFormat;
     trainFormat: ITrainFormat;

@@ -6,14 +6,14 @@ import { IAppStrings } from "../strings";
 export const chinese: IAppStrings = {
     appName: "AI Power",
     common: {
-        displayName: "显示名称",
+        displayName: "项目名称",
         description: "描述",
         submit: "提交",
         cancel: "取消",
         save: "保存",
         delete: "删除",
         provider: "数据集",
-        trainProvider: "网络",
+        trainProvider: "检测框架",
         homePage: "首页",
     },
     titleBar: {
@@ -90,7 +90,7 @@ export const chinese: IAppStrings = {
             description: "资源的路径",
         },
         targetConnection: {
-            title: "目标路径",
+            title: "项目路径",
             description: "用于保存和导出数据",
         },
         videoSettings: {
@@ -290,7 +290,7 @@ export const chinese: IAppStrings = {
     export: {
         title: "导出",
         settings: "导出设置",
-        saveSettings: "保存",
+        saveSettings: "确认",
         providers: {
             common: {
                 properties: {
@@ -304,17 +304,8 @@ export const chinese: IAppStrings = {
                         },
                     },
                     testTrainSplit: {
-                        title: "Test / Train Split",
-                        description: "The test train split to use for exported data",
-                    },
-                },
-            },
-            vottJson: {
-                displayName: "AIPOWER JSON",
-                properties: {
-                    includeImages: {
-                        title: "Include Images",
-                        description: "Whether or not to include binary image assets in target connection",
+                        title: "训练 / 验证 比例",
+                        description: "导出的训练和验证比例",
                     },
                 },
             },
@@ -383,15 +374,15 @@ export const chinese: IAppStrings = {
             pascalVoc: {
                 displayName: "Pascal VOC",
                 exportUnassigned: {
-                    title: "Export Unassigned",
-                    description: "Whether or not to include unassigned tags in exported data",
+                    title: "导出未分配的标签",
+                    description: "是否导出数据中包含未处理的标签信息",
                 },
             },
             cntk: {
                 displayName: "Microsoft Cognitive Toolkit (CNTK)",
             },
             coco: {
-                displayName: "coco",
+                displayName: "CoCo",
             },
         },
         messages: {

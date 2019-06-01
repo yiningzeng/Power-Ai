@@ -26,10 +26,6 @@
         "description": {
             "title": "${strings.common.description}",
             "type": "string"
-        },
-        "tags": {
-            "title": "${strings.tags.title}",
-            "type": "array"
         }
     },
     "required": [

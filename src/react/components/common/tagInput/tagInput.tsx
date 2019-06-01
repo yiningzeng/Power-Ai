@@ -309,12 +309,13 @@ export class TagInput extends React.Component<ITagInputProps, ITagInputState> {
             props = props.filter((prop) => prop.tag.name.toLowerCase().includes(query.toLowerCase()));
         }
 
-        return props.map((prop) =>
-            <TagInputItem
+        return props.map((prop) => {
+            return  <TagInputItem
                 key={prop.tag.name}
                 ref={(item) => this.setTagItemRef(item, prop.tag)}
                 {...prop}
-            />);
+            />;
+        });
     }
 
     private setTagItemRef = (item, tag) => {
