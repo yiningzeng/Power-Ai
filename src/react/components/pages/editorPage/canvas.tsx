@@ -3,7 +3,8 @@ import * as shortid from "shortid";
 import { CanvasTools } from "vott-ct";
 import { RegionData } from "vott-ct/lib/js/CanvasTools/Core/RegionData";
 import {
-    EditorMode, IAssetMetadata,
+    AppError,
+    EditorMode, ErrorCode, IAssetMetadata,
     IProject, IRegion, IZoomMode, RegionType,
 } from "../../../../models/applicationState";
 import CanvasHelpers from "./canvasHelpers";
@@ -11,7 +12,7 @@ import { AssetPreview, ContentSource } from "../../common/assetPreview/assetPrev
 import { Editor } from "vott-ct/lib/js/CanvasTools/CanvasTools.Editor";
 import Clipboard from "../../../../common/clipboard";
 import Confirm from "../../common/confirm/confirm";
-import { strings } from "../../../../common/strings";
+import {interpolate, strings} from "../../../../common/strings";
 import { SelectionMode } from "vott-ct/lib/js/CanvasTools/Interface/ISelectorSettings";
 import { Rect } from "vott-ct/lib/js/CanvasTools/Core/Rect";
 import { createContentBoundingBox } from "../../../../common/layout";
@@ -74,18 +75,15 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
     }
 
     public componentDidUpdate = async (prevProps: Readonly<ICanvasProps>, prevState: Readonly<ICanvasState>) => {
-        console.log("fuck Component DID UPDATE!");
         // Handles asset changing
         if (this.props.selectedAsset !== prevProps.selectedAsset) {
             this.setState({ currentAsset: this.props.selectedAsset });
-            console.log("fuck 1");
         }
 
         // Handle selection mode changes
         if (this.props.selectionMode !== prevProps.selectionMode) {
             const options = (this.props.selectionMode === SelectionMode.COPYRECT) ? this.template : null;
             this.editor.AS.setSelectionMode({ mode: this.props.selectionMode, template: options });
-            console.log("fuck 2");
         }
 
         const assetIdChanged = this.state.currentAsset.asset.id !== prevState.currentAsset.asset.id;
@@ -93,15 +91,13 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
         // When the selected asset has changed but is still the same asset id
         if (!assetIdChanged && this.state.currentAsset !== prevState.currentAsset) {
             this.refreshCanvasToolsRegions();
-            console.log("fuck 3");
         }
 
         // When the project tags change re-apply tags to regions
         if (this.props.project.tags !== prevProps.project.tags) {
             this.updateCanvasToolsRegionTags();
-            console.log("fuck 3");
         }
-
+        // this.positionCanvas(this.state.contentSource);
         // Handles when the canvas is enabled & disabled
         if (prevState.enabled !== this.state.enabled) {
             // When the canvas is ready to display
@@ -119,7 +115,6 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
                 this.clearAllRegions();
                 this.editor.AS.setSelectionMode(SelectionMode.NONE);
             }
-            console.log("fuck 5");
         }
         this.positionCanvas(this.state.contentSource);
     }
@@ -129,14 +124,14 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
         return (
             <Fragment>
                 <Confirm title={strings.editorPage.canvas.removeAllRegions.title}
-                    ref={this.clearConfirm as any}
-                    message={strings.editorPage.canvas.removeAllRegions.confirmation}
-                    confirmButtonColor="danger"
-                    onConfirm={this.removeAllRegions}
+                         ref={this.clearConfirm as any}
+                         message={strings.editorPage.canvas.removeAllRegions.confirmation}
+                         confirmButtonColor="danger"
+                         onConfirm={this.removeAllRegions}
                 />
                 <div id="ct-zone" ref={this.canvasZone} className={className} onClick={(e) => e.stopPropagation()}>
                     <div id="selection-zone">
-                        <div id="editor-zone" className="full-size" />
+                        <div id="editor-zone" className="full-size"/>
                     </div>
                 </div>
                 {this.renderChildren()}
@@ -168,8 +163,9 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
             transformer = CanvasHelpers.removeIfContained;
         }
         for (const selectedRegion of selectedRegions) {
-            selectedRegion.tags = transformer(selectedRegion.tags, tag);
+            selectedRegion.tags = [tag];
         }
+        console.log(`fuckselectedRegions: ${JSON.stringify(selectedRegions)}========= ${JSON.stringify(transformer)}`);
         this.updateRegions(selectedRegions);
         if (this.props.onSelectedRegionsChanged) {
             this.props.onSelectedRegionsChanged(selectedRegions);
@@ -220,7 +216,7 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
         this.onWindowResize();
     }
 
-    private removeAllRegions = () => {
+    public removeAllRegions = () => {
         const ids = this.state.currentAsset.regions.map((r) => r.id);
         for (const id of ids) {
             this.editor.RM.deleteRegionById(id);
@@ -498,7 +494,6 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
         if (!this.state.contentSource) {
             return;
         }
-
         this.positionCanvas(this.state.contentSource);
     }
 
