@@ -308,6 +308,18 @@ export interface ISize {
 }
 
 /**
+ * 图像编辑界面缩放接口参数
+ */
+export interface IZoomMode {
+    disableDrag: boolean;
+    x: number;
+    y: number;
+    miniWidth: number;
+    width: number | "auto";
+    height: number | "auto";
+}
+
+/**
  * @name - Region
  * @description - Defines a region within an asset
  * @member id - Unique identifier for this region

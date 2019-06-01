@@ -16,6 +16,7 @@ export enum ToolbarItemName {
     RemoveAllRegions = "removeAllRegions",
     ZoomInAsset = "zoomInAsset",
     ZoomOutAsset = "zoomOutAsset",
+    ZoomNormolAsset = "zoomNormolAsset",
     PreviousAsset = "navigatePreviousAsset",
     NextAsset = "navigateNextAsset",
     SaveProject = "saveProject",
@@ -40,7 +41,7 @@ export default function registerToolbar() {
     ToolbarItemFactory.register({
         name: ToolbarItemName.SelectCanvas,
         tooltip: strings.editorPage.toolbar.select,
-        icon: "fa-mouse-pointer",
+        icon: "fas fa-hand-rock",
         group: ToolbarItemGroup.Canvas,
         type: ToolbarItemType.State,
         accelerators: ["V", "v"],
@@ -64,14 +65,14 @@ export default function registerToolbar() {
         accelerators: ["P", "p"],
     });
 
-    ToolbarItemFactory.register({
-        name: ToolbarItemName.CopyRectangle,
-        tooltip: strings.editorPage.toolbar.copyRectangle,
-        icon: "far fa-clone",
-        group: ToolbarItemGroup.Canvas,
-        type: ToolbarItemType.State,
-        accelerators: ["CmdOrCtrl+W", "CmdOrCtrl+w"],
-    });
+    // ToolbarItemFactory.register({
+    //     name: ToolbarItemName.CopyRectangle,
+    //     tooltip: strings.editorPage.toolbar.copyRectangle,
+    //     icon: "far fa-clone",
+    //     group: ToolbarItemGroup.Canvas,
+    //     type: ToolbarItemType.State,
+    //     accelerators: ["CmdOrCtrl+W", "CmdOrCtrl+w"],
+    // });
 
     ToolbarItemFactory.register({
         name: ToolbarItemName.CopyRegions,
@@ -121,7 +122,7 @@ export default function registerToolbar() {
     ToolbarItemFactory.register({
         name: ToolbarItemName.ZoomOutAsset,
         tooltip: "缩小",
-        icon: "fa fa-minus-square",
+        icon: "fas fa-search-minus",
         group: ToolbarItemGroup.Zoom,
         type: ToolbarItemType.Action,
         accelerators: ["O", "o"],
@@ -130,10 +131,20 @@ export default function registerToolbar() {
     ToolbarItemFactory.register({
         name: ToolbarItemName.ZoomInAsset,
         tooltip: "放大",
-        icon: "fa fa-plus-square",
+        icon: "fas fa-search-plus",
         group: ToolbarItemGroup.Zoom,
         type: ToolbarItemType.Action,
         accelerators: ["I", "i"],
+    });
+
+    // 缩放回归正常
+    ToolbarItemFactory.register({
+        name: ToolbarItemName.ZoomNormolAsset,
+        tooltip: "正常",
+        icon: "fa-expand",
+        group: ToolbarItemGroup.Zoom,
+        type: ToolbarItemType.Action,
+        accelerators: ["U", "u"],
     });
 
     ToolbarItemFactory.register({

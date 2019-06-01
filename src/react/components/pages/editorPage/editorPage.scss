@@ -218,17 +218,21 @@
 }
 
 #ct-zone {
-  position: absolute;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
 
-  &.canvas-enabled {
-    visibility: visible;
-    z-index: 1;
-  }
+    &.canvas-enabled {
+        visibility: visible;
+        z-index: 1;
+    }
 
-  &.canvas-disabled {
-    visibility: hidden;
-    z-index: 0;
-  }
+    &.canvas-disabled {
+        visibility: hidden;
+        z-index: 0;
+    }
 }
 
 #selection-zone {
