@@ -20,6 +20,7 @@ interface ICondensedListProps {
     newLinkTo?: string;
     onClick?: (item) => void;
     onDelete?: (item) => void;
+    onAddClick?: () => void;
 }
 interface IDirState {
     openDir: string;
@@ -41,14 +42,14 @@ export default class CondensedList extends React.Component<ICondensedListProps> 
     }
 
     public render() {
-        const { title, items, newLinkTo, showToolbar, Component } = this.props;
+        const { title, items, newLinkTo, showToolbar, Component, onAddClick } = this.props;
 
         return (
             <div className="condensed-list">
                 <h6 className="condensed-list-header bg-darker-2 p-2">
                     <span>{title}</span>
                     {showToolbar &&
-                        <FolderSideBarToolbar onAddFolder={() => {console.log("asdasdasdasdasdasdasd"); }}/>}
+                        <FolderSideBarToolbar onAddFolder={onAddClick}/>}
                     {newLinkTo &&
                         <Link to={newLinkTo} className="float-right">
                             <i className="fas fa-plus-square" />
