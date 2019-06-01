@@ -110,6 +110,7 @@ export class CocoExportProvider extends ExportProvider {
             return new Promise<void>(async (resolve) => {
                 const blob = await HtmlFileReader.getAssetBlob(assetMetadata.asset);
                 const assetFilePath = `coco-json-export/${assetMetadata.asset.name}`;
+                await this.storageProvider.deleteContainer(assetFilePath);
                 const fileReader = new FileReader();
                 fileReader.onload = async () => {
                     const buffer = Buffer.from(fileReader.result as ArrayBuffer);

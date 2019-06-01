@@ -54,6 +54,7 @@ export class PascalVOCExportProvider extends ExportProvider<IPascalVOCExportProv
         console.log("PascalVOC:" + JSON.stringify(this.project));
         // Create Export Folder
         const exportFolderName = `${this.project.name.replace(/\s/g, "-")}-PascalVOC-export`;
+        await this.storageProvider.deleteContainer(exportFolderName);
         await this.storageProvider.createContainer(exportFolderName);
 
         await this.exportImages(exportFolderName, allAssets);

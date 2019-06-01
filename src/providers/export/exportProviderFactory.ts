@@ -55,7 +55,7 @@ export class ExportProviderFactory {
     public static create(name: string, project: IProject, options?: any): IExportProvider {
         Guard.empty(name);
         Guard.null(project);
-
+        console.log(`ExportProviderFactory: ${name}`);
         const handler = ExportProviderFactory.providerRegistry[name];
         if (!handler) {
             throw new Error(`No export provider has been registered with name '${name}'`);
@@ -69,6 +69,7 @@ export class ExportProviderFactory {
      * @param project VoTT project
      */
     public static createFromProject(project: IProject): IExportProvider {
+        console.log(`ExportProviderFactory exportProject: ${JSON.stringify(project)}`);
         return ExportProviderFactory.create(
             project.exportFormat.providerType,
             project,
