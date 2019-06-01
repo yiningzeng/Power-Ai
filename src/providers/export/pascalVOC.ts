@@ -54,6 +54,7 @@ export class PascalVOCExportProvider extends ExportProvider<IPascalVOCExportProv
         console.log("PascalVOC:" + JSON.stringify(this.project));
         // Create Export Folder
         const exportFolderName = `${this.project.name.replace(/\s/g, "-")}-PascalVOC-export`;
+        await this.storageProvider.deleteContainer(exportFolderName);
         await this.storageProvider.createContainer(exportFolderName);
 
         await this.exportImages(exportFolderName, allAssets);
@@ -191,10 +192,10 @@ export class PascalVOCExportProvider extends ExportProvider<IPascalVOCExportProv
                 const objectsXML = imageInfo.objects.map((o) => {
                     const params = {
                         name: o.name,
-                        xmin: o.xmin.toString(),
-                        ymin: o.ymin.toString(),
-                        xmax: o.xmax.toString(),
-                        ymax: o.ymax.toString(),
+                        xmin: o.xmin.toFixed().toString(),
+                        ymin: o.ymin.toFixed().toString(),
+                        xmax: o.xmax.toFixed().toString(),
+                        ymax: o.ymax.toFixed().toString(),
                     };
 
                     return interpolate(objectTemplate, params);

@@ -13,7 +13,10 @@ export enum ToolbarItemName {
     CopyRegions = "copyRegions",
     CutRegions = "cutRegions",
     PasteRegions = "pasteRegions",
+    HideAllRegions = "hideAllRegions",
+    ShowAllRegions = "showAllRegions",
     RemoveAllRegions = "removeAllRegions",
+    DeleteAsset = "deleteAsset",
     ZoomInAsset = "zoomInAsset",
     ZoomOutAsset = "zoomOutAsset",
     ZoomNormolAsset = "zoomNormolAsset",
@@ -101,6 +104,24 @@ export default function registerToolbar() {
         accelerators: ["CmdOrCtrl+V", "CmdOrCtrl+v"],
     });
 
+    // ToolbarItemFactory.register({
+    //     name: ToolbarItemName.ShowAllRegions,
+    //     tooltip: strings.editorPage.toolbar.removeAllRegions,
+    //     icon: "fa-eye",
+    //     group: ToolbarItemGroup.Regions,
+    //     type: ToolbarItemType.Action,
+    //     accelerators: ["CmdOrCtrl+Q", "CmdOrCtrl+q"],
+    // });
+    //
+    // ToolbarItemFactory.register({
+    //     name: ToolbarItemName.HideAllRegions,
+    //     tooltip: strings.editorPage.toolbar.removeAllRegions,
+    //     icon: "fa-eye-slash",
+    //     group: ToolbarItemGroup.Regions,
+    //     type: ToolbarItemType.Action,
+    //     accelerators: ["CmdOrCtrl+W", "CmdOrCtrl+w"],
+    // });
+
     ToolbarItemFactory.register({
         name: ToolbarItemName.RemoveAllRegions,
         tooltip: strings.editorPage.toolbar.removeAllRegions,
@@ -163,6 +184,15 @@ export default function registerToolbar() {
         group: ToolbarItemGroup.Navigation,
         type: ToolbarItemType.Action,
         accelerators: ["ArrowDown", "S", "s"],
+    });
+
+    ToolbarItemFactory.register({
+        name: ToolbarItemName.DeleteAsset,
+        tooltip: "删除素材",
+        icon: "fa-trash-alt",
+        group: ToolbarItemGroup.Navigation,
+        type: ToolbarItemType.Action,
+        accelerators: ["CmdOrCtrl+D", "CmdOrCtrl+d"],
     });
 
     ToolbarItemFactory.register({

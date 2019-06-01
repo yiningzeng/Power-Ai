@@ -60,15 +60,15 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
     private deleteConfirm: React.RefObject<Confirm> = React.createRef();
     private cloudFilePicker: React.RefObject<CloudFilePicker> = React.createRef();
     private importConfirm: React.RefObject<Confirm> = React.createRef();
-
     public render() {
+        console.log(`homepage: ${JSON.stringify(this.props)}`);
         return (
             <div className="app-homepage">
                 <div className="app-homepage-main">
                     <ul>
                         <li>
                             <a href="#" onClick={this.createNewProject} className="p-5 new-project">
-                                <i className="fas fa-folder-plus fa-9x"></i>
+                                <i className="fas fa-plus-circle fa-9x"></i>
                                 <h6>{strings.homePage.newProject}</h6>
                             </a>
                         </li>

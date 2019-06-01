@@ -113,7 +113,7 @@ export interface IProject {
     description?: string;
     tags: ITag[];
     sourceConnection: IConnection;
-    sourceListConnection: [];
+    sourceListConnection: string[];
     targetConnection: IConnection;
     exportFormat: IExportFormat;
     trainFormat: ITrainFormat;
@@ -386,6 +386,7 @@ export enum AssetState {
     NotVisited = 0,
     Visited = 1,
     Tagged = 2,
+    OkTagged = 3,
 }
 
 /**

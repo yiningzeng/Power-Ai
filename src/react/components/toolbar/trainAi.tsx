@@ -27,7 +27,7 @@ export class TrainAi extends ToolbarItem {
 
         toast.info(`开始配置训练...`);
 
-        IpcRendererProxy.send("TrainingSystem:startTraining", [this.props.project])
+        IpcRendererProxy.send(`TrainingSystem:${this.props.project.trainFormat.providerType}`, [this.props.project])
             .then(() => {
                 toast.success(`配置成功`);
             });

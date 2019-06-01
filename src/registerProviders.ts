@@ -53,11 +53,11 @@ export default function registerProviders() {
     // });
 
     // Export Providers
-    ExportProviderFactory.register({
-        name: "vottJson",
-        displayName: strings.export.providers.vottJson.displayName,
-        factory: (project, options) => new VottJsonExportProvider(project, options),
-    });
+    // ExportProviderFactory.register({
+    //     name: "vottJson",
+    //     displayName: strings.export.providers.vottJson.displayName,
+    //     factory: (project, options) => new VottJsonExportProvider(project, options),
+    // });
     ExportProviderFactory.register({
         name: "coco",
         displayName: strings.export.providers.coco.displayName,
@@ -68,11 +68,11 @@ export default function registerProviders() {
         displayName: strings.export.providers.pascalVoc.displayName,
         factory: (project, options) => new PascalVOCExportProvider(project, options),
     });
-    // ExportProviderFactory.register({
-    //     name: "tensorFlowRecords",
-    //     displayName: strings.export.providers.tfRecords.displayName,
-    //     factory: (project, options) => new TFRecordsExportProvider(project, options),
-    // });
+    ExportProviderFactory.register({
+        name: "tensorFlowRecords",
+        displayName: strings.export.providers.tfRecords.displayName,
+        factory: (project, options) => new TFRecordsExportProvider(project, options),
+    });
     // ExportProviderFactory.register({
     //     name: "azureCustomVision",
     //     displayName: strings.export.providers.azureCV.displayName,

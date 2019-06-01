@@ -105,7 +105,8 @@ export default class EditorSideBar extends React.Component<IEditorSideBarProps, 
     private rowRenderer = ({ key, index, style }): JSX.Element => {
         const asset = this.props.assets[index];
         const selectedAsset = this.props.selectedAsset;
-
+        console.log("EditorSideBar chinese: " + decodeURI(asset.name));
+        console.log("EditorSideBar asset: " + JSON.stringify(asset));
         return (
             <div key={key} style={style}
                 className={this.getAssetCssClassNames(asset, selectedAsset)}
@@ -115,7 +116,7 @@ export default class EditorSideBar extends React.Component<IEditorSideBarProps, 
                     <AssetPreview asset={asset} />
                 </div>
                 <div className="asset-item-metadata">
-                    <span className="asset-filename" title={asset.name}>{asset.name}</span>
+                    <span className="asset-filename" title={decodeURI(asset.name)}>{decodeURI(asset.name)}</span>
                     {asset.size &&
                         <span>
                             {asset.size.width} x {asset.size.height}
@@ -131,15 +132,22 @@ export default class EditorSideBar extends React.Component<IEditorSideBarProps, 
             case AssetState.Tagged:
                 return (
                     <span title={strings.editorPage.tagged}
-                        className="badge badge-tagged">
-                        <i className="fas fa-tag"></i>
+                          className="badge badge-tagged">
+                        <i className="fas fa-tags"></i>
                     </span>
                 );
             case AssetState.Visited:
                 return (
                     <span title={strings.editorPage.visited}
-                        className="badge badge-visited">
+                          className="badge badge-visited">
                         <i className="fas fa-eye"></i>
+                    </span>
+                );
+            case AssetState.OkTagged:
+                return (
+                    <span title={strings.editorPage.tagged}
+                          className="badge badge-ok-tagged">
+                        <i className="fas fa-check"></i>
                     </span>
                 );
             default:

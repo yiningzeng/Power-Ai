@@ -1,7 +1,6 @@
 import LocalizedStrings, { LocalizedStringsMethods } from "react-localization";
 import { chinese } from "./localization/zh-cn";
 import { english } from "./localization/en-us";
-import { spanish } from "./localization/es-cl";
 
 /**
  * Interface for all required strings in application
@@ -274,6 +273,10 @@ export interface IAppStrings {
                 title: string;
                 confirmation: string;
             },
+            deleteAsset: {
+                title: string;
+                confirmation: string;
+            },
         },
         messages: {
             enforceTaggedRegions: {
@@ -299,15 +302,6 @@ export interface IAppStrings {
                         },
                     },
                     testTrainSplit: {
-                        title: string,
-                        description: string,
-                    },
-                },
-            },
-            vottJson: {
-                displayName: string,
-                properties: {
-                    includeImages: {
                         title: string,
                         description: string,
                     },
@@ -479,7 +473,6 @@ interface IStrings extends LocalizedStringsMethods, IAppStrings { }
 export const strings: IStrings = new LocalizedStrings({
     ch: chinese,
     en: english,
-    es: spanish,
 });
 
 /**

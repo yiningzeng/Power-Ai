@@ -64,6 +64,10 @@ export class LocalFileSystemProxy implements IStorageProvider, IAssetProvider {
         return IpcRendererProxy.send(`${PROXY_NAME}:deleteFile`, [filePath]);
     }
 
+    public deleteFileOnlyPath(filePath: string): Promise<void> {
+        return IpcRendererProxy.send(`${PROXY_NAME}:deleteFile`, [filePath]);
+    }
+
     /**
      * Write text to file
      * @param fileName Name of target file
@@ -119,6 +123,10 @@ export class LocalFileSystemProxy implements IStorageProvider, IAssetProvider {
     public deleteContainer(folderName: string): Promise<void> {
         const folderPath = [this.options.folderPath, folderName].join("/");
         return IpcRendererProxy.send(`${PROXY_NAME}:deleteContainer`, [folderPath]);
+    }
+
+    public deleteDirectory(folderName: string): Promise<void> {
+        return IpcRendererProxy.send(`${PROXY_NAME}:deleteContainer`, [folderName]);
     }
 
     /**

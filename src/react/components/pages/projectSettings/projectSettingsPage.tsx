@@ -126,6 +126,7 @@ export default class ProjectSettingsPage extends React.Component<IProjectSetting
     private onFormSubmit = async (project: IProject) => {
         const isNew = !(!!project.id);
 
+        console.log(`onFormSubmit: ${JSON.stringify(project)}`);
         await this.props.applicationActions.ensureSecurityToken(project);
         await this.props.projectActions.saveProject(project);
         localStorage.removeItem(projectFormTempKey);

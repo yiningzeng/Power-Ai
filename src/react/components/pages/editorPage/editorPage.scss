@@ -294,6 +294,7 @@ canvas {
 }
 
 .badge-visited,
+.badge-ok-tagged,
 .badge-tagged {
   color: #fff;
   position: absolute;
@@ -304,6 +305,11 @@ canvas {
 }
 
 .badge-tagged {
+    background-color: rgba(red, 0.9);
+    border: 1px solid $lighter-2;
+}
+
+.badge-ok-tagged {
   background-color: rgba(green, 0.9);
   border: 1px solid $lighter-2;
 }

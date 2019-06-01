@@ -275,6 +275,10 @@ export const english: IAppStrings = {
                 title: "Remove All Regions",
                 confirmation: "Are you sure you want to remove all regions?",
             },
+            deleteAsset: {
+                title: "Delete Asset",
+                confirmation: "Are you sure you want to Delete Asset?",
+            },
         },
         messages: {
             enforceTaggedRegions: {
@@ -303,15 +307,6 @@ export const english: IAppStrings = {
                     testTrainSplit: {
                         title: "Test / Train Split",
                         description: "The test train split to use for exported data",
-                    },
-                },
-            },
-            vottJson: {
-                displayName: "VoTT JSON",
-                properties: {
-                    includeImages: {
-                        title: "Include Images",
-                        description: "Whether or not to include binary image assets in target connection",
                     },
                 },
             },

@@ -1,42 +1,54 @@
 import _ from "lodash";
-import React, { RefObject } from "react";
-import { connect } from "react-redux";
-import { RouteComponentProps } from "react-router-dom";
+import React, {RefObject} from "react";
+import {connect} from "react-redux";
+import {RouteComponentProps} from "react-router-dom";
 import SplitPane from "react-split-pane";
-import { bindActionCreators } from "redux";
-import { SelectionMode } from "vott-ct/lib/js/CanvasTools/Interface/ISelectorSettings";
+import {bindActionCreators} from "redux";
+import {SelectionMode} from "vott-ct/lib/js/CanvasTools/Interface/ISelectorSettings";
 import HtmlFileReader from "../../../../common/htmlFileReader";
-import { strings } from "../../../../common/strings";
+import {strings} from "../../../../common/strings";
 import {
-    AssetState, AssetType, EditorMode, IApplicationState,
-    IAppSettings, IAsset, IAssetMetadata, IProject, IRegion,
-    ISize, ITag, IAdditionalPageSettings, AppError, ErrorCode, IZoomMode,
+    AppError,
+    AssetState,
+    AssetType,
+    EditorMode,
+    ErrorCode,
+    IAdditionalPageSettings,
+    IApplicationState,
+    IAppSettings,
+    IAsset,
+    IAssetMetadata,
+    IProject,
+    IRegion,
+    ISize,
+    ITag,
+    IZoomMode,
 } from "../../../../models/applicationState";
-import { IToolbarItemRegistration, ToolbarItemFactory } from "../../../../providers/toolbar/toolbarItemFactory";
+import {IToolbarItemRegistration, ToolbarItemFactory} from "../../../../providers/toolbar/toolbarItemFactory";
 import IApplicationActions, * as applicationActions from "../../../../redux/actions/applicationActions";
 import IProjectActions, * as projectActions from "../../../../redux/actions/projectActions";
-import { ToolbarItemName } from "../../../../registerToolbar";
-import { AssetService } from "../../../../services/assetService";
-import { AssetPreview } from "../../common/assetPreview/assetPreview";
-import { KeyboardBinding } from "../../common/keyboardBinding/keyboardBinding";
-import { KeyEventType } from "../../common/keyboardManager/keyboardManager";
-import { TagInput } from "../../common/tagInput/tagInput";
-import { ToolbarItem } from "../../toolbar/toolbarItem";
+import {ToolbarItemName} from "../../../../registerToolbar";
+import {AssetService} from "../../../../services/assetService";
+import {AssetPreview} from "../../common/assetPreview/assetPreview";
+import {KeyboardBinding} from "../../common/keyboardBinding/keyboardBinding";
+import {KeyEventType} from "../../common/keyboardManager/keyboardManager";
+import {TagInput} from "../../common/tagInput/tagInput";
+import {ToolbarItem} from "../../toolbar/toolbarItem";
 import Canvas from "./canvas";
 import CanvasHelpers from "./canvasHelpers";
 import "./editorPage.scss";
 import EditorSideBar from "./editorSideBar";
-import { EditorToolbar } from "./editorToolbar";
+import {EditorToolbar} from "./editorToolbar";
 import Alert from "../../common/alert/alert";
 import Confirm from "../../common/confirm/confirm";
-import { ActiveLearningService } from "../../../../services/activeLearningService";
-import { toast } from "react-toastify";
+import {ActiveLearningService} from "../../../../services/activeLearningService";
+import {toast} from "react-toastify";
 import CondensedList from "../../common/condensedList/condensedList";
 import SourceItem from "../../common/condensedList/sourceItem";
 import {Rnd} from "react-rnd";
 import Zoom from "../../common/zoom/zoom";
-import zoom from "../../common/zoom/zoom";
-import {number} from "prop-types";
+
+import {LocalFileSystemProxy} from "../../../../providers/storage/localFileSystemProxy";
 // import "antd/lib/tree/style/css";
 
 const emptyZoomMode: IZoomMode = {
@@ -118,6 +130,7 @@ function mapDispatchToProps(dispatch) {
  */
 @connect(mapStateToProps, mapDispatchToProps)
 export default class EditorPage extends React.Component<IEditorPageProps, IEditorPageState> {
+
     public state: IEditorPageState = {
         treeList: [],
         selectedTag: null,
@@ -135,6 +148,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         showInvalidRegionWarning: false,
         zoomMode: emptyZoomMode,
     };
+    private localFileSystem: LocalFileSystemProxy;
 
     private activeLearningService: ActiveLearningService = null;
     private loadingProjectAssets: boolean = false;
@@ -142,6 +156,12 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
     private canvas: RefObject<Canvas> = React.createRef();
     private renameTagConfirm: React.RefObject<Confirm> = React.createRef();
     private deleteTagConfirm: React.RefObject<Confirm> = React.createRef();
+    private deleteConfirm: React.RefObject<Confirm> = React.createRef();
+
+    constructor(props, context) {
+        super(props, context);
+        this.localFileSystem = new LocalFileSystemProxy();
+    }
 
     public async componentDidMount() {
         const projectId = this.props.match.params["projectId"];
@@ -241,6 +261,24 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                 title="素材文件夹"
                                 Component={SourceItem}
                                 items={this.state.treeList}
+                                onAddClick={async () => {
+                                    console.log("新增文件夹");
+                                    const filePath = await this.localFileSystem.selectContainer();
+                                    toast.info(`已经选择 ${filePath}`);
+                                    let aa: string[];
+                                    aa = project.sourceListConnection;
+                                    if (aa === undefined) {
+                                        aa = [filePath];
+                                    } else {
+                                        aa.push(filePath);
+                                    }
+                                    console.log(`fuck: ${JSON.stringify(aa)}`);
+                                    // aa.push(filePath);
+                                    project.sourceListConnection = aa;
+                                    await this.props.applicationActions.ensureSecurityToken(project);
+                                    await this.props.actions.saveProject(project);
+                                    // localStorage.removeItem(projectFormTempKey);
+                                }}
                                 onClick={(item) => {
                                     if ( item === "已处理") {
                                         this.setState({
@@ -268,8 +306,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                     actions={this.props.actions}
                                     onToolbarItemSelected={this.onToolbarItemSelected} />
                             </div>
-                            <div className="editor-page-content-main-body"
-                                 >
+                            <div className="editor-page-content-main-body">
                                 {selectedAsset &&
                                 <Rnd
                                     ref="editorDom"
@@ -304,7 +341,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                                 width: ( w - deltaY),
                                             },
                                         });
-                                        console.log("fuckaavva" + deltaY + "       " + this.state.zoomMode.width);
+                                        console.log("fuck" + deltaY + "       " + this.state.zoomMode.width);
                                     })}
                                 >
                                     <Canvas
@@ -353,6 +390,11 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                             message={strings.editorPage.tags.delete.confirmation}
                             confirmButtonColor="danger"
                             onConfirm={this.onTagDeleted} />
+                        <Confirm title={strings.editorPage.canvas.deleteAsset.title}
+                                 ref={this.deleteConfirm as any}
+                                 message={strings.editorPage.canvas.deleteAsset.confirmation}
+                                 confirmButtonColor="danger"
+                                 onConfirm={this.onAssetDeleted}/>
                     </div>
                 </SplitPane>
                 <Alert show={this.state.showInvalidRegionWarning}
@@ -369,6 +411,17 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         this.setState({
             selectedRegions: [],
         });
+    }
+
+    /**
+     * Remove asset and projects and saves files
+     * @param tagName Name of tag to be deleted
+     */
+    private onAssetDeleted = async (): Promise<void> => {
+        const { selectedAsset } = this.state;
+        await this.localFileSystem.deleteDirectory(decodeURI(selectedAsset.asset.path.replace("file:", "")));
+        toast.success(`成功删除`);
+
     }
 
     /**
@@ -401,6 +454,23 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
      * @param tag Tag clicked
      */
     private onTagClicked = (tag: ITag): void => {
+        console.log("editorPage: onTagClicked: " + JSON.stringify(tag));
+        if (tag.name === "OK") {
+            this.canvas.current.removeAllRegions();
+            this.setState({
+                selectedAsset: {
+                    ...this.state.selectedAsset,
+                    asset: {
+                        ...this.state.selectedAsset.asset,
+                        state: AssetState.OkTagged,
+                    },
+                },
+            });
+            // toast.success("图片ok,删除所有的框");
+            // asdsds
+            console.log("EditorSideBar asset onTagClicked: " + JSON.stringify(this.state.selectedAsset));
+            return;
+        }
         this.setState({
             selectedTag: tag.name,
             lockedTags: [],
@@ -533,9 +603,14 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         // The root asset can either be the actual asset being edited (ex: VideoFrame) or the top level / root
         // asset selected from the side bar (image/video).
         const rootAsset = { ...(assetMetadata.asset.parent || assetMetadata.asset) };
-
+        // console.log("assetMetadata: " + JSON.stringify(assetMetadata));
         if (this.isTaggableAssetType(assetMetadata.asset)) {
-            assetMetadata.asset.state = assetMetadata.regions.length > 0 ? AssetState.Tagged : AssetState.Visited;
+            if (assetMetadata.asset.state === AssetState.OkTagged) {
+                assetMetadata.asset.state = AssetState.OkTagged;
+            } else {
+                assetMetadata.asset.state = assetMetadata.regions.length > 0 ? AssetState.Tagged : AssetState.Visited;
+            }
+            console.log("assetMetadata " + JSON.stringify(assetMetadata));
         } else if (assetMetadata.asset.state === AssetState.NotVisited) {
             assetMetadata.asset.state = AssetState.Visited;
         }
@@ -639,6 +714,10 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                     editorMode: EditorMode.CopyRect,
                 });
                 break;
+            case ToolbarItemName.ShowAllRegions:
+                break;
+            case ToolbarItemName.HideAllRegions:
+                break;
             case ToolbarItemName.SelectCanvas:
                 this.setState({
                     selectionMode: SelectionMode.NONE,
@@ -686,6 +765,9 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
             case ToolbarItemName.NextAsset:
                 await this.goToRootAsset(1);
                 break;
+            case ToolbarItemName.DeleteAsset:
+                this.deleteConfirm.current.open();
+                break;
             case ToolbarItemName.CopyRegions:
                 this.canvas.current.copyRegions();
                 break;
@@ -700,6 +782,9 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                 break;
             case ToolbarItemName.ActiveLearning:
                 await this.predictRegions();
+                break;
+            case ToolbarItemName.ExportProject:
+                toast.error("开始到处");
                 break;
         }
     }

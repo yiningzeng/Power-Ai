@@ -60,11 +60,11 @@ export default class Confirm extends React.Component<IConfirmProps, IConfirmStat
                 <Button
                     autoFocus={true}
                     color={this.props.confirmButtonColor || "primary"}
-                    onClick={this.onConfirmClick}>{this.props.confirmButtonText || "Yes"}
+                    onClick={this.onConfirmClick}>{this.props.confirmButtonText || "确定"}
                 </Button>
                 <Button
                     color={this.props.cancelButtonColor || "secondary"}
-                    onClick={this.onCancelClick}>{this.props.cancelButtonText || "No"}
+                    onClick={this.onCancelClick}>{this.props.cancelButtonText || "取消"}
                 </Button>
             </MessageBox>
         );
