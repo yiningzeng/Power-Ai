@@ -306,15 +306,6 @@ export const english: IAppStrings = {
                     },
                 },
             },
-            vottJson: {
-                displayName: "VoTT JSON",
-                properties: {
-                    includeImages: {
-                        title: "Include Images",
-                        description: "Whether or not to include binary image assets in target connection",
-                    },
-                },
-            },
             azureCV: {
                 displayName: "Azure Custom Vision Service",
                 regions: {

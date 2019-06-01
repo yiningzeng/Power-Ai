@@ -53,11 +53,11 @@ export default function registerProviders() {
     // });
 
     // Export Providers
-    ExportProviderFactory.register({
-        name: "vottJson",
-        displayName: strings.export.providers.vottJson.displayName,
-        factory: (project, options) => new VottJsonExportProvider(project, options),
-    });
+    // ExportProviderFactory.register({
+    //     name: "vottJson",
+    //     displayName: strings.export.providers.vottJson.displayName,
+    //     factory: (project, options) => new VottJsonExportProvider(project, options),
+    // });
     ExportProviderFactory.register({
         name: "coco",
         displayName: strings.export.providers.coco.displayName,

@@ -303,15 +303,6 @@ export interface IAppStrings {
                     },
                 },
             },
-            vottJson: {
-                displayName: string,
-                properties: {
-                    includeImages: {
-                        title: string,
-                        description: string,
-                    },
-                },
-            },
             azureCV: {
                 displayName: string,
                 regions: {

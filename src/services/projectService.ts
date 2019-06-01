@@ -49,9 +49,9 @@ const defaultTrainOptions: ITrainFormat = {
 };
 
 const defaultExportOptions: IExportFormat = {
-    providerType: "vottJson",
+    providerType: "coco",
     providerOptions: {
-        assetState: ExportAssetState.Visited,
+        assetState: ExportAssetState.All,
         includeImages: true,
     },
 };
