@@ -73,13 +73,13 @@ export class TitleBar extends React.Component<ITitleBarProps, ITitleBarState> {
                 }
                 {this.state.platform === PlatformType.Windows &&
                     <div className="title-bar-menu">
-                        <Menu ref={this.menu}
-                            mode="horizontal"
-                            selectable={false}
-                            triggerSubMenuAction="click"
-                            onClick={this.onMenuItemSelected}>
-                            {this.renderMenu(this.state.menu)}
-                        </Menu>
+                        {/*<Menu ref={this.menu}*/}
+                            {/*mode="horizontal"*/}
+                            {/*selectable={false}*/}
+                            {/*triggerSubMenuAction="click"*/}
+                            {/*onClick={this.onMenuItemSelected}>*/}
+                            {/*{this.renderMenu(this.state.menu)}*/}
+                        {/*</Menu>*/}
                     </div>
                 }
                 <div className="title-bar-main">{this.props.title || "欢迎"} - AI Power</div>
