@@ -95,5 +95,10 @@ export default function registerProviders() {
         displayName: strings.train.providers.fasterRcnn.displayName,
         factory: (project, options) => new FasterRcnnProvider(project, options),
     });
+    TrainProviderFactory.register({
+        name: "fpn",
+        displayName: "FPN",
+        factory: (project, options) => new FasterRcnnProvider(project, options),
+    });
     registerToolbar();
 }
