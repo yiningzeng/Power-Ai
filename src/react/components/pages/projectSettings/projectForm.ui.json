@@ -6,7 +6,7 @@
         "ui:widget": "textarea"
     },
     "sourceConnection": {
-        "ui:field": "sourceConnection"
+        "ui:widget": "localFolderPicker"
     },
     "sourceListConnection": {
         "items": {
@@ -14,7 +14,7 @@
         }
     },
     "targetConnection": {
-        "ui:field": "targetConnection"
+        "ui:widget": "localFolderPicker"
     },
     "tags": {
         "ui:field": "tagsInput"

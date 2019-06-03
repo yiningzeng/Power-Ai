@@ -35,13 +35,13 @@ export default function Sidebar({ project }) {
                         <i className="fas fa-sliders-h"></i>
                     </ConditionalNavLink>
                 </li>
-                <li>
-                    <ConditionalNavLink disabled={!projectId}
-                        title={strings.export.title}
-                        to={`/projects/${projectId}/export`}>
-                        <i className="fas fa-external-link-square-alt"></i>
-                    </ConditionalNavLink>
-                </li>
+                {/*<li>*/}
+                    {/*<ConditionalNavLink disabled={!projectId}*/}
+                        {/*title={strings.export.title}*/}
+                        {/*to={`/projects/${projectId}/export`}>*/}
+                        {/*<i className="fas fa-external-link-square-alt"></i>*/}
+                    {/*</ConditionalNavLink>*/}
+                {/*</li>*/}
                 {/*<li>*/}
                     {/*<ConditionalNavLink disabled={!projectId}*/}
                         {/*title={strings.activeLearning.title}*/}
@@ -56,13 +56,13 @@ export default function Sidebar({ project }) {
                         {/*<i className="fas fa-beer"></i>*/}
                     {/*</ConditionalNavLink>*/}
                 {/*</li>*/}
-                <li>
-                    <ConditionalNavLink disabled={!projectId}
-                                        title={"训练设置"}
-                                        to={`/projects/${projectId}/train`}>
-                        <i className="fas fa-beer"></i>
-                    </ConditionalNavLink>
-                </li>
+                {/*<li>*/}
+                    {/*<ConditionalNavLink disabled={!projectId}*/}
+                                        {/*title={"训练设置"}*/}
+                                        {/*to={`/projects/${projectId}/train`}>*/}
+                        {/*<i className="fas fa-beer"></i>*/}
+                    {/*</ConditionalNavLink>*/}
+                {/*</li>*/}
                 {/*<li>*/}
                     {/*<NavLink title={strings.connections.title}*/}
                         {/*to={`/connections`}><i className="fas fa-plug"></i></NavLink>*/}

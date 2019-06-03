@@ -211,8 +211,15 @@ export default function registerToolbar() {
         group: ToolbarItemGroup.Project,
         type: ToolbarItemType.Action,
         accelerators: ["CmdOrCtrl+E", "CmdOrCtrl+e"],
-    }, ExportProject);
-
+    });
+    // ToolbarItemFactory.register({
+    //     name: ToolbarItemName.ExportProject,
+    //     tooltip: strings.editorPage.toolbar.exportProject,
+    //     icon: "fa-external-link-square-alt",
+    //     group: ToolbarItemGroup.Project,
+    //     type: ToolbarItemType.Action,
+    //     accelerators: ["CmdOrCtrl+E", "CmdOrCtrl+e"],
+    // }, ExportProject);
     ToolbarItemFactory.register({
         name: ToolbarItemName.TrainAi,
         tooltip: strings.editorPage.toolbar.trainAi,
@@ -221,5 +228,14 @@ export default function registerToolbar() {
         group: ToolbarItemGroup.Ai,
         type: ToolbarItemType.Action,
         accelerators: ["CmdOrCtrl+T", "CmdOrCtrl+t"],
-    }, TrainAi);
+    });
+    // ToolbarItemFactory.register({
+    //     name: ToolbarItemName.TrainAi,
+    //     tooltip: strings.editorPage.toolbar.trainAi,
+    //     icon: "fa fa-train",
+    //     // icon: "fas fa-caret-square-right",
+    //     group: ToolbarItemGroup.Ai,
+    //     type: ToolbarItemType.Action,
+    //     accelerators: ["CmdOrCtrl+T", "CmdOrCtrl+t"],
+    // }, TrainAi);
 }

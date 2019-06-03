@@ -9,6 +9,7 @@ import { strings } from "../../../../common/strings";
 import { ExportAssetState } from "../../../../providers/export/exportProvider";
 import { toast } from "react-toastify";
 import {IYoloV3} from "../../../../models/trainConfig";
+import {IpcRendererProxy} from "../../../../common/ipcRendererProxy";
 
 /**
  * Properties for Export Page
@@ -111,6 +112,31 @@ export default class TrainPage extends React.Component<ITrainPageProps> {
 
         await this.props.actions.saveProject(projectToUpdate);
         toast.success(strings.export.messages.saveSuccess);
+
+        // region 开始训练
+        // const infoId = toast.info(`开始导出 ${this.props.project.name} ...`);
+        // const results = await this.props.actions.exportProject(this.props.project);
+        // const resultsTrainConfig = await this.props.actions.exportTrainConfig(this.props.project);
+        // toast.dismiss(infoId);
+        //
+        // if (!resultsTrainConfig || (resultsTrainConfig && resultsTrainConfig.success)) {
+        //     toast.success(`导出成功!`);
+        // } else if (resultsTrainConfig && !resultsTrainConfig.success) {
+        // }
+        // if (!results || (results && results.errors.length === 0)) {
+        //     toast.success(`导出成功!`);
+        // } else if (results && results.errors.length > 0) {
+        //     toast.warn(`成功导出部分 ${results.completed.length}/${results.count} 资源`);
+        // }
+
+        toast.info(`开始配置训练...`);
+
+        IpcRendererProxy.send(`TrainingSystem:${this.props.project.trainFormat.providerType}`, [this.props.project])
+            .then(() => {
+                toast.success(`配置成功`);
+            });
+        // endregion
+
         this.props.history.goBack();
     }
 

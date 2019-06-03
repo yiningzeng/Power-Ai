@@ -2,7 +2,14 @@ import React from "react";
 import Form, { FormValidation, ISubmitEvent, IChangeEvent, Widget } from "react-jsonschema-form";
 import { ITagsInputProps, TagEditorModal, TagsInput } from "vott-react";
 import { addLocValues, strings } from "../../../../common/strings";
-import { IConnection, IProject, ITag, IAppSettings } from "../../../../models/applicationState";
+import {
+    IConnection,
+    IProject,
+    ITag,
+    IAppSettings,
+    IProviderOptions,
+    ISecureString
+} from "../../../../models/applicationState";
 import { StorageProviderFactory } from "../../../../providers/storage/storageProviderFactory";
 import { ConnectionPickerWithRouter } from "../../common/connectionPicker/connectionPicker";
 import { CustomField } from "../../common/customField/customField";
@@ -11,6 +18,8 @@ import { ISecurityTokenPickerProps, SecurityTokenPicker } from "../../common/sec
 import "vott-react/dist/css/tagsInput.css";
 import { IConnectionProviderPickerProps } from "../../common/connectionProviderPicker/connectionProviderPicker";
 import LocalFolderPicker from "../../common/localFolderPicker/localFolderPicker";
+import IConnectionActions, * as connectionActions from "../../../../redux/actions/connectionActions";
+import {ILocalFileSystemProxyOptions} from "../../../../providers/storage/localFileSystemProxy";
 
 // tslint:disable-next-line:no-var-requires
 const formSchema = addLocValues(require("./projectForm.json"));
@@ -137,14 +146,14 @@ export default class ProjectForm extends React.Component<IProjectFormProps, IPro
                 securityTokens: this.props.appSettings.securityTokens,
                 onChange: props.onChange,
             })),
-            sourceConnection: CustomField<IConnectionProviderPickerProps>(ConnectionPickerWithRouter, (props) => {
-                return {
-                    id: props.idSchema.$id,
-                    value: props.formData,
-                    connections: this.props.connections,
-                    onChange: props.onChange,
-                };
-            }),
+            // sourceConnection: CustomField<IConnectionProviderPickerProps>(ConnectionPickerWithRouter, (props) => {
+            //     return {
+            //         id: props.idSchema.$id,
+            //         value: props.formData,
+            //         connections: this.props.connections,
+            //         onChange: props.onChange,
+            //     };
+            // }),
             targetConnection: CustomField<IConnectionProviderPickerProps>(ConnectionPickerWithRouter, (props) => {
                 const targetConnections = this.props.connections
                     .filter((connection) => StorageProviderFactory.isRegistered(connection.providerType));
@@ -178,18 +187,16 @@ export default class ProjectForm extends React.Component<IProjectFormProps, IPro
     }
 
     private onFormValidate(project: IProject, errors: FormValidation) {
-        if (Object.keys(project.sourceConnection).length === 0) {
-            errors.sourceConnection.addError("is a required property");
-        }
-
-        if (Object.keys(project.targetConnection).length === 0) {
-            errors.targetConnection.addError("is a required property");
-        }
+        // if (Object.keys(project.sourceConnection).length === 0) {
+        //     errors.sourceConnection.addError("is a required property");
+        // }
+        //
 
         if (this.state.classNames.indexOf("was-validated") === -1) {
             this.setState({
                 classNames: [...this.state.classNames, "was-validated"],
             });
+            errors.name.addError("必填");
         }
 
         return errors;
@@ -209,10 +216,25 @@ export default class ProjectForm extends React.Component<IProjectFormProps, IPro
         if ( args.formData.tags === undefined || args.formData.tags.length === 0) {
             temp = [okTag];
         }
+        const provider: ILocalFileSystemProxyOptions = {
+            folderPath: args.formData.targetConnection + "",
+        };
+        const target: IConnection = {
+            id: new Date().getTime().toString(),
+            name: new Date().getTime().toString(),
+            providerType: "localFileSystemProxy",
+            providerOptions: provider,
+        };
+
+        connectionActions.saveConnection(target);
+        // connectionActions.loadConnection(target);
         const project: IProject = {
             ...args.formData,
             tags: temp === undefined ? args.formData.tags : temp,
+            targetConnection: target,
+            sourceConnection: target,
         };
+
         console.log("projectForm: " + JSON.stringify(project));
         this.props.onSubmit(project);
     }

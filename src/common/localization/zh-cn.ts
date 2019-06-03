@@ -91,7 +91,7 @@ export const chinese: IAppStrings = {
         },
         targetConnection: {
             title: "项目路径",
-            description: "用于保存和导出数据",
+            description: "初始项目素材路径，用于保存和导出数据",
         },
         videoSettings: {
             title: "视频设置",
