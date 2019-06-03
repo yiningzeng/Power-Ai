@@ -145,7 +145,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
             videoSettings: (this.props.project) ? this.props.project.videoSettings : null,
             activeLearningSettings: (this.props.project) ? this.props.project.activeLearningSettings : null,
         },
-        thumbnailSize: this.props.appSettings.thumbnailSize || { width: 100, height: 90 },
+        thumbnailSize: this.props.appSettings.thumbnailSize || { width: 350, height: 90 },
         isValid: true,
         showInvalidRegionWarning: false,
         zoomMode: emptyZoomMode,
