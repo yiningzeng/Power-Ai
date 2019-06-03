@@ -289,7 +289,14 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                         this.loadProjectAssets();
                                     } else { this.loadProjectAssetsWithFolder(item.toString()); }
                                 }}
-                                onDelete={(item) => { console.log(item); }}
+                                onDelete={async (item) => {
+                                    let aa: string[];
+                                    aa = project.sourceListConnection;
+                                    aa.splice(aa.indexOf(item), 1);
+                                    project.sourceListConnection = aa;
+                                    await this.props.applicationActions.ensureSecurityToken(project);
+                                    await this.props.actions.saveProject(project);
+                                }}
                                 showToolbar={true}/>
                         </div>
                         <EditorSideBar
