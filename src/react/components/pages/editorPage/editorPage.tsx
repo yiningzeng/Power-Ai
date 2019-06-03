@@ -58,8 +58,8 @@ const emptyZoomMode: IZoomMode = {
     x: 0,
     y: 0,
     miniWidth: 800,
-    width: "auto",
-    height: "auto",
+    width: 1000, // "auto",
+    height: 1000, // "auto",
 };
 /**
  * Properties for Editor Page
