@@ -1,14 +1,14 @@
 import React from "react";
 
 export default function SourceItem({ item, openDir, onClick, onDelete }) {
-    const nameTemp = `${item}`;
+    const nameTemp = `${item.folderPath}`;
     let name = nameTemp.slice(nameTemp.lastIndexOf("\\") + 1);
     // console.log("name: windows" + name);
     name = name.slice(name.lastIndexOf("/") + 1);
     // console.log("name: linux" + name);
     return (
         <li className={openDir === item ? "editor-page-sidebar-tree-item" : ""}>
-            <a onClick={onClick} title={item}>
+            <a onClick={onClick} title={nameTemp}>
                 {/*<i className="fas fa-folder-open"></i>*/}
                 { item === "已处理" ?
                     <i className="fa fa-archive"></i> :

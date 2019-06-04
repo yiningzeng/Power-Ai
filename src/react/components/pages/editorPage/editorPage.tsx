@@ -1,3 +1,4 @@
+///<reference path="../../../../models/applicationState.ts"/>
 import _ from "lodash";
 import React, {RefObject} from "react";
 import {connect} from "react-redux";
@@ -17,9 +18,9 @@ import {
     IApplicationState,
     IAppSettings,
     IAsset,
-    IAssetMetadata,
-    IProject,
-    IRegion,
+    IAssetMetadata, IConnection,
+    IProject, IProviderOptions,
+    IRegion, ISecureString,
     ISize,
     ITag,
     IZoomMode,
@@ -48,8 +49,9 @@ import SourceItem from "../../common/condensedList/sourceItem";
 import {Rnd} from "react-rnd";
 import Zoom from "../../common/zoom/zoom";
 
-import {LocalFileSystemProxy} from "../../../../providers/storage/localFileSystemProxy";
+import {ILocalFileSystemProxyOptions, LocalFileSystemProxy} from "../../../../providers/storage/localFileSystemProxy";
 import {async} from "q";
+import * as connectionActions from "../../../../redux/actions/connectionActions";
 // import "antd/lib/tree/style/css";
 
 let projectId;
@@ -81,7 +83,7 @@ export interface IEditorPageProps extends RouteComponentProps, React.Props<Edito
  * State for Editor Page
  */
 export interface IEditorPageState {
-    treeList: string[];
+    treeList: IProviderOptions[] | ISecureString[];
     /** Array of assets in project */
     assets: IAsset[];
     /** The editor mode to set for canvas tools */
@@ -175,7 +177,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
             await this.props.actions.loadProject(project);
         }
         this.setState({
-            treeList: this.props.project.sourceListConnection,
+            treeList: this.props.project.sourceConnection.providerOptionsOthers,
         });
         console.log("editorPage: project" + JSON.stringify(this.props.project));
         this.activeLearningService = new ActiveLearningService(this.props.project.activeLearningSettings);
@@ -192,7 +194,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         console.log("editorPage: componentDidUpdate prevProps: " + JSON.stringify(prevProps));
         if (this.props.project && !prevProps.project) {
             this.setState({
-                treeList: this.props.project.sourceListConnection,
+                treeList: this.props.project.sourceConnection.providerOptionsOthers,
                 additionalSettings: {
                     videoSettings: (this.props.project) ? this.props.project.videoSettings : null,
                     activeLearningSettings: (this.props.project) ? this.props.project.activeLearningSettings : null,
@@ -206,6 +208,16 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
     }
 
     public render() {
+        // console.log(document.getElementById("ct-zone").offsetWidth);
+        // if (this.state.zoomMode.width === "auto") {
+        //     this.setState({
+        //         zoomMode: {
+        //             ...this.state.zoomMode,
+        //             width: Number(document.getElementById("ct-zone")),
+        //             height: Number(document.getElementById("ct-zone").style.height),
+        //         },
+        //     });
+        // }
         const { project } = this.props;
         const { treeList, assets, selectedAsset } = this.state;
         const rootAssets = assets.filter((asset) => !asset.parent);
@@ -218,19 +230,6 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         const folderPath = project.sourceConnection.providerOptions["folderPath"];
         console.log("editorPage: render folderPath ", folderPath);
         console.log("editorPage: render treeList ", treeList);
-        try {
-            const lenth = treeList.filter((v) => v === folderPath).length;
-            if ( treeList.filter((v) => v === "已处理").length === 0) {
-                lenth === 0 ? treeList.unshift("已处理", folderPath) : treeList.unshift("已处理");
-            } else {
-                treeList.shift();
-                lenth === 0 ? treeList.unshift("已处理", folderPath) : treeList.unshift("已处理");
-            }
-        } catch (e) {
-            console.error(e);
-            this.setState({treeList: ["已处理", folderPath]});
-        }
-
         return (
             <div className="editor-page">
                 {[...Array(10).keys()].map((index) => {
@@ -267,20 +266,29 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                 onAddClick={async () => {
                                     console.log("新增文件夹");
                                     const filePath = await this.localFileSystem.selectContainer();
-                                    toast.info(`已经选择 ${filePath}`);
-                                    let aa: string[];
-                                    aa = project.sourceListConnection;
-                                    if (aa === undefined) {
-                                        aa = [filePath];
-                                    } else {
-                                        aa.push(filePath);
-                                    }
-                                    console.log(`fuck: ${JSON.stringify(aa)}`);
-                                    // aa.push(filePath);
-                                    project.sourceListConnection = aa;
-                                    await this.props.applicationActions.ensureSecurityToken(project);
-                                    await this.props.actions.saveProject(project);
-                                    // localStorage.removeItem(projectFormTempKey);
+                                    const provider: ILocalFileSystemProxyOptions = {
+                                        folderPath: filePath,
+                                    };
+                                    const newSource: IConnection = {
+                                        id: new Date().getTime().toString(),
+                                        name: new Date().getTime().toString(),
+                                        providerType: "localFileSystemProxy",
+                                        providerOptions: provider,
+                                    };
+                                    connectionActions.saveConnection(newSource);
+
+                                    const newProject: IProject = {
+                                        ...project,
+                                        sourceConnection: {
+                                            ...project.sourceConnection,
+                                            providerOptionsOthers: [
+                                                ...project.sourceConnection.providerOptionsOthers,
+                                                provider,
+                                            ],
+                                        },
+                                    };
+                                    await this.props.applicationActions.ensureSecurityToken(newProject);
+                                    await this.props.actions.saveProject(newProject);
                                 }}
                                 onClick={(item) => {
                                     if ( item === "已处理") {
@@ -485,13 +493,22 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
             });
             // toast.success("图片ok,删除所有的框");
             // asdsds
-            console.log("EditorSideBar asset onTagClicked: " + JSON.stringify(this.state.selectedAsset));
+            console.log("editorPage: onTagClicked: his.state.selectedAsset: OK " + JSON.stringify(this.state.selectedAsset));
             return;
+        } else {
+            this.setState({
+                selectedTag: tag.name,
+                lockedTags: [],
+                selectedAsset: {
+                    ...this.state.selectedAsset,
+                    asset: {
+                        ...this.state.selectedAsset.asset,
+                        state: AssetState.Tagged,
+                    },
+                },
+            }, () => this.canvas.current.applyTag(tag.name));
+            console.log("editorPage: onTagClicked: his.state.selectedAsset: Tagged " + JSON.stringify(this.state.selectedAsset));
         }
-        this.setState({
-            selectedTag: tag.name,
-            lockedTags: [],
-        }, () => this.canvas.current.applyTag(tag.name));
     }
 
     /**
