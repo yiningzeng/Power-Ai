@@ -49,6 +49,7 @@ import {Rnd} from "react-rnd";
 import Zoom from "../../common/zoom/zoom";
 
 import {LocalFileSystemProxy} from "../../../../providers/storage/localFileSystemProxy";
+import {async} from "q";
 // import "antd/lib/tree/style/css";
 
 let projectId;
@@ -428,9 +429,16 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
      */
     private onAssetDeleted = async (): Promise<void> => {
         const { selectedAsset } = this.state;
-        await this.localFileSystem.deleteDirectory(decodeURI(selectedAsset.asset.path.replace("file:", "")));
+        // await this.localFileSystem.deleteDirectory(decodeURI(selectedAsset.asset.path.replace("file:", "")));
+        // this.props.project.assets[selectedAsset.asset.id].
+        await this.props.actions.deleteAsset(this.props.project, selectedAsset.asset);
         toast.success(`成功删除`);
-
+        this.loadingProjectAssets = false;
+        this.setState({
+            assets: [],
+        });
+        this.loadProjectAssets();
+        // this.updateRootAssets();
     }
 
     /**

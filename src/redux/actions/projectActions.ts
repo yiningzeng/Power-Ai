@@ -33,7 +33,7 @@ export default interface IProjectActions {
     loadAssetsWithFolder(project: IProject, folder: string): Promise<IAsset[]>;
     loadAssetMetadata(project: IProject, asset: IAsset): Promise<IAssetMetadata>;
     saveAssetMetadata(project: IProject, assetMetadata: IAssetMetadata): Promise<IAssetMetadata>;
-    deleteAsset(project: IProject, filePath: string): Promise<void>;
+    deleteAsset(project: IProject, selectAsset: IAsset): Promise<void>;
     updateProjectTag(project: IProject, oldTagName: string, newTagName: string): Promise<IAssetMetadata[]>;
     deleteProjectTag(project: IProject, tagName): Promise<IAssetMetadata[]>;
 }
@@ -196,23 +196,20 @@ export function saveAssetMetadata(
  * Dispatches Delete Project action and resolves with project
  * @param project - Project to delete
  */
-export function deleteAsset(project: IProject, filePath: string)
-    : (dispatch: Dispatch) => Promise<void> {
-    return async (dispatch: Dispatch) => {
-        const projectService = new ProjectService();
-
-        // // Lookup security token used to decrypt project settings
-        // const projectToken = appState.appSettings.securityTokens
-        //     .find((securityToken) => securityToken.name === project.securityToken);
-        //
-        // if (!projectToken) {
-        //     throw new AppError(ErrorCode.SecurityTokenNotFound, "Security Token Not Found");
-        // }
-        //
-        // const decryptedProject = await projectService.load(project, projectToken);
-        //
-        // await projectService.delete(decryptedProject);
-        // dispatch(deleteProjectAction(decryptedProject));
+export function deleteAsset(project: IProject, selectAsset: IAsset)
+    : (dispatch: Dispatch, getState: () => IApplicationState) => Promise<void> {
+    return async (dispatch: Dispatch, getState: () => IApplicationState) => {
+        const assetService = new AssetService(project);
+        // alert("删除素材: assetService" + JSON.stringify(assetService));
+        const currentProject = getState().currentProject;
+        const updatedProject = {
+            ...currentProject,
+            assets: assetService.deleteAsset(selectAsset),
+        };
+        // @ts-ignore
+        await saveProject(updatedProject)(dispatch, getState);
+        // @ts-ignore
+        dispatch(updateProjectTagAction(updatedProject));
     };
 }
 
