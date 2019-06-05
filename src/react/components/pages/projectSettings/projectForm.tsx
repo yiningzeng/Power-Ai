@@ -224,6 +224,7 @@ export default class ProjectForm extends React.Component<IProjectFormProps, IPro
             name: new Date().getTime().toString(),
             providerType: "localFileSystemProxy",
             providerOptions: provider,
+            providerOptionsOthers: [provider],
         };
 
         connectionActions.saveConnection(target);

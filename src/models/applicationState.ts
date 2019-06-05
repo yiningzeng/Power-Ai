@@ -172,6 +172,7 @@ export interface IConnection {
     description?: string;
     providerType: string;
     providerOptions: IProviderOptions | ISecureString;
+    providerOptionsOthers?: IProviderOptions[] | ISecureString[]; // 这里新增其他文件夹
 }
 
 /**

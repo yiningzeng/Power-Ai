@@ -91,6 +91,10 @@ export interface IAppStrings {
         sourceConnection: {
             title: string;
             description: string;
+            removeProvider: {
+                title: string,
+                confirmation: string,
+            },
         },
         targetConnection: {
             title: string;
