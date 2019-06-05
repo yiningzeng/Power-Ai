@@ -88,6 +88,10 @@ export const chinese: IAppStrings = {
         sourceConnection: {
             title: "关联资源",
             description: "资源的路径",
+            removeProvider: {
+                title: "移除文件夹",
+                confirmation: "确定要移除素材文件夹吗？这不会删除本地文件",
+            },
         },
         targetConnection: {
             title: "项目路径",

@@ -89,6 +89,10 @@ export const english: IAppStrings = {
         sourceConnection: {
             title: "Source Connection",
             description: "Where to load assets from",
+            removeProvider: {
+                title: "Remove Source Folder",
+                confirmation: "Are you sure you want to remove source folder?",
+            },
         },
         targetConnection: {
             title: "Target Connection",

@@ -161,6 +161,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
     private canvas: RefObject<Canvas> = React.createRef();
     private renameTagConfirm: React.RefObject<Confirm> = React.createRef();
     private deleteTagConfirm: React.RefObject<Confirm> = React.createRef();
+    private deleteSourceProviderConfirm: React.RefObject<Confirm> = React.createRef();
     private deleteConfirm: React.RefObject<Confirm> = React.createRef();
 
     constructor(props, context) {
@@ -299,12 +300,13 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                     } else { this.loadProjectAssetsWithFolder(item.toString()); }
                                 }}
                                 onDelete={async (item) => {
-                                    let aa: string[];
-                                    aa = project.sourceListConnection;
-                                    aa.splice(aa.indexOf(item), 1);
-                                    project.sourceListConnection = aa;
-                                    await this.props.applicationActions.ensureSecurityToken(project);
-                                    await this.props.actions.saveProject(project);
+                                   this.deleteSourceProviderConfirm.current.open(project, item);
+                                    // let aa: string[];
+                                    // aa = project.sourceListConnection;
+                                    // aa.splice(aa.indexOf(item), 1);
+                                    // project.sourceListConnection = aa;
+                                    // await this.props.applicationActions.ensureSecurityToken(project);
+                                    // await this.props.actions.saveProject(project);
                                 }}
                                 showToolbar={true}/>
                         </div>
@@ -408,6 +410,11 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                             message={strings.editorPage.tags.delete.confirmation}
                             confirmButtonColor="danger"
                             onConfirm={this.onTagDeleted} />
+                        <Confirm title={strings.projectSettings.sourceConnection.removeProvider.title}
+                                 ref={this.deleteSourceProviderConfirm}
+                                 message={strings.projectSettings.sourceConnection.removeProvider.confirmation}
+                                 confirmButtonColor="danger"
+                                 onConfirm={this.onSourceProviderDeleted} />
                         <Confirm title={strings.editorPage.canvas.deleteAsset.title}
                                  ref={this.deleteConfirm as any}
                                  message={strings.editorPage.canvas.deleteAsset.confirmation}
@@ -428,6 +435,25 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
     private onPageClick = () => {
         this.setState({
             selectedRegions: [],
+        });
+    }
+
+    private onSourceProviderDeleted = async (project: IProject, item: IProviderOptions|ISecureString):
+        Promise<void> => {
+        const newProject: IProject = {
+            ...project,
+            sourceConnection: {
+                ...project.sourceConnection,
+                providerOptionsOthers:
+                    project.sourceConnection.providerOptionsOthers.filter(
+                        (i) => i !== item,
+                    ),
+            },
+        };
+        await this.props.applicationActions.ensureSecurityToken(newProject);
+        await this.props.actions.saveProject(newProject);
+        this.setState({
+            treeList: this.state.treeList.filter((i) => i !== item),
         });
     }
 
