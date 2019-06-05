@@ -267,6 +267,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                 onAddClick={async () => {
                                     console.log("新增文件夹");
                                     const filePath = await this.localFileSystem.selectContainer();
+                                    if (filePath === undefined) { return; }
                                     const provider: ILocalFileSystemProxyOptions = {
                                         folderPath: filePath,
                                     };
@@ -290,14 +291,31 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                     };
                                     await this.props.applicationActions.ensureSecurityToken(newProject);
                                     await this.props.actions.saveProject(newProject);
+                                    this.setState({
+                                        treeList: newProject.sourceConnection.providerOptionsOthers,
+                                    });
                                 }}
-                                onClick={(item) => {
-                                    if ( item === "已处理") {
-                                        this.setState({
-                                            assets: [],
-                                        });
-                                        this.loadProjectAssets();
-                                    } else { this.loadProjectAssetsWithFolder(item.toString()); }
+                                onClick={ async (item) => {
+                                    // if ( item === "已处理") {
+                                    //     this.setState({
+                                    //         assets: [],
+                                    //     });
+                                    //     this.loadProjectAssets();
+                                    // } else { this.loadProjectAssetsWithFolder(item.toString()); }
+                                    const newProject: IProject = {
+                                        ...project,
+                                        sourceConnection: {
+                                            ...project.sourceConnection,
+                                            providerOptions: item,
+                                        },
+                                    };
+                                    await this.props.applicationActions.ensureSecurityToken(newProject);
+                                    await this.props.actions.saveProject(newProject);
+                                    this.loadingProjectAssets = false;
+                                    this.setState({
+                                        assets: [],
+                                    });
+                                    this.loadProjectAssets();
                                 }}
                                 onDelete={async (item) => {
                                    this.deleteSourceProviderConfirm.current.open(project, item);
@@ -959,7 +977,6 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
 
         // Get all root assets from source asset provider
         const sourceAssets = await this.props.actions.loadAssets(this.props.project);
-
         // Merge and uniquify
         const rootAssets = _(rootProjectAssets)
             .concat(sourceAssets)
