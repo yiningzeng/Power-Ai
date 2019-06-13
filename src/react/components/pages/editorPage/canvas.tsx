@@ -1,7 +1,7 @@
 import React, { Fragment, ReactElement } from "react";
 import * as shortid from "shortid";
-import { CanvasTools } from "vott-ct";
-import { RegionData } from "vott-ct/lib/js/CanvasTools/Core/RegionData";
+import { CanvasTools } from "aipower-ct";
+import { RegionData } from "aipower-ct/lib/js/CanvasTools/Core/RegionData";
 import {
     AppError,
     EditorMode, ErrorCode, IAssetMetadata,
@@ -9,12 +9,12 @@ import {
 } from "../../../../models/applicationState";
 import CanvasHelpers from "./canvasHelpers";
 import { AssetPreview, ContentSource } from "../../common/assetPreview/assetPreview";
-import { Editor } from "vott-ct/lib/js/CanvasTools/CanvasTools.Editor";
+import { Editor } from "aipower-ct/lib/js/CanvasTools/CanvasTools.Editor";
 import Clipboard from "../../../../common/clipboard";
 import Confirm from "../../common/confirm/confirm";
 import {interpolate, strings} from "../../../../common/strings";
-import { SelectionMode } from "vott-ct/lib/js/CanvasTools/Interface/ISelectorSettings";
-import { Rect } from "vott-ct/lib/js/CanvasTools/Core/Rect";
+import { SelectionMode } from "aipower-ct/lib/js/CanvasTools/Interface/ISelectorSettings";
+import { Rect } from "aipower-ct/lib/js/CanvasTools/Core/Rect";
 import { createContentBoundingBox } from "../../../../common/layout";
 
 export interface ICanvasProps extends React.Props<Canvas> {
@@ -478,6 +478,22 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
 
         const canvas = this.canvasZone.current;
         if (canvas) {
+            console.log("开始输出canvas");
+            console.log(canvas);
+            // canvas.addEventListener("click", (e) => { alert(e.offsetX + " " + e.offsetY); });
+            canvas.addEventListener("mousedown", (e) => {
+                console.log(e.offsetX + " " + e.offsetY);
+            });
+            canvas.addEventListener("mousemove", (e) => {
+                console.log("move");
+                const context = this.editor.contentCanvas.getContext("2d");
+                context.beginPath();
+                context.moveTo(0, 0);
+                context.lineWidth = 2;
+                context.strokeStyle = "red";
+                context.lineTo(e.offsetX, e.offsetY);
+                context.stroke();
+            });
             const boundingBox = createContentBoundingBox(contentSource);
             canvas.style.top = `${boundingBox.top}px`;
             canvas.style.left = `${boundingBox.left}px`;
