@@ -1,21 +1,17 @@
-import React, { Fragment, ReactElement } from "react";
+import React, {Fragment, ReactElement} from "react";
 import * as shortid from "shortid";
-import { CanvasTools } from "aipower-ct";
-import { RegionData } from "aipower-ct/lib/js/CanvasTools/Core/RegionData";
-import {
-    AppError,
-    EditorMode, ErrorCode, IAssetMetadata,
-    IProject, IRegion, IZoomMode, RegionType,
-} from "../../../../models/applicationState";
+import {CanvasTools} from "aipower-ct";
+import {RegionData} from "aipower-ct/lib/js/CanvasTools/Core/RegionData";
+import {EditorMode, IAssetMetadata, IProject, IRegion, RegionType,} from "../../../../models/applicationState";
 import CanvasHelpers from "./canvasHelpers";
-import { AssetPreview, ContentSource } from "../../common/assetPreview/assetPreview";
-import { Editor } from "aipower-ct/lib/js/CanvasTools/CanvasTools.Editor";
+import {AssetPreview, ContentSource} from "../../common/assetPreview/assetPreview";
+import {Editor} from "aipower-ct/lib/js/CanvasTools/CanvasTools.Editor";
 import Clipboard from "../../../../common/clipboard";
 import Confirm from "../../common/confirm/confirm";
-import {interpolate, strings} from "../../../../common/strings";
-import { SelectionMode } from "aipower-ct/lib/js/CanvasTools/Interface/ISelectorSettings";
-import { Rect } from "aipower-ct/lib/js/CanvasTools/Core/Rect";
-import { createContentBoundingBox } from "../../../../common/layout";
+import {strings} from "../../../../common/strings";
+import {SelectionMode} from "aipower-ct/lib/js/CanvasTools/Interface/ISelectorSettings";
+import {Rect} from "aipower-ct/lib/js/CanvasTools/Core/Rect";
+import {createContentBoundingBox} from "../../../../common/layout";
 
 export interface ICanvasProps extends React.Props<Canvas> {
     selectedAsset: IAssetMetadata;
@@ -56,6 +52,11 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
     private clearConfirm: React.RefObject<Confirm> = React.createRef();
 
     private template: Rect = new Rect(20, 20);
+
+    private isMouseDown: boolean = false;
+    private drawFlag: number = 0;
+    private pointX: number;
+    private pointY: number;
 
     public componentDidMount = () => {
         const sz = document.getElementById("editor-zone") as HTMLDivElement;
@@ -478,22 +479,37 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
 
         const canvas = this.canvasZone.current;
         if (canvas) {
-            console.log("开始输出canvas");
-            console.log(canvas);
+            if (this.props.editorMode === EditorMode.Pencil) {
+                canvas.addEventListener("mousedown", (e) => {
+                    this.isMouseDown = true;
+                    this.pointX = e.offsetX;
+                    this.pointY = e.offsetY;
+                    console.log(`画笔： ${this.pointX}  ${this.pointY}`);
+                });
+                canvas.addEventListener("mouseup", (e) => {
+                   this.isMouseDown = false;
+                   this.drawFlag = 0;
+                   console.log(`画笔： 结束绘画`);
+                });
+                canvas.addEventListener("mousemove", (e) => {
+                    if (this.isMouseDown) {
+                        console.log(`画笔： 正在绘画`);
+                        const context = this.editor.contentCanvas.getContext("2d");
+                        if (this.drawFlag) { context.beginPath(); }
+                        context.moveTo(this.pointX, this.pointY);
+                        context.lineWidth = 2;
+                        context.strokeStyle = "red";
+                        context.lineTo(e.offsetX, e.offsetY);
+                        context.stroke();
+                        if (this.drawFlag !== 0) {
+                            this.pointX = e.offsetX;
+                            this.pointY = e.offsetY;
+                        }
+                        this.drawFlag++;
+                    }
+                });
+            }
             // canvas.addEventListener("click", (e) => { alert(e.offsetX + " " + e.offsetY); });
-            canvas.addEventListener("mousedown", (e) => {
-                console.log(e.offsetX + " " + e.offsetY);
-            });
-            canvas.addEventListener("mousemove", (e) => {
-                console.log("move");
-                const context = this.editor.contentCanvas.getContext("2d");
-                context.beginPath();
-                context.moveTo(0, 0);
-                context.lineWidth = 2;
-                context.strokeStyle = "red";
-                context.lineTo(e.offsetX, e.offsetY);
-                context.stroke();
-            });
             const boundingBox = createContentBoundingBox(contentSource);
             canvas.style.top = `${boundingBox.top}px`;
             canvas.style.left = `${boundingBox.left}px`;
@@ -562,6 +578,7 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
             case EditorMode.Rectangle:
                 type = RegionType.Rectangle;
                 break;
+            case EditorMode.Pencil:
             case EditorMode.Polygon:
                 type = RegionType.Polygon;
                 break;
