@@ -19,11 +19,11 @@ import { KeyboardManager, KeyEventType } from "../../common/keyboardManager/keyb
 jest.mock("../../../../services/projectService");
 import ProjectService from "../../../../services/projectService";
 
-jest.mock("vott-ct/lib/js/CanvasTools/CanvasTools.Editor");
-import { Editor } from "vott-ct/lib/js/CanvasTools/CanvasTools.Editor";
+jest.mock("aipower-ct/lib/js/CanvasTools/CanvasTools.Editor");
+import { Editor } from "aipower-ct/lib/js/CanvasTools/CanvasTools.Editor";
 
-jest.mock("vott-ct/lib/js/CanvasTools/Region/RegionsManager");
-import { RegionsManager } from "vott-ct/lib/js/CanvasTools/Region/RegionsManager";
+jest.mock("aipower-ct/lib/js/CanvasTools/Region/RegionsManager");
+import { RegionsManager } from "aipower-ct/lib/js/CanvasTools/Region/RegionsManager";
 import Canvas from "./canvas";
 import { appInfo } from "../../../../common/appInfo";
 import SplitPane from "react-split-pane";

@@ -226,6 +226,7 @@ export interface IAppStrings {
             select: string;
             pan: string;
             drawRectangle: string;
+            drawWithPencil: string;
             drawPolygon: string;
             copyRectangle: string;
             copy: string;

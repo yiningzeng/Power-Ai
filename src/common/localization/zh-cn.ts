@@ -227,6 +227,7 @@ export const chinese: IAppStrings = {
             pan: "Pan",
             drawRectangle: "矩形",
             drawPolygon: "多边形",
+            drawWithPencil: "画笔",
             copyRectangle: "标签印章",
             copy: "复制",
             cut: "剪切",
