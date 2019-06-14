@@ -57,6 +57,7 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
     private drawFlag: number = 0;
     private pointX: number;
     private pointY: number;
+    private pencilPoints: Array<{ x: number, y: number }> = [];
 
     public componentDidMount = () => {
         const sz = document.getElementById("editor-zone") as HTMLDivElement;
@@ -303,6 +304,9 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
             },
             points: scaledRegionData.points,
         };
+        console.log(`画笔： onSelectionEnd->regionData(初始数据) ${JSON.stringify(regionData)}`);
+        console.log(`画笔： onSelectionEnd->scaledRegionData(转换后数据) ${JSON.stringify(scaledRegionData)}`);
+        console.log(`画笔： onSelectionEnd->newRegion ${JSON.stringify(newRegion)}`);
         if (lockedTags && lockedTags.length) {
             this.editor.RM.updateTagsById(id, CanvasHelpers.getTagsDescriptor(this.props.project.tags, newRegion));
         }
@@ -484,21 +488,33 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
                     this.isMouseDown = true;
                     this.pointX = e.offsetX;
                     this.pointY = e.offsetY;
+                    this.pencilPoints.push({x: e.offsetX, y: e.offsetY});
                     console.log(`画笔： ${this.pointX}  ${this.pointY}`);
                 });
                 canvas.addEventListener("mouseup", (e) => {
-                   this.isMouseDown = false;
-                   this.drawFlag = 0;
-                   console.log(`画笔： 结束绘画`);
+                    this.isMouseDown = false;
+                    this.drawFlag = 0;
+                    this.pencilPoints.push({x: e.offsetX, y: e.offsetY});
+                    console.log(`画笔： 结束绘画，终点: {${e.offsetX}, ${e.offsetY}} 取到的点 ${JSON.stringify(this.pencilPoints)}`);
+                    this.pencilPoints = [];
                 });
                 canvas.addEventListener("mousemove", (e) => {
                     if (this.isMouseDown) {
                         console.log(`画笔： 正在绘画`);
                         const context = this.editor.contentCanvas.getContext("2d");
-                        if (this.drawFlag) { context.beginPath(); }
+                        if (this.drawFlag) {
+                            context.beginPath();
+                            if ((e.offsetX % 10) === 0 || (e.offsetY % 10) === 0) {
+                                console.log(`画笔： `);
+                                this.pencilPoints.push({x: e.offsetX, y: e.offsetY});
+                                // context.lineWidth = 5;
+                                // context.strokeStyle = "blue";
+                            } else {
+                                context.lineWidth = 2;
+                                context.strokeStyle = "red";
+                            }
+                        }
                         context.moveTo(this.pointX, this.pointY);
-                        context.lineWidth = 2;
-                        context.strokeStyle = "red";
                         context.lineTo(e.offsetX, e.offsetY);
                         context.stroke();
                         if (this.drawFlag !== 0) {
