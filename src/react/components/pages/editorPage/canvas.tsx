@@ -520,7 +520,8 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
                             height: this.maxPoint.y - this.minPoint.y,
                             points: this.anticlockwisePencilPoints.concat(this.clockwisePencilPoints),
                             type: RegionDataType.Polygon,
-                        } as RegionData, 这里有问题，不能是单单的提交进去 RegionData这个还需要改写插件
+                        } as RegionData,
+
                         this.state.currentAsset.asset.size.width,
                         this.state.currentAsset.asset.size.height,
                     );
