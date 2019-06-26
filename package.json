@@ -67,6 +67,7 @@
     "pack-all": "npm run build && npm run webpack:prod && electron-builder && electron-packager . aipower --all --out ./all --overwrite --app-version=0.0.1",
     "pack-win64": "npm run build && npm run webpack:prod && electron-builder && electron-builder && electron-packager . aipower --platform=win32 --out ./all --arch=x64 --overwrite --app-version=2.0.1 --icon=./qt.ico",
     "pack-linux": "npm run build && npm run webpack:prod && electron-builder && electron-packager . aipower --platform=linux --out ./all --arch=x64 --overwrite --app-version=2.0.0 --icon=./qt.ico",
+    "pack-arm-linux": "npm run build && npm run webpack:prod && electron-builder && electron-packager . aipower --platform=linux --out ./all --arch=arm64 --overwrite --app-version=2.0.0 --icon=./qt.ico",
     "pack-mac": "npm run build && npm run webpack:prod && electron-builder && electron-packager . aipower --platform=darwin --out ./all --arch=x64 --overwrite --app-version=2.0.0",
     "compile": "tsc",
     "build": "react-scripts build",
