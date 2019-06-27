@@ -1,0 +1,30 @@
+import { IToolbarIcon } from "../Interface/IToolbarIcon";
+import { IconCallback } from "./ToolbarIcon";
+export declare class Toolbar {
+    private baseParent;
+    private paper;
+    private paperRect;
+    private backgroundRect;
+    private iconsLayer;
+    private iconSpace;
+    private toolbarWidth;
+    private toolbarHeight;
+    private icons;
+    private areHotKeysEnabled;
+    constructor(svgHost: SVGSVGElement);
+    addSelector(icon: IToolbarIcon, actor: IconCallback): void;
+    addSwitch(icon: IToolbarIcon, actor: IconCallback): void;
+    addSeparator(): void;
+    addTrigger(icon: IToolbarIcon, actor: IconCallback): void;
+    select(action: string): void;
+    setSwitch(action: string, on: boolean): void;
+    enableHotkeys(): void;
+    disableHotkeys(): void;
+    private buildUIElements;
+    private recalculateToolbarSize;
+    private updateToolbarSize;
+    private addIcon;
+    private findIconByKeycode;
+    private findIconByAction;
+    private subscribeToKeyboardEvents;
+}

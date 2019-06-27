@@ -776,6 +776,8 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                         disableDrag: true,
                     },
                 });
+                // this.canvas.current.editor.AS.enable();
+                // this.canvas.current.editor.AS.show();
                 break;
             case ToolbarItemName.DrawRectangle:
                 this.setState({
