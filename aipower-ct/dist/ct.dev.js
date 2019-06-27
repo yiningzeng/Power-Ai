@@ -16384,6 +16384,9 @@ class AreaSelector {
         else if (selectionMode === ISelectorSettings_1.SelectionMode.POLYGON) {
             this.selector = this.polygonSelector;
         }
+        else if (selectionMode === ISelectorSettings_1.SelectionMode.PENCIL) {
+            this.selector = this.polygonSelector;
+        }
         // restore enablement status
         this.enable();
         if (this.isVisible) {

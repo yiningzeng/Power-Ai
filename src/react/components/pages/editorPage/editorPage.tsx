@@ -769,13 +769,15 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         switch (toolbarItem.props.name) {
             case ToolbarItemName.DrawWithPencil:
                 this.setState({
-                    selectionMode: SelectionMode.NONE,
+                    selectionMode: SelectionMode.PENCIL,
                     editorMode: EditorMode.Pencil,
                     zoomMode: {
                         ...this.state.zoomMode,
                         disableDrag: true,
                     },
                 });
+                // this.canvas.current.editor.AS.enable();
+                // this.canvas.current.editor.AS.show();
                 break;
             case ToolbarItemName.DrawRectangle:
                 this.setState({

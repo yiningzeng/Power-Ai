@@ -11,5 +11,6 @@ var SelectionMode;
     SelectionMode[SelectionMode["COPYRECT"] = 3] = "COPYRECT";
     SelectionMode[SelectionMode["POLYLINE"] = 4] = "POLYLINE";
     SelectionMode[SelectionMode["POLYGON"] = 5] = "POLYGON";
+    SelectionMode[SelectionMode["PENCIL"] = 6] = "PENCIL";
 })(SelectionMode = exports.SelectionMode || (exports.SelectionMode = {}));
 //# sourceMappingURL=ISelectorSettings.js.map
