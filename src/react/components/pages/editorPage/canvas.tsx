@@ -364,7 +364,7 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
                 top: scaledRegionData.y,
             };
         }
-
+        console.log(`画笔： onRegionMoveEnd`);
         currentRegions[movedRegionIndex] = movedRegion;
         this.updateAssetRegions(currentRegions);
     }
@@ -479,6 +479,145 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
         }
     }
 
+    private mousedown = (e) => {
+        this.isMouseDown = true;
+        this.pointX = e.offsetX;
+        this.pointY = e.offsetY;
+        this.pencilPoints = [];
+        this.anticlockwisePencilPoints = [];
+        this.clockwisePencilPoints = [];
+        this.pencilPoints.push(new Point2D(e.offsetX, e.offsetY));
+        this.anticlockwisePencilPoints.push(new Point2D(e.offsetX, e.offsetY));
+        this.clockwisePencilPoints.push(new Point2D(e.offsetX, e.offsetY));
+        this.minPoint = this.maxPoint = new Point2D(e.offsetX, e.offsetY);
+        console.log(`画笔： ${this.pointX}  ${this.pointY}`);
+    }
+    private mouseup = (e) => {
+        this.isMouseDown = false;
+        this.drawFlag = 0;
+
+        // region 绘画 最小矩形边框
+        const context = this.editor.contentCanvas.getContext("2d");
+        context.rect(this.minPoint.x, this.minPoint.y,
+            this.maxPoint.x - this.minPoint.x, this.maxPoint.y - this.minPoint.y);
+        context.stroke();
+        // endregion
+
+        const id = shortid.generate();
+        const lockedTags = this.props.lockedTags;
+        for (let i = this.clockwisePencilPoints.length - 1; i >= 0; i--) {
+            this.anticlockwisePencilPoints.push(this.clockwisePencilPoints[i]);
+        }
+        const pencilRegionData = new RegionData(this.minPoint.x,
+            this.minPoint.y,
+            this.maxPoint.x - this.minPoint.x,
+            this.maxPoint.y - this.minPoint.y,
+            this.anticlockwisePencilPoints,
+            RegionDataType.Polygon);
+        const scaledRegionData = this.editor.scaleRegionToSourceSize(pencilRegionData,
+            this.state.currentAsset.asset.size.width,
+            this.state.currentAsset.asset.size.height,
+        );
+        const newRegion = {
+            id,
+            type: this.editorModeToType(EditorMode.Polygon),
+            tags: lockedTags || [],
+            boundingBox: {
+                height: scaledRegionData.height,
+                width: scaledRegionData.width,
+                left: scaledRegionData.x,
+                top: scaledRegionData.y,
+            },
+            points: scaledRegionData.points,
+        };
+        if (lockedTags && lockedTags.length) {
+            this.editor.RM.updateTagsById(id,
+                CanvasHelpers.getTagsDescriptor(this.props.project.tags, newRegion));
+        }
+        this.updateAssetRegions([...this.state.currentAsset.regions, newRegion]);
+        if (this.props.onSelectedRegionsChanged) {
+            this.props.onSelectedRegionsChanged([newRegion]);
+        }
+
+        console.log(`画笔： 结束绘画，终点: {${e.offsetX}, ${e.offsetY}} 取到的点 ${JSON.stringify(this.pencilPoints)}`);
+        this.pencilPoints = [];
+        this.pencilPoints.push(new Point2D(e.offsetX, e.offsetY));
+    }
+    private mousemove = (e) => {
+        if (this.isMouseDown) {
+            console.log(`画笔： 正在绘画`);
+            const context = this.editor.contentCanvas.getContext("2d");
+            const context1 = this.editor.contentCanvas.getContext("2d");
+            const context2 = this.editor.contentCanvas.getContext("2d");
+            if (this.drawFlag) {
+                context.beginPath();
+                context1.beginPath();
+                context2.beginPath();
+                if ((e.offsetX % 5) === 0 || (e.offsetY % 5) === 0) {
+                    const temp = this.pencilPoints.filter((v) => v.x === e.offsetX && v.y === e.offsetY);
+                    if (temp.length === 0) {
+                        if (e.offsetX < this.minPoint.x) {
+                            this.minPoint = new Point2D(e.offsetX, this.minPoint.y);
+                        }
+                        if (e.offsetY < this.minPoint.y) {
+                            this.minPoint = new Point2D(this.minPoint.x, e.offsetY);
+                        }
+                        if (e.offsetX > this.maxPoint.x) {
+                            this.maxPoint = new Point2D(e.offsetX, this.maxPoint.y);
+                        }
+                        if (e.offsetY > this.maxPoint.y) {
+                            this.maxPoint = new Point2D(this.maxPoint.x, e.offsetY);
+                        }
+                        const origin = this.pencilPoints[this.pencilPoints.length - 1];
+                        const differPoint: IPoint = {
+                            // x: e.offsetX - origin.x,
+                            // y: e.offsetY - origin.y,
+                            x: 1,
+                            y: 1,
+                        };
+                        console.log(`画笔： 两点的差值(${JSON.stringify(differPoint)})`);
+                        const anticlockwisePoint: IPoint = {x: -differPoint.y, y: differPoint.x}; // 逆时针转的点
+                        const clockwisePoint: IPoint = {x: differPoint.y, y: -differPoint.x}; // 顺时针转的点
+
+                        const point1 = this.anticlockwisePencilPoints[
+                        this.anticlockwisePencilPoints.length - 1];
+                        const point2 = this.clockwisePencilPoints[
+                        this.clockwisePencilPoints.length - 1];
+                        context1.moveTo(point1.x, point1.y);
+                        context1.lineTo(origin.x + anticlockwisePoint.x, origin.y + anticlockwisePoint.y);
+                        context2.moveTo(point2.x, point2.y);
+                        context2.lineTo(origin.x + clockwisePoint.x, origin.y + clockwisePoint.y);
+                        context1.stroke();
+                        context2.stroke();
+                        // 逆时针点新增
+                        this.anticlockwisePencilPoints.push(
+                            new Point2D(origin.x + anticlockwisePoint.x, origin.y + anticlockwisePoint.y),
+                        );
+                        // 逆时针点新增
+                        this.clockwisePencilPoints.push(
+                            new Point2D(origin.x + clockwisePoint.x, origin.y + clockwisePoint.y),
+                        );
+                        this.pencilPoints.push(new Point2D(e.offsetX, e.offsetY));
+                    }
+                    // console.log(`画笔： 查询是否有重复的 ${JSON.stringify(temp)}`);
+                    // console.log(`画笔： 最终的 ${JSON.stringify(this.pencilPoints)}`);
+                    // context.lineWidth = 5;
+                    // context.strokeStyle = "blue";
+                } else {
+                    context.lineWidth = 2;
+                    context.strokeStyle = "red";
+                }
+            }
+            context.moveTo(this.pointX, this.pointY);
+            context.lineTo(e.offsetX, e.offsetY);
+            context.stroke();
+            if (this.drawFlag !== 0) {
+                this.pointX = e.offsetX;
+                this.pointY = e.offsetY;
+            }
+            this.drawFlag++;
+        }
+    }
     /**
      * Positions the canvas tools drawing surface to be exactly over the asset content
      */
@@ -489,144 +628,15 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
 
         const canvas = this.canvasZone.current;
         if (canvas) {
-            if (this.props.editorMode === EditorMode.Pencil) {
-                canvas.addEventListener("mousedown", (e) => {
-                    this.isMouseDown = true;
-                    this.pointX = e.offsetX;
-                    this.pointY = e.offsetY;
-                    this.pencilPoints.push(new Point2D(e.offsetX, e.offsetY));
-                    this.anticlockwisePencilPoints.push(new Point2D(e.offsetX, e.offsetY));
-                    this.clockwisePencilPoints.push(new Point2D(e.offsetX, e.offsetY));
-                    this.minPoint = this.maxPoint = new Point2D(e.offsetX, e.offsetY);
-                    console.log(`画笔： ${this.pointX}  ${this.pointY}`);
-                });
-                canvas.addEventListener("mouseup", (e) => {
-                    this.isMouseDown = false;
-                    this.drawFlag = 0;
-
-                    // region 绘画 最小矩形边框
-                    const context = this.editor.contentCanvas.getContext("2d");
-                    context.rect(this.minPoint.x, this.minPoint.y,
-                        this.maxPoint.x - this.minPoint.x, this.maxPoint.y - this.minPoint.y);
-                    context.stroke();
-                    // endregion
-
-                    const id = shortid.generate();
-                    const lockedTags = this.props.lockedTags;
-                    const scaledRegionData = this.editor.scaleRegionToSourceSize({
-                            x: this.minPoint.x,
-                            y: this.minPoint.y,
-                            width: this.maxPoint.x - this.minPoint.x,
-                            height: this.maxPoint.y - this.minPoint.y,
-                            points: this.anticlockwisePencilPoints.concat(this.clockwisePencilPoints),
-                            type: RegionDataType.Polygon,
-                        } as RegionData,
-
-                        this.state.currentAsset.asset.size.width,
-                        this.state.currentAsset.asset.size.height,
-                    );
-                    const newRegion = {
-                        id,
-                        type: this.editorModeToType(EditorMode.Polygon),
-                        tags: lockedTags || [],
-                        boundingBox: {
-                            height: scaledRegionData.height,
-                            width: scaledRegionData.width,
-                            left: scaledRegionData.x,
-                            top: scaledRegionData.y,
-                        },
-                        points: scaledRegionData.points,
-                    };
-                    if (lockedTags && lockedTags.length) {
-                        this.editor.RM.updateTagsById(id,
-                            CanvasHelpers.getTagsDescriptor(this.props.project.tags, newRegion));
-                    }
-                    this.updateAssetRegions([...this.state.currentAsset.regions, newRegion]);
-                    if (this.props.onSelectedRegionsChanged) {
-                        this.props.onSelectedRegionsChanged([newRegion]);
-                    }
-
-                    console.log(`画笔： 结束绘画，终点: {${e.offsetX}, ${e.offsetY}} 取到的点 ${JSON.stringify(this.pencilPoints)}`);
-                    this.pencilPoints = [];
-                    this.pencilPoints.push(new Point2D(e.offsetX, e.offsetY));
-
-
-                });
-                canvas.addEventListener("mousemove", (e) => {
-                    if (this.isMouseDown) {
-                        console.log(`画笔： 正在绘画`);
-                        const context = this.editor.contentCanvas.getContext("2d");
-                        const context1 = this.editor.contentCanvas.getContext("2d");
-                        const context2 = this.editor.contentCanvas.getContext("2d");
-                        if (this.drawFlag) {
-                            context.beginPath();
-                            context1.beginPath();
-                            context2.beginPath();
-                            if ((e.offsetX % 5) === 0 || (e.offsetY % 5) === 0) {
-                                const temp = this.pencilPoints.filter((v) => v.x === e.offsetX && v.y === e.offsetY);
-                                if (temp.length === 0) {
-                                    if (e.offsetX < this.minPoint.x) {
-                                        this.minPoint = new Point2D(e.offsetX, this.minPoint.y);
-                                    }
-                                    if (e.offsetY < this.minPoint.y) {
-                                        this.minPoint = new Point2D(this.minPoint.x, e.offsetY);
-                                    }
-                                    if (e.offsetX > this.maxPoint.x) {
-                                        this.maxPoint = new Point2D(e.offsetX, this.maxPoint.y);
-                                    }
-                                    if (e.offsetY > this.maxPoint.y) {
-                                        this.maxPoint = new Point2D(this.maxPoint.x, e.offsetY);
-                                    }
-                                    const origin = this.pencilPoints[this.pencilPoints.length - 1];
-                                    const differPoint: IPoint = {
-                                        // x: e.offsetX - origin.x,
-                                        // y: e.offsetY - origin.y,
-                                        x: 1,
-                                        y: 1,
-                                    };
-                                    console.log(`画笔： 两点的差值(${JSON.stringify(differPoint)})`);
-                                    const anticlockwisePoint: IPoint = {x: -differPoint.y, y: differPoint.x}; // 逆时针转的点
-                                    const clockwisePoint: IPoint = {x: differPoint.y, y: -differPoint.x}; // 顺时针转的点
-
-                                    const point1 = this.anticlockwisePencilPoints[
-                                        this.anticlockwisePencilPoints.length - 1];
-                                    const point2 = this.clockwisePencilPoints[
-                                    this.clockwisePencilPoints.length - 1];
-                                    context1.moveTo(point1.x, point1.y);
-                                    context1.lineTo(origin.x + anticlockwisePoint.x, origin.y + anticlockwisePoint.y);
-                                    context2.moveTo(point2.x, point2.y);
-                                    context2.lineTo(origin.x + clockwisePoint.x, origin.y + clockwisePoint.y);
-                                    context1.stroke();
-                                    context2.stroke();
-                                    // 逆时针点新增
-                                    this.anticlockwisePencilPoints.push(
-                                        new Point2D(origin.x + anticlockwisePoint.x, origin.y + anticlockwisePoint.y),
-                                    );
-                                    // 逆时针点新增
-                                    this.clockwisePencilPoints.push(
-                                        new Point2D(origin.x + clockwisePoint.x, origin.y + clockwisePoint.y),
-                                        );
-                                    this.pencilPoints.push(new Point2D(e.offsetX, e.offsetY));
-                                }
-                                // console.log(`画笔： 查询是否有重复的 ${JSON.stringify(temp)}`);
-                                // console.log(`画笔： 最终的 ${JSON.stringify(this.pencilPoints)}`);
-                                // context.lineWidth = 5;
-                                // context.strokeStyle = "blue";
-                            } else {
-                                context.lineWidth = 2;
-                                context.strokeStyle = "red";
-                            }
-                        }
-                        context.moveTo(this.pointX, this.pointY);
-                        context.lineTo(e.offsetX, e.offsetY);
-                        context.stroke();
-                        if (this.drawFlag !== 0) {
-                            this.pointX = e.offsetX;
-                            this.pointY = e.offsetY;
-                        }
-                        this.drawFlag++;
-                    }
-                });
+            console.log(`画笔： ${this.props.editorMode}@@@ ${this.props.editorMode !== EditorMode.Pencil}`);
+            if (this.props.editorMode !== EditorMode.Pencil) {
+                canvas.removeEventListener("mousedown", this.mousedown);
+                canvas.removeEventListener("mouseup", this.mouseup);
+                canvas.removeEventListener("mousemove", this.mousemove);
+            } else {
+                canvas.addEventListener("mousedown", this.mousedown);
+                canvas.addEventListener("mouseup", this.mouseup);
+                canvas.addEventListener("mousemove", this.mousemove);
             }
             // canvas.addEventListener("click", (e) => { alert(e.offsetX + " " + e.offsetY); });
             const boundingBox = createContentBoundingBox(contentSource);
