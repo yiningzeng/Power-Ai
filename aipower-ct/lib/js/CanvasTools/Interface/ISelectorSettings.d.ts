@@ -8,7 +8,8 @@ export declare enum SelectionMode {
     RECT = 2,
     COPYRECT = 3,
     POLYLINE = 4,
-    POLYGON = 5
+    POLYGON = 5,
+    PENCIL = 6,
 }
 /**
  * Defines options to setup an selector in `AreaSelector`.
