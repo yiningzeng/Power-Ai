@@ -497,10 +497,10 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
         this.drawFlag = 0;
 
         // region 绘画 最小矩形边框
-        const context = this.editor.contentCanvas.getContext("2d");
-        context.rect(this.minPoint.x, this.minPoint.y,
-            this.maxPoint.x - this.minPoint.x, this.maxPoint.y - this.minPoint.y);
-        context.stroke();
+        // const context = this.editor.contentCanvas.getContext("2d");
+        // context.rect(this.minPoint.x, this.minPoint.y,
+        //     this.maxPoint.x - this.minPoint.x, this.maxPoint.y - this.minPoint.y);
+        // context.stroke();
         // endregion
 
         const id = shortid.generate();
@@ -546,13 +546,13 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
     private mousemove = (e) => {
         if (this.isMouseDown) {
             console.log(`画笔： 正在绘画`);
-            const context = this.editor.contentCanvas.getContext("2d");
-            const context1 = this.editor.contentCanvas.getContext("2d");
-            const context2 = this.editor.contentCanvas.getContext("2d");
+            // const context = this.editor.contentCanvas.getContext("2d");
+            // const context1 = this.editor.contentCanvas.getContext("2d");
+            // const context2 = this.editor.contentCanvas.getContext("2d");
             if (this.drawFlag) {
-                context.beginPath();
-                context1.beginPath();
-                context2.beginPath();
+                // context.beginPath();
+                // context1.beginPath();
+                // context2.beginPath();
                 if ((e.offsetX % 5) === 0 || (e.offsetY % 5) === 0) {
                     const temp = this.pencilPoints.filter((v) => v.x === e.offsetX && v.y === e.offsetY);
                     if (temp.length === 0) {
@@ -572,8 +572,8 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
                         const differPoint: IPoint = {
                             // x: e.offsetX - origin.x,
                             // y: e.offsetY - origin.y,
-                            x: 1,
-                            y: 1,
+                            x: 3,
+                            y: 3,
                         };
                         console.log(`画笔： 两点的差值(${JSON.stringify(differPoint)})`);
                         const anticlockwisePoint: IPoint = {x: -differPoint.y, y: differPoint.x}; // 逆时针转的点
@@ -583,12 +583,12 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
                         this.anticlockwisePencilPoints.length - 1];
                         const point2 = this.clockwisePencilPoints[
                         this.clockwisePencilPoints.length - 1];
-                        context1.moveTo(point1.x, point1.y);
-                        context1.lineTo(origin.x + anticlockwisePoint.x, origin.y + anticlockwisePoint.y);
-                        context2.moveTo(point2.x, point2.y);
-                        context2.lineTo(origin.x + clockwisePoint.x, origin.y + clockwisePoint.y);
-                        context1.stroke();
-                        context2.stroke();
+                        // context1.moveTo(point1.x, point1.y);
+                        // context1.lineTo(origin.x + anticlockwisePoint.x, origin.y + anticlockwisePoint.y);
+                        // context2.moveTo(point2.x, point2.y);
+                        // context2.lineTo(origin.x + clockwisePoint.x, origin.y + clockwisePoint.y);
+                        // context1.stroke();
+                        // context2.stroke();
                         // 逆时针点新增
                         this.anticlockwisePencilPoints.push(
                             new Point2D(origin.x + anticlockwisePoint.x, origin.y + anticlockwisePoint.y),
@@ -604,13 +604,13 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
                     // context.lineWidth = 5;
                     // context.strokeStyle = "blue";
                 } else {
-                    context.lineWidth = 2;
-                    context.strokeStyle = "red";
+                    // context.lineWidth = 2;
+                    // context.strokeStyle = "red";
                 }
             }
-            context.moveTo(this.pointX, this.pointY);
-            context.lineTo(e.offsetX, e.offsetY);
-            context.stroke();
+            // context.moveTo(this.pointX, this.pointY);
+            // context.lineTo(e.offsetX, e.offsetY);
+            // context.stroke();
             if (this.drawFlag !== 0) {
                 this.pointX = e.offsetX;
                 this.pointY = e.offsetY;
