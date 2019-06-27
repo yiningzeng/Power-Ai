@@ -769,7 +769,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         switch (toolbarItem.props.name) {
             case ToolbarItemName.DrawWithPencil:
                 this.setState({
-                    selectionMode: SelectionMode.PENCIL,
+                    selectionMode: SelectionMode.NONE,
                     editorMode: EditorMode.Pencil,
                     zoomMode: {
                         ...this.state.zoomMode,
