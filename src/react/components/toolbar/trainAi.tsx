@@ -7,6 +7,7 @@ import {Dispatch} from "redux";
 /**
  * @name - Export Project
  * @description - Toolbar item to export current project
+ * 已经弃用
  */
 export class TrainAi extends ToolbarItem {
     protected onItemClick = async () => {

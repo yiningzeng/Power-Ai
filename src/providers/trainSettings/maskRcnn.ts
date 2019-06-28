@@ -2,56 +2,58 @@ import _ from "lodash";
 import { TrainProvider } from "./trainProvider";
 import { IProject, IAssetMetadata, ITag, IExportProviderOptions } from "../../models/applicationState";
 import Guard from "../../common/guard";
-import { IFasterRcnnCondig } from "../../models/trainConfig";
+import { IMaskRcnnCondig} from "../../models/trainConfig";
 import YAML from "json2yaml";
+import {interpolate} from "../../common/strings";
+import {maskRcnnTemplate} from "./templates/maskRcnnTemplates";
 
-const trainSettings: IFasterRcnnCondig  = {
-    MODEL: {
-        TYPE: "generalized_rcnn",
-        CONV_BODY: "FPN.add_fpn_ResNet50_conv5_body",
-        NUM_CLASSES: 3,
-        FASTER_RCNN: true,
-    },
-    NUM_GPUS: 2,
-    SOLVER: {
-        WEIGHT_DECAY: 0.0001,
-        LR_POLICY: "steps_with_decay",
-        BASE_LR: 0.0025,
-        GAMMA: 0.1,
-        MAX_ITER: 60000,
-        STEPS: [0, 30000, 40000],
-    },
-    FPN: {
-        FPN_ON: true,
-        MULTILEVEL_ROIS: true,
-        MULTILEVEL_RPN: true,
-    },
-    FAST_RCNN: {
-        ROI_BOX_HEAD: "fast_rcnn_heads.add_roi_2mlp_head",
-        ROI_XFORM_METHOD: "RoIAlign",
-        ROI_XFORM_RESOLUTION: 7,
-        ROI_XFORM_SAMPLING_RATIO: 2,
-    },
-    TRAIN: {
-        WEIGHTS: "/Detectron/models/R-50.pkl",
-        DATASETS: "('coco_2014_train',)",
-        SCALES: "(500,)",
-        MAX_SIZE: 833,
-        BATCH_SIZE_PER_IM: 256,
-        RPN_PRE_NMS_TOP_N: 2000,
-        AUGUMENT: true, // 数据增强
-        MULTI_SCALE: true, // 多尺度
-        USE_FLIPPED: false,
-    },
-    TEST: {
-        DATASETS: "('coco_2014_minival',)",
-        SCALE: 500,
-        MAX_SIZE: 833,
-        NMS: 0.5,
-        RPN_PRE_NMS_TOP_N: 1000,
-        RPN_POST_NMS_TOP_N: 1000,
-    },
-    OUTPUT_DIR: ".",
+const trainSettings: IMaskRcnnCondig  = {
+// MODEL:,
+    MODEL_TYPE: "generalized_rcnn",
+    MODEL_CONV_BODY: "FPN.add_fpn_ResNet50_conv5_body",
+    MODEL_NUM_CLASSES: 4,
+    MODEL_FASTER_RCNN: true,
+    MODEL_MASK_ON: true,
+    NUM_GPUS: 1,
+// SOLVER:,
+    SOLVER_WEIGHT_DECAY: 0.0001,
+    SOLVER_LR_POLICY: "steps_with_decay",
+    SOLVER_BASE_LR: 0.02,
+    SOLVER_GAMMA: 0.1,
+    SOLVER_MAX_ITER: 90000,
+    SOLVER_STEPS: [0, 60000, 80000],
+// FPN:,
+    FPN_FPN_ON: true,
+    FPN_MULTILEVEL_ROIS: true,
+    FPN_MULTILEVEL_RPN: true,
+// FAST_RCNN:,
+    FAST_RCNN_ROI_BOX_HEAD: "fast_rcnn_heads.add_roi_2mlp_head",
+    FAST_RCNN_ROI_XFORM_METHOD: "RoIAlign",
+    FAST_RCNN_ROI_XFORM_RESOLUTION: 7,
+    FAST_RCNN_ROI_XFORM_SAMPLING_RATIO: 2,
+// MRCNN:,
+    MRCNN_ROI_MASK_HEAD: "mask_rcnn_heads.mask_rcnn_fcn_head_v1up4convs",
+    MRCNN_RESOLUTION: 28,
+    MRCNN_ROI_XFORM_METHOD: "RoIAlign",
+    MRCNN_ROI_XFORM_RESOLUTION: 14,
+    MRCNN_ROI_XFORM_SAMPLING_RATIO: 2,
+    MRCNN_DILATION: 1,
+    MRCNN_CONV_INIT: "MSRAFill",
+// TRAIN:,
+    TRAIN_WEIGHTS: "https://dl.fbaipublicfiles.com/detectron/ImageNetPretrained/MSRA/R-50.pkl",
+    TRAIN_DATASETS: "('coco_2014_train', 'coco_2014_valminusminival')",
+    TRAIN_SCALES: "(800,)",
+    TRAIN_MAX_SIZE: 833,
+    TRAIN_BATCH_SIZE_PER_IM: 32,
+    TRAIN_RPN_PRE_NMS_TOP_N: 2000,
+// TEST:,
+    TEST_DATASETS: "('coco_2014_minival',)",
+    TEST_SCALE: 800,
+    TEST_MAX_SIZE: 833,
+    TEST_NMS: 0.5,
+    TEST_RPN_PRE_NMS_TOP_N: 1000,
+    TEST_RPN_POST_NMS_TOP_N: 1000,
+OUTPUT_DIR: ".",
 };
 
 /**
@@ -79,6 +81,9 @@ export class MaskRcnnProvider extends TrainProvider<IFasterRcnnProviderOptions> 
      * Export project to PascalVOC
      */
     public async export(): Promise<void> {
+        console.log("这里已经只是简单的导出！所有的训练操作代码在 /src/electron/providers/training/trainingSystem.ts");
+        await this.storageProvider.writeText(`train-config/train-config.yaml`,
+            interpolate(maskRcnnTemplate, trainSettings));
         // trainSettings.MODEL.NUM_CLASSES = this.project.tags.length + 1;
         // trainSettings.TRAIN.AUGUMENT = this.project.trainSettings.augument;
         // trainSettings.TRAIN.MULTI_SCALE = this.project.trainSettings.multiScale;
@@ -114,8 +119,9 @@ export class MaskRcnnProvider extends TrainProvider<IFasterRcnnProviderOptions> 
         //         trainSettings.SOLVER.STEPS = [0, 3750, 5000];
         //         break;
         // }
-        await this.storageProvider.writeText(`coco-json-export/train-config.yaml`,
-            YAML.stringify(trainSettings));
+
+        // await this.storageProvider.writeText(`train-config/train-config.yaml`,
+        //     YAML.stringify(trainSettings));
     }
 
     // private async exportPBTXT(exportFolderName: string, project: IProject) {

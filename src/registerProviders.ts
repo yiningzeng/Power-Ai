@@ -101,10 +101,10 @@ export default function registerProviders() {
         displayName: strings.train.providers.maskRcnn.displayName,
         factory: (project, options) => new MaskRcnnProvider(project, options),
     });
-    TrainProviderFactory.register({
-        name: "fpn",
-        displayName: "FPN",
-        factory: (project, options) => new FasterRcnnProvider(project, options),
-    });
+    // TrainProviderFactory.register({
+    //     name: "fpn",
+    //     displayName: "FPN",
+    //     factory: (project, options) => new FasterRcnnProvider(project, options),
+    // });
     registerToolbar();
 }

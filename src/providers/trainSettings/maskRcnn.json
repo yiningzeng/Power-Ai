@@ -26,6 +26,12 @@
                     ],
                     "default": 1
                 },
+                "fpn": {
+                    "title": "FPN",
+                    "type": "boolean",
+                    "description": "开启FPN",
+                    "default": true
+                },
                 "useFlipped": {
                     "title": "图像翻转",
                     "type": "boolean",
