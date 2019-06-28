@@ -403,6 +403,9 @@ export const english: IAppStrings = {
             fasterRcnn: {
                 displayName: "Faster Rcnn",
             },
+            maskRcnn: {
+                displayName: "Mask Rcnn",
+            },
             yolov3: {
                 displayName: "Yolo v3",
             },
