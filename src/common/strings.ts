@@ -400,6 +400,9 @@ export interface IAppStrings {
             fasterRcnn: {
                 displayName: string,
             },
+            maskRcnn: {
+                displayName: string,
+            },
             yolov3: {
                 displayName: string,
             },

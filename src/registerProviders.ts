@@ -16,6 +16,7 @@ import { CntkExportProvider } from "./providers/export/cntk";
 import {CocoExportProvider} from "./providers/export/coco";
 import {Yolov3Provider} from "./providers/trainSettings/yolov3";
 import {FasterRcnnProvider} from "./providers/trainSettings/fasterRcnn";
+import {MaskRcnnProvider} from "./providers/trainSettings/maskRcnn";
 
 /**
  * Registers storage, asset and export providers, as well as all toolbar items
@@ -96,9 +97,14 @@ export default function registerProviders() {
         factory: (project, options) => new FasterRcnnProvider(project, options),
     });
     TrainProviderFactory.register({
-        name: "fpn",
-        displayName: "FPN",
-        factory: (project, options) => new FasterRcnnProvider(project, options),
+        name: "maskRcnn",
+        displayName: strings.train.providers.maskRcnn.displayName,
+        factory: (project, options) => new MaskRcnnProvider(project, options),
     });
+    // TrainProviderFactory.register({
+    //     name: "fpn",
+    //     displayName: "FPN",
+    //     factory: (project, options) => new FasterRcnnProvider(project, options),
+    // });
     registerToolbar();
 }

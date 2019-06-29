@@ -402,6 +402,9 @@ export const chinese: IAppStrings = {
             fasterRcnn: {
                 displayName: "Faster Rcnn",
             },
+            maskRcnn: {
+                displayName: "Mask Rcnn",
+            },
             yolov3: {
                 displayName: "Yolo v3",
             },

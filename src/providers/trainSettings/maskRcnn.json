@@ -32,18 +32,6 @@
                     "description": "开启FPN",
                     "default": true
                 },
-                "augument": {
-                    "title": "数据增强",
-                    "type": "boolean",
-                    "description": "训练的时候模拟大量数据训练",
-                    "default": true
-                },
-                "multiScale": {
-                    "title": "多尺度",
-                    "type": "boolean",
-                    "description": "多尺度训练",
-                    "default": true
-                },
                 "useFlipped": {
                     "title": "图像翻转",
                     "type": "boolean",
