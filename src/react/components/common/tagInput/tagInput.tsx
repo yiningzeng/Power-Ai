@@ -180,6 +180,7 @@ export class TagInput extends React.Component<ITagInputProps, ITagInputState> {
     }
 
     private onLockTag = (tag: ITag) => {
+        // alert(JSON.stringify(tag));
         if (!tag) {
             return;
         }
@@ -394,6 +395,7 @@ export class TagInput extends React.Component<ITagInputProps, ITagInputState> {
                 this.props.onTagClick(tag);
             }
         }
+        // alert(`啦啦${JSON.stringify(this.state.searchTags)}`);
     }
 
     private deleteTag = (tag: ITag) => {
