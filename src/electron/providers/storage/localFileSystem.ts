@@ -71,6 +71,7 @@ export default class LocalFileSystem implements IStorageProvider {
     }
 
     public writeText(filePath: string, contents: string): Promise<void> {
+        已发现问题 pascal voc 导出的数据xml不全 #46
         const buffer = Buffer.alloc(contents.length, contents);
         return this.writeBinary(filePath, buffer);
     }
