@@ -64,9 +64,13 @@ export class CocoExportProvider extends ExportProvider {
                 await this.storageProvider.deleteContainer(assetFilePath);
                 const fileReader = new FileReader();
                 fileReader.onload = async () => {
-                    const buffer = Buffer.from(fileReader.result as ArrayBuffer);
-                    await this.storageProvider.writeBinary(assetFilePath, buffer);
-                    resolve();
+                    try {
+                        const buffer = Buffer.from(fileReader.result as ArrayBuffer);
+                        await this.storageProvider.writeBinary(assetFilePath, buffer);
+                        resolve();
+                    } catch (e) {
+                        console.error(e);
+                    }
                 };
                 fileReader.readAsArrayBuffer(blob);
             });
