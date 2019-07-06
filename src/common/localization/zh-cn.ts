@@ -396,7 +396,7 @@ export const chinese: IAppStrings = {
     },
     train: {
         title: "训练设置",
-        settings: "",
+        settings: "训练参数设置",
         saveSettings: "保存",
         providers: {
             fasterRcnn: {
