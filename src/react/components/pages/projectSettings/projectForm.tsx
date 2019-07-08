@@ -25,10 +25,10 @@ import {ILocalFileSystemProxyOptions} from "../../../../providers/storage/localF
 const formSchema = addLocValues(require("./projectForm.json"));
 // tslint:disable-next-line:no-var-requires
 const uiSchema = addLocValues(require("./projectForm.ui.json"));
-const okTag: ITag = {
-    name: "OK",
-    color: "#FFFFF0",
-};
+// const okTag: ITag = {
+//     name: "OK",
+//     color: "#FFFFF0",
+// };
 /**
  * Required properties for Project Settings form
  * @member project - Current project to fill form
@@ -211,11 +211,11 @@ export default class ProjectForm extends React.Component<IProjectFormProps, IPro
     private onFormSubmit(args: ISubmitEvent<IProject>) {
         // 默认添加OK的标签
         // this.tagsInput.current.state.tags.push(okTag);
-        let temp: ITag[];
-        console.log("projectForm: args.formData " + JSON.stringify(args.formData));
-        if ( args.formData.tags === undefined || args.formData.tags.length === 0) {
-            temp = [okTag];
-        }
+        // let temp: ITag[];
+        // console.log("projectForm: args.formData " + JSON.stringify(args.formData));
+        // if ( args.formData.tags === undefined || args.formData.tags.length === 0) {
+        //     temp = [okTag];
+        // }
         const provider: ILocalFileSystemProxyOptions = {
             folderPath: args.formData.targetConnection + "",
         };
@@ -231,7 +231,7 @@ export default class ProjectForm extends React.Component<IProjectFormProps, IPro
         // connectionActions.loadConnection(target);
         const project: IProject = {
             ...args.formData,
-            tags: temp === undefined ? args.formData.tags : temp,
+            // tags: temp === undefined ? args.formData.tags : temp,
             targetConnection: target,
             sourceConnection: target,
         };
