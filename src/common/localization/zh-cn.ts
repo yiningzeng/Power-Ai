@@ -4,7 +4,7 @@ import { IAppStrings } from "../strings";
  * App Strings for English language
  */
 export const chinese: IAppStrings = {
-    appName: "AI Power",
+    appName: "Power Ai",
     common: {
         displayName: "项目名称",
         description: "描述",
