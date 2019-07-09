@@ -73,7 +73,14 @@ export default class LocalFileSystem implements IStorageProvider {
     public writeText(filePath: string, contents: string): Promise<void> {
         // 已发现问题 pascal voc 导出的数据xml不全 #46 https://nodejs.org/zh-cn/docs/guides/buffer-constructor-deprecation/
         // 可能是内存不够造成的
-        const buffer = Buffer.alloc(contents.length, contents);
+        // const buffer = Buffer.alloc(contents.length, contents);
+        // console.log(`写入 初始长度：${contents.length}`);
+        // contents = contents + "\t\t\t\t\t\t\t\t\t\n\n\n\n";
+        // console.log(`写入 最终长度：${contents.length}`);
+        // console.log(`写入：${contents}`);
+        const buffer = Buffer.alloc(contents.length + 250, " ");
+        buffer.write(contents);
+        console.log(`写入buffer：${buffer}`);
         return this.writeBinary(filePath, buffer);
     }
 
