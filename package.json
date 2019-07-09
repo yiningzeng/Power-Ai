@@ -1,6 +1,6 @@
 {
-  "name": "AIPower",
-  "version": "2.0.0",
+  "name": "Power-Ai",
+  "version": "2.4.35",
   "author": {
     "name": "Microsoft",
     "url": "https://github.com/Microsoft/VoTT"
@@ -65,11 +65,11 @@
   },
   "scripts": {
     "start": "nf start -p 3000",
-    "pack-all": "npm run build && npm run webpack:prod && electron-builder && electron-packager . aipower --all --out ./all --overwrite --app-version=0.0.1",
-    "pack-win64": "npm run build && npm run webpack:prod && electron-builder && electron-builder && electron-packager . aipower --platform=win32 --out ./all --arch=x64 --overwrite --app-version=2.0.1 --icon=./qt.ico",
-    "pack-linux": "npm run build && npm run webpack:prod && electron-builder && electron-packager . aipower --platform=linux --out ./all --arch=x64 --overwrite --app-version=2.0.0 --icon=./qt.ico",
-    "pack-arm-linux": "npm run build && npm run webpack:prod && electron-builder && electron-packager . aipower --platform=linux --out ./all --arch=arm64 --overwrite --app-version=2.0.0 --icon=./qt.ico",
-    "pack-mac": "npm run build && npm run webpack:prod && electron-builder && electron-packager . aipower --platform=darwin --out ./all --arch=x64 --overwrite --app-version=2.0.0",
+    "pack-all": "npm run build && npm run webpack:prod && electron-builder && electron-packager . Power-Ai --all --out ./all --overwrite --app-version=0.0.1",
+    "pack-win64": "npm run build && npm run webpack:prod && electron-builder && electron-builder && electron-packager . Power-Ai --platform=win32 --out ./all --arch=x64 --overwrite --app-version=2.0.1 --icon=./qt.ico",
+    "pack-linux": "npm run build && npm run webpack:prod && electron-builder && electron-packager . Power-Ai --platform=linux --out ./all --arch=x64 --overwrite --app-version=2.0.0 --icon=./qt.ico",
+    "pack-arm-linux": "npm run build && npm run webpack:prod && electron-builder && electron-packager . Power-Ai --platform=linux --out ./all --arch=arm64 --overwrite --app-version=2.0.0 --icon=./qt.ico",
+    "pack-mac": "npm run build && npm run webpack:prod && electron-builder && electron-packager . Power-Ai --platform=darwin --out ./all --arch=x64 --overwrite --app-version=2.0.0",
     "compile": "tsc",
     "build": "react-scripts build",
     "webpack:dev": "webpack --config ./config/webpack.dev.js",
