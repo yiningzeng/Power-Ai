@@ -227,6 +227,7 @@ export const chinese: IAppStrings = {
             pan: "Pan",
             drawRectangle: "矩形",
             drawPolygon: "多边形",
+            drawWithPencil: "画笔",
             copyRectangle: "标签印章",
             copy: "复制",
             cut: "剪切",
@@ -395,11 +396,14 @@ export const chinese: IAppStrings = {
     },
     train: {
         title: "训练设置",
-        settings: "",
+        settings: "训练参数设置",
         saveSettings: "保存",
         providers: {
             fasterRcnn: {
                 displayName: "Faster Rcnn",
+            },
+            maskRcnn: {
+                displayName: "Mask Rcnn",
             },
             yolov3: {
                 displayName: "Yolo v3",

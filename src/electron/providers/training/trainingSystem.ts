@@ -53,12 +53,62 @@ export default class TrainingSystem {
                 console.log("out code：" + code);
             });
 
-            let win = new BrowserWindow({ width: 1800, height: 1000, show: false });
-            win.on("closed", () => {
-                win = null;
+            // let win = new BrowserWindow({ width: 1800, height: 1000, show: false });
+            // win.on("closed", () => {
+            //     win = null;
+            // });
+            // win.loadURL("http://localhost:8097");
+            // win.show();
+            // resolve("成功");
+        });
+    }
+
+    public maskRcnn(project: IProject): Promise<string> {
+        return new Promise<string>((resolve, reject) => {
+            const passwordFile = process.cwd() + "/password.txt";
+            const sourcePath = `${project.targetConnection.providerOptions["folderPath"]}/coco-json-export/`;
+            const filePath = path.normalize(sourcePath);
+            const cmdStr = "cd " + filePath + "\n" +
+                "port=8097\n" +
+                "while :\n" +
+                "do\n" +
+                "        if netstat -tlpn | grep $port\n" +
+                "        then\n" +
+                '                echo "端口占用"\n' +
+                "                port=`expr $port + 1`\n" +
+                "        else\n" +
+                '                echo "$port端口可用"\n' +
+                "                break\n" +
+                "        fi\n" +
+                "done\n" +
+                "echo `cat " + passwordFile + "` | sudo -S nvidia-docker run -d -p $port:8097 -v " +
+                filePath + ":/Detectron/detectron/datasets/data/ --name " +
+                project.name + "-$port registry.cn-hangzhou.aliyuncs.com/baymin/ai-power:ai-power-v2.2\n" +
+                "sleep 2\n" +
+                "x-www-browser http://localhost:$port";
+            // 执行命令行，如果命令不需要路径，或就是项目根目录，则不需要cwd参数：
+            console.log(cmdStr);
+            workerProcess = exec(cmdStr);
+            // 不受child_process默认的缓冲区大小的使用方法，没参数也要写上{}：workerProcess = exec(cmdStr, {})
+            // 打印正常的后台可执行程序输出
+            workerProcess.stdout.on("data", (data) => {
+                console.log("stdout: " + data);
             });
-            win.loadURL("http://localhost:8097");
-            win.show();
+            // 打印错误的后台可执行程序输出
+            workerProcess.stderr.on("data", (data) => {
+                console.log("stderr: " + data);
+            });
+            // 退出之后的输出
+            workerProcess.on("close", (code) => {
+                console.log("out code：" + code);
+            });
+
+            // let win = new BrowserWindow({ width: 1800, height: 1000, show: false });
+            // win.on("closed", () => {
+            //     win = null;
+            // });
+            // win.loadURL("http://localhost:8097");
+            // win.show();
             resolve("成功");
         });
     }

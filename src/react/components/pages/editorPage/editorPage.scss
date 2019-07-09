@@ -27,6 +27,7 @@
       .asset-list {
         user-select: none;
       }
+     .asset-list::-webkit-scrollbar{width:14px;}
 
       .asset-list:focus {
         outline: none;

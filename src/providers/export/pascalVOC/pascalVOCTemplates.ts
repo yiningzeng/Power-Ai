@@ -19,7 +19,7 @@ export const annotationTemplate = "\
     </size\>\n\
     <segmented>0</segmented>\n\
     ${objects}\n\
-</annotation\>\n";
+</annotation\>";
 
 export const objectTemplate = "\
 <object>\n\

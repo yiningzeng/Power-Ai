@@ -8,7 +8,7 @@ import { interpolate } from "../../common/strings";
 import os from "os";
 import {IYoloV3} from "../../models/trainConfig";
 import {constants} from "../../common/constants";
-import {yolov3Template} from "./yolo/yolov3Templates";
+import {yolov3Template} from "./templates/yolov3Templates";
 
 interface IObjectInfo {
     name: string;

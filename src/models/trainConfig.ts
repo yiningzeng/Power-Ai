@@ -8,6 +8,7 @@ export interface IDetectron {
         netModelType: NetModelType,
         layerNumbEnum: string;
         gpuNumb: number;
+        fpn: boolean;
         augument: boolean;
         multiScale: boolean;
         useFlipped: boolean;
@@ -45,8 +46,111 @@ export enum NetModelType {
     YoloV3 = "yoloV3",
 }
 
-// fasterRcnn 配置文件的接口
+// 最新的faster Rcnn 配置
+export interface IMaskRcnnCondig {
+    // MODEL: {
+    MODEL_TYPE: string;
+    MODEL_CONV_BODY: string;
+    MODEL_NUM_CLASSES: number;
+    MODEL_FASTER_RCNN: boolean;
+    MODEL_MASK_ON: boolean;
+    // };
+    NUM_GPUS: number;
+    // SOLVER: {
+    SOLVER_WEIGHT_DECAY: number;
+    SOLVER_LR_POLICY: string;
+    SOLVER_BASE_LR: number;
+    SOLVER_GAMMA: number;
+    SOLVER_MAX_ITER: number;
+    SOLVER_STEPS: [number, number, number];
+    // };
+    // FPN: {
+    FPN_FPN_ON: boolean;
+    FPN_MULTILEVEL_ROIS: boolean;
+    FPN_MULTILEVEL_RPN: boolean;
+    // };
+    // FAST_RCNN: {
+    FAST_RCNN_ROI_BOX_HEAD: string;
+    FAST_RCNN_ROI_XFORM_METHOD: string;
+    FAST_RCNN_ROI_XFORM_RESOLUTION: number;
+    FAST_RCNN_ROI_XFORM_SAMPLING_RATIO: number;
+    // MRCNN
+    MRCNN_ROI_MASK_HEAD: string;
+    MRCNN_RESOLUTION: number;
+    MRCNN_ROI_XFORM_METHOD: string;
+    MRCNN_ROI_XFORM_RESOLUTION: number;
+    MRCNN_ROI_XFORM_SAMPLING_RATIO: number;
+    MRCNN_DILATION: number;
+    MRCNN_CONV_INIT: string;
+    // };
+    // TRAIN: {
+    TRAIN_WEIGHTS: string;
+    TRAIN_DATASETS: string;
+    TRAIN_SCALES: string;
+    TRAIN_MAX_SIZE: number;
+    TRAIN_BATCH_SIZE_PER_IM: number;
+    TRAIN_RPN_PRE_NMS_TOP_N: number;
+    // };
+    // TEST: {
+    TEST_DATASETS: string;
+    TEST_SCALE: number;
+    TEST_MAX_SIZE: number;
+    TEST_NMS: number;
+    TEST_RPN_PRE_NMS_TOP_N: number;
+    TEST_RPN_POST_NMS_TOP_N: number;
+    // };
+    OUTPUT_DIR: string;
+}
+
+// 最新的faster Rcnn 配置
 export interface IFasterRcnnCondig {
+    // MODEL: {
+    MODEL_TYPE: string;
+    MODEL_CONV_BODY: string;
+    MODEL_NUM_CLASSES: number;
+    MODEL_FASTER_RCNN: boolean;
+    // };
+    NUM_GPUS: number;
+    // SOLVER: {
+    SOLVER_WEIGHT_DECAY: number;
+    SOLVER_LR_POLICY: string;
+    SOLVER_BASE_LR: number;
+    SOLVER_GAMMA: number;
+    SOLVER_MAX_ITER: number;
+    SOLVER_STEPS: [number, number, number];
+    // };
+    // FPN: {
+    FPN_FPN_ON: boolean;
+    FPN_MULTILEVEL_ROIS: boolean;
+    FPN_MULTILEVEL_RPN: boolean;
+    // };
+    // FAST_RCNN: {
+    FAST_RCNN_ROI_BOX_HEAD: string;
+    FAST_RCNN_ROI_XFORM_METHOD: string;
+    FAST_RCNN_ROI_XFORM_RESOLUTION: number;
+    FAST_RCNN_ROI_XFORM_SAMPLING_RATIO: number;
+    // };
+    // TRAIN: {
+    TRAIN_WEIGHTS: string;
+    TRAIN_DATASETS: string;
+    TRAIN_SCALES: string;
+    TRAIN_MAX_SIZE: number;
+    TRAIN_BATCH_SIZE_PER_IM: number;
+    TRAIN_RPN_PRE_NMS_TOP_N: number;
+    // };
+    // TEST: {
+    TEST_DATASETS: string;
+    TEST_SCALE: number;
+    TEST_MAX_SIZE: number;
+    TEST_NMS: number;
+    TEST_RPN_PRE_NMS_TOP_N: number;
+    TEST_RPN_POST_NMS_TOP_N: number;
+    // };
+    OUTPUT_DIR: string;
+}
+
+// fasterRcnn 配置文件的接口
+export interface IFasterRcnnCondigGiveUp {
     MODEL: IMODEL;
     NUM_GPUS: number;
     SOLVER: ISOLVER;

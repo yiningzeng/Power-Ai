@@ -226,6 +226,7 @@ export interface IAppStrings {
             select: string;
             pan: string;
             drawRectangle: string;
+            drawWithPencil: string;
             drawPolygon: string;
             copyRectangle: string;
             copy: string;
@@ -399,6 +400,9 @@ export interface IAppStrings {
             fasterRcnn: {
                 displayName: string,
             },
+            maskRcnn: {
+                displayName: string,
+            },
             yolov3: {
                 displayName: string,
             },
@@ -508,5 +512,12 @@ export function interpolateJson(json: any, params: any) {
 export function interpolate(template: string, params: any) {
     const names = Object.keys(params);
     const vals = Object["values"](params);
+    // if (template.includes("annotation") || template.includes("truncated")) {
+    //     alert(`template: ${template}`);
+    //     alert(`name: ${names}`);
+    //     alert(`vals: ${vals}`);
+    //     alert(`res: ${new Function(...names, `return \`${template}\`;`)(...vals)}`);
+    // }
+    //
     return new Function(...names, `return \`${template}\`;`)(...vals);
 }

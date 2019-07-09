@@ -4,53 +4,55 @@ import { IProject, IAssetMetadata, ITag, IExportProviderOptions } from "../../mo
 import Guard from "../../common/guard";
 import { IFasterRcnnCondig } from "../../models/trainConfig";
 import YAML from "json2yaml";
+import {interpolate} from "../../common/strings";
+import {yolov3Template} from "./templates/yolov3Templates";
 
 const trainSettings: IFasterRcnnCondig  = {
-    MODEL: {
-        TYPE: "generalized_rcnn",
-        CONV_BODY: "FPN.add_fpn_ResNet50_conv5_body",
-        NUM_CLASSES: 3,
-        FASTER_RCNN: true,
-    },
+    // MODEL: {
+    MODEL_TYPE: "generalized_rcnn",
+    MODEL_CONV_BODY: "FPN.add_fpn_ResNet50_conv5_body",
+    MODEL_NUM_CLASSES: 3,
+    MODEL_FASTER_RCNN: true,
+    // },
     NUM_GPUS: 2,
-    SOLVER: {
-        WEIGHT_DECAY: 0.0001,
-        LR_POLICY: "steps_with_decay",
-        BASE_LR: 0.0025,
-        GAMMA: 0.1,
-        MAX_ITER: 60000,
-        STEPS: [0, 30000, 40000],
-    },
-    FPN: {
-        FPN_ON: true,
-        MULTILEVEL_ROIS: true,
-        MULTILEVEL_RPN: true,
-    },
-    FAST_RCNN: {
-        ROI_BOX_HEAD: "fast_rcnn_heads.add_roi_2mlp_head",
-        ROI_XFORM_METHOD: "RoIAlign",
-        ROI_XFORM_RESOLUTION: 7,
-        ROI_XFORM_SAMPLING_RATIO: 2,
-    },
-    TRAIN: {
-        WEIGHTS: "/Detectron/models/R-50.pkl",
-        DATASETS: "('coco_2014_train',)",
-        SCALES: "(500,)",
-        MAX_SIZE: 833,
-        BATCH_SIZE_PER_IM: 256,
-        RPN_PRE_NMS_TOP_N: 2000,
-        AUGUMENT: true, // 数据增强
-        MULTI_SCALE: true, // 多尺度
-        USE_FLIPPED: false,
-    },
-    TEST: {
-        DATASETS: "('coco_2014_minival',)",
-        SCALE: 500,
-        MAX_SIZE: 833,
-        NMS: 0.5,
-        RPN_PRE_NMS_TOP_N: 1000,
-        RPN_POST_NMS_TOP_N: 1000,
-    },
+    // SOLVER: {
+    SOLVER_WEIGHT_DECAY: 0.0001,
+    SOLVER_LR_POLICY: "steps_with_decay",
+    SOLVER_BASE_LR: 0.0025,
+    SOLVER_GAMMA: 0.1,
+    SOLVER_MAX_ITER: 60000,
+    SOLVER_STEPS: [0, 30000, 40000],
+    // },
+    // FPN: {
+    FPN_FPN_ON: true,
+    FPN_MULTILEVEL_ROIS: true,
+    FPN_MULTILEVEL_RPN: true,
+    // },
+    // FAST_RCNN: {
+    FAST_RCNN_ROI_BOX_HEAD: "fast_rcnn_heads.add_roi_2mlp_head",
+    FAST_RCNN_ROI_XFORM_METHOD: "RoIAlign",
+    FAST_RCNN_ROI_XFORM_RESOLUTION: 7,
+    FAST_RCNN_ROI_XFORM_SAMPLING_RATIO: 2,
+    // },
+    // TRAIN: {
+    TRAIN_WEIGHTS: "/Detectron/models/R-50.pkl",
+    TRAIN_DATASETS: "('coco_2014_train',)",
+    TRAIN_SCALES: "(500,)",
+    TRAIN_MAX_SIZE: 833,
+    TRAIN_BATCH_SIZE_PER_IM: 256,
+    TRAIN_RPN_PRE_NMS_TOP_N: 2000,
+    // AUGUMENT: true, // 数据增强
+    // MULTI_SCALE: true, // 多尺度
+    // USE_FLIPPED: false,
+    // },
+    // TEST: {
+    TEST_DATASETS: "('coco_2014_minival',)",
+    TEST_SCALE: 500,
+    TEST_MAX_SIZE: 833,
+    TEST_NMS: 0.5,
+    TEST_RPN_PRE_NMS_TOP_N: 1000,
+    TEST_RPN_POST_NMS_TOP_N: 1000,
+    // },
     OUTPUT_DIR: ".",
 };
 
@@ -79,6 +81,8 @@ export class FasterRcnnProvider extends TrainProvider<IFasterRcnnProviderOptions
      * Export project to PascalVOC
      */
     public async export(): Promise<void> {
+        await this.storageProvider.writeText(`train-config/train-config.yaml`,
+            interpolate(yolov3Template, trainSettings));
         // trainSettings.MODEL.NUM_CLASSES = this.project.tags.length + 1;
         // trainSettings.TRAIN.AUGUMENT = this.project.trainSettings.augument;
         // trainSettings.TRAIN.MULTI_SCALE = this.project.trainSettings.multiScale;
@@ -114,8 +118,8 @@ export class FasterRcnnProvider extends TrainProvider<IFasterRcnnProviderOptions
         //         trainSettings.SOLVER.STEPS = [0, 3750, 5000];
         //         break;
         // }
-        await this.storageProvider.writeText(`coco-json-export/train-config.yaml`,
-            YAML.stringify(trainSettings));
+        // await this.storageProvider.writeText(`coco-json-export/train-config.yaml`,
+        //     YAML.stringify(trainSettings));
     }
 
     // private async exportPBTXT(exportFolderName: string, project: IProject) {

@@ -37,6 +37,7 @@ const defaultFastrcnn: IDetectron = {
         netModelType: NetModelType.FasterRcnn,
         layerNumbEnum: "50",
         gpuNumb: 1,
+        fpn: true,
         augument: true,
         multiScale: true,
         useFlipped: false,
@@ -139,7 +140,7 @@ export default class ProjectService implements IProjectService {
 
         await storageProvider.writeText(
             `${project.name}${constants.projectFileExtension}`,
-            JSON.stringify(project, null, 4),
+            JSON.stringify(project, null, "\t"),
         );
 
         return project;

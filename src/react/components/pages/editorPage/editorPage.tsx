@@ -5,7 +5,7 @@ import {connect} from "react-redux";
 import {RouteComponentProps} from "react-router-dom";
 import SplitPane from "react-split-pane";
 import {bindActionCreators} from "redux";
-import {SelectionMode} from "vott-ct/lib/js/CanvasTools/Interface/ISelectorSettings";
+import {SelectionMode} from "aipower-ct/lib/js/CanvasTools/Interface/ISelectorSettings";
 import HtmlFileReader from "../../../../common/htmlFileReader";
 import {strings} from "../../../../common/strings";
 import {
@@ -767,6 +767,18 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         let w;
         let zoomDelta;
         switch (toolbarItem.props.name) {
+            case ToolbarItemName.DrawWithPencil:
+                this.setState({
+                    selectionMode: SelectionMode.NONE,
+                    editorMode: EditorMode.Pencil,
+                    zoomMode: {
+                        ...this.state.zoomMode,
+                        disableDrag: true,
+                    },
+                });
+                // this.canvas.current.editor.AS.enable();
+                // this.canvas.current.editor.AS.show();
+                break;
             case ToolbarItemName.DrawRectangle:
                 this.setState({
                     selectionMode: SelectionMode.RECT,

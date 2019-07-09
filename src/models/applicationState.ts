@@ -402,12 +402,14 @@ export enum RegionType {
     Point = "POINT",
     Rectangle = "RECTANGLE",
     Polygon = "POLYGON",
+    Pencil = "PENCIL",
     Square = "SQUARE",
 }
 
 export enum EditorMode {
     Rectangle = "RECT",
     Polygon = "POLYGON",
+    Pencil = "PENCIL",
     Polyline = "POLYLINE",
     Point = "POINT",
     Select = "SELECT",

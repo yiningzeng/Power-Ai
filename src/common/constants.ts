@@ -2,7 +2,7 @@
  * Constants used throughout application
  */
 export const constants = {
-    projectFileExtension: ".vott",
+    projectFileExtension: ".power-ai",
     assetMetadataFileExtension: "-asset.json",
     exportFileExtension: "-export.json",
     exportCoCoFileExtension: "-coco.pjson",

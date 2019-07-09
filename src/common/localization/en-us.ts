@@ -228,6 +228,7 @@ export const english: IAppStrings = {
             pan: "Pan",
             drawRectangle: "Draw Rectangle",
             drawPolygon: "Draw Polygon",
+            drawWithPencil: "Draw with a pencil",
             copyRectangle: "Copy Rectangle",
             copy: "Copy Regions",
             cut: "Cut Regions",
@@ -401,6 +402,9 @@ export const english: IAppStrings = {
         providers: {
             fasterRcnn: {
                 displayName: "Faster Rcnn",
+            },
+            maskRcnn: {
+                displayName: "Mask Rcnn",
             },
             yolov3: {
                 displayName: "Yolo v3",

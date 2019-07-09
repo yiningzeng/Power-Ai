@@ -91,7 +91,7 @@ export default class TrainPage extends React.Component<ITrainPageProps> {
                 <h3>
                     <i className="fas fa-sliders-h fa-1x"></i>
                     <span className="px-2">
-                        {strings.export.settings}
+                        {strings.train.settings}
                     </span>
                 </h3>
                 <div className="m-3">
@@ -129,7 +129,11 @@ export default class TrainPage extends React.Component<ITrainPageProps> {
         //     toast.warn(`成功导出部分 ${results.completed.length}/${results.count} 资源`);
         // }
 
-        toast.info(`开始配置训练...`);
+        // toast.info(`开始配置训练...`);
+
+        const infoId = toast.info(`开始导出 ${this.props.project.name} 配置文件...`);
+        await this.props.actions.exportTrainConfig(this.props.project);
+        toast.dismiss(infoId);
 
         IpcRendererProxy.send(`TrainingSystem:${this.props.project.trainFormat.providerType}`, [this.props.project])
             .then(() => {

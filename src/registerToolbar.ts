@@ -9,6 +9,7 @@ export enum ToolbarItemName {
     SelectCanvas = "selectCanvas",
     DrawRectangle = "drawRectangle",
     DrawPolygon = "drawPolygon",
+    DrawWithPencil = "drawWithPencil",
     CopyRectangle = "copyRectangle",
     CopyRegions = "copyRegions",
     CutRegions = "cutRegions",
@@ -58,14 +59,21 @@ export default function registerToolbar() {
         type: ToolbarItemType.State,
         accelerators: ["R", "r"],
     });
-
+    ToolbarItemFactory.register({
+        name: ToolbarItemName.DrawWithPencil,
+        tooltip: strings.editorPage.toolbar.drawWithPencil,
+        icon: "fa-pencil-alt",
+        group: ToolbarItemGroup.Canvas,
+        type: ToolbarItemType.State,
+        accelerators: ["P", "p"],
+    });
     ToolbarItemFactory.register({
         name: ToolbarItemName.DrawPolygon,
         tooltip: strings.editorPage.toolbar.drawPolygon,
         icon: "fa-draw-polygon",
         group: ToolbarItemGroup.Canvas,
         type: ToolbarItemType.State,
-        accelerators: ["P", "p"],
+        accelerators: ["D", "d"],
     });
 
     // ToolbarItemFactory.register({
