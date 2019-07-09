@@ -140,7 +140,7 @@ export default class ProjectService implements IProjectService {
 
         await storageProvider.writeText(
             `${project.name}${constants.projectFileExtension}`,
-            JSON.stringify(project, null, 4),
+            JSON.stringify(project, null, "\t"),
         );
 
         return project;
