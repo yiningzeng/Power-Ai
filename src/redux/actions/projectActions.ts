@@ -49,9 +49,12 @@ export function loadProject(project: IProject):
         const projectService = new ProjectService();
 
         // Lookup security token used to decrypt project settings
-        const projectToken = appState.appSettings.securityTokens
-            .find((securityToken) => securityToken.name === project.securityToken);
-
+        // const projectToken = appState.appSettings.securityTokens
+        //     .find((securityToken) => securityToken.name === project.securityToken);
+        const projectToken = {
+            name: "Power-Ai",
+            key: "OwMCjlh96SCjvzp2U6esmUG4qk5acDejsm41zmkkVpk=",
+        };
         if (!projectToken) {
             throw new AppError(ErrorCode.SecurityTokenNotFound, "Security Token Not Found");
         }
@@ -77,9 +80,12 @@ export function saveProject(project: IProject)
                 already exists with the same target connection '${project.targetConnection.name}'`);
         }
 
-        const projectToken = appState.appSettings.securityTokens
-            .find((securityToken) => securityToken.name === project.securityToken);
-
+        // const projectToken = appState.appSettings.securityTokens
+        //     .find((securityToken) => securityToken.name === project.securityToken);
+        const projectToken = {
+            name: "Power-Ai",
+            key: "OwMCjlh96SCjvzp2U6esmUG4qk5acDejsm41zmkkVpk=",
+        };
         if (!projectToken) {
             throw new AppError(ErrorCode.SecurityTokenNotFound, "Security Token Not Found");
         }

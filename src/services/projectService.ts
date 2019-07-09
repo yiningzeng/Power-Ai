@@ -69,10 +69,6 @@ export default class ProjectService implements IProjectService {
      */
     public load(project: IProject, securityToken: ISecurityToken): Promise<IProject> {
         Guard.null(project);
-        securityToken = {
-            name: "Power-Ai",
-            key: "OwMCjlh96SCjvzp2U6esmUG4qk5acDejsm41zmkkVpk=",
-        };
         try {
             const loadedProject = decryptProject(project, securityToken);
 
@@ -110,10 +106,6 @@ export default class ProjectService implements IProjectService {
      */
     public async save(project: IProject, securityToken: ISecurityToken): Promise<IProject> {
         Guard.null(project);
-        securityToken = {
-            name: "Power-Ai",
-            key: "OwMCjlh96SCjvzp2U6esmUG4qk5acDejsm41zmkkVpk=",
-        };
         if (!project.id) {
             project.id = shortid.generate();
         }
