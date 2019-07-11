@@ -120,6 +120,10 @@ export const english: IAppStrings = {
         totalRegionCount: "Total Tagged Regions",
         totalTagCount: "Total Tags",
         avgTagCountPerAsset: "Average tags per asset",
+        currentAsset: {
+            name: "Current Asset's Name",
+            size: "Current Asset's Size",
+        },
     },
     tags: {
         title: "Tags",
