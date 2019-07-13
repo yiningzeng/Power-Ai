@@ -3,7 +3,7 @@ import shortid from "shortid";
 import { StorageProviderFactory } from "../providers/storage/storageProviderFactory";
 import {
     IProject, ISecurityToken, AppError,
-    ErrorCode, ModelPathType, IActiveLearningSettings, ITrainFormat,
+    ErrorCode, ModelPathType, IActiveLearningSettings, ITrainFormat, IProviderOptions,
 } from "../models/applicationState";
 import Guard from "../common/guard";
 import { constants } from "../common/constants";
@@ -13,6 +13,7 @@ import packageJson from "../../package.json";
 import { ExportAssetState } from "../providers/export/exportProvider";
 import { IExportFormat } from "vott-react";
 import {IDetectron, NetModelType} from "../models/trainConfig";
+import {toast} from "react-toastify";
 
 /**
  * Functions required for a project service
@@ -22,6 +23,7 @@ import {IDetectron, NetModelType} from "../models/trainConfig";
 export interface IProjectService {
     load(project: IProject, securityToken: ISecurityToken): Promise<IProject>;
     save(project: IProject, securityToken: ISecurityToken): Promise<IProject>;
+    transfer(project: IProject, securityToken: ISecurityToken): Promise<IProject>;
     delete(project: IProject): Promise<void>;
     isDuplicate(project: IProject, projectList: IProject[]): boolean;
 }
@@ -129,16 +131,91 @@ export default class ProjectService implements IProjectService {
         if (!project.trainFormat) {
             project.trainFormat = defaultTrainOptions;
         }
-
-        project.version = packageJson.version;
-
+        // if (project.version.includes("删除")) {
+        //     console.log(`删除保存: ${JSON.stringify(project)}`);
+        // }
+        // project.version = packageJson.version;
         const storageProvider = StorageProviderFactory.createFromConnection(project.targetConnection);
         await this.saveExportSettings(project);
         project = encryptProject(project, securityToken);
-
+        // if (project.version.includes("删除")) {
+        //     console.log(`删除保存 final ${project.name}${constants.projectFileExtension}: ${JSON.stringify(project)}`);
+        //     await storageProvider.writeText(
+        //         `${project.name}-final-${constants.projectFileExtension}`,
+        //         JSON.stringify(project, null, "\t"),
+        //     );
+        // }
         await storageProvider.writeText(
             `${project.name}${constants.projectFileExtension}`,
             JSON.stringify(project, null, "\t"),
+        );
+
+        return project;
+    }
+
+    public async transfer(project: IProject, securityToken: ISecurityToken): Promise<IProject> {
+        Guard.null(project);
+        if (!project.id) {
+            project.id = shortid.generate();
+        }
+
+        // Ensure tags is always initialized to an array
+        if (!project.tags) {
+            project.tags = [];
+        }
+
+        // Initialize active learning settings if they don't exist
+        if (!project.activeLearningSettings) {
+            project.activeLearningSettings = defaultActiveLearningSettings;
+        }
+
+        // Initialize export settings if they don't exist
+        if (!project.exportFormat) {
+            project.exportFormat = defaultExportOptions;
+        }
+
+        // Initialize train settings if they don't exist
+        if (!project.trainFormat) {
+            project.trainFormat = defaultTrainOptions;
+        }
+        // if (project.version.includes("删除")) {
+        //     console.log(`删除保存: ${JSON.stringify(project)}`);
+        // }
+        // project.version = packageJson.version;
+        const storageProvider = StorageProviderFactory.createFromConnection(project.targetConnection);
+        project = decryptProject(project, securityToken);
+        console.log(`韵升-》解密: ${decodeURIComponent(JSON.stringify(project))}`);
+        这里需要改
+        project = {
+            ...project,
+            targetConnection: {
+                ...project.targetConnection,
+                providerOptions: {
+                    folderPath: {
+                        folderPath: "/home/baymin/daily-work/new-work/素材/yunsheng_date/6and4",
+                    }, // 这个就是所有项目文件保存的目录
+                },
+                providerOptionsOthers: [{
+                    folderPath: "/home/baymin/daily-work/new-work/素材/yunsheng_date/6and4",
+                }],
+            },
+        };
+        console.log(`韵升-》加密: ${JSON.stringify(encryptProject(project, securityToken))}`);
+        const targetOptions = JSON.parse(JSON.stringify(project.targetConnection.providerOptions));
+        toast.error(targetOptions["folderPath"]);
+
+        // toast.error(JSON.stringify(project.targetConnection.providerOptions));
+
+        // if (project.version.includes("删除")) {
+        //     console.log(`删除保存 final ${project.name}${constants.projectFileExtension}: ${JSON.stringify(project)}`);
+        //     await storageProvider.writeText(
+        //         `${project.name}-final-${constants.projectFileExtension}`,
+        //         JSON.stringify(project, null, "\t"),
+        //     );
+        // }
+        await storageProvider.writeText(
+            `${project.name}-transfer${constants.projectFileExtension}`,
+            decodeURIComponent(JSON.stringify(project, null, "\t")),
         );
 
         return project;

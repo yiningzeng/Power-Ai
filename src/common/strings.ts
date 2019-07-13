@@ -241,6 +241,7 @@ export interface IAppStrings {
             nextAsset: string;
             saveProject: string;
             exportProject: string;
+            transferProject: string;
             activeLearning: string;
             trainAi: string;
         }

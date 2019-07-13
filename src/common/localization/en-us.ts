@@ -242,6 +242,7 @@ export const english: IAppStrings = {
             nextAsset: "Next Asset",
             saveProject: "Save Project",
             exportProject: "Export Project",
+            transferProject: "Transfer Project",
             activeLearning: "Active Learning",
             trainAi: "Start Learning",
         },

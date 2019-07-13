@@ -25,6 +25,7 @@ export enum ToolbarItemName {
     NextAsset = "navigateNextAsset",
     SaveProject = "saveProject",
     ExportProject = "exportProject",
+    TransferProject = "transferProject",
     ActiveLearning = "activeLearning",
     TrainAi = "trainAi",
 }
@@ -215,10 +216,19 @@ export default function registerToolbar() {
     ToolbarItemFactory.register({
         name: ToolbarItemName.ExportProject,
         tooltip: strings.editorPage.toolbar.exportProject,
-        icon: "fa-external-link-square-alt",
+        icon: "fa-file-export",
         group: ToolbarItemGroup.Project,
         type: ToolbarItemType.Action,
         accelerators: ["CmdOrCtrl+E", "CmdOrCtrl+e"],
+    });
+    ToolbarItemFactory.register({
+        name: ToolbarItemName.TransferProject,
+        tooltip: strings.editorPage.toolbar.transferProject,
+        // icon: "fa-external-link-square-alt",
+        icon: "fa-external-link-alt",
+        group: ToolbarItemGroup.Project,
+        type: ToolbarItemType.Action,
+        accelerators: ["CmdOrCtrl+M", "CmdOrCtrl+m"],
     });
     // ToolbarItemFactory.register({
     //     name: ToolbarItemName.ExportProject,

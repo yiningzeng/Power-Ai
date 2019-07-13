@@ -829,6 +829,7 @@ export default class MockFactory {
         return {
             load: jest.fn((project: IProject) => Promise.resolve(project)),
             save: jest.fn((project: IProject) => Promise.resolve(project)),
+            transfer: jest.fn((project: IProject) => Promise.resolve(project)),
             delete: jest.fn((project: IProject) => Promise.resolve()),
             isDuplicate: jest.fn((project: IProject, projectList: IProject[]) => true),
         };
@@ -846,6 +847,7 @@ export default class MockFactory {
             loadAssets: jest.fn(() => Promise.resolve()),
             loadAssetsWithFolder: jest.fn(() => Promise.resolve()),
             exportProject: jest.fn(() => Promise.resolve()),
+            transferProject: jest.fn(() => Promise.resolve()),
             exportTrainConfig: jest.fn(() => Promise.resolve()),
             loadAssetMetadata: jest.fn(() => Promise.resolve()),
             saveAssetMetadata: jest.fn(() => Promise.resolve()),

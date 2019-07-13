@@ -28,6 +28,7 @@ export default interface IProjectActions {
     deleteProject(project: IProject): Promise<void>;
     closeProject(): void;
     exportProject(project: IProject): Promise<void> | Promise<IExportResults>;
+    transferProject(project: IProject): Promise<void>;
     exportTrainConfig(project: IProject): Promise<void> | Promise<ITrainConfigResults>;
     loadAssets(project: IProject): Promise<IAsset[]>;
     loadAssetsWithFolder(project: IProject, folder: string): Promise<IAsset[]>;
@@ -306,6 +307,31 @@ export function exportProject(project: IProject): (dispatch: Dispatch) => Promis
 
             return results as IExportResults;
         }
+    };
+}
+
+export function transferProject(project: IProject):
+    (dispatch: Dispatch, getState: () => IApplicationState) => Promise<void> {
+    return async (dispatch: Dispatch, getState: () => IApplicationState) => {
+        const appState = getState();
+        const projectService = new ProjectService();
+        if (projectService.isDuplicate(project, appState.recentProjects)) {
+            throw new AppError(ErrorCode.ProjectDuplicateName, `Project with name '${project.name}
+                already exists with the same target connection '${project.targetConnection.name}'`);
+        }
+
+        let projectToken = appState.appSettings.securityTokens
+            .find((securityToken) => securityToken.name === project.securityToken);
+        if (project.version !== "2.0.0") {
+            projectToken = {
+                name: "Power-Ai",
+                key: "OwMCjlh96SCjvzp2U6esmUG4qk5acDejsm41zmkkVpk=",
+            };
+        }
+        if (!projectToken) {
+            throw new AppError(ErrorCode.SecurityTokenNotFound, "Security Token Not Found");
+        }
+        await projectService.transfer(project, projectToken);
     };
 }
 

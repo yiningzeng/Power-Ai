@@ -878,6 +878,10 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                 // toast.error("开始到处");
                 this.props.history.push(`/projects/${projectId}/export`);
                 break;
+            case ToolbarItemName.TransferProject:
+                await this.props.actions.transferProject(this.props.project);
+                // this.props.history.push(`/projects/${projectId}/export`);
+                break;
             case ToolbarItemName.TrainAi:
                 // toast.error("开始到处");
                 this.props.history.push(`/projects/${projectId}/train`);
