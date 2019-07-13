@@ -36,6 +36,10 @@ export class StatusBarMetrics extends React.Component<IStatusBarMetricsProps> {
                     <i className="fas fa-eye"></i>
                     <span className="metric-visited-asset-count">{visitedAssets.length}</span>
                 </li>
+                <li title={strings.common.displayName}>
+                    <i className="fas fa-project-diagram"></i>
+                    <span className="metric-source-connection-name">{project.name}</span>
+                </li>
                 <li title={strings.projectMetrics.currentAsset.name}>
                     <i className="fas fa-coffee"></i>
                     <span className="metric-source-connection-name">{
