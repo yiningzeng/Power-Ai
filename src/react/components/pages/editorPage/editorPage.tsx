@@ -486,11 +486,12 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         this.canvas.current.removeAllRegions();
         await this.props.actions.deleteAsset(this.props.project, selectedAsset.asset);
         toast.success(`成功删除`);
+        this.goToRootAsset(1);
         this.loadingProjectAssets = false;
         this.setState({
             assets: [],
         });
-        this.loadProjectAssets();
+        await this.loadProjectAssets();
         // this.updateRootAssets();
     }
 
