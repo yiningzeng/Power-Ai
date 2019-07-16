@@ -234,7 +234,7 @@ export default class ProjectService implements IProjectService {
             `${project.name}-transfer${constants.projectFileExtension}`,
             JSON.stringify(project, null, "\t"),
         );
-
+        toast.success(`导出转移的项目文件 ${project.name}-transfer${constants.projectFileExtension} 成功`);
         return project;
     }
 
