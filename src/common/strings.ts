@@ -31,6 +31,9 @@ export interface IAppStrings {
         openLocalProject: {
             title: string;
         },
+        openTransferProject: {
+            title: string;
+        },
         openCloudProject: {
             title: string;
             selectConnection: string;

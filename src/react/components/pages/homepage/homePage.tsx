@@ -14,13 +14,15 @@ import RecentProjectItem from "./recentProjectItem";
 import { constants } from "../../../../common/constants";
 import {
     IApplicationState, IConnection, IProject, IFileInfo,
-    ErrorCode, AppError, IAppError, IAppSettings, IAsset,
+    ErrorCode, AppError, IAppError, IAppSettings, IAsset, IProviderOptions,
 } from "../../../../models/applicationState";
 import ImportService from "../../../../services/importService";
 import { IAssetMetadata } from "../../../../models/applicationState";
 import { toast } from "react-toastify";
 import MessageBox from "../../common/messageBox/messageBox";
 import { isElectron } from "../../../../common/hostProcess";
+import {ILocalFileSystemProxyOptions} from "../../../../providers/storage/localFileSystemProxy";
+import * as connectionActions from "../../../../redux/actions/connectionActions";
 
 export interface IHomePageProps extends RouteComponentProps, React.Props<HomePage> {
     recentProjects: IProject[];
@@ -69,7 +71,7 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                         <li>
                             <a href="#" onClick={this.createNewProject} className="p-5 new-project">
                                 <i className="fas fa-plus-circle fa-9x"></i>
-                                <h6>{strings.homePage.newProject}</h6>
+                                <h6 style={{marginTop: "10px"}}>{strings.homePage.newProject}</h6>
                             </a>
                         </li>
                         {isElectron() &&
@@ -77,12 +79,25 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                                 <a href="#" className="p-5 file-upload"
                                     onClick={() => this.filePicker.current.upload()} >
                                     <i className="fas fa-folder-open fa-9x"></i>
-                                    <h6>{strings.homePage.openLocalProject.title}</h6>
+                                    <h6 style={{marginTop: "10px"}}>{strings.homePage.openLocalProject.title}</h6>
                                 </a>
                                 <FilePicker ref={this.filePicker}
                                     onChange={this.onProjectFileUpload}
                                     onError={this.onProjectFileUploadError} />
                             </li>
+                        }
+                        {isElectron() &&
+                        <li>
+                            <a href="#" className="p-5 file-upload"
+                               onClick={() => this.filePicker.current.upload()} >
+                                <i className="fas fa-file-import fa-9x"></i>
+                                <h6 style={{marginTop: "10px", marginLeft: "10px"}}>
+                                    {strings.homePage.openTransferProject.title}</h6>
+                            </a>
+                            <FilePicker ref={this.filePicker}
+                                        onChange={this.onProjectFileUpload}
+                                        onError={this.onProjectFileUploadError} />
+                        </li>
                         }
                         {/*<li>*/}
                         {/*<a href="#" onClick={this.handleOpenCloudProjectClick} className="p-5 cloud-open-project">*/}
@@ -151,6 +166,25 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                 throw new Error(e.message);
             }
         } else {
+            // if (projectJson.name.includes("-Transfer")) {
+            //
+            // }
+            // 新增connect
+            const connection: IConnection = projectJson.targetConnection;
+            const provider: ILocalFileSystemProxyOptions = {
+                folderPath: JSON.parse(JSON.stringify(connection.providerOptions))["folderPath"],
+            };
+            const newSource: IConnection = {
+                id: connection.id,
+                name: connection.id,
+                providerType: "localFileSystemProxy",
+                providerOptions: provider,
+            };
+            // projectJson = {
+            //     ...projectJson,
+            //     version: "yining",
+            // };
+            connectionActions.saveConnection(newSource);
             await this.loadSelectedProject(projectJson);
         }
     }

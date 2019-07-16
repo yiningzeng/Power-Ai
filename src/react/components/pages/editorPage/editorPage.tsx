@@ -964,7 +964,8 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         }
 
         const assetMetadata = await this.props.actions.loadAssetMetadata(this.props.project, asset);
-
+        // 主要是这里加载
+        console.log(`迁移: ${JSON.stringify(assetMetadata)}`);
         try {
             if (!assetMetadata.asset.size) {
                 const assetProps = await HtmlFileReader.readAssetAttributes(asset);

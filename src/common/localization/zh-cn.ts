@@ -28,6 +28,9 @@ export const chinese: IAppStrings = {
         openLocalProject: {
             title: "打开本地项目",
         },
+        openTransferProject: {
+            title: "打开迁移的项目",
+        },
         openCloudProject: {
             title: "打开线上项目",
             selectConnection: "选择连接",

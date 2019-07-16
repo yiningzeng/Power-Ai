@@ -181,7 +181,14 @@ export function loadAssetsWithFolder(project: IProject, folder: string): (dispat
 export function loadAssetMetadata(project: IProject, asset: IAsset): (dispatch: Dispatch) => Promise<IAssetMetadata> {
     return async (dispatch: Dispatch) => {
         const assetService = new AssetService(project);
-        const assetMetadata = await assetService.getAssetMetadata(asset);
+        let assetMetadata = await assetService.getAssetMetadata(asset);
+        assetMetadata = {
+            ...assetMetadata,
+            asset: {
+                ...assetMetadata.asset,
+                path: asset.path,
+            },
+        };
         console.log(`loadAssetMetadata: ${JSON.stringify(assetMetadata)}`);
         dispatch(loadAssetMetadataAction(assetMetadata));
 

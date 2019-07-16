@@ -184,25 +184,42 @@ export default class ProjectService implements IProjectService {
         // project.version = packageJson.version;
         const storageProvider = StorageProviderFactory.createFromConnection(project.targetConnection);
         project = decryptProject(project, securityToken);
-        console.log(`韵升-》解密: ${decodeURIComponent(JSON.stringify(project))}`);
-        这里需要改
+        // let projectString = decodeURIComponent(JSON.stringify(project));
+        // projectString = projectString.replace("\/media\/baymin\/c731be01-5353-4600-8df0-b766fc1f9b80\/new-work\/",
+        //     "\/home\/baymin\/daily-work\/new-work\/")
+        //     .replace("\/home\/baymin\/new-work\/",
+        //         "\/home\/baymin\/daily-work\/new-work\/");
+        // const aa = projectString.replace("c731be01-5353-4600-8df0-b766fc1f9b80",
+        //     "kkkkkkkkkkkkkkkkkkkkkkkkkkkk");
+        // console.log(`韵升-》解密: ${JSON.stringify(project)}`);
+        // let projectJson: IProject;
+        // try {
+        //     projectJson = JSON.parse(projectString);
+        //     projectJson = {
+        //         ...projectJson,
+        //         name: projectJson.name + "-Transfer",
+        //     };
+        //
+        // } catch (error) {
+        //     throw new AppError(ErrorCode.ProjectInvalidJson, "Error parsing JSON");
+        // }
         project = {
             ...project,
-            targetConnection: {
-                ...project.targetConnection,
-                providerOptions: {
-                    folderPath: {
-                        folderPath: "/home/baymin/daily-work/new-work/素材/yunsheng_date/6and4",
-                    }, // 这个就是所有项目文件保存的目录
-                },
-                providerOptionsOthers: [{
-                    folderPath: "/home/baymin/daily-work/new-work/素材/yunsheng_date/6and4",
-                }],
-            },
+            name: project.name + "-Transfer",
+            // targetConnection: {
+            //     ...project.targetConnection,
+            //     providerOptions: {
+            //         folderPath: "/home/baymin/daily-work/new-work/素材/yunsheng_date/6and4", // 这个就是所有项目文件保存的目录
+            //     },
+            //     providerOptionsOthers: [{
+            //         folderPath: "/home/baymin/daily-work/new-work/素材/yunsheng_date/6and4",
+            //     }],
+            // },
         };
-        console.log(`韵升-》加密: ${JSON.stringify(encryptProject(project, securityToken))}`);
-        const targetOptions = JSON.parse(JSON.stringify(project.targetConnection.providerOptions));
-        toast.error(targetOptions["folderPath"]);
+
+        // console.log(`韵升-》加密: ${JSON.stringify(encryptProject(projectJson, securityToken))}`);
+        // const targetOptions = JSON.parse(JSON.stringify(project.targetConnection.providerOptions));
+        // toast.error(targetOptions["folderPath"]);
 
         // toast.error(JSON.stringify(project.targetConnection.providerOptions));
 
@@ -215,7 +232,7 @@ export default class ProjectService implements IProjectService {
         // }
         await storageProvider.writeText(
             `${project.name}-transfer${constants.projectFileExtension}`,
-            decodeURIComponent(JSON.stringify(project, null, "\t")),
+            JSON.stringify(project, null, "\t"),
         );
 
         return project;
