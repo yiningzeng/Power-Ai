@@ -485,13 +485,16 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         // this.props.project.assets[selectedAsset.asset.id].
         this.canvas.current.removeAllRegions();
         await this.props.actions.deleteAsset(this.props.project, selectedAsset.asset);
+        console.log(`删除素材fuck：${JSON.stringify(this.props.project)}`);
         toast.success(`成功删除`);
-        this.goToRootAsset(1);
+        this.goToRootAsset(-1);
         this.loadingProjectAssets = false;
         this.setState({
             assets: [],
+            selectedTag: null,
         });
         await this.loadProjectAssets();
+        console.log(`删除素材fuck 222：${JSON.stringify(this.props.project)}`);
         // this.updateRootAssets();
     }
 
