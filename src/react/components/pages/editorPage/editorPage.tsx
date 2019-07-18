@@ -60,9 +60,9 @@ const emptyZoomMode: IZoomMode = {
     disableDrag: true,
     x: 0,
     y: 0,
-    miniWidth: 800,
-    width: 1000, // "auto",
-    height: 1000, // "auto",
+    miniWidth: 500,
+    width: "auto",
+    height: "auto",
 };
 /**
  * Properties for Editor Page
@@ -379,7 +379,14 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                                 width: ( w - deltaY),
                                             },
                                         });
-                                        console.log("fuck" + deltaY + "       " + this.state.zoomMode.width);
+                                        if (this.state.zoomMode.height === "auto") {
+                                            this.setState({
+                                                zoomMode: {
+                                                    ...this.state.zoomMode,
+                                                    height: document.getElementById("ct-zone").offsetHeight,
+                                                },
+                                            });
+                                        }
                                     })}
                                 >
                                     <Canvas
@@ -932,6 +939,8 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
             zoomMode: {
                 ...emptyZoomMode,
                 disableDrag: this.state.zoomMode.disableDrag,
+                width: "auto",
+                height: "auto",
             },
         });
         const selectedRootAsset = this.state.selectedAsset.asset.parent || this.state.selectedAsset.asset;
