@@ -28,6 +28,7 @@ export enum ToolbarItemName {
     TransferProject = "transferProject",
     ActiveLearning = "activeLearning",
     TrainAi = "trainAi",
+    RemoteTrainAi = "remoteTrainAi",
 }
 
 export enum ToolbarItemGroup {
@@ -77,14 +78,14 @@ export default function registerToolbar() {
         accelerators: ["D", "d"],
     });
 
-    // ToolbarItemFactory.register({
-    //     name: ToolbarItemName.CopyRectangle,
-    //     tooltip: strings.editorPage.toolbar.copyRectangle,
-    //     icon: "far fa-clone",
-    //     group: ToolbarItemGroup.Canvas,
-    //     type: ToolbarItemType.State,
-    //     accelerators: ["CmdOrCtrl+W", "CmdOrCtrl+w"],
-    // });
+    ToolbarItemFactory.register({
+        name: ToolbarItemName.CopyRectangle,
+        tooltip: strings.editorPage.toolbar.copyRectangle,
+        icon: "far fa-clone",
+        group: ToolbarItemGroup.Canvas,
+        type: ToolbarItemType.State,
+        accelerators: ["CmdOrCtrl+W", "CmdOrCtrl+w"],
+    });
 
     ToolbarItemFactory.register({
         name: ToolbarItemName.CopyRegions,
@@ -246,6 +247,16 @@ export default function registerToolbar() {
         group: ToolbarItemGroup.Ai,
         type: ToolbarItemType.Action,
         accelerators: ["CmdOrCtrl+T", "CmdOrCtrl+t"],
+    });
+
+    ToolbarItemFactory.register({
+        name: ToolbarItemName.RemoteTrainAi,
+        tooltip: strings.editorPage.toolbar.trainAi,
+        icon: "fa fa-train",
+        // icon: "fas fa-caret-square-right",
+        group: ToolbarItemGroup.Ai,
+        type: ToolbarItemType.Action,
+        accelerators: ["CmdOrCtrl+Y", "CmdOrCtrl+y"],
     });
     // ToolbarItemFactory.register({
     //     name: ToolbarItemName.TrainAi,

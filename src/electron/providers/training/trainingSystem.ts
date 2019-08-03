@@ -1,5 +1,8 @@
 import { BrowserWindow, dialog } from "electron";
 import fs from "fs";
+import ftp from "ftp";
+import archiver from "archiver";
+// const Client = require("ftp");
 import path from "path";
 import {IProject} from "../../../models/applicationState";
 import child_process from "child_process";
@@ -33,7 +36,7 @@ export default class TrainingSystem {
                 "done\n" +
                 "echo `cat " + passwordFile + "` | sudo -S nvidia-docker run -d -p $port:8097 -v " +
                 filePath + ":/Detectron/detectron/datasets/data/ --name " +
-                project.name + "-$port registry.cn-hangzhou.aliyuncs.com/baymin/ai-power:ai-power-v2.2\n" +
+                project.name + "-$port registry.cn-hangzhou.aliyuncs.com/baymin/ai-power:ai-power-v2.5\n" +
                 "sleep 2\n" +
                 "x-www-browser http://localhost:$port";
             // 执行命令行，如果命令不需要路径，或就是项目根目录，则不需要cwd参数：
@@ -165,6 +168,28 @@ export default class TrainingSystem {
         });
     }
 
+    public remoteTrain(project: IProject): Promise<string> {
+        // ftp使用教程 https://www.npmjs.com/package/ftp
+        // 打包 https://www.npmjs.com/package/archiver
+        return new Promise<string>((resolve, reject) => {
+            const config = {
+                host: "192.168.31.157",
+                user: "baymin",
+                password: "baymin1024",
+            };
+            const c = new ftp();
+            c.on("ready", () => {
+                c.put("/home/baymin/daily-work/auto-daily/2019-08-03", "README.md", (err) => {
+                    if (err) { throw err; }
+                    console.log("上传成功");
+                    c.end();
+                });
+            });
+            // connect to localhost:21 as anonymous
+            c.connect(config);
+            resolve("成功");
+        });
+    }
     /**
      * Gets the node file system stats for the specified path
      * @param  {string} path
