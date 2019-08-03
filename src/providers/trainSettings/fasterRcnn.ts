@@ -121,7 +121,7 @@ export class FasterRcnnProvider extends TrainProvider<IFasterRcnnProviderOptions
                 trainSettings.SOLVER_STEPS = [0, 3750, 5000];
                 break;
         }
-        await this.storageProvider.writeText(`train-config/train-config.yaml`,
+        await this.storageProvider.writeText(`coco-json-export/train-config.yaml`,
             interpolate(fasterRcnnTemplate, trainSettings));
     }
 
