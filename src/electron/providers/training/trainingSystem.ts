@@ -6,6 +6,7 @@ import archiver from "archiver";
 import path from "path";
 import {IProject} from "../../../models/applicationState";
 import child_process from "child_process";
+import has = Reflect.has;
 const exec = child_process.exec;
 // 任何你期望执行的cmd命令，ls都可以
 
@@ -169,26 +170,99 @@ export default class TrainingSystem {
     }
 
     public remoteTrain(project: IProject): Promise<string> {
+        return new Promise<string>((resolve, reject) => {
+            console.log(`开始打包`);
+            const sourcePath = `${project.targetConnection.providerOptions["folderPath"]}`;
+            const tarPath = path.normalize(`${sourcePath}/${project.name}-train-assets.tar`);
+            console.log(`${tarPath}`);
+            const output = fs.createWriteStream(tarPath);
+            const archive = archiver("tar", {
+                zlib: { level: 9 }, // Sets the compression level.
+            });
+            output.on("close", () => {
+                console.log(archive.pointer() + " total bytes");
+                console.log(`${project.name}-train-assets.tar 打包完成`);
+                console.log("archiver has been finalized and the output file descriptor has closed.");
+                const config = {
+                    host: "192.168.31.157",
+                    user: "baymin",
+                    password: "baymin1024",
+                };
+                const c = new ftp();
+                c.on("ready", () => {
+                    c.put(tarPath, `${project.name}-train-assets.tar`, (err) => {
+                        if (err) {
+                            throw err;
+                        }
+                        console.log("上传成功");
+                        c.end();
+                    });
+                });
+                // connect to localhost:21 as anonymous
+                c.connect(config);
+            });
+            output.on("end", () => {
+                console.log("Data has been drained");
+            });
+            archive.on("warning", (err) => {
+                if (err.code === "ENOENT") {
+                    // log warning
+                } else {
+                    // throw error
+                    throw err;
+                }
+            });
+            archive.on("error", (err) => {
+                throw err;
+            });
+            archive.pipe(output);
+            // archive.file("/home/baymin/daily-work/new-work/素材/cizhuan/ceshi.txt", { name: "file4.txt" });
+            // archive.file("/home/baymin/daily-work/new-work/素材/cizhuan/ceshi.txt");
+            let assetsBasePath = "coco-json-export/";
+            switch (project.exportFormat.providerType) {
+                case "coco":
+                    assetsBasePath = "coco-json-export/";
+                    break;
+                case "pascalVOC":
+                    assetsBasePath = `${project.name}-PascalVOC-export/`;
+                    break;
+                case "tensorFlowRecords":
+                    resolve("暂时不支持tensorFlowRecords数据集的远程训练");
+                    break;
+            }
+            archive.directory(path.normalize(`${sourcePath}/${assetsBasePath}/`), `${project.name}-remote-train`);
+            archive.finalize();
+        });
+        // toast.success("开始打包");
+        // tar.c(
+        //     {
+        //         gzip: true,
+        //         file: "/home/baymin/daily-work/new-work/素材/cizhuan/打包.tgz",
+        //     },
+        //     ["/home/baymin/daily-work/new-work/素材/cizhuan/ceshi.txt",
+        //         "/home/baymin/daily-work/new-work/素材/cizhuan/coco-json-export/"],
+        // ).then( () => { toast.success("打包成功"); });
         // ftp使用教程 https://www.npmjs.com/package/ftp
         // 打包 https://www.npmjs.com/package/archiver
-        return new Promise<string>((resolve, reject) => {
-            const config = {
-                host: "192.168.31.157",
-                user: "baymin",
-                password: "baymin1024",
-            };
-            const c = new ftp();
-            c.on("ready", () => {
-                c.put("/home/baymin/daily-work/auto-daily/2019-08-03", "README.md", (err) => {
-                    if (err) { throw err; }
-                    console.log("上传成功");
-                    c.end();
-                });
-            });
-            // connect to localhost:21 as anonymous
-            c.connect(config);
-            resolve("成功");
-        });
+
+        // return new Promise<string>((resolve, reject) => {
+        //     const config = {
+        //         host: "192.168.31.157",
+        //         user: "baymin",
+        //         password: "baymin1024",
+        //     };
+        //     const c = new ftp();
+        //     c.on("ready", () => {
+        //         c.put("/home/baymin/daily-work/auto-daily/2019-08-03", "README.md", (err) => {
+        //             if (err) { throw err; }
+        //             console.log("上传成功");
+        //             c.end();
+        //         });
+        //     });
+        //     // connect to localhost:21 as anonymous
+        //     c.connect(config);
+        //     resolve("成功");
+        // });
     }
     /**
      * Gets the node file system stats for the specified path
