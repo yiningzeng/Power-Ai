@@ -180,7 +180,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         this.setState({
             treeList: this.props.project.sourceConnection.providerOptionsOthers,
         });
-        console.log("editorPage: project" + JSON.stringify(this.props.project));
+        // console.log("editorPage: project" + JSON.stringify(this.props.project));
         this.activeLearningService = new ActiveLearningService(this.props.project.activeLearningSettings);
     }
 
@@ -188,11 +188,11 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         if (this.props.project && this.state.assets.length === 0) {
             await this.loadProjectAssets();
         }
-        console.log("editorPage: componentDidUpdate this.props.project: " + JSON.stringify(this.props.project));
+        // console.log("editorPage: componentDidUpdate this.props.project: " + JSON.stringify(this.props.project));
         // Navigating directly to the page via URL (ie, http://vott/projects/a1b2c3dEf/edit) sets the default state
         // before props has been set, this updates the project and additional settings to be valid once props are
         // retrieved.
-        console.log("editorPage: componentDidUpdate prevProps: " + JSON.stringify(prevProps));
+        // console.log("editorPage: componentDidUpdate prevProps: " + JSON.stringify(prevProps));
         if (this.props.project && !prevProps.project) {
             this.setState({
                 treeList: this.props.project.sourceConnection.providerOptionsOthers,
@@ -202,7 +202,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                 },
             });
         }
-        console.log("editorPage: componentDidUpdate this.state" + JSON.stringify(this.state));
+        // console.log("editorPage: componentDidUpdate this.state" + JSON.stringify(this.state));
         if (this.props.project && prevProps.project && this.props.project.tags !== prevProps.project.tags) {
             this.updateRootAssets();
         }
@@ -222,15 +222,15 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         const { project } = this.props;
         const { treeList, assets, selectedAsset } = this.state;
         const rootAssets = assets.filter((asset) => !asset.parent);
-        console.log("editorPage: render project ", project);
-        console.log("editorPage: render assets ", assets);
-        console.log("editorPage: render selectedAsset ", selectedAsset);
+        // console.log("editorPage: render project ", project);
+        // console.log("editorPage: render rootAssets ", JSON.stringify(rootAssets));
+        // console.log("editorPage: render selectedAsset ", selectedAsset);
         if (!project) {
             return (<div>Loading...</div>);
         }
-        const folderPath = project.sourceConnection.providerOptions["folderPath"];
-        console.log("editorPage: render folderPath ", folderPath);
-        console.log("editorPage: render treeList ", treeList);
+        // const folderPath = project.sourceConnection.providerOptions["folderPath"];
+        // console.log("editorPage: render folderPath ", folderPath);
+        // console.log("editorPage: render treeList ", treeList);
         return (
             <div className="editor-page">
                 {[...Array(10).keys()].map((index) => {
@@ -331,6 +331,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                         <EditorSideBar
                             assets={rootAssets}
                             selectedAsset={selectedAsset ? selectedAsset.asset : null}
+                            // selectedAsset={null}
                             onBeforeAssetSelected={this.onBeforeAssetSelected}
                             onAssetSelected={this.selectAsset}
                             thumbnailSize={this.state.thumbnailSize}
@@ -492,7 +493,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         // this.props.project.assets[selectedAsset.asset.id].
         this.canvas.current.removeAllRegions();
         await this.props.actions.deleteAsset(this.props.project, selectedAsset.asset);
-        console.log(`删除素材fuck：${JSON.stringify(this.props.project)}`);
+        // console.log(`删除素材fuck：${JSON.stringify(this.props.project)}`);
         toast.success(`成功删除`);
         this.goToRootAsset(-1);
         this.loadingProjectAssets = false;
@@ -501,7 +502,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
             selectedTag: null,
         });
         await this.loadProjectAssets();
-        console.log(`删除素材fuck 222：${JSON.stringify(this.props.project)}`);
+        // console.log(`删除素材fuck 222：${JSON.stringify(this.props.project)}`);
         // this.updateRootAssets();
     }
 
@@ -690,7 +691,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         // The root asset can either be the actual asset being edited (ex: VideoFrame) or the top level / root
         // asset selected from the side bar (image/video).
         const rootAsset = { ...(assetMetadata.asset.parent || assetMetadata.asset) };
-        console.log("assetMetadata: " + JSON.stringify(assetMetadata));
+        // console.log("assetMetadata: " + JSON.stringify(assetMetadata));
         if (this.isTaggableAssetType(assetMetadata.asset)) {
             if (assetMetadata.asset.state === AssetState.OkTagged) {
                 assetMetadata.asset.state = AssetState.OkTagged;
