@@ -418,6 +418,9 @@ export const chinese: IAppStrings = {
             },
         },
     },
+    remoteTrainSettings: {
+        ip: "训练服务器ip",
+    },
     trainSettings: {
         title: "训练设置",
         messages: {

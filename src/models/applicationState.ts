@@ -245,6 +245,7 @@ export interface IActiveLearningSettings {
 }
 
 export interface ITrainFormat {
+    ip: string;
     providerType: string;
     providerOptions: IYoloV3 | IDetectron;
 }

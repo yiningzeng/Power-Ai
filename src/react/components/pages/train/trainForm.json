@@ -4,6 +4,11 @@
         "providerType"
     ],
     "properties": {
+        "ip": {
+            "title": "${strings.remoteTrainSettings.ip}",
+            "type": "string",
+            "default": "localhost"
+        },
         "providerType": {
             "title": "${strings.common.trainProvider}",
             "type": "string"

@@ -64,6 +64,7 @@ const trainSettingsYolov3: IYoloV3 = {
 @connect(mapStateToProps, mapDispatchToProps)
 export default class TrainPage extends React.Component<ITrainPageProps> {
     private emptyTrainFormat: ITrainFormat = {
+        ip: "localhost",
         providerType: "yolov3",
         providerOptions: trainSettingsYolov3,
     };
@@ -111,7 +112,7 @@ export default class TrainPage extends React.Component<ITrainPageProps> {
         };
 
         await this.props.actions.saveProject(projectToUpdate);
-        toast.success(strings.export.messages.saveSuccess);
+        // toast.success(strings.export.messages.saveSuccess);
 
         // region 开始训练
         // const infoId = toast.info(`开始导出 ${this.props.project.name} ...`);
@@ -133,12 +134,12 @@ export default class TrainPage extends React.Component<ITrainPageProps> {
 
         const infoId = toast.info(`开始导出 ${this.props.project.name} 配置文件...`);
         await this.props.actions.exportTrainConfig(this.props.project);
-        toast.dismiss(infoId);
 
+        toast.dismiss(infoId);
         IpcRendererProxy.send(`TrainingSystem:${this.props.project.trainFormat.providerType}`, [this.props.project])
-            .then(() => {
-                toast.success(`配置成功`);
-            });
+            .then((data) => {
+            console.log(data);
+        });
         // endregion
 
         this.props.history.goBack();

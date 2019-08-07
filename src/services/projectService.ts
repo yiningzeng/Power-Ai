@@ -47,6 +47,7 @@ const defaultFastrcnn: IDetectron = {
 };
 
 const defaultTrainOptions: ITrainFormat = {
+    ip: "localhost",
     providerType: "fasterRcnn",
     providerOptions: defaultFastrcnn,
 };

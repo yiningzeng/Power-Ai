@@ -101,11 +101,11 @@ export default function registerProviders() {
         displayName: strings.train.providers.maskRcnn.displayName,
         factory: (project, options) => new MaskRcnnProvider(project, options),
     });
-    TrainProviderFactory.register({
-        name: "remoteTrain",
-        displayName: strings.train.providers.maskRcnn.displayName,
-        factory: (project, options) => new MaskRcnnProvider(project, options),
-    });
+    // TrainProviderFactory.register({
+    //     name: "remoteTrain",
+    //     displayName: strings.train.providers.maskRcnn.displayName,
+    //     factory: (project, options) => new MaskRcnnProvider(project, options),
+    // });
     // TrainProviderFactory.register({
     //     name: "fpn",
     //     displayName: "FPN",

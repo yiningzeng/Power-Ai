@@ -1,7 +1,9 @@
 import { BrowserWindow, dialog } from "electron";
 import fs from "fs";
 import ftp from "ftp";
+import got from "got";
 import archiver from "archiver";
+import FormData from "form-data";
 // const Client = require("ftp");
 import path from "path";
 import {IProject} from "../../../models/applicationState";
@@ -19,6 +21,10 @@ export default class TrainingSystem {
 
     public fasterRcnn(project: IProject): Promise<string> {
         return new Promise<string>((resolve, reject) => {
+            if (project.trainFormat.ip !== "localhost") {
+                resolve(this.remoteTrain(project));
+                return;
+            }
             const passwordFile = process.cwd() + "/password.txt";
             const sourcePath = `${project.targetConnection.providerOptions["folderPath"]}/coco-json-export/`;
             const filePath = path.normalize(sourcePath);
@@ -184,7 +190,7 @@ export default class TrainingSystem {
                 console.log(`${project.name}-train-assets.tar 打包完成`);
                 console.log("archiver has been finalized and the output file descriptor has closed.");
                 const config = {
-                    host: "192.168.31.157",
+                    host: project.trainFormat.ip,
                     user: "baymin",
                     password: "baymin1024",
                 };
@@ -194,8 +200,63 @@ export default class TrainingSystem {
                         if (err) {
                             throw err;
                         }
-                        console.log("上传成功");
                         c.end();
+                        console.log("上传成功");
+                        const trainInfo = {
+                            ...project.trainFormat,
+                            assets: `${project.name}-train-assets.tar`,
+                        };
+                        // http://www.squaremobius.net/amqp.node/channel_api.html api文档
+                        // rabbitmq
+                        const exchange = "ai.train.topic";
+                        const amqplib = require("amqplib").connect("amqp://baymin:baymin1024@192.168.31.157:5672");
+                        // Publisher
+                        amqplib.then((conn) => {
+                            return conn.createChannel();
+                        }).then((ch) => {
+                            ch.publish(exchange, `train.start.${project.name}.${project.trainFormat.providerType}`,
+                                Buffer.from(JSON.stringify(trainInfo)));
+                            // ch.assertExchange(exchange, "topic").then(() => {
+                            //     console.log("creat Exchange success");
+                            // }).catch((err) => {
+                            //     console.log("creat Exchange failed");
+                            //     console.log(err);
+                            // });
+                            // return ch.assertQueue(q).then((ok) => {
+                            //     console.log(ok);
+                            //     ch.bindQueue(q, exchange, "train.start.#");
+                            //     // return ch.sendToQueue(q, Buffer.from("something to do"));
+                            // });
+                        }).catch(console.warn);
+
+                        // Consumer
+                        // amqplib.then((conn) => {
+                        //     return conn.createChannel();
+                        // }).then((ch) => {
+                        //     return ch.assertQueue(q).then((ok) => {
+                        //         return ch.consume(q, (msg) => {
+                        //             if (msg !== null) {
+                        //                 console.log(`get masg ${msg.content.toString()}`);
+                        //                 ch.ack(msg);
+                        //             }
+                        //         });
+                        //     });
+                        // }).catch(console.warn);
+
+                        const form = new FormData();
+                        form.append("username", "baymin");
+                        form.append("password", "e10adc3949ba59abbe56e057f20f883e");
+                        got("http://rest.yining.site:8080/api/v1/u2", {
+                            body: form,
+                            method: "POST",
+                        }).then((response) => {
+                            console.log("进来了大爷");
+                            console.log(response.body);
+                        }).catch((error) => {
+                            console.log("错误了");
+                            console.log(error.response.body);
+                        });
+
                     });
                 });
                 // connect to localhost:21 as anonymous
@@ -227,11 +288,13 @@ export default class TrainingSystem {
                     assetsBasePath = `${project.name}-PascalVOC-export/`;
                     break;
                 case "tensorFlowRecords":
+                    console.log("暂时不支持tensorFlowRecords数据集的远程训练");
                     resolve("暂时不支持tensorFlowRecords数据集的远程训练");
                     break;
             }
             archive.directory(path.normalize(`${sourcePath}/${assetsBasePath}/`), `${project.name}-remote-train`);
             archive.finalize();
+            resolve("成功啦啦啦啦啦啊");
         });
         // toast.success("开始打包");
         // tar.c(

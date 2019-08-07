@@ -2,7 +2,7 @@
     "type": "object",
     "properties": {
         "name": {
-            "title": "${strings.common.displayName}",
+            "title": "${strings.remoteTrainSettings.ip}",
             "type": "string",
             "pattern": "^[^\\\\\\\\/:*?\\\\\\\"<>|]*$"
         }

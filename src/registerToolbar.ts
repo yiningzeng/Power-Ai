@@ -38,6 +38,7 @@ export enum ToolbarItemGroup {
     Project = "project",
     Zoom = "Zoom",
     Ai = "ai",
+    Start = "start",
 }
 
 /**
@@ -242,22 +243,31 @@ export default function registerToolbar() {
     ToolbarItemFactory.register({
         name: ToolbarItemName.TrainAi,
         tooltip: strings.editorPage.toolbar.trainAi,
-        icon: "fa fa-train",
+        icon: "fa fa-fighter-jet",
         // icon: "fas fa-caret-square-right",
         group: ToolbarItemGroup.Ai,
         type: ToolbarItemType.Action,
         accelerators: ["CmdOrCtrl+T", "CmdOrCtrl+t"],
     });
 
-    ToolbarItemFactory.register({
-        name: ToolbarItemName.RemoteTrainAi,
-        tooltip: strings.editorPage.toolbar.trainAi,
-        icon: "fa fa-train",
-        // icon: "fas fa-caret-square-right",
-        group: ToolbarItemGroup.Ai,
-        type: ToolbarItemType.Action,
-        accelerators: ["CmdOrCtrl+Y", "CmdOrCtrl+y"],
-    });
+    // ToolbarItemFactory.register({
+    //     name: ToolbarItemName.RemoteTrainAi,
+    //     tooltip: strings.editorPage.toolbar.trainAi,
+    //     icon: "fa fa-train",
+    //     // icon: "fas fa-caret-square-right",
+    //     group: ToolbarItemGroup.Ai,
+    //     type: ToolbarItemType.Action,
+    //     accelerators: ["CmdOrCtrl+Y", "CmdOrCtrl+y"],
+    // });
+    // ToolbarItemFactory.register({
+    //     name: ToolbarItemName.RemoteTrainAi,
+    //     tooltip: strings.editorPage.toolbar.trainAi,
+    //     icon: "fa fa-fighter-jet",
+    //     // icon: "fas fa-caret-square-right",
+    //     group: ToolbarItemGroup.Start,
+    //     type: ToolbarItemType.Action,
+    //     accelerators: ["CmdOrCtrl+F", "CmdOrCtrl+f"],
+    // });
     // ToolbarItemFactory.register({
     //     name: ToolbarItemName.TrainAi,
     //     tooltip: strings.editorPage.toolbar.trainAi,

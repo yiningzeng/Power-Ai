@@ -652,6 +652,7 @@ export default class MockFactory {
             },
         };
         return {
+            ip: "localhost",
             providerType: "fasterRcnn",
             providerOptions: defaultFastrcnn,
         };
@@ -873,7 +874,6 @@ export default class MockFactory {
      */
     public static appSettings(): IAppSettings {
         const securityTokens = MockFactory.createSecurityTokens();
-
         return {
             devToolsEnabled: false,
             securityTokens: [
@@ -892,6 +892,13 @@ export default class MockFactory {
         return {
             name: `Security-Token-${nameSuffix}`,
             key: generateKey(),
+        };
+    }
+
+    public static createPowerAiSecurityToken(): ISecurityToken {
+        return {
+            name: `Power-Ai`,
+            key: "OwMCjlh96SCjvzp2U6esmUG4qk5acDejsm41zmkkVpk=",
         };
     }
 
@@ -940,6 +947,7 @@ export default class MockFactory {
      * @param projectId Current project ID
      */
     public static editorPageProps(projectId?: string): IEditorPageProps {
+        // @ts-ignore
         return {
             actions: (projectActions as any) as IProjectActions,
             applicationActions: (applicationActions as any) as IApplicationActions,

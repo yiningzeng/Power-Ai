@@ -80,7 +80,7 @@ export default class LocalFileSystem implements IStorageProvider {
         // console.log(`写入：${contents}`);
         const buffer = Buffer.alloc(contents.length + 250, " ");
         buffer.write(contents);
-        console.log(`写入buffer：${buffer}`);
+        // console.log(`写入buffer：${buffer}`);
         return this.writeBinary(filePath, buffer);
     }
 

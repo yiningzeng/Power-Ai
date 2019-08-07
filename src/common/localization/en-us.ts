@@ -419,6 +419,9 @@ export const english: IAppStrings = {
             },
         },
     },
+    remoteTrainSettings: {
+        ip: "server ip",
+    },
     trainSettings: {
         title: "Train Settings",
         messages: {

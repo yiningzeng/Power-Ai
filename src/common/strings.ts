@@ -416,6 +416,9 @@ export interface IAppStrings {
             },
         }
     };
+    remoteTrainSettings: {
+      ip: string;
+    };
     trainSettings: {
         title: string;
         messages: {
