@@ -75,6 +75,10 @@ export default class TrainingSystem {
 
     public maskRcnn(project: IProject): Promise<string> {
         return new Promise<string>((resolve, reject) => {
+            if (project.trainFormat.ip !== "localhost") {
+                resolve(this.remoteTrain(project));
+                return;
+            }
             const passwordFile = process.cwd() + "/password.txt";
             const sourcePath = `${project.targetConnection.providerOptions["folderPath"]}/coco-json-export/`;
             const filePath = path.normalize(sourcePath);
@@ -125,6 +129,10 @@ export default class TrainingSystem {
 
     public yolov3(project: IProject): Promise<string> {
         return new Promise<string>((resolve, reject) => {
+            if (project.trainFormat.ip !== "localhost") {
+                resolve(this.remoteTrain(project));
+                return;
+            }
             const passwordFile = process.cwd() + "/password.txt";
             const sourcePath = project.targetConnection.providerOptions["folderPath"] + "/"
                 + project.name.replace(/\s/g, "-") + "-PascalVOC-export/";
@@ -179,7 +187,19 @@ export default class TrainingSystem {
         return new Promise<string>((resolve, reject) => {
             console.log(`开始打包`);
             const sourcePath = `${project.targetConnection.providerOptions["folderPath"]}`;
-            const tarPath = path.normalize(`${sourcePath}/${project.name}-train-assets.tar`);
+            // 打包的tar文件名
+            const myDate = new Date();
+            let month = myDate.getMonth() + 1;
+            // @ts-ignore
+            month = (month < 10 ? "0" + month : month);
+            let day = myDate.getDate();
+            // @ts-ignore
+            day = (day < 10 ? "0" + day : day);
+            const date = `${myDate.getFullYear()}${month.toString()}${day.toString()}`; // 获取当前时间比如 20190808
+            const tarBaseName = `train-assets-${project.name}-${project.trainFormat.providerType}-${date}`; // 组合tar的基本名
+            const tarName = `${tarBaseName}.tar`;
+            // tar路径
+            const tarPath = path.normalize(`${sourcePath}/${tarName}`);
             console.log(`${tarPath}`);
             const output = fs.createWriteStream(tarPath);
             const archive = archiver("tar", {
@@ -187,7 +207,7 @@ export default class TrainingSystem {
             });
             output.on("close", () => {
                 console.log(archive.pointer() + " total bytes");
-                console.log(`${project.name}-train-assets.tar 打包完成`);
+                console.log(`${tarName} 打包完成`);
                 console.log("archiver has been finalized and the output file descriptor has closed.");
                 const config = {
                     host: project.trainFormat.ip,
@@ -196,25 +216,39 @@ export default class TrainingSystem {
                 };
                 const c = new ftp();
                 c.on("ready", () => {
-                    c.put(tarPath, `${project.name}-train-assets.tar`, (err) => {
+                    c.put(tarPath, tarName, (err) => {
                         if (err) {
                             throw err;
                         }
                         c.end();
                         console.log("上传成功");
+                        const packageInfo = {
+                            projectId: project.id,
+                            projectName: project.name,
+                            packageDir: tarBaseName,
+                            packageName: tarName,
+                        };
                         const trainInfo = {
+                            projectId: project.id,
+                            projectName: project.name,
+                            assetsDir: tarBaseName,
+                            assetsType: project.exportFormat.providerType,
                             ...project.trainFormat,
-                            assets: `${project.name}-train-assets.tar`,
                         };
                         // http://www.squaremobius.net/amqp.node/channel_api.html api文档
                         // rabbitmq
-                        const exchange = "ai.train.topic";
+                        const trainExchange = "ai.train.topic";
+                        const packageExchange = "ai.package.topic";
                         const amqplib = require("amqplib").connect("amqp://baymin:baymin1024@192.168.31.157:5672");
                         // Publisher
                         amqplib.then((conn) => {
                             return conn.createChannel();
                         }).then((ch) => {
-                            ch.publish(exchange, `train.start.${project.name}.${project.trainFormat.providerType}`,
+                            ch.publish(packageExchange,
+                                `package.upload-done.${project.name}.${project.trainFormat.providerType}`,
+                                Buffer.from(JSON.stringify(packageInfo)));
+                            ch.publish(trainExchange,
+                                `train.start.${project.name}.${project.trainFormat.providerType}`,
                                 Buffer.from(JSON.stringify(trainInfo)));
                             // ch.assertExchange(exchange, "topic").then(() => {
                             //     console.log("creat Exchange success");
@@ -292,7 +326,7 @@ export default class TrainingSystem {
                     resolve("暂时不支持tensorFlowRecords数据集的远程训练");
                     break;
             }
-            archive.directory(path.normalize(`${sourcePath}/${assetsBasePath}/`), `${project.name}-remote-train`);
+            archive.directory(path.normalize(`${sourcePath}/${assetsBasePath}/`), tarBaseName);
             archive.finalize();
             resolve("成功啦啦啦啦啦啊");
         });
