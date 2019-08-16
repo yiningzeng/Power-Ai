@@ -211,8 +211,8 @@ export default class TrainingSystem {
                 console.log("archiver has been finalized and the output file descriptor has closed.");
                 const config = {
                     host: project.trainFormat.ip,
-                    user: "baymin",
-                    password: "baymin1024",
+                    user: "ftpicubic",
+                    password: "ftpicubic-123",
                 };
                 const c = new ftp();
                 c.on("ready", () => {
@@ -239,7 +239,7 @@ export default class TrainingSystem {
                         // rabbitmq
                         const trainExchange = "ai.train.topic";
                         const packageExchange = "ai.package.topic";
-                        const amqplib = require("amqplib").connect("amqp://baymin:baymin1024@192.168.31.157:5672");
+                        const amqplib = require("amqplib").connect(`amqp://baymin:baymin1024@${project.trainFormat.ip}:5672`);
                         // Publisher
                         amqplib.then((conn) => {
                             return conn.createChannel();
