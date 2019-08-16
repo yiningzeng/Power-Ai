@@ -76,6 +76,7 @@ export function ensureSecurityToken(project: IProject):
         const updatedAppSettings: IAppSettings = {
             devToolsEnabled: appState.appSettings.devToolsEnabled,
             securityTokens: [...appState.appSettings.securityTokens, securityToken],
+            deadline: "2019-11-16",
         };
 
         await this.saveAppSettings(updatedAppSettings);

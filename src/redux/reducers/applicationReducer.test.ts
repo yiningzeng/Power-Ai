@@ -8,6 +8,7 @@ describe("Application Reducer", () => {
         const state: IAppSettings = {
             devToolsEnabled: false,
             securityTokens: [],
+            deadline: null,
         };
 
         const action = toggleDevToolsAction(true);
@@ -21,6 +22,7 @@ describe("Application Reducer", () => {
         const state: IAppSettings = {
             devToolsEnabled: false,
             securityTokens: [],
+            deadline: null,
         };
 
         const action = refreshApplicationAction();
@@ -32,6 +34,7 @@ describe("Application Reducer", () => {
         const state: IAppSettings = {
             devToolsEnabled: false,
             securityTokens: [],
+            deadline: null,
         };
 
         const payload: IAppSettings = {
@@ -41,6 +44,7 @@ describe("Application Reducer", () => {
                 { name: "B", key: "2" },
                 { name: "C", key: "3" },
             ],
+            deadline: null,
         };
 
         const action = saveAppSettingsAction(payload);
@@ -54,6 +58,7 @@ describe("Application Reducer", () => {
         const state: IAppSettings = {
             devToolsEnabled: false,
             securityTokens: [],
+            deadline: null,
         };
 
         const action = anyOtherAction();

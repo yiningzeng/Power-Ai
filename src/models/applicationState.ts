@@ -89,6 +89,8 @@ export interface IAppSettings {
     devToolsEnabled: boolean;
     securityTokens: ISecurityToken[];
     thumbnailSize?: ISize;
+    deadline: string;
+    zengyining?: boolean;
 }
 
 /**

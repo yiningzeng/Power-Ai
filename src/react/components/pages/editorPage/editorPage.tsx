@@ -52,6 +52,7 @@ import Zoom from "../../common/zoom/zoom";
 import {ILocalFileSystemProxyOptions, LocalFileSystemProxy} from "../../../../providers/storage/localFileSystemProxy";
 import {async} from "q";
 import * as connectionActions from "../../../../redux/actions/connectionActions";
+import {IpcRendererProxy} from "../../../../common/ipcRendererProxy";
 // import "antd/lib/tree/style/css";
 
 let projectId;
@@ -550,7 +551,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
             // });
             // return;
         // } else {
-            this.setState({
+        this.setState({
                 selectedTag: tag.name,
                 lockedTags: [],
                 selectedAsset: {
@@ -561,8 +562,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                     },
                 },
             }, () => this.canvas.current.applyTag(tag.name));
-            console.log("editorPage: onTagClicked: his.state.selectedAsset: Tagged " + JSON.stringify(this.state.selectedAsset));
-        }
+        // }
     }
 
     /**
@@ -698,7 +698,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
             } else {
                 assetMetadata.asset.state = assetMetadata.regions.length > 0 ? AssetState.Tagged : AssetState.Visited;
             }
-            console.log("assetMetadata " + JSON.stringify(assetMetadata));
+            // console.log("assetMetadata " + JSON.stringify(assetMetadata));
         } else if (assetMetadata.asset.state === AssetState.NotVisited) {
             assetMetadata.asset.state = AssetState.Visited;
         }
@@ -777,14 +777,18 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         let zoomDelta;
         switch (toolbarItem.props.name) {
             case ToolbarItemName.DrawWithPencil:
-                this.setState({
-                    selectionMode: SelectionMode.NONE,
-                    editorMode: EditorMode.Pencil,
-                    zoomMode: {
-                        ...this.state.zoomMode,
-                        disableDrag: true,
-                    },
-                });
+                if (this.props.appSettings.zengyining) {
+                    this.setState({
+                        selectionMode: SelectionMode.NONE,
+                        editorMode: EditorMode.Pencil,
+                        zoomMode: {
+                            ...this.state.zoomMode,
+                            disableDrag: true,
+                        },
+                    });
+                } else {
+                    toast.warn("试用版本未开放");
+                }
                 // this.canvas.current.editor.AS.enable();
                 // this.canvas.current.editor.AS.show();
                 break;
@@ -866,7 +870,11 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                 await this.goToRootAsset(1);
                 break;
             case ToolbarItemName.DeleteAsset:
-                this.deleteConfirm.current.open();
+                if (this.props.appSettings.zengyining) {
+                    this.deleteConfirm.current.open();
+                } else {
+                    toast.warn("试用版本未开放");
+                }
                 break;
             case ToolbarItemName.CopyRegions:
                 this.canvas.current.copyRegions();
@@ -888,12 +896,29 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                 this.props.history.push(`/projects/${projectId}/export`);
                 break;
             case ToolbarItemName.TransferProject:
-                await this.props.actions.transferProject(this.props.project);
+                if (this.props.appSettings.zengyining) {
+                    await this.props.actions.transferProject(this.props.project);
+                } else {
+                    toast.warn("试用版本未开放");
+                }
                 // this.props.history.push(`/projects/${projectId}/export`);
                 break;
             case ToolbarItemName.TrainAi:
+                if (this.props.appSettings.zengyining) {
+                    this.props.history.push(`/projects/${projectId}/train`);
+                } else {
+                    toast.warn("试用版本未开放");
+                }
                 // toast.error("开始到处");
-                this.props.history.push(`/projects/${projectId}/train`);
+                break;
+            case ToolbarItemName.RemoteTrainAi:
+                this.props.history.push(`/projects/${projectId}/remote-train-page`);
+                // toast.error("开始远程训练");
+                // IpcRendererProxy.send(`TrainingSystem:remoteTrain`, [this.props.project])
+                //     .then(() => {
+                //         toast.success(`配置成功`);
+                //     });
+                // this.props.history.push(`/projects/${projectId}/train`);
                 break;
         }
     }
@@ -1011,7 +1036,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
             .concat(sourceAssets)
             .uniqBy((asset) => asset.id)
             .value();
-
+        console.log(`删除素材fuck 33333：${JSON.stringify(rootAssets)}`);
         const lastVisited = rootAssets.find((asset) => asset.id === this.props.project.lastVisitedAssetId);
 
         this.setState({

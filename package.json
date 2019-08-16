@@ -1,6 +1,6 @@
 {
   "name": "Power-Ai",
-  "version": "2.4.37",
+  "version": "2.5.89",
   "author": {
     "name": "Microsoft",
     "url": "https://github.com/Microsoft/VoTT"
@@ -35,6 +35,7 @@
     "json2yaml": "^1.1.0",
     "lodash": "^4.17.11",
     "md5.js": "^1.3.5",
+    "moment": "^2.24.0",
     "node-fetch": "^2.3.0",
     "node-int64": "^0.4.0",
     "rc-align": "^2.4.5",
