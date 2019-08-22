@@ -600,20 +600,18 @@ export const yolov3Template = "[net]\n" +
     "size=1\n" +
     "stride=1\n" +
     "pad=1\n" +
-    "filters=255\n" +
+    "filters=@filters@\n" +
     "activation=linear\n" +
-    "\n" +
     "\n" +
     "[yolo]\n" +
     "mask = 6,7,8\n" +
-    "anchors = 10,13,  16,30,  33,23,  30,61,  62,45,  59,119,  116,90,  156,198,  373,326\n" +
-    "classes=80\n" +
+    "anchors = @anchors@\n" +
+    "classes=@classes@\n" +
     "num=9\n" +
     "jitter=.3\n" +
-    "ignore_thresh = .7\n" +
+    "ignore_thresh = .5\n" +
     "truth_thresh = 1\n" +
     "random=1\n" +
-    "\n" +
     "\n" +
     "[route]\n" +
     "layers = -4\n" +
@@ -686,21 +684,18 @@ export const yolov3Template = "[net]\n" +
     "size=1\n" +
     "stride=1\n" +
     "pad=1\n" +
-    "filters=255\n" +
+    "filters=@filters@\n" +
     "activation=linear\n" +
-    "\n" +
     "\n" +
     "[yolo]\n" +
     "mask = 3,4,5\n" +
-    "anchors = 10,13,  16,30,  33,23,  30,61,  62,45,  59,119,  116,90,  156,198,  373,326\n" +
-    "classes=80\n" +
+    "anchors = @anchors@\n" +
+    "classes=@classes@\n" +
     "num=9\n" +
     "jitter=.3\n" +
-    "ignore_thresh = .7\n" +
+    "ignore_thresh = .5\n" +
     "truth_thresh = 1\n" +
     "random=1\n" +
-    "\n" +
-    "\n" +
     "\n" +
     "[route]\n" +
     "layers = -4\n" +
@@ -714,10 +709,10 @@ export const yolov3Template = "[net]\n" +
     "activation=leaky\n" +
     "\n" +
     "[upsample]\n" +
-    "stride=2\n" +
+    "stride=4\n" +
     "\n" +
     "[route]\n" +
-    "layers = -1, 36\n" +
+    "layers = -1, 11\n" +
     "\n" +
     "\n" +
     "\n" +
@@ -773,17 +768,16 @@ export const yolov3Template = "[net]\n" +
     "size=1\n" +
     "stride=1\n" +
     "pad=1\n" +
-    "filters=255\n" +
+    "filters=@filters@\n" +
     "activation=linear\n" +
-    "\n" +
     "\n" +
     "[yolo]\n" +
     "mask = 0,1,2\n" +
-    "anchors = 10,13,  16,30,  33,23,  30,61,  62,45,  59,119,  116,90,  156,198,  373,326\n" +
-    "classes=80\n" +
+    "anchors = @anchors@\n" +
+    "classes=@classes@\n" +
     "num=9\n" +
     "jitter=.3\n" +
-    "ignore_thresh = .7\n" +
+    "ignore_thresh = .5\n" +
     "truth_thresh = 1\n" +
     "random=1\n" +
     "\n";

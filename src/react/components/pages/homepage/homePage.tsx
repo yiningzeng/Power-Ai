@@ -71,6 +71,13 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
             };
             this.props.applicationActions.saveAppSettings(newAppSettings);
         }
+        if (this.props.appSettings.zengyining === undefined || this.props.appSettings.zengyining === null) {
+            const newAppSettings = {
+                ...this.props.appSettings,
+                zengyining: true,
+            };
+            this.props.applicationActions.saveAppSettings(newAppSettings);
+        }
         return (
             <div className="app-homepage">
                 <div className="app-homepage-main">

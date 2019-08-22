@@ -239,7 +239,8 @@ export default class TrainingSystem {
                         // rabbitmq
                         const trainExchange = "ai.train.topic";
                         const packageExchange = "ai.package.topic";
-                        const amqplib = require("amqplib").connect(`amqp://baymin:baymin1024@${project.trainFormat.ip}:5672`);
+                        const amqplib = require("amqplib")
+                            .connect(`amqp://baymin:baymin1024@${project.trainFormat.ip}:5672`);
                         // Publisher
                         amqplib.then((conn) => {
                             return conn.createChannel();

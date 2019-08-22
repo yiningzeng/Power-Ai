@@ -2,6 +2,12 @@
     "type": "object",
     "title": "${strings.train.providers.fasterRcnn.displayName}",
     "properties": {
+        "fasterRcnnImage": {
+            "type": "string",
+            "title": "镜像版本",
+            "description": "训练镜像使用的版本",
+            "default": "registry.cn-hangzhou.aliyuncs.com/baymin/ai-power:ai-power-wo-auto-v3.6"
+        },
         "detectron": {
             "title": "网络参数",
             "type": "object",

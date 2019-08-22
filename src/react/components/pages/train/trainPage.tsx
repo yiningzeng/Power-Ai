@@ -37,6 +37,7 @@ function mapDispatchToProps(dispatch) {
 }
 
 const trainSettingsYolov3: IYoloV3 = {
+    gpu_numb: 0,
     yolov3net: {
         batch: 64,
         subdivisions: 16,
