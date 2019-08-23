@@ -6,7 +6,7 @@ import HtmlFileReader from "../../common/htmlFileReader";
 // import { itemTemplate, annotationTemplate, objectTemplate } from "./pascalVOC/pascalVOCTemplates";
 import { interpolate } from "../../common/strings";
 import os from "os";
-import {IYoloV3} from "../../models/trainConfig";
+import {IDetectron, IYoloV3} from "../../models/trainConfig";
 import {constants} from "../../common/constants";
 import {yolov3Template} from "./templates/yolov3Templates";
 
@@ -25,13 +25,10 @@ interface IImageInfo {
 }
 
 const trainSettings: IYoloV3 = {
+    gpu_numb: 0,
     yolov3net: {
         batch: 64,
-        subdivisions: 16,
-        width: 608,
-        height: 608,
-        channels: 3,
-        momentum: 0.9,
+        subdivisions: 32,
         decay: 0.0005,
         angle: 0,
         saturation: 1.5,
@@ -39,10 +36,14 @@ const trainSettings: IYoloV3 = {
         hue: .1,
         learning_rate: 0.001,
         burn_in: 1000,
-        max_batches: 500200,
+        max_batches: 100000,
+        width: 416,
+        height: 416,
+        channels: 3,
         policy: "steps",
-        steps: "400000,450000",
+        steps: "80000,90000",
         scales: ".1,.1",
+        momentum: 0.9,
     },
 };
 
@@ -72,8 +73,30 @@ export class Yolov3Provider extends TrainProvider<IYoloV3ProviderOptions> {
      * Export project to PascalVOC
      */
     public async export(): Promise<void> {
-        const fileName = `train-config/yolov3.cfg`;
-        await this.storageProvider.writeText(fileName, interpolate(yolov3Template, trainSettings.yolov3net));
+        const exportFolderName = `${this.project.name.replace(/\s/g, "-")}-PascalVOC-export`;
+        let config: IYoloV3 = this.project.trainFormat.providerOptions as IYoloV3;
+        const max = config.yolov3net.max_batches;
+        const step = `${(max * 0.8).toFixed()},${(max * 0.9).toFixed()}`;
+        config = {
+            ...config,
+            yolov3net: {
+                ...config.yolov3net,
+                steps: step,
+                policy: "steps",
+                scales: ".1,.1",
+                momentum: 0.9,
+            },
+        };
+        let gps = "0";
+        for (let i = 1; i < config.gpu_numb; i++) {
+            gps = `${gps},${i}`;
+        }
+        await this.storageProvider.writeText(`${exportFolderName}/use_gpus`, gps);
+        console.log(`导出1：${JSON.stringify(this.project.trainFormat.providerOptions)}`);
+        console.log(`导出2：${JSON.stringify(config)}`);
+        const fileName = `${exportFolderName}/yolov3-voc.cfg`;
+        await this.storageProvider.writeText(fileName, interpolate(yolov3Template, config.yolov3net));
+
     }
 
     // private async exportPBTXT(exportFolderName: string, project: IProject) {

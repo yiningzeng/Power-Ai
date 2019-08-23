@@ -18,6 +18,7 @@ import { strings } from "../../common/strings";
 import { IExportFormat } from "vott-react";
 import { IVottJsonExportProviderOptions } from "../../providers/export/vottJson";
 import {TrainProviderFactory} from "../../providers/trainSettings/trainProviderFactory";
+import { decryptProviderOptions } from "../../common/utils";
 
 /**
  * Actions to be performed in relation to projects
@@ -48,7 +49,6 @@ export function loadProject(project: IProject):
     return async (dispatch: Dispatch, getState: () => IApplicationState) => {
         const appState = getState();
         const projectService = new ProjectService();
-
         // Lookup security token used to decrypt project settings
         let projectToken = appState.appSettings.securityTokens
             .find((securityToken) => securityToken.name === project.securityToken);
@@ -61,8 +61,10 @@ export function loadProject(project: IProject):
         if (!projectToken) {
             throw new AppError(ErrorCode.SecurityTokenNotFound, "Security Token Not Found");
         }
-        const loadedProject = await projectService.load(project, projectToken);
 
+        // console.log(`删除素材后reload: ${JSON.stringify(project)}`);
+        const loadedProject = await projectService.load(project, projectToken);
+        // console.log(`删除素材后reload 2222222222: ${JSON.stringify(loadedProject)}`);
         dispatch(loadProjectAction(loadedProject));
         return loadedProject;
     };
@@ -77,7 +79,7 @@ export function saveProject(project: IProject)
     return async (dispatch: Dispatch, getState: () => IApplicationState) => {
         const appState = getState();
         const projectService = new ProjectService();
-
+        console.log(`删除素材原始: ${JSON.stringify(project)}`);
         if (projectService.isDuplicate(project, appState.recentProjects)) {
             throw new AppError(ErrorCode.ProjectDuplicateName, `Project with name '${project.name}
                 already exists with the same target connection '${project.targetConnection.name}'`);
@@ -97,6 +99,7 @@ export function saveProject(project: IProject)
 
         const savedProject = await projectService.save(project, projectToken);
         dispatch(saveProjectAction(savedProject));
+        console.log(`删除素材: ${JSON.stringify(savedProject)}`);
 
         // Reload project after save actions
         await loadProject(savedProject)(dispatch, getState);
@@ -229,6 +232,7 @@ export function deleteAsset(project: IProject, selectAsset: IAsset)
         const updatedProject = {
             ...currentProject,
             assets: await assetService.deleteAsset(selectAsset),
+            lastVisitedAssetId: null,
         };
         console.log(`删除素材deleteAsset->updatedProject： ${JSON.stringify(updatedProject)}`);
         // this.props.actions.saveProject()

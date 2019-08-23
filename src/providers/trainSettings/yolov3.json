@@ -2,10 +2,39 @@
     "type": "object",
     "title": "${strings.train.providers.yolov3.displayName}",
     "properties": {
+        "yolov3Image": {
+            "type": "string",
+            "title": "镜像版本",
+            "description": "训练镜像使用的版本",
+            "default": "registry.cn-hangzhou.aliyuncs.com/baymin/ai-power:darknet_auto-ai-power-v3.2"
+        },
+        "gpu_numb": {
+            "type": "number",
+            "title": "GPU数量",
+            "default": 6
+        },
         "yolov3net":{
             "title": "网络参数",
             "type": "object",
             "properties": {
+                "width": {
+                    "type": "number",
+                    "title": "图像宽",
+                    "description": "width: 默认608",
+                    "default": 608
+                },
+                "height": {
+                    "type": "number",
+                    "title": "图像高",
+                    "description": "height: 默认608",
+                    "default": 608
+                },
+                "channels": {
+                    "type": "number",
+                    "title": "图像通道数",
+                    "description": "channels: 默认3",
+                    "default": 3
+                },
                 "batch": {
                     "type": "number",
                     "title": "批数据量",
@@ -16,7 +45,7 @@
                     "title": "批数据量细分",
                     "type": "number",
                     "description": "subdivisions: batch/subdivisions作为一次性送入训练器的样本数量,如果内存不够大，将batch分割为subdivisions个子batch",
-                    "default": 64
+                    "default": 32
                 },
                 "decay": {
                     "title": "权重衰减正则项",
@@ -28,7 +57,7 @@
                     "title": "旋转角度",
                     "type": "number",
                     "description": "angle: 通过旋转角度来生成更多训练样本",
-                    "default": 0
+                    "default": 360
                 },
                 "saturation": {
                     "title": "饱和度",
@@ -64,7 +93,7 @@
                     "title": "最大迭代次数",
                     "type": "number",
                     "description": "max_batches: 通过调整色调来生成更多训练样本",
-                    "default": 20200
+                    "default": 100000
                 }
             }
         }

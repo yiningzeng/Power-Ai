@@ -1,5 +1,6 @@
 // region 界面参数
 export interface IYoloV3 {
+    gpu_numb: number;
     yolov3net: IYoloV3Net;
 }
 

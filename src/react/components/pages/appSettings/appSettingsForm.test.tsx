@@ -11,6 +11,7 @@ describe("App Settings Form", () => {
     const defaultAppSettings: IAppSettings = {
         devToolsEnabled: false,
         securityTokens: [],
+        deadline: null,
     };
 
     function createComponent(props: IAppSettingsFormProps = null)
@@ -44,6 +45,7 @@ describe("App Settings Form", () => {
                 { name: "B", key: "2" },
                 { name: "C", key: "3" },
             ],
+            deadline: null,
         };
         const props = createProps(appSettings);
         wrapper = createComponent(props);
@@ -60,6 +62,7 @@ describe("App Settings Form", () => {
                 { name: "B", key: "2" },
                 { name: "C", key: "3" },
             ],
+            deadline: null,
         };
 
         wrapper.setProps({ appSettings: updatedAppSettings });

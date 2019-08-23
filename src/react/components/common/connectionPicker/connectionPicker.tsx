@@ -85,4 +85,5 @@ export class ConnectionPicker extends React.Component<IConnectionPickerProps, IC
     }
 }
 
+// @ts-ignore
 export const ConnectionPickerWithRouter = withRouter<IConnectionPickerProps>(ConnectionPicker);

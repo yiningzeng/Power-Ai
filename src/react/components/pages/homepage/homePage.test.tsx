@@ -275,6 +275,7 @@ describe("Homepage Component", () => {
             appSettings: {
                 devToolsEnabled: false,
                 securityTokens: [],
+                deadline: null,
             },
             match: {
                 params: {},

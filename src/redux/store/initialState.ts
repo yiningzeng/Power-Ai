@@ -11,6 +11,7 @@ const initialState: IApplicationState = {
     appSettings: {
         devToolsEnabled: false,
         securityTokens: [],
+        deadline: null,
     },
     connections: [],
     recentProjects: [],
