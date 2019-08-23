@@ -433,15 +433,15 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                             },
                                         });
                                     }}
-                                    onMouseMove={(e) => {
-                                        this.setState({
-                                            zoomMode: {
-                                                ...this.state.zoomMode,
-                                                zoomCenterX: e.clientX,
-                                                zoomCenterY: e.clientY,
-                                            },
-                                        });
-                                    }}
+                                    // onMouseMove={(e) => {
+                                    //     this.setState({
+                                    //         zoomMode: {
+                                    //             ...this.state.zoomMode,
+                                    //             zoomCenterX: e.clientX,
+                                    //             zoomCenterY: e.clientY,
+                                    //         },
+                                    //     });
+                                    // }}
                                     onWheel={ (e) => Zoom(e, (deltaY) => {
                                         const w = document.getElementById("ct-zone").offsetWidth;
                                         const h = document.getElementById("ct-zone").offsetHeight;
