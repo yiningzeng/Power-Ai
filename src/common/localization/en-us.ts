@@ -244,7 +244,7 @@ export const english: IAppStrings = {
             previousAsset: "Previous Asset",
             nextAsset: "Next Asset",
             saveProject: "Save Project",
-            exportProject: "Export Project",
+            exportProject: "Export Train Assets",
             transferProject: "Transfer Project",
             activeLearning: "Active Learning",
             trainAi: "Start Learning",
@@ -400,6 +400,8 @@ export const english: IAppStrings = {
             },
         },
         messages: {
+            title: "exporting",
+            content: "Please be patient and have a cup of coffee.",
             saveSuccess: "Successfully saved export settings",
         },
     },
@@ -417,6 +419,12 @@ export const english: IAppStrings = {
             yolov3: {
                 displayName: "Yolo v3",
             },
+        },
+        messages: {
+            title: "processing...",
+            content: "Please be patient and have a cup of coffee.",
+            success: "Training assets has been uploaded to the server",
+            fail: "failed, please check",
         },
     },
     remoteTrainSettings: {
