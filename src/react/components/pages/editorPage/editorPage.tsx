@@ -433,15 +433,15 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                             },
                                         });
                                     }}
-                                    // onMouseMove={(e) => {
-                                    //     this.setState({
-                                    //         zoomMode: {
-                                    //             ...this.state.zoomMode,
-                                    //             zoomCenterX: e.clientX,
-                                    //             zoomCenterY: e.clientY,
-                                    //         },
-                                    //     });
-                                    // }}
+                                    onMouseMove={(e) => {
+                                        this.setState({
+                                            zoomMode: {
+                                                ...this.state.zoomMode,
+                                                zoomCenterX: e.clientX,
+                                                zoomCenterY: e.clientY,
+                                            },
+                                        });
+                                    }}
                                     onWheel={ (e) => Zoom(e, (deltaY) => {
                                         const w = document.getElementById("ct-zone").offsetWidth;
                                         const h = document.getElementById("ct-zone").offsetHeight;
@@ -863,6 +863,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                 } else {
                     toast.warn("试用版本未开放");
                 }
+                this.canvas.current.enableCanvas(true);
                 // this.canvas.current.editor.AS.enable();
                 // this.canvas.current.editor.AS.show();
                 break;
@@ -875,6 +876,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                         disableDrag: true,
                     },
                 });
+                this.canvas.current.enableCanvas(true);
                 break;
             case ToolbarItemName.DrawPolygon:
                 this.setState({
@@ -885,12 +887,14 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                         disableDrag: true,
                     },
                 });
+                this.canvas.current.enableCanvas(true);
                 break;
             case ToolbarItemName.CopyRectangle:
                 this.setState({
                     selectionMode: SelectionMode.COPYRECT,
                     editorMode: EditorMode.CopyRect,
                 });
+                this.canvas.current.enableCanvas(true);
                 break;
             case ToolbarItemName.ShowAllRegions:
                 break;
@@ -905,6 +909,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                         disableDrag: false,
                     },
                 });
+                this.canvas.current.enableCanvas(false);
                 break;
             case ToolbarItemName.ZoomOutAsset: // 缩小
                 w = document.getElementById("ct-zone").offsetWidth;
@@ -939,9 +944,11 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                 break;
             case ToolbarItemName.PreviousAsset:
                 await this.goToRootAsset(-1);
+                this.canvas.current.enableCanvas(true);
                 break;
             case ToolbarItemName.NextAsset:
                 await this.goToRootAsset(1);
+                this.canvas.current.enableCanvas(true);
                 break;
             case ToolbarItemName.DeleteAsset:
                 if (this.props.appSettings.zengyining) {
@@ -951,6 +958,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                 }
                 break;
             case ToolbarItemName.CopyRegions:
+                this.canvas.current.enableCanvas(true);
                 this.canvas.current.copyRegions();
                 this.canvas.current.pasteRegions();
                 break;

@@ -2,7 +2,7 @@ import React, {Fragment, ReactElement} from "react";
 import * as shortid from "shortid";
 import {CanvasTools} from "aipower-ct";
 import {RegionData, RegionDataType} from "aipower-ct/lib/js/CanvasTools/Core/RegionData";
-import {EditorMode, IAssetMetadata, IPoint, IProject, IRegion, RegionType,} from "../../../../models/applicationState";
+import {EditorMode, IAssetMetadata, IPoint, IProject, IRegion, RegionType} from "../../../../models/applicationState";
 import CanvasHelpers from "./canvasHelpers";
 import {AssetPreview, ContentSource} from "../../common/assetPreview/assetPreview";
 import {Editor} from "aipower-ct/lib/js/CanvasTools/CanvasTools.Editor";
@@ -147,6 +147,12 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
         );
     }
 
+    public enableCanvas = (b): void => {
+       this.setState({
+           ...this.state,
+           enabled: b,
+       });
+    }
     /**
      * Toggles tag on all selected regions
      * @param selectedTag Tag name
