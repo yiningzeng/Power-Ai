@@ -74,6 +74,7 @@
     "scripts": {
         "start": "nf start -p 3000",
         "pack-all": "npm run build && npm run webpack:prod && electron-builder && electron-packager . Power-Ai --all --out ./all  --icon=./qt.ico --overwrite --app-version=0.0.1",
+        "pack-win32": "npm run build && npm run webpack:prod && electron-builder && electron-builder && electron-packager . Power-Ai --platform=win32 --out ./all --arch=ia32 --overwrite --app-version=2.0.1 --icon=./qt.ico",
         "pack-win64": "npm run build && npm run webpack:prod && electron-builder && electron-builder && electron-packager . Power-Ai --platform=win32 --out ./all --arch=x64 --overwrite --app-version=2.0.1 --icon=./qt.ico",
         "pack-linux": "npm run build && npm run webpack:prod && electron-builder && electron-packager . Power-Ai --platform=linux --out ./all --arch=x64 --overwrite --app-version=2.0.0 --icon=./qt.ico",
         "pack-arm-linux": "npm run build && npm run webpack:prod && electron-builder && electron-packager . Power-Ai --platform=linux --out ./all --arch=arm64 --overwrite --app-version=2.0.0 --icon=./qt.ico",
