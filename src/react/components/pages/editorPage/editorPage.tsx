@@ -79,8 +79,11 @@ const emptyZoomMode: IZoomMode = {
     x: 0,
     y: 0,
     miniWidth: 500,
+    miniHeight: 500,
     width: "auto",
     height: "auto",
+    zoomCenterX: 0,
+    zoomCenterY: 0,
 };
 /**
  * Properties for Editor Page
@@ -425,16 +428,31 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                                 ...position,
                                                 width: ref.offsetWidth,
                                                 height: ref.offsetHeight,
+                                                zoomCenterX: ref.offsetWidth / 2,
+                                                zoomCenterY: ref.offsetHeight / 2,
+                                            },
+                                        });
+                                    }}
+                                    onMouseMove={(e) => {
+                                        this.setState({
+                                            zoomMode: {
+                                                ...this.state.zoomMode,
+                                                zoomCenterX: e.clientX,
+                                                zoomCenterY: e.clientY,
                                             },
                                         });
                                     }}
                                     onWheel={ (e) => Zoom(e, (deltaY) => {
                                         const w = document.getElementById("ct-zone").offsetWidth;
-                                        if ((w - deltaY) < this.state.zoomMode.miniWidth) { return; }
+                                        const h = document.getElementById("ct-zone").offsetHeight;
+                                        if ((h - deltaY) < this.state.zoomMode.miniHeight) { return; }
                                         this.setState({
                                             zoomMode: {
                                                 ...this.state.zoomMode,
-                                                width: ( w - deltaY),
+                                                width: ( w - deltaY * 2),
+                                                height: ( h - deltaY * 2),
+                                                x: this.state.zoomMode.x + deltaY,
+                                                y: this.state.zoomMode.y + deltaY,
                                             },
                                         });
                                         if (this.state.zoomMode.height === "auto") {

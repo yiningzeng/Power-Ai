@@ -319,8 +319,11 @@ export interface IZoomMode {
     x: number;
     y: number;
     miniWidth: number;
+    miniHeight: number;
     width: number | "auto";
     height: number | "auto";
+    zoomCenterX: number;
+    zoomCenterY: number;
 }
 
 /**
