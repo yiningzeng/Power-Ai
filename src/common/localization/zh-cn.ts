@@ -266,20 +266,19 @@ export const chinese: IAppStrings = {
             title: "切换帮助菜单",
             escape: "退出帮助菜单",
         },
-        assetError: "Unable to load asset",
+        assetError: "加载素材失败",
         tags: {
             hotKey: {
                 apply: "设置标签快捷键",
                 lock: "锁定标签快捷键",
             },
             rename: {
-                title: "Rename Tag",
-                confirmation: "Are you sure you want to rename this tag? It will be renamed throughout all assets",
+                title: "重命名标签",
+                confirmation: "确定要重命名标签么？这将会把所有的已打标的素材更改",
             },
             delete: {
-                title: "Delete Tag",
-                confirmation: "Are you sure you want to delete this tag? It will be deleted throughout all assets \
-                and any regions where this is the only tag will also be deleted",
+                title: "删除标签",
+                confirmation: "确定要删除标签么？这会删除所有素材中已经打标的标签",
             },
         },
         canvas: {
@@ -294,9 +293,9 @@ export const chinese: IAppStrings = {
         },
         messages: {
             enforceTaggedRegions: {
-                title: "Invalid region(s) detected",
+                title: "检测到未标记的框",
                 // tslint:disable-next-line:max-line-length
-                description: "1 or more regions have not been tagged.  Ensure all regions are tagged before continuing to next asset.",
+                description: "一个或者多个框未打标，请确认",
             },
         },
     },
