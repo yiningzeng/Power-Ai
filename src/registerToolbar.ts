@@ -62,14 +62,14 @@ export default function registerToolbar() {
         type: ToolbarItemType.State,
         accelerators: ["R", "r"],
     });
-    ToolbarItemFactory.register({
-        name: ToolbarItemName.DrawWithPencil,
-        tooltip: strings.editorPage.toolbar.drawWithPencil,
-        icon: "fa-pencil-alt",
-        group: ToolbarItemGroup.Canvas,
-        type: ToolbarItemType.State,
-        accelerators: ["P", "p"],
-    });
+    // ToolbarItemFactory.register({
+    //     name: ToolbarItemName.DrawWithPencil,
+    //     tooltip: strings.editorPage.toolbar.drawWithPencil,
+    //     icon: "fa-pencil-alt",
+    //     group: ToolbarItemGroup.Canvas,
+    //     type: ToolbarItemType.State,
+    //     accelerators: ["P", "p"],
+    // });
     ToolbarItemFactory.register({
         name: ToolbarItemName.DrawPolygon,
         tooltip: strings.editorPage.toolbar.drawPolygon,
@@ -82,8 +82,8 @@ export default function registerToolbar() {
     ToolbarItemFactory.register({
         name: ToolbarItemName.CopyRectangle,
         tooltip: strings.editorPage.toolbar.copyRectangle,
-        icon: "far fa-clone",
-        group: ToolbarItemGroup.Canvas,
+        icon: "far fa-chess-king",
+        group: ToolbarItemGroup.Regions,
         type: ToolbarItemType.State,
         accelerators: ["CmdOrCtrl+W", "CmdOrCtrl+w"],
     });
@@ -97,23 +97,23 @@ export default function registerToolbar() {
         accelerators: ["CmdOrCtrl+C", "CmdOrCtrl+c"],
     });
 
-    ToolbarItemFactory.register({
-        name: ToolbarItemName.CutRegions,
-        tooltip: strings.editorPage.toolbar.cut,
-        icon: "fa-cut",
-        group: ToolbarItemGroup.Regions,
-        type: ToolbarItemType.Action,
-        accelerators: ["CmdOrCtrl+X", "CmdOrCtrl+x"],
-    });
-
-    ToolbarItemFactory.register({
-        name: ToolbarItemName.PasteRegions,
-        tooltip: strings.editorPage.toolbar.paste,
-        icon: "fa-paste",
-        group: ToolbarItemGroup.Regions,
-        type: ToolbarItemType.Action,
-        accelerators: ["CmdOrCtrl+V", "CmdOrCtrl+v"],
-    });
+    // ToolbarItemFactory.register({
+    //     name: ToolbarItemName.CutRegions,
+    //     tooltip: strings.editorPage.toolbar.cut,
+    //     icon: "fa-cut",
+    //     group: ToolbarItemGroup.Regions,
+    //     type: ToolbarItemType.Action,
+    //     accelerators: ["CmdOrCtrl+X", "CmdOrCtrl+x"],
+    // });
+    //
+    // ToolbarItemFactory.register({
+    //     name: ToolbarItemName.PasteRegions,
+    //     tooltip: strings.editorPage.toolbar.paste,
+    //     icon: "fa-paste",
+    //     group: ToolbarItemGroup.Regions,
+    //     type: ToolbarItemType.Action,
+    //     accelerators: ["CmdOrCtrl+V", "CmdOrCtrl+v"],
+    // });
 
     // ToolbarItemFactory.register({
     //     name: ToolbarItemName.ShowAllRegions,

@@ -243,7 +243,7 @@ export const chinese: IAppStrings = {
             previousAsset: "上一个",
             nextAsset: "下一个",
             saveProject: "保存项目",
-            exportProject: "导出项目素材",
+            exportProject: "导出训练素材",
             transferProject: "迁移项目",
             activeLearning: "自动标注当前素材",
             trainAi: "开始训练",
@@ -399,6 +399,8 @@ export const chinese: IAppStrings = {
             },
         },
         messages: {
+            title: "正在导出",
+            content: "请耐心等待，去喝杯咖啡再来吧",
             saveSuccess: "已成功保存导出设置",
         },
     },
@@ -416,6 +418,12 @@ export const chinese: IAppStrings = {
             yolov3: {
                 displayName: "Yolo v3",
             },
+        },
+        messages: {
+            title: "正在处理...",
+            content: "请耐心等待，去喝杯咖啡再来吧",
+            success: "处理完成，训练素材已经上传到服务器",
+            fail: "处理失败，请检查",
         },
     },
     remoteTrainSettings: {

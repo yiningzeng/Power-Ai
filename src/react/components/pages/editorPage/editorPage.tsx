@@ -54,6 +54,24 @@ import * as connectionActions from "../../../../redux/actions/connectionActions"
 import {IpcRendererProxy} from "../../../../common/ipcRendererProxy";
 // import "antd/lib/tree/style/css";
 
+import Button from "@material-ui/core/Button";
+import Dialog from "@material-ui/core/Dialog";
+import DialogActions from "@material-ui/core/DialogActions";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogContentText from "@material-ui/core/DialogContentText";
+import DialogTitle from "@material-ui/core/DialogTitle";
+import Paper, { PaperProps } from "@material-ui/core/Paper";
+import Draggable from "react-draggable";
+import { makeStyles } from "@material-ui/styles";
+import LinearProgress from "@material-ui/core/LinearProgress";
+function PaperComponent(props: PaperProps) {
+    return (
+        <Draggable cancel={'[class*="MuiDialogContent-root"]'}>
+            <Paper {...props} />
+        </Draggable>
+    );
+}
+
 let projectId;
 
 const emptyZoomMode: IZoomMode = {
@@ -112,6 +130,7 @@ export interface IEditorPageState {
     /** Whether the show invalid region warning alert should display */
     showInvalidRegionWarning: boolean;
     zoomMode: IZoomMode;
+    dialog: boolean;
 }
 
 function mapStateToProps(state: IApplicationState) {
@@ -135,7 +154,6 @@ function mapDispatchToProps(dispatch) {
  */
 @connect(mapStateToProps, mapDispatchToProps)
 export default class EditorPage extends React.Component<IEditorPageProps, IEditorPageState> {
-
     public state: IEditorPageState = {
         treeList: [],
         selectedTag: null,
@@ -152,6 +170,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         isValid: true,
         showInvalidRegionWarning: false,
         zoomMode: emptyZoomMode,
+        dialog: false,
     };
     private localFileSystem: LocalFileSystemProxy;
 
@@ -228,6 +247,13 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         if (!project) {
             return (<div>Loading...</div>);
         }
+        const handleClickOpen = () => {
+            this.setState({dialog: true});
+        };
+
+        const handleClose = () => {
+           this.setState({dialog: false});
+        };
         // const folderPath = project.sourceConnection.providerOptions["folderPath"];
         // console.log("editorPage: render folderPath ", folderPath);
         // console.log("editorPage: render treeList ", treeList);
@@ -259,6 +285,37 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                     onChange={this.onSideBarResize}
                     onDragFinished={this.onSideBarResizeComplete}>
                     <div className="editor-page-sidebar bg-lighter-1">
+                        <div>
+                            <Button variant="outlined" color="primary" onClick={handleClickOpen}>
+                                Open form dialog
+                            </Button>
+                            <Dialog
+                                fullWidth={true}
+                                disableBackdropClick={true}
+                                open={this.state.dialog}
+                                onClose={handleClose}
+                                PaperComponent={PaperComponent}
+                                aria-labelledby="draggable-dialog-title"
+                            >
+                                <DialogTitle style={{ cursor: "move" }} id="draggable-dialog-title">
+                                   请耐心等待...
+                                </DialogTitle>
+                                <DialogContent>
+                                    <LinearProgress />
+                                    <DialogContentText>
+                                        正在努力打包上传...
+                                    </DialogContentText>
+                                </DialogContent>
+                                <DialogActions>
+                                    {/*<Button onClick={handleClose} color="primary">*/}
+                                       {/*取消 */}
+                                    {/*</Button>*/}
+                                    {/*<Button onClick={handleClose} color="primary">*/}
+                                        {/*Subscribe*/}
+                                    {/*</Button>*/}
+                                </DialogActions>
+                            </Dialog>
+                        </div>
                         <div className="editor-page-sidebar-tree bg-lighter-1">
                             <CondensedList
                                 title="素材文件夹"
@@ -877,13 +934,14 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                 break;
             case ToolbarItemName.CopyRegions:
                 this.canvas.current.copyRegions();
-                break;
-            case ToolbarItemName.CutRegions:
-                this.canvas.current.cutRegions();
-                break;
-            case ToolbarItemName.PasteRegions:
                 this.canvas.current.pasteRegions();
                 break;
+            // case ToolbarItemName.CutRegions:
+            //     this.canvas.current.cutRegions();
+            //     break;
+            // case ToolbarItemName.PasteRegions:
+            //     this.canvas.current.pasteRegions();
+            //     break;
             case ToolbarItemName.RemoveAllRegions:
                 this.canvas.current.confirmRemoveAllRegions();
                 break;

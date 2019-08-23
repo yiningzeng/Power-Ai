@@ -397,6 +397,8 @@ export interface IAppStrings {
             },
         },
         messages: {
+            title: string,
+            content: string,
             saveSuccess: string;
         },
     };
@@ -415,6 +417,12 @@ export interface IAppStrings {
                 displayName: string,
             },
         }
+        messages: {
+            title: string,
+            content: string,
+            success: string;
+            fail: string;
+        },
     };
     remoteTrainSettings: {
       ip: string;

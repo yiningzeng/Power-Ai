@@ -10,7 +10,7 @@ import { ExportAssetState } from "../../../../providers/export/exportProvider";
 import { toast } from "react-toastify";
 import {IYoloV3} from "../../../../models/trainConfig";
 import {IpcRendererProxy} from "../../../../common/ipcRendererProxy";
-
+import DraggableDialog from "../../common/draggableDialog/draggableDialog";
 /**
  * Properties for Export Page
  * @member project - Project being edited
@@ -69,7 +69,7 @@ export default class TrainPage extends React.Component<ITrainPageProps> {
         providerType: "yolov3",
         providerOptions: trainSettingsYolov3,
     };
-
+    private draggableDialog: React.RefObject<DraggableDialog> = React.createRef();
     constructor(props, context) {
         super(props, context);
 
@@ -90,6 +90,14 @@ export default class TrainPage extends React.Component<ITrainPageProps> {
 
         return (
             <div className="m-3">
+                <DraggableDialog
+                    title={strings.export.messages.title}
+                    ref={this.draggableDialog}
+                    content={strings.export.messages.content}
+                    disableBackdropClick={true}
+                    disableEscapeKeyDown={true}
+                    fullWidth={true}
+                />
                 <h3>
                     <i className="fas fa-sliders-h fa-1x"></i>
                     <span className="px-2">
@@ -107,6 +115,7 @@ export default class TrainPage extends React.Component<ITrainPageProps> {
     }
 
     private onFormSubmit = async (trainFormat: ITrainFormat) => {
+        this.draggableDialog.current.open();
         const projectToUpdate: IProject = {
             ...this.props.project,
             trainFormat,
@@ -141,8 +150,9 @@ export default class TrainPage extends React.Component<ITrainPageProps> {
             .then((data) => {
             console.log(data);
         });
+        alert("232323");
         // endregion
-
+        this.draggableDialog.current.close();
         this.props.history.goBack();
     }
 
