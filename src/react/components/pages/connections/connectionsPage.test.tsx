@@ -7,7 +7,6 @@ import { AnyAction, Store } from "redux";
 import MockFactory from "../../../../common/mockFactory";
 import { IApplicationState, IConnection } from "../../../../models/applicationState";
 import { AssetProviderFactory } from "../../../../providers/storage/assetProviderFactory";
-import { IAzureCloudStorageOptions } from "../../../../providers/storage/azureBlobStorage";
 import IConnectionActions, * as connectionActions from "../../../../redux/actions/connectionActions";
 import initialState from "../../../../redux/store/initialState";
 import createReduxStore from "../../../../redux/store/store";
@@ -139,8 +138,6 @@ describe("Connections Page", () => {
 
             AssetProviderFactory.createFromConnection = jest.fn(() => assetProvider);
 
-            const options: IAzureCloudStorageOptions = connection.providerOptions as IAzureCloudStorageOptions;
-
             wrapper
                 .find("input#root_name")
                 .simulate("change", { target: { value: connection.name } });
@@ -156,15 +153,6 @@ describe("Connections Page", () => {
 
             wrapper.update();
 
-            wrapper
-                .find("input#root_providerOptions_accountName")
-                .simulate("change", { target: { value: options.accountName } });
-            wrapper
-                .find("input#root_providerOptions_containerName")
-                .simulate("change", { target: { value: options.containerName } });
-            wrapper
-                .find("input#root_providerOptions_sas")
-                .simulate("change", { target: { value: options.sas } });
             wrapper
                 .find(Form)
                 .simulate("submit");
