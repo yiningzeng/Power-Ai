@@ -612,31 +612,22 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
      */
     private onTagClicked = (tag: ITag): void => {
         console.log("editorPage: onTagClicked: " + JSON.stringify(tag));
-        // if (tag.name === "OK") {
-            // this.canvas.current.removeAllRegions();
-            // this.setState({
-            //     selectedAsset: {
-            //         ...this.state.selectedAsset,
-            //         asset: {
-            //             ...this.state.selectedAsset.asset,
-            //             state: AssetState.OkTagged,
-            //         },
-            //     },
-            // });
-            // return;
-        // } else {
+
         this.setState({
-                selectedTag: tag.name,
-                lockedTags: [],
-                selectedAsset: {
-                    ...this.state.selectedAsset,
-                    asset: {
-                        ...this.state.selectedAsset.asset,
-                        state: AssetState.Tagged,
-                    },
-                },
-            }, () => this.canvas.current.applyTag(tag.name));
-        // }
+            selectedTag: tag.name,
+            lockedTags: [],
+        }, () => this.canvas.current.applyTag(tag.name));
+        // this.setState({
+        //         selectedTag: tag.name,
+        //         lockedTags: [],
+        //         selectedAsset: {
+        //             ...this.state.selectedAsset,
+        //             asset: {
+        //                 ...this.state.selectedAsset.asset,
+        //                 state: AssetState.Tagged,
+        //             },
+        //         },
+        //     }, () => this.canvas.current.applyTag(tag.name));
     }
 
     /**
