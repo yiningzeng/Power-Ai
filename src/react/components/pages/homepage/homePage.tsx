@@ -100,19 +100,19 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                                         onError={this.onProjectFileUploadError}/>
                         </li>
                         }
-                        {isElectron() &&
-                        <li>
-                            <a href="#" className="p-5 file-upload"
-                               onClick={() => this.filePicker.current.upload()}>
-                                <i className="fas fa-file-import fa-9x"></i>
-                                <h6 style={{marginTop: "10px", marginLeft: "10px"}}>
-                                    {strings.homePage.openTransferProject.title}</h6>
-                            </a>
-                            <FilePicker ref={this.filePicker}
-                                        onChange={this.onProjectFileUpload}
-                                        onError={this.onProjectFileUploadError}/>
-                        </li>
-                        }
+                        {/*{isElectron() &&*/}
+                        {/*<li>*/}
+                            {/*<a href="#" className="p-5 file-upload"*/}
+                               {/*onClick={() => this.filePicker.current.upload()}>*/}
+                                {/*<i className="fas fa-file-import fa-9x"></i>*/}
+                                {/*<h6 style={{marginTop: "10px", marginLeft: "10px"}}>*/}
+                                    {/*{strings.homePage.openTransferProject.title}</h6>*/}
+                            {/*</a>*/}
+                            {/*<FilePicker ref={this.filePicker}*/}
+                                        {/*onChange={this.onProjectFileUpload}*/}
+                                        {/*onError={this.onProjectFileUploadError}/>*/}
+                        {/*</li>*/}
+                        {/*}*/}
                         {/*<li>*/}
                         {/*<a href="#" onClick={this.handleOpenCloudProjectClick} className="p-5 cloud-open-project">*/}
                         {/*<i className="fas fa-cloud fa-9x"></i>*/}
