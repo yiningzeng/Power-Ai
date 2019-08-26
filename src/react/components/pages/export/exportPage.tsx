@@ -6,9 +6,9 @@ import IProjectActions, * as projectActions from "../../../../redux/actions/proj
 import ExportForm from "./exportForm";
 import { IProject, IApplicationState, IExportFormat } from "../../../../models/applicationState";
 import { strings } from "../../../../common/strings";
+import DraggableDialog from "../../common/draggableDialog/draggableDialog";
 import { ExportAssetState } from "../../../../providers/export/exportProvider";
 import { toast } from "react-toastify";
-import DraggableDialog from "../../common/draggableDialog/draggableDialog";
 import Confirm from "../../common/confirm/confirm";
 
 /**
@@ -78,6 +78,7 @@ export default class ExportPage extends React.Component<IExportPageProps> {
                     disableBackdropClick={true}
                     disableEscapeKeyDown={true}
                     fullWidth={true}
+                    onDone={() => this.props.history.goBack()}
                 />
                 <h3>
                     <i className="fas fa-sliders-h fa-1x"></i>
@@ -110,18 +111,19 @@ export default class ExportPage extends React.Component<IExportPageProps> {
         // if (!exportTrain || exportTrain ) {
             // toast.success(`导出训练配置文件成功`);
         // }
+        // const res = await this.props.actions.packageProject(projectToUpdate);
+        // this.draggableDialog.current.change("导出", JSON.stringify(res));
         const results = await this.props.actions.exportProject(this.props.project);
         // toast.dismiss(infoId);
-        this.draggableDialog.current.close();
         if (!results || (results && results.errors.length === 0)) {
-            toast.success(`导出成功`);
+            this.draggableDialog.current.change("导出完成", "导出成功，确定返回上一页", true, true);
         } else if (results && results.errors.length > 0) {
-            toast.warn(`成功的导出了 ${results.completed.length}/${results.count} 素材，但导出不全，请检查`);
+            this.draggableDialog.current.change("导出不全",
+                `成功的导出了 ${results.completed.length}/${results.count} 素材，但导出不全，请检查`, true, true);
+            // toast.warn(`成功的导出了 ${results.completed.length}/${results.count} 素材，但导出不全，请检查`);
         }
-
         // endregion
-
-        this.props.history.goBack();
+        // this.props.history.goBack();
     }
 
     private onFormCancel() {

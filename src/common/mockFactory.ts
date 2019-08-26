@@ -6,7 +6,7 @@ import {
     IPoint, IRegion, RegionType, ModelPathType, ITrainFormat,
 } from "../models/applicationState";
 import { IV1Project, IV1Region } from "../models/v1Models";
-import { ExportAssetState } from "../providers/export/exportProvider";
+import {ExportAssetState, IStartTrainResults} from "../providers/export/exportProvider";
 import { IAssetProvider, IAssetProviderRegistrationOptions } from "../providers/storage/assetProviderFactory";
 import { IStorageProvider, IStorageProviderRegistrationOptions } from "../providers/storage/storageProviderFactory";
 import { IExportProviderRegistrationOptions } from "../providers/export/exportProviderFactory";
@@ -819,6 +819,9 @@ export default class MockFactory {
             exportProject: jest.fn(() => Promise.resolve()),
             transferProject: jest.fn(() => Promise.resolve()),
             exportTrainConfig: jest.fn(() => Promise.resolve()),
+            trainAddQueueProject: jest.fn(() => Promise.resolve()),
+            trainPackageProject: jest.fn(() => Promise.resolve()),
+            trainUploadProject: jest.fn(() => Promise.resolve()),
             loadAssetMetadata: jest.fn(() => Promise.resolve()),
             saveAssetMetadata: jest.fn(() => Promise.resolve()),
             deleteAsset: jest.fn(() => Promise.resolve()),

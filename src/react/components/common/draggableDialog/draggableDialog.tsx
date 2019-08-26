@@ -7,6 +7,7 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import Paper, { PaperProps } from "@material-ui/core/Paper";
 import Draggable from "react-draggable";
 import LinearProgress from "@material-ui/core/LinearProgress";
+import Button from "@material-ui/core/Button";
 
 export interface IDraggableDialogProps {
     title?: string;
@@ -14,10 +15,17 @@ export interface IDraggableDialogProps {
     disableBackdropClick?: boolean;
     disableEscapeKeyDown?: boolean;
     fullWidth?: boolean;
+    onDone?: () => void;
+    onCancel?: () => void;
 }
 
 export interface IDraggableDialogState {
-   open: boolean;
+    open: boolean;
+    done: boolean;
+    change: boolean;
+    title?: string;
+    content?: string;
+    showCancel?: boolean;
 }
 
 function PaperComponent(props: PaperProps) {
@@ -35,6 +43,8 @@ export default class DraggableDialog extends React.Component<IDraggableDialogPro
 
         this.state = {
             open: false,
+            done: false,
+            change: false,
         };
         this.open = this.open.bind(this);
         this.close = this.close.bind(this);
@@ -58,15 +68,25 @@ export default class DraggableDialog extends React.Component<IDraggableDialogPro
                     aria-labelledby="draggable-dialog-title"
                 >
                     <DialogTitle style={{ cursor: "move" }} id="draggable-dialog-title">
-                        {this.props.title === undefined ? "请耐心等待" : this.props.title}
+                        {this.state.change ?
+                            this.state.title === undefined ? "处理完成" : this.state.title :
+                            this.props.title === undefined ? "请耐心等待" : this.props.title}
                     </DialogTitle>
                     <DialogContent>
-                        <LinearProgress />
+                        {this.state.done ? undefined : <LinearProgress />}
                         <DialogContentText style={{marginTop: "20px"}}>
-                            {this.props.content === undefined ? "正在处理" : this.props.content}
+                            {this.state.change ?
+                                this.state.content === undefined ? "已经处理完成，确定返回上一页" : this.state.content :
+                                this.props.content === undefined ? "正在处理" : this.props.content}
                         </DialogContentText>
                     </DialogContent>
                     <DialogActions>
+                        {this.state.done ? <Button onClick={(e) => this.props.onDone()} color="primary" >
+                            确定
+                        </Button> : undefined}
+                        {this.state.showCancel ? <Button onClick={(e) => this.props.onCancel()} color="primary" >
+                            取消
+                        </Button> : undefined}
                     </DialogActions>
                 </Dialog>
             </div>
@@ -75,6 +95,16 @@ export default class DraggableDialog extends React.Component<IDraggableDialogPro
 
     public open = () => {
         this.setState({open: true});
+    }
+
+    public change = (title, content, done = false, showCancel= false, change= true) => {
+        this.setState({
+            change,
+            showCancel,
+            done,
+            title,
+            content,
+        });
     }
 
     public close = () => {

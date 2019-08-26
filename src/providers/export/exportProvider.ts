@@ -37,6 +37,16 @@ export interface ITrainConfigResults {
     success: boolean;
 }
 
+export interface IStartTrainResults {
+    success: boolean;
+    msg: string;
+    tarPath?: string;
+    tarBaseName?: string;
+    tarName?: string;
+    sourcePath?: string;
+    assetsBasePath?: string;
+}
+
 /**
  * @name - IExportProvider
  * @description - Defines the required interface for all VoTT export providers
