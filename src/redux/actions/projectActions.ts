@@ -1,5 +1,6 @@
 import { Action, Dispatch } from "redux";
 import ProjectService from "../../services/projectService";
+import TrainService from "../../services/trainService";
 import { ActionTypes } from "./actionTypes";
 import { AssetService } from "../../services/assetService";
 import { ExportProviderFactory } from "../../providers/export/exportProviderFactory";
@@ -12,7 +13,12 @@ import {
     IProject,
 } from "../../models/applicationState";
 import { createAction, createPayloadAction, IPayloadAction } from "./actionCreators";
-import {ExportAssetState, IExportResults, ITrainConfigResults} from "../../providers/export/exportProvider";
+import {
+    ExportAssetState,
+    IExportResults,
+    IStartTrainResults,
+    ITrainConfigResults,
+} from "../../providers/export/exportProvider";
 import { appInfo } from "../../common/appInfo";
 import { strings } from "../../common/strings";
 import { IExportFormat } from "vott-react";
@@ -31,6 +37,9 @@ export default interface IProjectActions {
     exportProject(project: IProject): Promise<void> | Promise<IExportResults>;
     transferProject(project: IProject): Promise<void>;
     exportTrainConfig(project: IProject): Promise<void> | Promise<ITrainConfigResults>;
+    trainAddQueueProject(project: IProject, source: IStartTrainResults): Promise<IStartTrainResults>;
+    trainPackageProject(project: IProject): Promise<IStartTrainResults>;
+    trainUploadProject(project: IProject, source: IStartTrainResults): Promise<IStartTrainResults>;
     loadAssets(project: IProject): Promise<IAsset[]>;
     loadAssetsWithFolder(project: IProject, folder: string): Promise<IAsset[]>;
     loadAssetMetadata(project: IProject, asset: IAsset): Promise<IAssetMetadata>;
@@ -377,6 +386,30 @@ export function exportTrainConfig(project: IProject):
 
             return results as ITrainConfigResults;
         }
+    };
+}
+
+export function trainPackageProject(project: IProject):
+    (dispatch: Dispatch) => Promise<void> | Promise<ITrainConfigResults> {
+    return async (dispatch: Dispatch) => {
+        const trainService = new TrainService();
+        return await trainService.trainPackageProject(project);
+    };
+}
+
+export function trainUploadProject(project: IProject, source: IStartTrainResults):
+    (dispatch: Dispatch) => Promise<ITrainConfigResults> {
+    return async (dispatch: Dispatch) => {
+        const trainService = new TrainService();
+        return await trainService.trainUploadProject(project, source);
+    };
+}
+
+export function trainAddQueueProject(project: IProject, source: IStartTrainResults):
+    (dispatch: Dispatch) => Promise<ITrainConfigResults> {
+    return async (dispatch: Dispatch) => {
+        const trainService = new TrainService();
+        return await trainService.trainAddQueueProject(project, source);
     };
 }
 

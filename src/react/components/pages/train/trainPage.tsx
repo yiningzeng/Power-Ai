@@ -97,6 +97,10 @@ export default class TrainPage extends React.Component<ITrainPageProps> {
                     disableBackdropClick={true}
                     disableEscapeKeyDown={true}
                     fullWidth={true}
+                    onDone={() => this.props.history.goBack()}
+                    onCancel={() => {
+                        this.props.history.goBack();
+                    }}
                 />
                 <h3>
                     <i className="fas fa-sliders-h fa-1x"></i>
@@ -120,7 +124,6 @@ export default class TrainPage extends React.Component<ITrainPageProps> {
             ...this.props.project,
             trainFormat,
         };
-
         await this.props.actions.saveProject(projectToUpdate);
         // toast.success(strings.export.messages.saveSuccess);
 
@@ -141,19 +144,36 @@ export default class TrainPage extends React.Component<ITrainPageProps> {
         // }
 
         // toast.info(`开始配置训练...`);
-
-        const infoId = toast.info(`开始导出 ${this.props.project.name} 配置文件...`);
+        this.draggableDialog.current.change("导出配置文件", "请耐心等待，去喝杯咖啡再来吧");
         await this.props.actions.exportTrainConfig(this.props.project);
-
-        toast.dismiss(infoId);
-        IpcRendererProxy.send(`TrainingSystem:${this.props.project.trainFormat.providerType}`, [this.props.project])
-            .then((data) => {
-            console.log(data);
-        });
-        alert("232323");
+        // toast.dismiss(infoId);
+        // IpcRendererProxy.send(`TrainingSystem:${this.props.project.trainFormat.providerType}`, [this.props.project])
+        //     .then((data) => {
+        //     console.log(data);
+        // });
+        // alert("232323");
         // endregion
-        this.draggableDialog.current.close();
-        this.props.history.goBack();
+
+        this.draggableDialog.current.change("正在打包", "请耐心等待，去喝杯咖啡再来吧");
+        const packageRes = await this.props.actions.trainPackageProject(this.props.project);
+        if (packageRes.success) {
+            this.draggableDialog.current.change(`正在上传`, "请耐心等待，去喝杯咖啡再来吧");
+            const upload = await this.props.actions.trainUploadProject(this.props.project, packageRes);
+            if (upload.success) {
+                this.draggableDialog.current.change(`正在加入训练队列`, "请耐心等待，去喝杯咖啡再来吧");
+                const res = await this.props.actions.trainAddQueueProject(this.props.project, packageRes);
+                if (res.success) {
+                    this.draggableDialog.current.change("已成功加入训练队列",
+                        "项目等待训练中...在后台管理页面可以查看训练最新状态", true);
+                } else {
+                    this.draggableDialog.current.change("加入队列失败", res.msg, true);
+                }
+            } else {
+                this.draggableDialog.current.change("上传失败", upload.msg, true);
+            }
+        } else {
+            this.draggableDialog.current.change("打包失败", packageRes.msg, true);
+        }
     }
 
     private onFormCancel() {
