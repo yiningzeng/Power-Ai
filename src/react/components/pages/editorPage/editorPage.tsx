@@ -935,11 +935,19 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                 break;
             case ToolbarItemName.PreviousAsset:
                 await this.goToRootAsset(-1);
-                this.canvas.current.enableCanvas(true);
+                this.setState({
+                    selectionMode: SelectionMode.RECT,
+                    editorMode: EditorMode.Rectangle,
+                });
+                // this.canvas.current.enableCanvas(true);
                 break;
             case ToolbarItemName.NextAsset:
                 await this.goToRootAsset(1);
-                this.canvas.current.enableCanvas(true);
+                this.setState({
+                    selectionMode: SelectionMode.RECT,
+                    editorMode: EditorMode.Rectangle,
+                });
+                // this.canvas.current.enableCanvas(true);
                 break;
             case ToolbarItemName.DeleteAsset:
                 if (this.props.appSettings.zengyining) {
