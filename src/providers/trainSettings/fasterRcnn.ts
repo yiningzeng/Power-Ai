@@ -41,6 +41,14 @@ const trainSettings: IFasterRcnnCondig  = {
         TRAIN_MAX_SIZE: 833,
         TRAIN_BATCH_SIZE_PER_IM: 256,
         TRAIN_RPN_PRE_NMS_TOP_N: 2000,
+        NEGATIVE: true, // 开启负样本
+        MULTI_SCALE: false, // 开启多尺度
+        CROP_SCALE: 0.5, // 按图像原始尺寸比例裁剪
+        MULTI_COLOR: false, // 多彩变换
+        ROTATION: false, // 图像旋转
+        ROT: 0.5, // 旋转数据的概率
+        ROT_RANDOM: false, // 随机旋转
+        ROT_RANDOM_ANGLE: 360,
         // AUGUMENT: true, // 数据增强
         // MULTI_SCALE: true, // 多尺度
         // USE_FLIPPED: false,

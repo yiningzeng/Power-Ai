@@ -138,6 +138,14 @@ export interface IFasterRcnnCondig {
     TRAIN_MAX_SIZE: number;
     TRAIN_BATCH_SIZE_PER_IM: number;
     TRAIN_RPN_PRE_NMS_TOP_N: number;
+    NEGATIVE: boolean;
+    MULTI_SCALE: boolean;
+    CROP_SCALE: number;
+    MULTI_COLOR: boolean;
+    ROTATION: boolean;
+    ROT: number;
+    ROT_RANDOM: boolean;
+    ROT_RANDOM_ANGLE: number;
     // };
     // TEST: {
     TEST_DATASETS: string;

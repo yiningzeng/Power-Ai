@@ -289,9 +289,6 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                     onDragFinished={this.onSideBarResizeComplete}>
                     <div className="editor-page-sidebar bg-lighter-1">
                         <div>
-                            <Button variant="outlined" color="primary" onClick={handleClickOpen}>
-                                Open form dialog
-                            </Button>
                             <Dialog
                                 fullWidth={true}
                                 disableBackdropClick={true}

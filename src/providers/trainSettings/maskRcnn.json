@@ -1,6 +1,6 @@
 {
     "type": "object",
-    "title": "${strings.train.providers.fasterRcnn.displayName}",
+    "title": "${strings.train.providers.maskRcnn.displayName}",
     "properties": {
         "maskRcnnImage": {
             "type": "string",
@@ -9,7 +9,7 @@
             "default": "registry.cn-hangzhou.aliyuncs.com/baymin/ai-power:ai-power-wo-auto-v3.6"
         },
         "detectron": {
-            "title": "网络参数",
+            "title": "",
             "type": "object",
             "properties": {
                 "layerNumbEnum": {

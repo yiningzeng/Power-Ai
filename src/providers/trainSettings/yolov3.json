@@ -14,7 +14,7 @@
             "default": 6
         },
         "yolov3net":{
-            "title": "网络参数",
+            "title": "",
             "type": "object",
             "properties": {
                 "width": {
