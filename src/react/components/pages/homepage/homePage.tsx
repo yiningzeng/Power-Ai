@@ -70,7 +70,14 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                 deadline: moment().add(90, "days").format("YYYY-MM-DD"),
             };
             this.props.applicationActions.saveAppSettings(newAppSettings);
+
         }
+        // 试用版本使用这个
+        // if (this.props.appSettings.zengyining === undefined || this.props.appSettings.zengyining === null) {
+        //     toast.warn("您当前处于试用权限，有些功能会受限制", { autoClose: false });
+        // }
+        // 试用版本使用这个
+        // 正式版使用这个
         if (this.props.appSettings.zengyining === undefined || this.props.appSettings.zengyining === null) {
             const newAppSettings = {
                 ...this.props.appSettings,
@@ -78,6 +85,7 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
             };
             this.props.applicationActions.saveAppSettings(newAppSettings);
         }
+        // 正式版使用这个
         return (
             <div className="app-homepage">
                 <div className="app-homepage-main">

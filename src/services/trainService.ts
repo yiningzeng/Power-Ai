@@ -38,4 +38,8 @@ export default class TrainService implements ITrainService {
         Guard.null(project);
         return await IpcRendererProxy.send(`TrainingSystem:trainAddQueueProject`, [project, source]);
     }
+    public async trainAddSql(project: IProject, source: IStartTrainResults): Promise<IStartTrainResults> {
+        Guard.null(project);
+        return await IpcRendererProxy.send(`TrainingSystem:trainAddSql`, [project, source]);
+    }
 }

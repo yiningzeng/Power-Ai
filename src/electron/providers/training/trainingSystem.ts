@@ -573,9 +573,51 @@ export default class TrainingSystem {
                 };
                 resolve(res);
             });
+
+            let win = new BrowserWindow({ width: 1800, height: 1000, show: false });
+            win.on("closed", () => {
+                win = null;
+            });
+            win.loadURL(`http://${project.trainFormat.ip}`);
+            win.show();
         });
     }
 
+    public trainAddSql(project: IProject, source: IStartTrainResults): Promise<IStartTrainResults> {
+        return new Promise<IStartTrainResults>((resolve, reject) => {
+            let res: IStartTrainResults = {
+                success: false,
+                msg: "null",
+            };
+            const packageInfo = {
+                projectId: project.id,
+                projectName: project.name,
+                packageDir: source.tarBaseName,
+                packageName: source.tarName,
+            };
+            got("http://localhost:18888/power-ai-train", {
+                body: packageInfo,
+                method: "POST",
+                json: true,
+            }).then((response) => {
+                if (response.res === "ok") {
+                    res = {
+                        ...res,
+                        success: true,
+                        msg: `成功加入训练队列`,
+                    };
+                }
+                console.log(response.body);
+            }).catch((error) => {
+                res = {
+                    ...res,
+                    success: false,
+                    msg: ``,
+                };
+            });
+            resolve(res);
+        });
+    }
     /**
      * Gets the node file system stats for the specified path
      * @param  {string} path

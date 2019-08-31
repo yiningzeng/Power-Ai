@@ -163,6 +163,7 @@ export default class TrainPage extends React.Component<ITrainPageProps> {
                 this.draggableDialog.current.change(`正在加入训练队列`, "请耐心等待，去喝杯咖啡再来吧");
                 const res = await this.props.actions.trainAddQueueProject(this.props.project, packageRes);
                 if (res.success) {
+                    await this.props.actions.trainAddSql(this.props.project, packageRes);
                     this.draggableDialog.current.change("已成功加入训练队列",
                         "项目等待训练中...在后台管理页面可以查看训练最新状态", true);
                 } else {

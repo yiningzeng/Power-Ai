@@ -38,6 +38,7 @@ export default interface IProjectActions {
     transferProject(project: IProject): Promise<void>;
     exportTrainConfig(project: IProject): Promise<void> | Promise<ITrainConfigResults>;
     trainAddQueueProject(project: IProject, source: IStartTrainResults): Promise<IStartTrainResults>;
+    trainAddSql(project: IProject, source: IStartTrainResults): Promise<IStartTrainResults>;
     trainPackageProject(project: IProject): Promise<IStartTrainResults>;
     trainUploadProject(project: IProject, source: IStartTrainResults): Promise<IStartTrainResults>;
     loadAssets(project: IProject): Promise<IAsset[]>;
@@ -413,6 +414,13 @@ export function trainAddQueueProject(project: IProject, source: IStartTrainResul
     };
 }
 
+export function trainAddSql(project: IProject, source: IStartTrainResults):
+    (dispatch: Dispatch) => Promise<ITrainConfigResults> {
+    return async (dispatch: Dispatch) => {
+        const trainService = new TrainService();
+        return await trainService.trainAddSql(project, source);
+    };
+}
 /**
  * Load project action type
  */
