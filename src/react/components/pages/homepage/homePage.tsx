@@ -70,7 +70,6 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                 deadline: moment().add(90, "days").format("YYYY-MM-DD"),
             };
             this.props.applicationActions.saveAppSettings(newAppSettings);
-
         }
         // 试用版本使用这个
         // if (this.props.appSettings.zengyining === undefined || this.props.appSettings.zengyining === null) {
