@@ -85,11 +85,15 @@ export default class HtmlFileReader {
             data = await this.getAssetFrameImage(asset);
         } else {
             // Download the asset binary from the storage provider
-            const response = await axios.get<Blob>(asset.path, config);
-            if (response.status !== 200) {
-                throw new Error("Error downloading asset binary");
+            try {
+                const response = await axios.get<Blob>(asset.path, config);
+                if (response.status !== 200) {
+                    return null;
+                }
+                data = await response.data;
+            } catch (e) {
+                return null;
             }
-            data = await response.data;
         }
 
         return data;
