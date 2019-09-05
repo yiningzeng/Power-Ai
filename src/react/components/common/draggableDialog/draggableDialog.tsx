@@ -94,7 +94,7 @@ export default class DraggableDialog extends React.Component<IDraggableDialogPro
     }
 
     public open = () => {
-        this.setState({open: true});
+        this.setState({open: true, done: false, change: false});
     }
 
     public change = (title, content, done = false, showCancel= false, change= true) => {
