@@ -156,7 +156,8 @@ export class AssetService {
     public async deleteAsset(selectAsset: IAsset): Promise<IAsset[]> {
         // const path = decodeURI(selectedAsset.asset.path.replace("file:", ""));
         // await this.localFileSystem.deleteDirectory(path); //根据路径删除
-        await this.storageProvider.deleteFile(selectAsset.name); // 根据文件名删除，可能存在多文件夹有问题
+        console.log(`删除中文:${selectAsset.name}`);
+        await this.storageProvider.deleteFile(decodeURI(selectAsset.name)); // 根据文件名删除，可能存在多文件夹有问题
         return _
             .values(this.project.assets)
             .filter((asset) => asset.id !== selectAsset.id)

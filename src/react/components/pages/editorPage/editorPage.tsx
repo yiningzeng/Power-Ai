@@ -353,12 +353,6 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                     });
                                 }}
                                 onClick={ async (item) => {
-                                    // if ( item === "已处理") {
-                                    //     this.setState({
-                                    //         assets: [],
-                                    //     });
-                                    //     this.loadProjectAssets();
-                                    // } else { this.loadProjectAssetsWithFolder(item.toString()); }
                                     const newProject: IProject = {
                                         ...project,
                                         sourceConnection: {
@@ -568,12 +562,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         // console.log(`删除素材fuck：${JSON.stringify(this.props.project)}`);
         toast.success(`成功删除`);
         this.goToRootAsset(-1);
-        this.loadingProjectAssets = false;
-        this.setState({
-            assets: [],
-            selectedTag: null,
-        });
-        await this.loadProjectAssets();
+        await this.deleteAssetsAndRefreshProjectAssets();
         // console.log(`删除素材fuck 222：${JSON.stringify(this.props.project)}`);
         // this.updateRootAssets();
     }
@@ -1128,28 +1117,33 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         });
     }
 
+    private deleteAssetsAndRefreshProjectAssets = async (): Promise<void> => {
+        const newAssets = _.values(this.state.assets)
+            .filter((asset) => asset.id !== this.state.selectedAsset.asset.id)
+            .sort((a, b) => a.timestamp - b.timestamp);
+        this.setState({
+            assets: newAssets,
+        });
+    }
+
     private loadProjectAssetsWithFolder = async (folder): Promise<void> => {
         if (this.loadingProjectAssets) {
             return;
         }
-        console.log("editorPage: loadProjectAssetsWithFolder: " + folder);
 
         this.loadingProjectAssets = true;
 
         // Get all root project assets
         const rootProjectAssets = _.values(this.props.project.assets)
             .filter((asset) => !asset.parent);
-        console.log("editorPage: loadProjectAssetsWithFolder: rootProjectAssets", rootProjectAssets);
         // Get all root assets from source asset provider
         const sourceAssets = await this.props.actions.loadAssetsWithFolder(this.props.project, folder);
-        console.log("editorPage: loadProjectAssetsWithFolder: sourceAssets", sourceAssets);
         // Merge and uniquify
         const rootAssets = sourceAssets;
         _(rootProjectAssets)
             .concat(sourceAssets)
             .uniqBy((asset) => asset.id)
             .value();
-        console.log("editorPage: loadProjectAssetsWithFolder: rootAssets", rootAssets);
         const lastVisited = rootAssets.find((asset) => asset.id === this.props.project.lastVisitedAssetId);
 
         this.setState({
