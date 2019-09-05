@@ -23,6 +23,10 @@ export const english: IAppStrings = {
         restore: "Restore",
         close: "Close",
     },
+    assetsFolderBar: {
+        addFolder: "Add Assets Folder",
+        importAssets: "Import Tagged Assets",
+    },
     homePage: {
         newProject: "New Project",
         openLocalProject: {

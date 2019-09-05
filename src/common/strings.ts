@@ -26,6 +26,10 @@ export interface IAppStrings {
         restore: string;
         close: string;
     };
+    assetsFolderBar: {
+        addFolder: string;
+        importAssets: string;
+    };
     homePage: {
         newProject: string;
         openLocalProject: {

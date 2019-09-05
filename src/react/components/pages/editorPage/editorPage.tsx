@@ -321,6 +321,9 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                 title="素材文件夹"
                                 Component={SourceItem}
                                 items={this.state.treeList}
+                                onImportTaggedAssetsFolder={async () => {
+                                    alert("hahhahaaha");
+                                }}
                                 onAddClick={async () => {
                                     console.log("新增文件夹");
                                     const filePath = await this.localFileSystem.selectContainer();

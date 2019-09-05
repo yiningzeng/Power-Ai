@@ -23,6 +23,10 @@ export const chinese: IAppStrings = {
         restore: "恢复",
         close: "关闭",
     },
+    assetsFolderBar: {
+        addFolder: "新增素材文件夹",
+        importAssets: "导入已经标注的素材文件夹",
+    },
     homePage: {
         newProject: "新建项目",
         openLocalProject: {

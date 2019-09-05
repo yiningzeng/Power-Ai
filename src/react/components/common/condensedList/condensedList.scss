@@ -16,8 +16,20 @@
             margin-right: 0.5em;
         }
 
-        &-add {
-            margin-left: 84px;
+        &-toolbar {
+            //width: 100%;
+            //float: right;
+            margin-left: 50px;
+            display: flex;
+            flex-direction: row;
+            &-item {
+                color: #ccc;
+                padding: 1px;
+            }
+            &-item:hover {
+                color: white;
+                cursor: pointer;
+            }
         }
     }
 
