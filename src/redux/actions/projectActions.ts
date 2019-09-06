@@ -22,7 +22,7 @@ import {
 import { appInfo } from "../../common/appInfo";
 import { strings } from "../../common/strings";
 import { IExportFormat } from "vott-react";
-import { IVottJsonExportProviderOptions } from "../../providers/export/vottJson";
+import { IPowerAiExportProviderOptions } from "../../providers/export/powerAi";
 import {TrainProviderFactory} from "../../providers/trainSettings/trainProviderFactory";
 import { decryptProviderOptions } from "../../common/utils";
 
@@ -45,7 +45,7 @@ export default interface IProjectActions {
     loadAssetsWithFolder(project: IProject, folder: string): Promise<IAsset[]>;
     loadAssetMetadata(project: IProject, asset: IAsset): Promise<IAssetMetadata>;
     saveAssetMetadata(project: IProject, assetMetadata: IAssetMetadata): Promise<IAssetMetadata>;
-    deleteAsset(project: IProject, selectAsset: IAsset): Promise<void>;
+    deleteAsset(project: IProject, selectAsset: IAsset): Promise<IProject>;
     updateProjectTag(project: IProject, oldTagName: string, newTagName: string): Promise<IAssetMetadata[]>;
     deleteProjectTag(project: IProject, tagName): Promise<IAssetMetadata[]>;
 }
@@ -89,7 +89,7 @@ export function saveProject(project: IProject)
     return async (dispatch: Dispatch, getState: () => IApplicationState) => {
         const appState = getState();
         const projectService = new ProjectService();
-        console.log(`删除素材原始: ${JSON.stringify(project)}`);
+        console.log(`malesaveProject: ${JSON.stringify(project)}`);
         if (projectService.isDuplicate(project, appState.recentProjects)) {
             throw new AppError(ErrorCode.ProjectDuplicateName, `Project with name '${project.name}
                 already exists with the same target connection '${project.targetConnection.name}'`);
@@ -109,7 +109,7 @@ export function saveProject(project: IProject)
 
         const savedProject = await projectService.save(project, projectToken);
         dispatch(saveProjectAction(savedProject));
-        console.log(`删除素材: ${JSON.stringify(savedProject)}`);
+        console.log(`malesaveProject: ${JSON.stringify(savedProject)}`);
 
         // Reload project after save actions
         await loadProject(savedProject)(dispatch, getState);
@@ -231,9 +231,10 @@ export function saveAssetMetadata(
 /**
  * Dispatches Delete Project action and resolves with project
  * @param project - Project to delete
+ * @param selectAsset
  */
 export function deleteAsset(project: IProject, selectAsset: IAsset)
-    : (dispatch: Dispatch, getState: () => IApplicationState) => Promise<void> {
+    : (dispatch: Dispatch, getState: () => IApplicationState) => Promise<IProject> {
     return async (dispatch: Dispatch, getState: () => IApplicationState) => {
         const assetService = new AssetService(project);
         // alert("删除素材: assetService" + JSON.stringify(assetService));
@@ -248,8 +249,10 @@ export function deleteAsset(project: IProject, selectAsset: IAsset)
         // this.props.actions.saveProject()
         // @ts-ignore
         const finalProject = await saveProject(updatedProject)(dispatch, getState);
-        dispatch(saveProjectAction(finalProject));
+        // @ts-ignore
+        dispatch(deleteProjectAssetAction(updatedProject));
         console.log(`删除素材deleteAsset->finalProject： ${JSON.stringify(finalProject)}`);
+        return finalProject;
     };
 }
 
@@ -496,6 +499,10 @@ export interface IDeleteProjectTagAction extends IPayloadAction<string, IProject
     type: ActionTypes.DELETE_PROJECT_TAG_SUCCESS;
 }
 
+export interface IDeleteProjectAssetAction extends IPayloadAction<string, IProject> {
+    type: ActionTypes.DELETE_PROJECT_ASSET_SUCCESS;
+}
+
 /**
  * Instance of Load Project action
  */
@@ -547,3 +554,6 @@ export const updateProjectTagAction =
  */
 export const deleteProjectTagAction =
     createPayloadAction<IDeleteProjectTagAction>(ActionTypes.DELETE_PROJECT_TAG_SUCCESS);
+
+export const deleteProjectAssetAction =
+    createPayloadAction<IDeleteProjectAssetAction>(ActionTypes.DELETE_PROJECT_ASSET_SUCCESS);

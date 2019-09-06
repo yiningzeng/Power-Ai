@@ -400,7 +400,10 @@ export const english: IAppStrings = {
                 displayName: "Microsoft Cognitive Toolkit (CNTK)",
             },
             coco: {
-                displayName: "coco",
+                displayName: "CoCo",
+            },
+            powerAi: {
+                displayName: "PowerAi",
             },
         },
         messages: {

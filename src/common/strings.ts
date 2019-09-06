@@ -399,6 +399,9 @@ export interface IAppStrings {
             coco: {
                 displayName: string,
             },
+            powerAi: {
+                displayName: string,
+            },
         },
         messages: {
             title: string,

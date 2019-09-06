@@ -79,6 +79,7 @@ export default class ExportPage extends React.Component<IExportPageProps> {
                     disableEscapeKeyDown={true}
                     fullWidth={true}
                     onDone={() => this.props.history.goBack()}
+                    onCancel={() => this.draggableDialog.current.close()}
                 />
                 <h3>
                     <i className="fas fa-sliders-h fa-1x"></i>

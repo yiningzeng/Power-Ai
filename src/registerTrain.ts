@@ -1,7 +1,6 @@
 import { ExportProviderFactory } from "./providers/export/exportProviderFactory";
 import { PascalVOCExportProvider } from "./providers/export/pascalVOC";
 import { TFRecordsExportProvider } from "./providers/export/tensorFlowRecords";
-import { VottJsonExportProvider } from "./providers/export/vottJson";
 import { AssetProviderFactory } from "./providers/storage/assetProviderFactory";
 import { BingImageSearch } from "./providers/storage/bingImageSearch";
 import { LocalFileSystemProxy } from "./providers/storage/localFileSystemProxy";

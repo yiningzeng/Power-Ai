@@ -1,5 +1,5 @@
 import _ from "lodash";
-import { VottJsonExportProvider, IVottJsonExportProviderOptions } from "./vottJson";
+import { PowerAiExportProvider, IPowerAiExportProviderOptions } from "./powerAi";
 import registerProviders from "../../registerProviders";
 import { ExportAssetState } from "./exportProvider";
 import { ExportProviderFactory } from "./exportProviderFactory";
@@ -56,17 +56,17 @@ describe("VoTT Json Export Provider", () => {
     });
 
     it("Is defined", () => {
-        expect(VottJsonExportProvider).toBeDefined();
+        expect(PowerAiExportProvider).toBeDefined();
     });
 
     it("Can be instantiated through the factory", () => {
-        const options: IVottJsonExportProviderOptions = {
+        const options: IPowerAiExportProviderOptions = {
             assetState: ExportAssetState.All,
             includeImages: true,
         };
         const exportProvider = ExportProviderFactory.create("vottJson", testProject, options);
         expect(exportProvider).not.toBeNull();
-        expect(exportProvider).toBeInstanceOf(VottJsonExportProvider);
+        expect(exportProvider).toBeInstanceOf(PowerAiExportProvider);
     });
 
     describe("Export variations", () => {
@@ -89,12 +89,12 @@ describe("VoTT Json Export Provider", () => {
         });
 
         it("Exports all assets", async () => {
-            const options: IVottJsonExportProviderOptions = {
+            const options: IPowerAiExportProviderOptions = {
                 assetState: ExportAssetState.All,
                 includeImages: true,
             };
 
-            const exportProvider = new VottJsonExportProvider(testProject, options);
+            const exportProvider = new PowerAiExportProvider(testProject, options);
             await exportProvider.export();
 
             const storageProviderMock = LocalFileSystemProxy as any;
@@ -115,12 +115,12 @@ describe("VoTT Json Export Provider", () => {
         });
 
         it("Exports only visited assets (includes tagged)", async () => {
-            const options: IVottJsonExportProviderOptions = {
+            const options: IPowerAiExportProviderOptions = {
                 assetState: ExportAssetState.Visited,
                 includeImages: true,
             };
 
-            const exportProvider = new VottJsonExportProvider(testProject, options);
+            const exportProvider = new PowerAiExportProvider(testProject, options);
             await exportProvider.export();
 
             const storageProviderMock = LocalFileSystemProxy as any;
@@ -143,12 +143,12 @@ describe("VoTT Json Export Provider", () => {
         });
 
         it("Exports only tagged assets", async () => {
-            const options: IVottJsonExportProviderOptions = {
+            const options: IPowerAiExportProviderOptions = {
                 assetState: ExportAssetState.Tagged,
                 includeImages: true,
             };
 
-            const exportProvider = new VottJsonExportProvider(testProject, options);
+            const exportProvider = new PowerAiExportProvider(testProject, options);
             await exportProvider.export();
 
             const storageProviderMock = LocalFileSystemProxy as any;
@@ -170,12 +170,12 @@ describe("VoTT Json Export Provider", () => {
         });
 
         it("Includes images in export when option is selected", async () => {
-            const options: IVottJsonExportProviderOptions = {
+            const options: IPowerAiExportProviderOptions = {
                 assetState: ExportAssetState.All,
                 includeImages: true,
             };
 
-            const exportProvider = new VottJsonExportProvider(testProject, options);
+            const exportProvider = new PowerAiExportProvider(testProject, options);
             await exportProvider.export();
 
             expect(LocalFileSystemProxy.prototype.writeText).toBeCalledTimes(1);
@@ -183,12 +183,12 @@ describe("VoTT Json Export Provider", () => {
         });
 
         it("Does not include images in export when option is not selected", async () => {
-            const options: IVottJsonExportProviderOptions = {
+            const options: IPowerAiExportProviderOptions = {
                 assetState: ExportAssetState.All,
                 includeImages: false,
             };
 
-            const exportProvider = new VottJsonExportProvider(testProject, options);
+            const exportProvider = new PowerAiExportProvider(testProject, options);
             await exportProvider.export();
 
             expect(LocalFileSystemProxy.prototype.writeText).toBeCalledTimes(1);

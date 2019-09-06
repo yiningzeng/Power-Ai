@@ -1120,13 +1120,15 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         });
     }
 
-    private deleteAssetsAndRefreshProjectAssets = async (): Promise<void> => {
+    private deleteAssetsAndRefreshProjectAssets = async (finalProject): Promise<void> => {
         const newAssets = _.values(this.state.assets)
             .filter((asset) => asset.id !== this.state.selectedAsset.asset.id)
             .sort((a, b) => a.timestamp - b.timestamp);
         this.setState({
             assets: newAssets,
         });
+        console.log(`好可怜a${JSON.stringify(finalProject)}`);
+        // await this.props.actions.saveProject(finalProject);
     }
 
     private loadProjectAssetsWithFolder = async (folder): Promise<void> => {

@@ -400,6 +400,9 @@ export const chinese: IAppStrings = {
             coco: {
                 displayName: "CoCo",
             },
+            powerAi: {
+                displayName: "PowerAi(可导入到其他项目)",
+            },
         },
         messages: {
             title: "正在导出",
