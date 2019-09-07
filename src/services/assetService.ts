@@ -14,6 +14,7 @@ import { TFRecordsReader } from "../providers/export/tensorFlowRecords/tensorFlo
 import { FeatureType } from "../providers/export/tensorFlowRecords/tensorFlowBuilder";
 import { appInfo } from "../common/appInfo";
 import { encodeFileURI } from "../common/utils";
+import {LocalFileSystemProxy} from "../providers/storage/localFileSystemProxy";
 
 /**
  * @name - Asset Service
@@ -30,7 +31,6 @@ export class AssetService {
         Guard.empty(filePath);
 
         const normalizedPath = filePath.toLowerCase();
-
         // If the path is not already prefixed with a protocol
         // then assume it comes from the local file system
         if (!normalizedPath.startsWith("http://") &&
@@ -154,9 +154,10 @@ export class AssetService {
      * @param selectAsset
      */
     public async deleteAsset(selectAsset: IAsset): Promise<IAsset[]> {
-        // const path = decodeURI(selectedAsset.asset.path.replace("file:", ""));
+        const path = decodeURI(selectAsset.path.replace("file:", ""));
         // await this.localFileSystem.deleteDirectory(path); //根据路径删除
-        console.log(`删除中文:${selectAsset.name}`);
+        console.log(`删除素材deleteAsset->删除中文:${JSON.stringify(selectAsset)}`);
+        await new LocalFileSystemProxy().deleteFileOnlyPath(path);
         await this.storageProvider.deleteFile(decodeURI(selectAsset.name)); // 根据文件名删除，可能存在多文件夹有问题
         return _
             .values(this.project.assets)
