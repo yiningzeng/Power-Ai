@@ -190,14 +190,16 @@ export default class ProjectService implements IProjectService {
         const tempAssets: IAsset[] = [];
         for (const one of _.values(jsonImportProject.assets)) {
             const itemJsonText = interpolate(await importStorageProvider.readText(`${one.id}-asset.json`), params);
+            const json = JSON.parse(itemJsonText);
             const md5Hash = new MD5().update(one.path).digest("hex");
+            json["asset"]["id"] = md5Hash;
             const oneTemp = {
                 ...one,
                 id: md5Hash,
             };
             tempAssets.push(oneTemp);
             await projectStorageProvider.writeText(`${md5Hash}-asset.json`,
-                JSON.stringify(JSON.parse(itemJsonText), null, 4));
+                JSON.stringify(json, null, 4));
         }
 
         // 合并素材
