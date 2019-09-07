@@ -35,10 +35,10 @@ export default class TagInputToolbar extends React.Component<ITagInputToolbarPro
             <div className="tag-input-toolbar">
                 {
                     this.getToolbarItems().map((itemConfig) =>
-                        <div key={itemConfig.displayName} className={`tag-input-toolbar-item ${itemConfig.className}`}
+                        <a title={itemConfig.displayName} key={itemConfig.displayName} className={`tag-input-toolbar-item ${itemConfig.className}`}
                             onClick={(e) => this.onToolbarItemClick(e, itemConfig)}>
                             <i className={`tag-input-toolbar-icon fas ${itemConfig.icon}`} />
-                        </div>,
+                        </a>,
                     )
                 }
             </div>

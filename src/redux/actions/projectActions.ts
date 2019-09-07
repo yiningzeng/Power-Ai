@@ -1,5 +1,6 @@
 import { Action, Dispatch } from "redux";
 import ProjectService from "../../services/projectService";
+import TrainService from "../../services/trainService";
 import { ActionTypes } from "./actionTypes";
 import { AssetService } from "../../services/assetService";
 import { ExportProviderFactory } from "../../providers/export/exportProviderFactory";
@@ -12,12 +13,20 @@ import {
     IProject,
 } from "../../models/applicationState";
 import { createAction, createPayloadAction, IPayloadAction } from "./actionCreators";
-import {ExportAssetState, IExportResults, ITrainConfigResults} from "../../providers/export/exportProvider";
+import {
+    ExportAssetState,
+    IExportResults,
+    IStartTrainResults,
+    ITrainConfigResults,
+} from "../../providers/export/exportProvider";
 import { appInfo } from "../../common/appInfo";
 import { strings } from "../../common/strings";
 import { IExportFormat } from "vott-react";
-import { IVottJsonExportProviderOptions } from "../../providers/export/vottJson";
+import { IPowerAiExportProviderOptions } from "../../providers/export/powerAi";
 import {TrainProviderFactory} from "../../providers/trainSettings/trainProviderFactory";
+import { decryptProviderOptions } from "../../common/utils";
+import {constants} from "../../common/constants";
+import _ from "lodash";
 
 /**
  * Actions to be performed in relation to projects
@@ -28,12 +37,18 @@ export default interface IProjectActions {
     deleteProject(project: IProject): Promise<void>;
     closeProject(): void;
     exportProject(project: IProject): Promise<void> | Promise<IExportResults>;
+    importTaggedAssets(project: IProject, folder: string): Promise<IProject>;
+    transferProject(project: IProject): Promise<void>;
     exportTrainConfig(project: IProject): Promise<void> | Promise<ITrainConfigResults>;
+    trainAddQueueProject(project: IProject, source: IStartTrainResults): Promise<IStartTrainResults>;
+    trainAddSql(project: IProject, source: IStartTrainResults): Promise<IStartTrainResults>;
+    trainPackageProject(project: IProject): Promise<IStartTrainResults>;
+    trainUploadProject(project: IProject, source: IStartTrainResults): Promise<IStartTrainResults>;
     loadAssets(project: IProject): Promise<IAsset[]>;
     loadAssetsWithFolder(project: IProject, folder: string): Promise<IAsset[]>;
     loadAssetMetadata(project: IProject, asset: IAsset): Promise<IAssetMetadata>;
     saveAssetMetadata(project: IProject, assetMetadata: IAssetMetadata): Promise<IAssetMetadata>;
-    deleteAsset(project: IProject, selectAsset: IAsset): Promise<void>;
+    deleteAsset(project: IProject, selectAsset: IAsset): Promise<IProject>;
     updateProjectTag(project: IProject, oldTagName: string, newTagName: string): Promise<IAssetMetadata[]>;
     deleteProjectTag(project: IProject, tagName): Promise<IAssetMetadata[]>;
 }
@@ -47,16 +62,22 @@ export function loadProject(project: IProject):
     return async (dispatch: Dispatch, getState: () => IApplicationState) => {
         const appState = getState();
         const projectService = new ProjectService();
-
         // Lookup security token used to decrypt project settings
-        const projectToken = appState.appSettings.securityTokens
+        let projectToken = appState.appSettings.securityTokens
             .find((securityToken) => securityToken.name === project.securityToken);
-
+        if (project.version !== "2.0.0") {
+            projectToken = {
+                name: "Power-Ai",
+                key: "OwMCjlh96SCjvzp2U6esmUG4qk5acDejsm41zmkkVpk=",
+            };
+        }
         if (!projectToken) {
             throw new AppError(ErrorCode.SecurityTokenNotFound, "Security Token Not Found");
         }
-        const loadedProject = await projectService.load(project, projectToken);
 
+        // console.log(`删除素材后reload: ${JSON.stringify(project)}`);
+        const loadedProject = await projectService.load(project, projectToken);
+        // console.log(`删除素材后reload 2222222222: ${JSON.stringify(loadedProject)}`);
         dispatch(loadProjectAction(loadedProject));
         return loadedProject;
     };
@@ -71,21 +92,27 @@ export function saveProject(project: IProject)
     return async (dispatch: Dispatch, getState: () => IApplicationState) => {
         const appState = getState();
         const projectService = new ProjectService();
-
+        console.log(`malesaveProject: ${JSON.stringify(project)}`);
         if (projectService.isDuplicate(project, appState.recentProjects)) {
             throw new AppError(ErrorCode.ProjectDuplicateName, `Project with name '${project.name}
                 already exists with the same target connection '${project.targetConnection.name}'`);
         }
 
-        const projectToken = appState.appSettings.securityTokens
+        let projectToken = appState.appSettings.securityTokens
             .find((securityToken) => securityToken.name === project.securityToken);
-
+        if (project.version !== "2.0.0") {
+            projectToken = {
+                name: "Power-Ai",
+                key: "OwMCjlh96SCjvzp2U6esmUG4qk5acDejsm41zmkkVpk=",
+            };
+        }
         if (!projectToken) {
             throw new AppError(ErrorCode.SecurityTokenNotFound, "Security Token Not Found");
         }
 
         const savedProject = await projectService.save(project, projectToken);
         dispatch(saveProjectAction(savedProject));
+        console.log(`malesaveProject: ${JSON.stringify(savedProject)}`);
 
         // Reload project after save actions
         await loadProject(savedProject)(dispatch, getState);
@@ -105,9 +132,14 @@ export function deleteProject(project: IProject)
         const projectService = new ProjectService();
 
         // Lookup security token used to decrypt project settings
-        const projectToken = appState.appSettings.securityTokens
+        let projectToken = appState.appSettings.securityTokens
             .find((securityToken) => securityToken.name === project.securityToken);
-
+        if (project.version !== "2.0.0") {
+            projectToken = {
+                name: "Power-Ai",
+                key: "OwMCjlh96SCjvzp2U6esmUG4qk5acDejsm41zmkkVpk=",
+            };
+        }
         if (!projectToken) {
             throw new AppError(ErrorCode.SecurityTokenNotFound, "Security Token Not Found");
         }
@@ -165,7 +197,14 @@ export function loadAssetsWithFolder(project: IProject, folder: string): (dispat
 export function loadAssetMetadata(project: IProject, asset: IAsset): (dispatch: Dispatch) => Promise<IAssetMetadata> {
     return async (dispatch: Dispatch) => {
         const assetService = new AssetService(project);
-        const assetMetadata = await assetService.getAssetMetadata(asset);
+        let assetMetadata = await assetService.getAssetMetadata(asset);
+        assetMetadata = {
+            ...assetMetadata,
+            asset: {
+                ...assetMetadata.asset,
+                path: asset.path,
+            },
+        };
         console.log(`loadAssetMetadata: ${JSON.stringify(assetMetadata)}`);
         dispatch(loadAssetMetadataAction(assetMetadata));
 
@@ -195,24 +234,29 @@ export function saveAssetMetadata(
 /**
  * Dispatches Delete Project action and resolves with project
  * @param project - Project to delete
+ * @param selectAsset
  */
 export function deleteAsset(project: IProject, selectAsset: IAsset)
-    : (dispatch: Dispatch, getState: () => IApplicationState) => Promise<void> {
+    : (dispatch: Dispatch, getState: () => IApplicationState) => Promise<IProject> {
     return async (dispatch: Dispatch, getState: () => IApplicationState) => {
         const assetService = new AssetService(project);
         // alert("删除素材: assetService" + JSON.stringify(assetService));
         const currentProject = getState().currentProject;
         console.log(`删除素材deleteAsset： ${JSON.stringify(currentProject)}`);
         const updatedProject = {
-            ...currentProject,
-            assets: await assetService.deleteAsset(selectAsset),
+            ...project,
+            assets: _.keyBy(await assetService.deleteAsset(selectAsset), (asset) => asset.id),
+            // lastVisitedAssetId: null,
         };
         console.log(`删除素材deleteAsset->updatedProject： ${JSON.stringify(updatedProject)}`);
         // this.props.actions.saveProject()
-        // @ts-ignore
-        const finalProject = await saveProject(updatedProject)(dispatch, getState);
-        dispatch(saveProjectAction(finalProject));
-        console.log(`删除素材deleteAsset->finalProject： ${JSON.stringify(finalProject)}`);
+        await saveProject(updatedProject)(dispatch, getState);
+        // dispatch(deleteProjectAssetAction(updatedProject));
+
+        dispatch(saveProjectAction(updatedProject));
+        // Reload project after save actions
+        await loadProject(updatedProject)(dispatch, getState);
+        return updatedProject;
     };
 }
 
@@ -303,6 +347,60 @@ export function exportProject(project: IProject): (dispatch: Dispatch) => Promis
     };
 }
 
+export function importTaggedAssets(project: IProject, folder: string):
+    (dispatch: Dispatch, getState: () => IApplicationState) => Promise<IProject> {
+    return async (dispatch: Dispatch, getState: () => IApplicationState) => {
+        const appState = getState();
+        const projectService = new ProjectService();
+        if (projectService.isDuplicate(project, appState.recentProjects)) {
+            throw new AppError(ErrorCode.ProjectDuplicateName, `Project with name '${project.name}
+                already exists with the same target connection '${project.targetConnection.name}'`);
+        }
+        let projectToken = appState.appSettings.securityTokens
+            .find((securityToken) => securityToken.name === project.securityToken);
+        if (project.version !== "2.0.0") {
+            projectToken = {
+                name: "Power-Ai",
+                key: "OwMCjlh96SCjvzp2U6esmUG4qk5acDejsm41zmkkVpk=",
+            };
+        }
+        if (!projectToken) {
+            throw new AppError(ErrorCode.SecurityTokenNotFound, "Security Token Not Found");
+        }
+        const updatedProject = await projectService.importTaggedAssets(project, folder);
+        await saveProject(updatedProject)(dispatch, getState);
+        dispatch(saveProjectAction(updatedProject));
+        // Reload project after save actions
+        await loadProject(updatedProject)(dispatch, getState);
+        return updatedProject;
+    };
+}
+
+export function transferProject(project: IProject):
+    (dispatch: Dispatch, getState: () => IApplicationState) => Promise<void> {
+    return async (dispatch: Dispatch, getState: () => IApplicationState) => {
+        const appState = getState();
+        const projectService = new ProjectService();
+        if (projectService.isDuplicate(project, appState.recentProjects)) {
+            throw new AppError(ErrorCode.ProjectDuplicateName, `Project with name '${project.name}
+                already exists with the same target connection '${project.targetConnection.name}'`);
+        }
+
+        let projectToken = appState.appSettings.securityTokens
+            .find((securityToken) => securityToken.name === project.securityToken);
+        if (project.version !== "2.0.0") {
+            projectToken = {
+                name: "Power-Ai",
+                key: "OwMCjlh96SCjvzp2U6esmUG4qk5acDejsm41zmkkVpk=",
+            };
+        }
+        if (!projectToken) {
+            throw new AppError(ErrorCode.SecurityTokenNotFound, "Security Token Not Found");
+        }
+        await projectService.transfer(project, projectToken);
+    };
+}
+
 /**
  * Initialize export provider, get export data and dispatch export project action
  * @param project - Project to export
@@ -328,6 +426,37 @@ export function exportTrainConfig(project: IProject):
     };
 }
 
+export function trainPackageProject(project: IProject):
+    (dispatch: Dispatch) => Promise<void> | Promise<ITrainConfigResults> {
+    return async (dispatch: Dispatch) => {
+        const trainService = new TrainService();
+        return await trainService.trainPackageProject(project);
+    };
+}
+
+export function trainUploadProject(project: IProject, source: IStartTrainResults):
+    (dispatch: Dispatch) => Promise<ITrainConfigResults> {
+    return async (dispatch: Dispatch) => {
+        const trainService = new TrainService();
+        return await trainService.trainUploadProject(project, source);
+    };
+}
+
+export function trainAddQueueProject(project: IProject, source: IStartTrainResults):
+    (dispatch: Dispatch) => Promise<ITrainConfigResults> {
+    return async (dispatch: Dispatch) => {
+        const trainService = new TrainService();
+        return await trainService.trainAddQueueProject(project, source);
+    };
+}
+
+export function trainAddSql(project: IProject, source: IStartTrainResults):
+    (dispatch: Dispatch) => Promise<ITrainConfigResults> {
+    return async (dispatch: Dispatch) => {
+        const trainService = new TrainService();
+        return await trainService.trainAddSql(project, source);
+    };
+}
 /**
  * Load project action type
  */
@@ -403,6 +532,10 @@ export interface IDeleteProjectTagAction extends IPayloadAction<string, IProject
     type: ActionTypes.DELETE_PROJECT_TAG_SUCCESS;
 }
 
+export interface IDeleteProjectAssetAction extends IPayloadAction<string, IProject> {
+    type: ActionTypes.DELETE_PROJECT_ASSET_SUCCESS;
+}
+
 /**
  * Instance of Load Project action
  */
@@ -454,3 +587,6 @@ export const updateProjectTagAction =
  */
 export const deleteProjectTagAction =
     createPayloadAction<IDeleteProjectTagAction>(ActionTypes.DELETE_PROJECT_TAG_SUCCESS);
+
+export const deleteProjectAssetAction =
+    createPayloadAction<IDeleteProjectAssetAction>(ActionTypes.DELETE_PROJECT_ASSET_SUCCESS);

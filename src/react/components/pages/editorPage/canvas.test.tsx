@@ -280,7 +280,7 @@ describe("Editor Canvas", () => {
         const assetMetadata = MockFactory.createTestAssetMetadata(MockFactory.createTestAsset("new-asset"));
 
         wrapper.setProps({ selectedAsset: assetMetadata });
-        wrapper.setState({ enabled: true });
+        wrapper.setState({ enabled: false });
 
         const img = document.createElement("img");
         wrapper.find(AssetPreview).props().onLoaded(img);

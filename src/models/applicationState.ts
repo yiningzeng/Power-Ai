@@ -89,6 +89,8 @@ export interface IAppSettings {
     devToolsEnabled: boolean;
     securityTokens: ISecurityToken[];
     thumbnailSize?: ISize;
+    deadline: string;
+    zengyining?: boolean;
 }
 
 /**
@@ -245,6 +247,7 @@ export interface IActiveLearningSettings {
 }
 
 export interface ITrainFormat {
+    ip: string;
     providerType: string;
     providerOptions: IYoloV3 | IDetectron;
 }
@@ -316,8 +319,11 @@ export interface IZoomMode {
     x: number;
     y: number;
     miniWidth: number;
+    miniHeight: number;
     width: number | "auto";
     height: number | "auto";
+    zoomCenterX: number;
+    zoomCenterY: number;
 }
 
 /**

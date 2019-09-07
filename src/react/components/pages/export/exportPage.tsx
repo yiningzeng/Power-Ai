@@ -1,4 +1,4 @@
-import React from "react";
+import React, {Fragment} from "react";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import { RouteComponentProps } from "react-router-dom";
@@ -6,8 +6,10 @@ import IProjectActions, * as projectActions from "../../../../redux/actions/proj
 import ExportForm from "./exportForm";
 import { IProject, IApplicationState, IExportFormat } from "../../../../models/applicationState";
 import { strings } from "../../../../common/strings";
+import DraggableDialog from "../../common/draggableDialog/draggableDialog";
 import { ExportAssetState } from "../../../../providers/export/exportProvider";
 import { toast } from "react-toastify";
+import Confirm from "../../common/confirm/confirm";
 
 /**
  * Properties for Export Page
@@ -47,6 +49,8 @@ export default class ExportPage extends React.Component<IExportPageProps> {
         },
     };
 
+    private draggableDialog: React.RefObject<DraggableDialog> = React.createRef();
+
     constructor(props, context) {
         super(props, context);
 
@@ -67,6 +71,16 @@ export default class ExportPage extends React.Component<IExportPageProps> {
 
         return (
             <div className="m-3">
+                <DraggableDialog
+                    title={strings.export.messages.title}
+                    ref={this.draggableDialog}
+                    content={strings.export.messages.content}
+                    disableBackdropClick={true}
+                    disableEscapeKeyDown={true}
+                    fullWidth={true}
+                    onDone={() => this.props.history.goBack()}
+                    onCancel={() => this.draggableDialog.current.close()}
+                />
                 <h3>
                     <i className="fas fa-sliders-h fa-1x"></i>
                     <span className="px-2">
@@ -84,31 +98,33 @@ export default class ExportPage extends React.Component<IExportPageProps> {
     }
 
     private onFormSubmit = async (exportFormat: IExportFormat) => {
+
+        this.draggableDialog.current.open();
         const projectToUpdate: IProject = {
             ...this.props.project,
             exportFormat,
         };
 
         await this.props.actions.saveProject(projectToUpdate);
-        toast.success(strings.export.messages.saveSuccess);
-
         // region 导出
-        const infoId = toast.info(`Started export for ${this.props.project.name}...`, { autoClose: false });
+        // const infoId = toast.info(`Started export for ${this.props.project.name}...`, { autoClose: false });
         const exportTrain = await this.props.actions.exportTrainConfig(this.props.project);
-        if (!exportTrain || exportTrain ) {
-            toast.success(`导出训练配置文件成功`);
-        }
+        // if (!exportTrain || exportTrain ) {
+            // toast.success(`导出训练配置文件成功`);
+        // }
+        // const res = await this.props.actions.packageProject(projectToUpdate);
+        // this.draggableDialog.current.change("导出", JSON.stringify(res));
         const results = await this.props.actions.exportProject(this.props.project);
-        toast.dismiss(infoId);
-
+        // toast.dismiss(infoId);
         if (!results || (results && results.errors.length === 0)) {
-            toast.success(`Export completed successfully!`);
+            this.draggableDialog.current.change("导出完成", "导出成功，确定返回上一页", true, true);
         } else if (results && results.errors.length > 0) {
-            toast.warn(`Successfully exported ${results.completed.length}/${results.count} assets`);
+            this.draggableDialog.current.change("导出不全",
+                `成功的导出了 ${results.completed.length}/${results.count} 素材，但导出不全，请检查`, true, true);
+            // toast.warn(`成功的导出了 ${results.completed.length}/${results.count} 素材，但导出不全，请检查`);
         }
         // endregion
-
-        this.props.history.goBack();
+        // this.props.history.goBack();
     }
 
     private onFormCancel() {

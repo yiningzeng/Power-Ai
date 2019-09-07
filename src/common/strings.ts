@@ -26,9 +26,16 @@ export interface IAppStrings {
         restore: string;
         close: string;
     };
+    assetsFolderBar: {
+        addFolder: string;
+        importAssets: string;
+    };
     homePage: {
         newProject: string;
         openLocalProject: {
+            title: string;
+        },
+        openTransferProject: {
             title: string;
         },
         openCloudProject: {
@@ -122,6 +129,10 @@ export interface IAppStrings {
         totalRegionCount: string;
         totalTagCount: string;
         avgTagCountPerAsset: string;
+        currentAsset: {
+            name: string;
+            size: string
+        }
     };
     tags: {
         title: string;
@@ -222,6 +233,18 @@ export interface IAppStrings {
         height: string;
         tagged: string;
         visited: string;
+        assetsFolderBar: {
+            importTaggedAssets: {
+                progress: {
+                    title: string;
+                    content: string;
+                },
+                done: {
+                    title: string;
+                    content: string;
+                },
+            },
+        };
         toolbar: {
             select: string;
             pan: string;
@@ -237,6 +260,7 @@ export interface IAppStrings {
             nextAsset: string;
             saveProject: string;
             exportProject: string;
+            transferProject: string;
             activeLearning: string;
             trainAi: string;
         }
@@ -387,8 +411,13 @@ export interface IAppStrings {
             coco: {
                 displayName: string,
             },
+            powerAi: {
+                displayName: string,
+            },
         },
         messages: {
+            title: string,
+            content: string,
             saveSuccess: string;
         },
     };
@@ -407,6 +436,15 @@ export interface IAppStrings {
                 displayName: string,
             },
         }
+        messages: {
+            title: string,
+            content: string,
+            success: string;
+            fail: string;
+        },
+    };
+    remoteTrainSettings: {
+      ip: string;
     };
     trainSettings: {
         title: string;

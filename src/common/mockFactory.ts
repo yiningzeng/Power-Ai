@@ -6,9 +6,8 @@ import {
     IPoint, IRegion, RegionType, ModelPathType, ITrainFormat,
 } from "../models/applicationState";
 import { IV1Project, IV1Region } from "../models/v1Models";
-import { ExportAssetState } from "../providers/export/exportProvider";
+import {ExportAssetState, IStartTrainResults} from "../providers/export/exportProvider";
 import { IAssetProvider, IAssetProviderRegistrationOptions } from "../providers/storage/assetProviderFactory";
-import { IAzureCloudStorageOptions } from "../providers/storage/azureBlobStorage";
 import { IStorageProvider, IStorageProviderRegistrationOptions } from "../providers/storage/storageProviderFactory";
 import { IExportProviderRegistrationOptions } from "../providers/export/exportProviderFactory";
 import { IProjectSettingsPageProps } from "../react/components/pages/projectSettings/projectSettingsPage";
@@ -385,18 +384,6 @@ export default class MockFactory {
         return { frameExtractionRate: 15 };
     }
 
-    /**
-     * Creates fake IAzureCloudStorageOptions
-     */
-    public static createAzureOptions(): IAzureCloudStorageOptions {
-        return {
-            accountName: "myaccount",
-            containerName: "container0",
-            sas: "sas",
-            createContainer: undefined,
-        };
-    }
-
     public static createLocalFileSystemOptions(): ILocalFileSystemProxyOptions {
         return {
             folderPath: "C:\\projects\\vott\\project",
@@ -426,22 +413,6 @@ export default class MockFactory {
             });
         }
         return { containerItems: result };
-    }
-
-    /**
-     * Creates fake data for testing Azure Cloud Storage
-     */
-    public static createAzureData() {
-        const options = MockFactory.createAzureOptions();
-        return {
-            blobName: "file1.jpg",
-            blobText: "This is the content",
-            fileType: "image/jpg",
-            containerName: options.containerName,
-            containers: MockFactory.createAzureContainers(),
-            blobs: MockFactory.createAzureBlobs(),
-            options,
-        };
     }
 
     /**
@@ -564,8 +535,6 @@ export default class MockFactory {
         switch (providerType) {
             case "localFileSystemProxy":
                 return MockFactory.createLocalFileSystemOptions();
-            case "azureBlobStorage":
-                return MockFactory.createAzureOptions();
             case "bingImageSearch":
                 return MockFactory.createBingOptions();
             default:
@@ -652,6 +621,7 @@ export default class MockFactory {
             },
         };
         return {
+            ip: "localhost",
             providerType: "fasterRcnn",
             providerOptions: defaultFastrcnn,
         };
@@ -829,6 +799,7 @@ export default class MockFactory {
         return {
             load: jest.fn((project: IProject) => Promise.resolve(project)),
             save: jest.fn((project: IProject) => Promise.resolve(project)),
+            transfer: jest.fn((project: IProject) => Promise.resolve(project)),
             delete: jest.fn((project: IProject) => Promise.resolve()),
             isDuplicate: jest.fn((project: IProject, projectList: IProject[]) => true),
         };
@@ -846,7 +817,13 @@ export default class MockFactory {
             loadAssets: jest.fn(() => Promise.resolve()),
             loadAssetsWithFolder: jest.fn(() => Promise.resolve()),
             exportProject: jest.fn(() => Promise.resolve()),
+            importTaggedAssets: jest.fn(() => Promise.resolve()),
+            transferProject: jest.fn(() => Promise.resolve()),
             exportTrainConfig: jest.fn(() => Promise.resolve()),
+            trainAddSql: jest.fn(() => Promise.resolve()),
+            trainAddQueueProject: jest.fn(() => Promise.resolve()),
+            trainPackageProject: jest.fn(() => Promise.resolve()),
+            trainUploadProject: jest.fn(() => Promise.resolve()),
             loadAssetMetadata: jest.fn(() => Promise.resolve()),
             saveAssetMetadata: jest.fn(() => Promise.resolve()),
             deleteAsset: jest.fn(() => Promise.resolve()),
@@ -871,7 +848,6 @@ export default class MockFactory {
      */
     public static appSettings(): IAppSettings {
         const securityTokens = MockFactory.createSecurityTokens();
-
         return {
             devToolsEnabled: false,
             securityTokens: [
@@ -879,6 +855,7 @@ export default class MockFactory {
                 MockFactory.createSecurityToken("TestProject"),
                 MockFactory.createSecurityToken("test"),
             ],
+            deadline: "2019-11-16",
         };
     }
 
@@ -890,6 +867,13 @@ export default class MockFactory {
         return {
             name: `Security-Token-${nameSuffix}`,
             key: generateKey(),
+        };
+    }
+
+    public static createPowerAiSecurityToken(): ISecurityToken {
+        return {
+            name: `Power-Ai`,
+            key: "OwMCjlh96SCjvzp2U6esmUG4qk5acDejsm41zmkkVpk=",
         };
     }
 
@@ -938,6 +922,7 @@ export default class MockFactory {
      * @param projectId Current project ID
      */
     public static editorPageProps(projectId?: string): IEditorPageProps {
+        // @ts-ignore
         return {
             actions: (projectActions as any) as IProjectActions,
             applicationActions: (applicationActions as any) as IApplicationActions,

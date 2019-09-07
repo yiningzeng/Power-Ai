@@ -1,6 +1,7 @@
 // 控制滚轮缩放
 const zoom = (onWheelEvent, callback) => {
     console.log(onWheelEvent);
+    console.log(`啦啦: ${onWheelEvent.deltaX}, ${onWheelEvent.deltaY}, ${onWheelEvent.deltaZ}`);
     // // console.log("zoom: width" + dom.style.width +" left" +dom.style.left);
     let e = onWheelEvent;
     callback(e.deltaY);

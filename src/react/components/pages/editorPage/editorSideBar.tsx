@@ -105,8 +105,8 @@ export default class EditorSideBar extends React.Component<IEditorSideBarProps, 
     private rowRenderer = ({ key, index, style }): JSX.Element => {
         const asset = this.props.assets[index];
         const selectedAsset = this.props.selectedAsset;
-        console.log("EditorSideBar chinese: " + decodeURI(asset.name));
-        console.log("EditorSideBar asset: " + JSON.stringify(asset));
+        // console.log("EditorSideBar chinese: " + decodeURI(asset.name));
+        // console.log("EditorSideBar asset: " + JSON.stringify(this.props.assets));
         return (
             <div key={key} style={style}
                 className={this.getAssetCssClassNames(asset, selectedAsset)}

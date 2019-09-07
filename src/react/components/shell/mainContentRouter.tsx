@@ -4,6 +4,7 @@ import HomePage from "../pages/homepage/homePage";
 import ActiveLearningPage from "../pages/activeLearning/activeLearningPage";
 // import TrainSettingsPage from "../pages/trainSettings/trainSettingsPage";
 import TrainPage from "../pages/train/trainPage";
+import RemoteTrainPage from "../pages/remoteTrain/remoteTrainPage";
 import AppSettingsPage from "../pages/appSettings/appSettingsPage";
 import ConnectionPage from "../pages/connections/connectionsPage";
 import EditorPage from "../pages/editorPage/editorPage";
@@ -29,6 +30,7 @@ export default function MainContentRouter() {
                 <Route path="/projects/:projectId/active-learning" component={ActiveLearningPage} />
                 {/*<Route path="/projects/:projectId/train-settings" component={TrainSettingsPage} />*/}
                 <Route path="/projects/:projectId/train" component={TrainPage} />
+                <Route path="/projects/:projectId/remote-train-page" component={RemoteTrainPage} />
                 <Route component={HomePage} />
             </Switch>
         </div>

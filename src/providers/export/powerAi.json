@@ -1,6 +1,6 @@
 {
     "type": "object",
-    "title": "${strings.export.providers.vottJson.displayName}",
+    "title": "${strings.export.providers.powerAi.displayName}",
     "properties": {
         "assetState": {
             "type": "string",
@@ -11,18 +11,12 @@
                 "visited",
                 "tagged"
             ],
-            "default": "visited",
+            "default": "all",
             "enumNames": [
                 "${strings.export.providers.common.properties.assetState.options.all}",
                 "${strings.export.providers.common.properties.assetState.options.visited}",
                 "${strings.export.providers.common.properties.assetState.options.tagged}"
             ]
-        },
-        "includeImages": {
-            "type": "boolean",
-            "default": true,
-            "title": "${strings.export.providers.vottJson.properties.includeImages.title}",
-            "description": "${strings.export.providers.vottJson.properties.includeImages.description}"
         }
     }
 }

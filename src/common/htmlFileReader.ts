@@ -85,16 +85,45 @@ export default class HtmlFileReader {
             data = await this.getAssetFrameImage(asset);
         } else {
             // Download the asset binary from the storage provider
-            const response = await axios.get<Blob>(asset.path, config);
-            if (response.status !== 200) {
-                throw new Error("Error downloading asset binary");
+            try {
+                const response = await axios.get<Blob>(asset.path, config);
+                if (response.status !== 200) {
+                    return null;
+                }
+                data = await response.data;
+            } catch (e) {
+                return null;
             }
-            data = await response.data;
         }
 
         return data;
     }
 
+    public static async getAssetTransferBlob(asset: IAsset): Promise<Blob> {
+        Guard.null(asset);
+
+        const config: AxiosRequestConfig = {
+            responseType: "blob",
+        };
+
+        let data = null;
+        if (asset.type === AssetType.VideoFrame) {
+            data = await this.getAssetFrameImage(asset);
+        } else {
+            // Download the asset binary from the storage provider
+            try {
+                const response = await axios.get<Blob>(asset.path, config);
+                if (response.status !== 200) {
+                    return null;
+                }
+                data = await response.data;
+            } catch (e) {
+                return null;
+            }
+        }
+
+        return data;
+    }
     /**
      * Downloads the binary array from the asset path
      * @param asset The asset to download

@@ -23,10 +23,17 @@ export const chinese: IAppStrings = {
         restore: "恢复",
         close: "关闭",
     },
+    assetsFolderBar: {
+        addFolder: "新增素材文件夹",
+        importAssets: "导入已经标注的素材文件夹",
+    },
     homePage: {
         newProject: "新建项目",
         openLocalProject: {
             title: "打开本地项目",
+        },
+        openTransferProject: {
+            title: "打开迁移的项目",
         },
         openCloudProject: {
             title: "打开线上项目",
@@ -111,14 +118,18 @@ export const chinese: IAppStrings = {
         title: "Project Metrics",
         assetsSectionTitle: "Assets",
         totalAssetCount: "Total Assets",
-        visitedAssets: "Visited Assets (${count})",
-        taggedAssets: "Tagged Assets (${count})",
-        nonTaggedAssets: "Not Tagged Assets (${count})",
-        nonVisitedAssets: "Not Visited Assets (${count})",
+        visitedAssets: "查看的素材 (${count})",
+        taggedAssets: "标记的素材 (${count})",
+        nonTaggedAssets: "未标记的素材 (${count})",
+        nonVisitedAssets: "未查看的素材 (${count})",
         tagsSectionTitle: "Tags & Labels",
         totalRegionCount: "Total Tagged Regions",
         totalTagCount: "Total Tags",
         avgTagCountPerAsset: "Average tags per asset",
+        currentAsset: {
+            name: "当前素材名称",
+            size: "当前素材尺寸",
+        },
     },
     tags: {
         title: "标签",
@@ -222,6 +233,18 @@ export const chinese: IAppStrings = {
         height: "高",
         tagged: "Tagged",
         visited: "Visited",
+        assetsFolderBar: {
+            importTaggedAssets: {
+                progress: {
+                    title: "正在导入",
+                    content: "请耐心等待，去喝杯咖啡再来吧",
+                },
+                done: {
+                    title: "导入完成",
+                    content: "已经成功导入，可在素材文件夹列表查看",
+                },
+            },
+        },
         toolbar: {
             select: "选择",
             pan: "Pan",
@@ -236,7 +259,8 @@ export const chinese: IAppStrings = {
             previousAsset: "上一个",
             nextAsset: "下一个",
             saveProject: "保存项目",
-            exportProject: "导出项目",
+            exportProject: "导出训练素材",
+            transferProject: "迁移项目",
             activeLearning: "自动标注当前素材",
             trainAi: "开始训练",
         },
@@ -258,20 +282,19 @@ export const chinese: IAppStrings = {
             title: "切换帮助菜单",
             escape: "退出帮助菜单",
         },
-        assetError: "Unable to load asset",
+        assetError: "加载素材失败",
         tags: {
             hotKey: {
                 apply: "设置标签快捷键",
                 lock: "锁定标签快捷键",
             },
             rename: {
-                title: "Rename Tag",
-                confirmation: "Are you sure you want to rename this tag? It will be renamed throughout all assets",
+                title: "重命名标签",
+                confirmation: "确定要重命名标签么？这将会把所有的已打标的素材更改",
             },
             delete: {
-                title: "Delete Tag",
-                confirmation: "Are you sure you want to delete this tag? It will be deleted throughout all assets \
-                and any regions where this is the only tag will also be deleted",
+                title: "删除标签",
+                confirmation: "确定要删除标签么？这会删除所有素材中已经打标的标签",
             },
         },
         canvas: {
@@ -286,9 +309,9 @@ export const chinese: IAppStrings = {
         },
         messages: {
             enforceTaggedRegions: {
-                title: "Invalid region(s) detected",
+                title: "检测到未标记的框",
                 // tslint:disable-next-line:max-line-length
-                description: "1 or more regions have not been tagged.  Ensure all regions are tagged before continuing to next asset.",
+                description: "一个或者多个框未打标，请确认",
             },
         },
     },
@@ -389,8 +412,13 @@ export const chinese: IAppStrings = {
             coco: {
                 displayName: "CoCo",
             },
+            powerAi: {
+                displayName: "PowerAi(可导入到其他项目)",
+            },
         },
         messages: {
+            title: "正在导出",
+            content: "请耐心等待，去喝杯咖啡再来吧",
             saveSuccess: "已成功保存导出设置",
         },
     },
@@ -409,6 +437,15 @@ export const chinese: IAppStrings = {
                 displayName: "Yolo v3",
             },
         },
+        messages: {
+            title: "正在处理...",
+            content: "请耐心等待，去喝杯咖啡再来吧",
+            success: "处理完成，训练素材已经上传到服务器",
+            fail: "处理失败，请检查",
+        },
+    },
+    remoteTrainSettings: {
+        ip: "训练服务器ip",
     },
     trainSettings: {
         title: "训练设置",

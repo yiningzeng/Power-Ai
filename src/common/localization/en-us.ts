@@ -23,10 +23,17 @@ export const english: IAppStrings = {
         restore: "Restore",
         close: "Close",
     },
+    assetsFolderBar: {
+        addFolder: "Add Assets Folder",
+        importAssets: "Import Tagged Assets",
+    },
     homePage: {
         newProject: "New Project",
         openLocalProject: {
             title: "Open Local Project",
+        },
+        openTransferProject: {
+            title: "Open Local Transfer Project",
         },
         openCloudProject: {
             title: "Open Cloud Project",
@@ -120,6 +127,10 @@ export const english: IAppStrings = {
         totalRegionCount: "Total Tagged Regions",
         totalTagCount: "Total Tags",
         avgTagCountPerAsset: "Average tags per asset",
+        currentAsset: {
+            name: "Current Asset's Name",
+            size: "Current Asset's Size",
+        },
     },
     tags: {
         title: "Tags",
@@ -223,6 +234,18 @@ export const english: IAppStrings = {
         height: "Height",
         tagged: "Tagged",
         visited: "Visited",
+        assetsFolderBar: {
+            importTaggedAssets: {
+                progress: {
+                    title: "Importing",
+                    content: "Please be patient and have a cup of coffee.",
+                },
+                done: {
+                    title: "Import success",
+                    content: "Assets has been successfully imported",
+                },
+            },
+        },
         toolbar: {
             select: "Select (V)",
             pan: "Pan",
@@ -237,7 +260,8 @@ export const english: IAppStrings = {
             previousAsset: "Previous Asset",
             nextAsset: "Next Asset",
             saveProject: "Save Project",
-            exportProject: "Export Project",
+            exportProject: "Export Train Assets",
+            transferProject: "Transfer Project",
             activeLearning: "Active Learning",
             trainAi: "Start Learning",
         },
@@ -388,10 +412,15 @@ export const english: IAppStrings = {
                 displayName: "Microsoft Cognitive Toolkit (CNTK)",
             },
             coco: {
-                displayName: "coco",
+                displayName: "CoCo",
+            },
+            powerAi: {
+                displayName: "PowerAi",
             },
         },
         messages: {
+            title: "exporting",
+            content: "Please be patient and have a cup of coffee.",
             saveSuccess: "Successfully saved export settings",
         },
     },
@@ -410,6 +439,15 @@ export const english: IAppStrings = {
                 displayName: "Yolo v3",
             },
         },
+        messages: {
+            title: "processing...",
+            content: "Please be patient and have a cup of coffee.",
+            success: "Training assets has been uploaded to the server",
+            fail: "failed, please check",
+        },
+    },
+    remoteTrainSettings: {
+        ip: "server ip",
     },
     trainSettings: {
         title: "Train Settings",

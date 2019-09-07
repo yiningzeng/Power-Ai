@@ -2,9 +2,8 @@ import { ExportProviderFactory } from "./providers/export/exportProviderFactory"
 import { TrainProviderFactory } from "./providers/trainSettings/trainProviderFactory";
 import { PascalVOCExportProvider } from "./providers/export/pascalVOC";
 import { TFRecordsExportProvider } from "./providers/export/tensorFlowRecords";
-import { VottJsonExportProvider } from "./providers/export/vottJson";
+import { PowerAiExportProvider } from "./providers/export/powerAi";
 import { AssetProviderFactory } from "./providers/storage/assetProviderFactory";
-import { AzureBlobStorage } from "./providers/storage/azureBlobStorage";
 import { BingImageSearch } from "./providers/storage/bingImageSearch";
 import { LocalFileSystemProxy } from "./providers/storage/localFileSystemProxy";
 import { StorageProviderFactory } from "./providers/storage/storageProviderFactory";
@@ -29,12 +28,6 @@ export default function registerProviders() {
         platformSupport: HostProcessType.Electron,
         factory: (options) => new LocalFileSystemProxy(options),
     });
-    StorageProviderFactory.register({
-        name: "azureBlobStorage",
-        displayName: strings.connections.providers.azureBlob.title,
-        factory: (options) => new AzureBlobStorage(options),
-    });
-
     // Asset Providers
     AssetProviderFactory.register({
         name: "localFileSystemProxy",
@@ -54,11 +47,6 @@ export default function registerProviders() {
     // });
 
     // Export Providers
-    // ExportProviderFactory.register({
-    //     name: "vottJson",
-    //     displayName: strings.export.providers.vottJson.displayName,
-    //     factory: (project, options) => new VottJsonExportProvider(project, options),
-    // });
     ExportProviderFactory.register({
         name: "coco",
         displayName: strings.export.providers.coco.displayName,
@@ -73,6 +61,11 @@ export default function registerProviders() {
         name: "tensorFlowRecords",
         displayName: strings.export.providers.tfRecords.displayName,
         factory: (project, options) => new TFRecordsExportProvider(project, options),
+    });
+    ExportProviderFactory.register({
+        name: "powerAi",
+        displayName: strings.export.providers.powerAi.displayName,
+        factory: (project, options) => new PowerAiExportProvider(project, options),
     });
     // ExportProviderFactory.register({
     //     name: "azureCustomVision",
@@ -101,6 +94,11 @@ export default function registerProviders() {
         displayName: strings.train.providers.maskRcnn.displayName,
         factory: (project, options) => new MaskRcnnProvider(project, options),
     });
+    // TrainProviderFactory.register({
+    //     name: "remoteTrain",
+    //     displayName: strings.train.providers.maskRcnn.displayName,
+    //     factory: (project, options) => new MaskRcnnProvider(project, options),
+    // });
     // TrainProviderFactory.register({
     //     name: "fpn",
     //     displayName: "FPN",

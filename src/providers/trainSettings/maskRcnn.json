@@ -1,9 +1,15 @@
 {
     "type": "object",
-    "title": "${strings.train.providers.fasterRcnn.displayName}",
+    "title": "${strings.train.providers.maskRcnn.displayName}",
     "properties": {
+        "maskRcnnImage": {
+            "type": "string",
+            "title": "镜像版本",
+            "description": "训练镜像使用的版本",
+            "default": "registry.cn-hangzhou.aliyuncs.com/baymin/ai-power:ai-power-wo-auto-v4.2"
+        },
         "detectron": {
-            "title": "网络参数",
+            "title": "",
             "type": "object",
             "properties": {
                 "layerNumbEnum": {

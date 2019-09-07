@@ -11,7 +11,7 @@ import { ExportProviderFactory } from "../providers/export/exportProviderFactory
 import { generateKey } from "../common/crypto";
 import { encryptProject, decryptProject } from "../common/utils";
 import { ExportAssetState } from "../providers/export/exportProvider";
-import { IVottJsonExportProviderOptions } from "../providers/export/vottJson";
+import { IPowerAiExportProviderOptions } from "../providers/export/powerAi";
 
 describe("Project Service", () => {
     let projectSerivce: IProjectService = null;
@@ -85,7 +85,7 @@ describe("Project Service", () => {
         testProject.exportFormat = null;
         const result = await projectSerivce.save(testProject, securityToken);
 
-        const vottJsonExportProviderOptions: IVottJsonExportProviderOptions = {
+        const vottJsonExportProviderOptions: IPowerAiExportProviderOptions = {
             assetState: ExportAssetState.Visited,
             includeImages: true,
         };

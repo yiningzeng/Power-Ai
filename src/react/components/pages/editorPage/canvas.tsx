@@ -2,7 +2,7 @@ import React, {Fragment, ReactElement} from "react";
 import * as shortid from "shortid";
 import {CanvasTools} from "aipower-ct";
 import {RegionData, RegionDataType} from "aipower-ct/lib/js/CanvasTools/Core/RegionData";
-import {EditorMode, IAssetMetadata, IPoint, IProject, IRegion, RegionType,} from "../../../../models/applicationState";
+import {EditorMode, IAssetMetadata, IPoint, IProject, IRegion, RegionType} from "../../../../models/applicationState";
 import CanvasHelpers from "./canvasHelpers";
 import {AssetPreview, ContentSource} from "../../common/assetPreview/assetPreview";
 import {Editor} from "aipower-ct/lib/js/CanvasTools/CanvasTools.Editor";
@@ -147,6 +147,12 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
         );
     }
 
+    public enableCanvas = (b): void => {
+       this.setState({
+           ...this.state,
+           enabled: b,
+       });
+    }
     /**
      * Toggles tag on all selected regions
      * @param selectedTag Tag name
@@ -310,9 +316,9 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
             },
             points: scaledRegionData.points,
         };
-        console.log(`画笔： onSelectionEnd->regionData(初始数据) ${JSON.stringify(regionData)}`);
-        console.log(`画笔： onSelectionEnd->scaledRegionData(转换后数据) ${JSON.stringify(scaledRegionData)}`);
-        console.log(`画笔： onSelectionEnd->newRegion ${JSON.stringify(newRegion)}`);
+        // console.log(`画笔： onSelectionEnd->regionData(初始数据) ${JSON.stringify(regionData)}`);
+        // console.log(`画笔： onSelectionEnd->scaledRegionData(转换后数据) ${JSON.stringify(scaledRegionData)}`);
+        // console.log(`画笔： onSelectionEnd->newRegion ${JSON.stringify(newRegion)}`);
         if (lockedTags && lockedTags.length) {
             this.editor.RM.updateTagsById(id, CanvasHelpers.getTagsDescriptor(this.props.project.tags, newRegion));
         }
@@ -628,15 +634,17 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
 
         const canvas = this.canvasZone.current;
         if (canvas) {
-            console.log(`画笔： ${this.props.editorMode}@@@ ${this.props.editorMode !== EditorMode.Pencil}`);
+            // console.log(`画笔： ${this.props.editorMode}@@@ ${this.props.editorMode !== EditorMode.Pencil}`);
             if (this.props.editorMode !== EditorMode.Pencil) {
                 canvas.removeEventListener("mousedown", this.mousedown);
                 canvas.removeEventListener("mouseup", this.mouseup);
                 canvas.removeEventListener("mousemove", this.mousemove);
+                console.log("removeeeeeeeeeee");
             } else {
                 canvas.addEventListener("mousedown", this.mousedown);
                 canvas.addEventListener("mouseup", this.mouseup);
                 canvas.addEventListener("mousemove", this.mousemove);
+                console.log("addddddddddddd");
             }
             // canvas.addEventListener("click", (e) => { alert(e.offsetX + " " + e.offsetY); });
             const boundingBox = createContentBoundingBox(contentSource);

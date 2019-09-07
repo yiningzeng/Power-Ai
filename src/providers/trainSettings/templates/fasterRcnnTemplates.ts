@@ -27,6 +27,14 @@ export const fasterRcnnTemplate = "MODEL:\n" +
     "  MAX_SIZE: ${TRAIN_MAX_SIZE}\n" +
     "  BATCH_SIZE_PER_IM: ${TRAIN_BATCH_SIZE_PER_IM}\n" +
     "  RPN_PRE_NMS_TOP_N: ${TRAIN_RPN_PRE_NMS_TOP_N}\n" +
+    "  NEGATIVE: ${NEGATIVE}\n" +
+    "  MULTI_SCALE: ${MULTI_SCALE}\n" +
+    "  CROP_SCALE: ${CROP_SCALE}\n" +
+    "  MULTI_COLOR: ${MULTI_COLOR}\n" +
+    "  ROTATION: ${ROTATION}\n" +
+    "  ROT: ${ROT}\n" +
+    "  ROT_RANDOM: ${ROT_RANDOM}\n" +
+    "  ROT_RANDOM_ANGLE: ${ROT_RANDOM_ANGLE}\n" +
     "TEST:\n" +
     "  DATASETS: ${TEST_DATASETS}\n" +
     "  SCALE: ${TEST_SCALE}\n" +
