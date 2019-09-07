@@ -25,6 +25,8 @@ import { IExportFormat } from "vott-react";
 import { IPowerAiExportProviderOptions } from "../../providers/export/powerAi";
 import {TrainProviderFactory} from "../../providers/trainSettings/trainProviderFactory";
 import { decryptProviderOptions } from "../../common/utils";
+import {constants} from "../../common/constants";
+import _ from "lodash";
 
 /**
  * Actions to be performed in relation to projects
@@ -35,6 +37,7 @@ export default interface IProjectActions {
     deleteProject(project: IProject): Promise<void>;
     closeProject(): void;
     exportProject(project: IProject): Promise<void> | Promise<IExportResults>;
+    importTaggedAssets(project: IProject, folder: string): Promise<IProject>;
     transferProject(project: IProject): Promise<void>;
     exportTrainConfig(project: IProject): Promise<void> | Promise<ITrainConfigResults>;
     trainAddQueueProject(project: IProject, source: IStartTrainResults): Promise<IStartTrainResults>;
@@ -341,6 +344,35 @@ export function exportProject(project: IProject): (dispatch: Dispatch) => Promis
 
             return results as IExportResults;
         }
+    };
+}
+
+export function importTaggedAssets(project: IProject, folder: string):
+    (dispatch: Dispatch, getState: () => IApplicationState) => Promise<IProject> {
+    return async (dispatch: Dispatch, getState: () => IApplicationState) => {
+        const appState = getState();
+        const projectService = new ProjectService();
+        if (projectService.isDuplicate(project, appState.recentProjects)) {
+            throw new AppError(ErrorCode.ProjectDuplicateName, `Project with name '${project.name}
+                already exists with the same target connection '${project.targetConnection.name}'`);
+        }
+        let projectToken = appState.appSettings.securityTokens
+            .find((securityToken) => securityToken.name === project.securityToken);
+        if (project.version !== "2.0.0") {
+            projectToken = {
+                name: "Power-Ai",
+                key: "OwMCjlh96SCjvzp2U6esmUG4qk5acDejsm41zmkkVpk=",
+            };
+        }
+        if (!projectToken) {
+            throw new AppError(ErrorCode.SecurityTokenNotFound, "Security Token Not Found");
+        }
+        const updatedProject = await projectService.importTaggedAssets(project, folder);
+        await saveProject(updatedProject)(dispatch, getState);
+        dispatch(saveProjectAction(updatedProject));
+        // Reload project after save actions
+        await loadProject(updatedProject)(dispatch, getState);
+        return updatedProject;
     };
 }
 

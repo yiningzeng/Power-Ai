@@ -64,6 +64,8 @@ import Paper, { PaperProps } from "@material-ui/core/Paper";
 import Draggable from "react-draggable";
 import { makeStyles } from "@material-ui/styles";
 import LinearProgress from "@material-ui/core/LinearProgress";
+import {constants} from "../../../../common/constants";
+import DraggableDialog from "../../common/draggableDialog/draggableDialog";
 function PaperComponent(props: PaperProps) {
     return (
         <Draggable cancel={'[class*="MuiDialogContent-root"]'}>
@@ -185,6 +187,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
     private deleteTagConfirm: React.RefObject<Confirm> = React.createRef();
     private deleteSourceProviderConfirm: React.RefObject<Confirm> = React.createRef();
     private deleteConfirm: React.RefObject<Confirm> = React.createRef();
+    private draggableDialog: React.RefObject<DraggableDialog> = React.createRef();
 
     constructor(props, context) {
         super(props, context);
@@ -321,9 +324,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                 title="素材文件夹"
                                 Component={SourceItem}
                                 items={this.state.treeList}
-                                onImportTaggedAssetsFolder={async () => {
-                                    alert("hahhahaaha");
-                                }}
+                                onImportTaggedAssetsFolder={this.onImportTaggedAssets}
                                 onAddClick={async () => {
                                     console.log("新增文件夹");
                                     const filePath = await this.localFileSystem.selectContainer();
@@ -523,6 +524,19 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                     message={strings.editorPage.messages.enforceTaggedRegions.description}
                     closeButtonColor="info"
                     onClose={() => this.setState({ showInvalidRegionWarning: false })} />
+                <DraggableDialog
+                    title={strings.editorPage.assetsFolderBar.importTaggedAssets.progress.title}
+                    ref={this.draggableDialog}
+                    content={strings.editorPage.assetsFolderBar.importTaggedAssets.progress.content}
+                    disableBackdropClick={true}
+                    disableEscapeKeyDown={true}
+                    fullWidth={true}
+                    onDone={() => {
+                        this.draggableDialog.current.close();
+                        location.reload();
+                    }}
+                    onCancel={() => this.draggableDialog.current.close()}
+                />
             </div>
         );
     }
@@ -569,6 +583,20 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         await this.deleteAssetsAndRefreshProjectAssets(finalProject);
         // console.log(`删除素材fuck 222：${JSON.stringify(this.props.project)}`);
         // this.updateRootAssets();
+    }
+
+    /**
+     * 导入已经标记的素材
+     */
+    private onImportTaggedAssets = async (): Promise<void> => {
+        const fileFolder = await this.localFileSystem.selectContainer();
+        if (!fileFolder) return;
+        this.draggableDialog.current.open();
+        const updateProject = await this.props.actions.importTaggedAssets(this.props.project, fileFolder);
+        await this.props.actions.saveProject(updateProject);
+        this.draggableDialog.current.change(strings.editorPage.assetsFolderBar.importTaggedAssets.done.title,
+            strings.editorPage.assetsFolderBar.importTaggedAssets.done.content,
+            true);
     }
 
     /**
@@ -1048,7 +1076,6 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         const selectedRootAsset = this.state.selectedAsset.asset.parent || this.state.selectedAsset.asset;
         const currentIndex = this.state.assets
             .findIndex((asset) => asset.id === selectedRootAsset.id);
-
         if (direction > 0) {
             await this.selectAsset(this.state.assets[Math.min(this.state.assets.length - 1, currentIndex + 1)]);
         } else {
@@ -1065,6 +1092,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
     }
 
     private selectAsset = async (asset: IAsset): Promise<void> => {
+
         // Nothing to do if we are already on the same asset.
         if (this.state.selectedAsset && this.state.selectedAsset.asset.id === asset.id) {
             return;
@@ -1076,8 +1104,6 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         }
 
         const assetMetadata = await this.props.actions.loadAssetMetadata(this.props.project, asset);
-        // 主要是这里加载
-        console.log(`迁移: ${JSON.stringify(assetMetadata)}`);
         try {
             if (!assetMetadata.asset.size) {
                 const assetProps = await HtmlFileReader.readAssetAttributes(asset);
@@ -1112,7 +1138,6 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
             .concat(sourceAssets)
             .uniqBy((asset) => asset.id)
             .value();
-        console.log(`删除素材fuck 33333：${JSON.stringify(rootAssets)}`);
         const lastVisited = rootAssets.find((asset) => asset.id === this.props.project.lastVisitedAssetId);
 
         this.setState({
@@ -1132,7 +1157,6 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         this.setState({
             assets: newAssets,
         });
-        console.log(`好可怜a${JSON.stringify(finalProject)}`);
         // await this.props.actions.saveProject(finalProject);
     }
 

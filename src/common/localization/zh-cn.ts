@@ -233,6 +233,18 @@ export const chinese: IAppStrings = {
         height: "高",
         tagged: "Tagged",
         visited: "Visited",
+        assetsFolderBar: {
+            importTaggedAssets: {
+                progress: {
+                    title: "正在导入",
+                    content: "请耐心等待，去喝杯咖啡再来吧",
+                },
+                done: {
+                    title: "导入完成",
+                    content: "已经成功导入，可在素材文件夹列表查看",
+                },
+            },
+        },
         toolbar: {
             select: "选择",
             pan: "Pan",

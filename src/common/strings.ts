@@ -233,6 +233,18 @@ export interface IAppStrings {
         height: string;
         tagged: string;
         visited: string;
+        assetsFolderBar: {
+            importTaggedAssets: {
+                progress: {
+                    title: string;
+                    content: string;
+                },
+                done: {
+                    title: string;
+                    content: string;
+                },
+            },
+        };
         toolbar: {
             select: string;
             pan: string;

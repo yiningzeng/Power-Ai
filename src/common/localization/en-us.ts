@@ -234,6 +234,18 @@ export const english: IAppStrings = {
         height: "Height",
         tagged: "Tagged",
         visited: "Visited",
+        assetsFolderBar: {
+            importTaggedAssets: {
+                progress: {
+                    title: "Importing",
+                    content: "Please be patient and have a cup of coffee.",
+                },
+                done: {
+                    title: "Import success",
+                    content: "Assets has been successfully imported",
+                },
+            },
+        },
         toolbar: {
             select: "Select (V)",
             pan: "Pan",
