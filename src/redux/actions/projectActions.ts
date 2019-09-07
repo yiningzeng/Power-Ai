@@ -241,18 +241,19 @@ export function deleteAsset(project: IProject, selectAsset: IAsset)
         const currentProject = getState().currentProject;
         console.log(`删除素材deleteAsset： ${JSON.stringify(currentProject)}`);
         const updatedProject = {
-            ...currentProject,
-            assets: await assetService.deleteAsset(selectAsset),
-            lastVisitedAssetId: null,
+            ...project,
+            assets: _.keyBy(await assetService.deleteAsset(selectAsset), (asset) => asset.id),
+            // lastVisitedAssetId: null,
         };
         console.log(`删除素材deleteAsset->updatedProject： ${JSON.stringify(updatedProject)}`);
         // this.props.actions.saveProject()
-        // @ts-ignore
-        const finalProject = await saveProject(updatedProject)(dispatch, getState);
-        // @ts-ignore
-        dispatch(deleteProjectAssetAction(updatedProject));
-        console.log(`删除素材deleteAsset->finalProject： ${JSON.stringify(finalProject)}`);
-        return finalProject;
+        await saveProject(updatedProject)(dispatch, getState);
+        // dispatch(deleteProjectAssetAction(updatedProject));
+
+        dispatch(saveProjectAction(updatedProject));
+        // Reload project after save actions
+        await loadProject(updatedProject)(dispatch, getState);
+        return updatedProject;
     };
 }
 
