@@ -561,11 +561,12 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         // await this.localFileSystem.deleteDirectory(decodeURI(selectedAsset.asset.path.replace("file:", "")));
         // this.props.project.assets[selectedAsset.asset.id].
         this.canvas.current.removeAllRegions();
-        await this.props.actions.deleteAsset(this.props.project, selectedAsset.asset);
+        const finalProject = await this.props.actions.deleteAsset(this.props.project, selectedAsset.asset);
+        await this.props.actions.saveProject(finalProject);
         // console.log(`删除素材fuck：${JSON.stringify(this.props.project)}`);
         toast.success(`成功删除`);
-        this.goToRootAsset(-1);
-        await this.deleteAssetsAndRefreshProjectAssets();
+        this.goToRootAsset(1);
+        await this.deleteAssetsAndRefreshProjectAssets(finalProject);
         // console.log(`删除素材fuck 222：${JSON.stringify(this.props.project)}`);
         // this.updateRootAssets();
     }
@@ -927,6 +928,10 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                 this.setState({
                     selectionMode: SelectionMode.RECT,
                     editorMode: EditorMode.Rectangle,
+                    zoomMode: {
+                        ...this.state.zoomMode,
+                        disableDrag: true,
+                    },
                 });
                 // this.canvas.current.enableCanvas(true);
                 break;
@@ -935,15 +940,15 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                 this.setState({
                     selectionMode: SelectionMode.RECT,
                     editorMode: EditorMode.Rectangle,
+                    zoomMode: {
+                        ...this.state.zoomMode,
+                        disableDrag: true,
+                    },
                 });
                 // this.canvas.current.enableCanvas(true);
                 break;
             case ToolbarItemName.DeleteAsset:
-                if (this.props.appSettings.zengyining) {
-                    this.deleteConfirm.current.open();
-                } else {
-                    toast.warn("试用版本未开放");
-                }
+                this.deleteConfirm.current.open();
                 break;
             case ToolbarItemName.CopyRegions:
                 this.canvas.current.enableCanvas(true);
