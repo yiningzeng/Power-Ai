@@ -709,10 +709,10 @@ export const yolov3Template = "[net]\n" +
     "activation=leaky\n" +
     "\n" +
     "[upsample]\n" +
-    "stride=4\n" +
+    "stride=2\n" +
     "\n" +
     "[route]\n" +
-    "layers = -1, 11\n" +
+    "layers = -1, 36\n" +
     "\n" +
     "\n" +
     "\n" +
@@ -779,5 +779,6 @@ export const yolov3Template = "[net]\n" +
     "jitter=.3\n" +
     "ignore_thresh = .5\n" +
     "truth_thresh = 1\n" +
+    "random=1\n" +
     "random=1\n" +
     "\n";
