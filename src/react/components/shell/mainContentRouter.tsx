@@ -10,6 +10,7 @@ import ConnectionPage from "../pages/connections/connectionsPage";
 import EditorPage from "../pages/editorPage/editorPage";
 import ExportPage from "../pages/export/exportPage";
 import ProjectSettingsPage from "../pages/projectSettings/projectSettingsPage";
+import AiTestSettingsPage from "../pages/aitest/testSettingsPage";
 
 /**
  * @name - Main Content Router
@@ -31,6 +32,7 @@ export default function MainContentRouter() {
                 {/*<Route path="/projects/:projectId/train-settings" component={TrainSettingsPage} />*/}
                 <Route path="/projects/:projectId/train" component={TrainPage} />
                 <Route path="/projects/:projectId/remote-train-page" component={RemoteTrainPage} />
+                <Route path="/projects/:projectId/remote-test-page" component={AiTestSettingsPage} />
                 <Route component={HomePage} />
             </Switch>
         </div>

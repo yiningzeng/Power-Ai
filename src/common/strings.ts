@@ -263,6 +263,7 @@ export interface IAppStrings {
             transferProject: string;
             activeLearning: string;
             trainAi: string;
+            onlineTest: string;
         }
         videoPlayer: {
             nextTaggedFrame: {

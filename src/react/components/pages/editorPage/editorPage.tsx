@@ -66,6 +66,8 @@ import { makeStyles } from "@material-ui/styles";
 import LinearProgress from "@material-ui/core/LinearProgress";
 import {constants} from "../../../../common/constants";
 import DraggableDialog from "../../common/draggableDialog/draggableDialog";
+import {IStartTestResults} from "../../../../providers/export/exportProvider";
+import AiTestSettingsPage from "../aitest/testSettingsPage";
 function PaperComponent(props: PaperProps) {
     return (
         <Draggable cancel={'[class*="MuiDialogContent-root"]'}>
@@ -1023,6 +1025,13 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                 //         toast.success(`配置成功`);
                 //     });
                 // this.props.history.push(`/projects/${projectId}/train`);
+                break;
+            case ToolbarItemName.OnlineTest:
+                if (this.props.appSettings.zengyining) {
+                    this.props.history.push(`/projects/${projectId}/remote-test-page`);
+                } else {
+                    toast.warn("试用版本未开放");
+                }
                 break;
         }
     }

@@ -263,6 +263,7 @@ export const chinese: IAppStrings = {
             transferProject: "迁移项目",
             activeLearning: "自动标注当前素材",
             trainAi: "开始训练",
+            onlineTest: "在线测试",
         },
         videoPlayer: {
             previousTaggedFrame: {

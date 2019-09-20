@@ -249,6 +249,7 @@ export interface IActiveLearningSettings {
 export interface ITrainFormat {
     ip: string;
     providerType: string;
+    tarBaseName?: string;
     providerOptions: IYoloV3 | IDetectron;
 }
 

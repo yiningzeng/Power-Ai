@@ -821,6 +821,7 @@ export default class MockFactory {
             transferProject: jest.fn(() => Promise.resolve()),
             exportTrainConfig: jest.fn(() => Promise.resolve()),
             trainAddSql: jest.fn(() => Promise.resolve()),
+            testImage: jest.fn(() => Promise.resolve()),
             trainAddQueueProject: jest.fn(() => Promise.resolve()),
             trainPackageProject: jest.fn(() => Promise.resolve()),
             trainUploadProject: jest.fn(() => Promise.resolve()),
