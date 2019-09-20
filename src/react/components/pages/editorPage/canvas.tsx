@@ -98,7 +98,7 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
 
         // When the selected asset has changed but is still the same asset id
         if (!assetIdChanged && this.state.currentAsset !== prevState.currentAsset) {
-            console.log("updateAssetRegions: fuck");
+            console.log("updateAssetRegions: 多标记的时候造成卡顿， 去掉下面这行就不卡");
             this.refreshCanvasToolsRegions();
         }
 
@@ -125,6 +125,7 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
                 this.editor.AS.setSelectionMode(SelectionMode.NONE);
             }
         }
+        console.log("updateAssetRegions: 多标记的时候造成卡顿， 去掉下面这行就不卡，但是会造成缩放有问题");
         this.positionCanvas(this.state.contentSource);
     }
 
