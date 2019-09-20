@@ -157,6 +157,14 @@ export default class TrainPage extends React.Component<ITrainPageProps> {
         this.draggableDialog.current.change("正在打包", "请耐心等待，去喝杯咖啡再来吧");
         const packageRes = await this.props.actions.trainPackageProject(this.props.project);
         if (packageRes.success) {
+            const updateProject = {
+                ...this.props.project,
+                trainFormat: {
+                    ...this.props.project.trainFormat,
+                    tarBaseName: packageRes.tarBaseName,
+                },
+            };
+            await this.props.actions.saveProject(updateProject);
             this.draggableDialog.current.change(`正在上传`, "请耐心等待，去喝杯咖啡再来吧");
             const upload = await this.props.actions.trainUploadProject(this.props.project, packageRes);
             if (upload.success) {
