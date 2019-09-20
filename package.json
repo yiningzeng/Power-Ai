@@ -1,6 +1,6 @@
 {
     "name": "Power-Ai",
-    "version": "3.0.10",
+    "version": "3.0.14",
     "author": {
         "name": "Microsoft",
         "url": "https://github.com/Microsoft/VoTT"
@@ -40,6 +40,7 @@
         "moment": "^2.24.0",
         "node-fetch": "^2.3.0",
         "node-int64": "^0.4.0",
+        "powerai-ct": "^2.2.7",
         "rc-align": "^2.4.5",
         "rc-checkbox": "^2.1.6",
         "rc-menu": "^7.4.21",

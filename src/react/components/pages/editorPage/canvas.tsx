@@ -1,16 +1,16 @@
 import React, {Fragment, ReactElement} from "react";
 import * as shortid from "shortid";
-import {CanvasTools} from "aipower-ct";
-import {RegionData, RegionDataType} from "aipower-ct/lib/js/CanvasTools/Core/RegionData";
+import {CanvasTools} from "powerai-ct";
+import {RegionData, RegionDataType} from "powerai-ct/lib/js/CanvasTools/Core/RegionData";
 import {EditorMode, IAssetMetadata, IPoint, IProject, IRegion, RegionType} from "../../../../models/applicationState";
 import CanvasHelpers from "./canvasHelpers";
 import {AssetPreview, ContentSource} from "../../common/assetPreview/assetPreview";
-import {Editor} from "aipower-ct/lib/js/CanvasTools/CanvasTools.Editor";
+import {Editor} from "powerai-ct/lib/js/CanvasTools/CanvasTools.Editor";
 import Clipboard from "../../../../common/clipboard";
 import Confirm from "../../common/confirm/confirm";
 import {strings} from "../../../../common/strings";
-import {SelectionMode} from "aipower-ct/lib/js/CanvasTools/Interface/ISelectorSettings";
-import {Rect} from "aipower-ct/lib/js/CanvasTools/Core/Rect";
+import {SelectionMode} from "powerai-ct/lib/js/CanvasTools/Interface/ISelectorSettings";
+import {Rect} from "powerai-ct/lib/js/CanvasTools/Core/Rect";
 import {createContentBoundingBox} from "../../../../common/layout";
 import {Point2D} from "vott-ct/lib/js/CanvasTools/Core/Point2D";
 
@@ -68,7 +68,7 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
     public componentDidMount = () => {
         const sz = document.getElementById("editor-zone") as HTMLDivElement;
         this.editor = new CanvasTools.Editor(sz);
-        this.editor.autoResize = false;
+        this.editor.autoResize = true;
         this.editor.onSelectionEnd = this.onSelectionEnd;
         this.editor.onRegionMoveEnd = this.onRegionMoveEnd;
         this.editor.onRegionDelete = this.onRegionDelete;
@@ -98,6 +98,7 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
 
         // When the selected asset has changed but is still the same asset id
         if (!assetIdChanged && this.state.currentAsset !== prevState.currentAsset) {
+            console.log("updateAssetRegions: fuck");
             this.refreshCanvasToolsRegions();
         }
 
@@ -288,9 +289,13 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
      * @returns {void}
      */
     private onSelectionEnd = (regionData: RegionData) => {
-        if (CanvasHelpers.isEmpty(regionData)) {
+        if (CanvasHelpers.isEmpty(regionData) ) {
             return;
         }
+        if (CanvasHelpers.isAreaEmpty(regionData)) {
+            return;
+        }
+
         const id = shortid.generate();
 
         this.editor.RM.addRegion(id, regionData, null);
@@ -303,6 +308,7 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
             this.state.currentAsset.asset.size.width,
             this.state.currentAsset.asset.size.height,
         );
+
         const lockedTags = this.props.lockedTags;
         const newRegion = {
             id,
@@ -316,13 +322,16 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
             },
             points: scaledRegionData.points,
         };
+        console.log(`onSelectionEnd： ${JSON.stringify(newRegion)}`);
         // console.log(`画笔： onSelectionEnd->regionData(初始数据) ${JSON.stringify(regionData)}`);
         // console.log(`画笔： onSelectionEnd->scaledRegionData(转换后数据) ${JSON.stringify(scaledRegionData)}`);
         // console.log(`画笔： onSelectionEnd->newRegion ${JSON.stringify(newRegion)}`);
         if (lockedTags && lockedTags.length) {
             this.editor.RM.updateTagsById(id, CanvasHelpers.getTagsDescriptor(this.props.project.tags, newRegion));
         }
+        // region 造成数据多卡顿的问题
         this.updateAssetRegions([...this.state.currentAsset.regions, newRegion]);
+        // endregion
         if (this.props.onSelectedRegionsChanged) {
             this.props.onSelectedRegionsChanged([newRegion]);
         }
@@ -338,6 +347,7 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
             ...this.state.currentAsset,
             regions,
         };
+        console.log(`updateAssetRegions: ${JSON.stringify(currentAsset)}`);
         this.setState({
             currentAsset,
         }, () => {
@@ -370,7 +380,7 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
                 top: scaledRegionData.y,
             };
         }
-        console.log(`画笔： onRegionMoveEnd`);
+        console.log(`onRegionMoveEnd： onRegionMoveEnd`);
         currentRegions[movedRegionIndex] = movedRegion;
         this.updateAssetRegions(currentRegions);
     }
@@ -397,6 +407,7 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
 
     /**
      * Method called when deleting a region from the editor
+     * 从编辑器中删除区域时调用的方法
      * @param {string} id the id of the selected region
      * @param {boolean} multiSelect boolean whether region was selected with multi selection
      * @returns {void}
@@ -471,6 +482,7 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
 
     /**
      * Set the loaded asset content source into the canvas tools canvas
+     * 将加载的资产内容源设置到画布工具画布中
      */
     private setContentSource = async (contentSource: ContentSource) => {
         try {
@@ -626,6 +638,7 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
     }
     /**
      * Positions the canvas tools drawing surface to be exactly over the asset content
+     * 将画布工具绘图表面放置在资源内容的正上方
      */
     private positionCanvas = (contentSource: ContentSource) => {
         if (!contentSource) {
@@ -635,17 +648,19 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
         const canvas = this.canvasZone.current;
         if (canvas) {
             // console.log(`画笔： ${this.props.editorMode}@@@ ${this.props.editorMode !== EditorMode.Pencil}`);
-            if (this.props.editorMode !== EditorMode.Pencil) {
-                canvas.removeEventListener("mousedown", this.mousedown);
-                canvas.removeEventListener("mouseup", this.mouseup);
-                canvas.removeEventListener("mousemove", this.mousemove);
-                console.log("removeeeeeeeeeee");
-            } else {
-                canvas.addEventListener("mousedown", this.mousedown);
-                canvas.addEventListener("mouseup", this.mouseup);
-                canvas.addEventListener("mousemove", this.mousemove);
-                console.log("addddddddddddd");
-            }
+            // region 去掉画笔
+            // if (this.props.editorMode !== EditorMode.Pencil) {
+            //     canvas.removeEventListener("mousedown", this.mousedown);
+            //     canvas.removeEventListener("mouseup", this.mouseup);
+            //     canvas.removeEventListener("mousemove", this.mousemove);
+            //     console.log("removeeeeeeeeeee");
+            // } else {
+            //     canvas.addEventListener("mousedown", this.mousedown);
+            //     canvas.addEventListener("mouseup", this.mouseup);
+            //     canvas.addEventListener("mousemove", this.mousemove);
+            //     console.log("addddddddddddd");
+            // }
+            // endregion 去掉画笔
             // canvas.addEventListener("click", (e) => { alert(e.offsetX + " " + e.offsetY); });
             const boundingBox = createContentBoundingBox(contentSource);
             canvas.style.top = `${boundingBox.top}px`;

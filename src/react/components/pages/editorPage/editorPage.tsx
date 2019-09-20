@@ -1,10 +1,10 @@
 import _ from "lodash";
 import React, {RefObject} from "react";
 import {connect} from "react-redux";
-import {RouteComponentProps} from "react-router-dom";
+import {Route, RouteComponentProps, Switch} from "react-router-dom";
 import SplitPane from "react-split-pane";
 import {bindActionCreators} from "redux";
-import {SelectionMode} from "aipower-ct/lib/js/CanvasTools/Interface/ISelectorSettings";
+import {SelectionMode} from "powerai-ct/lib/js/CanvasTools/Interface/ISelectorSettings";
 import HtmlFileReader from "../../../../common/htmlFileReader";
 import {strings} from "../../../../common/strings";
 import {
@@ -880,6 +880,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                 break;
             case ToolbarItemName.DrawRectangle:
                 this.setState({
+                    ...this.state,
                     selectionMode: SelectionMode.RECT,
                     editorMode: EditorMode.Rectangle,
                     zoomMode: {
