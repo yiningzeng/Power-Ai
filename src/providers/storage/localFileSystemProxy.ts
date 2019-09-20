@@ -75,7 +75,7 @@ export class LocalFileSystemProxy implements IStorageProvider, IAssetProvider {
      */
     public writeText(fileName: string, contents: string): Promise<void> {
         const filePath = [this.options.folderPath, fileName].join("/");
-        IpcRendererProxy.send(`${PROXY_NAME}:deleteFile`, [filePath]);
+        // IpcRendererProxy.send(`${PROXY_NAME}:deleteFile`, [filePath]);
         return IpcRendererProxy.send(`${PROXY_NAME}:writeText`, [filePath, contents]);
     }
 
