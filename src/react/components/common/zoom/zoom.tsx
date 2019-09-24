@@ -5,6 +5,20 @@ const zoom = (onWheelEvent, callback) => {
     // // console.log("zoom: width" + dom.style.width +" left" +dom.style.left);
     let e = onWheelEvent;
     callback(e.deltaY);
+    // var ratioL = (this.clientX - onWheelEvent.offsetLeft) / onWheelEvent.offsetWidth,
+    //     ratioT = (this.clientY - onWheelEvent.offsetTop) / onWheelEvent.offsetHeight,
+    //     ratioDelta = !delta ? 1 + 0.1 : 1 - 0.1,
+    //     w = parseInt(oImg.offsetWidth * ratioDelta),
+    //     h = parseInt(oImg.offsetHeight * ratioDelta),
+    //     l = Math.round(this.clientX - (w * ratioL)),
+    //     t = Math.round(this.clientY - (h * ratioT));
+    // with(oImg.style) {
+    //     width = w +'px';
+    //     height = h +'px';
+    //     left = l +'px';
+    //     top = t +'px';
+    // }
+
     // let imageModalWidth = parseInt(dom.style.width);
     // let modalLeft = parseInt(dom.style.left);
     // // 计算缩放后的大小 每一次滚轮 100px

@@ -6,12 +6,12 @@
             "type": "string",
             "title": "镜像版本",
             "description": "训练镜像使用的版本",
-            "default": "registry.cn-hangzhou.aliyuncs.com/baymin/ai-power:darknet_auto-ai-power-v4.0"
+            "default": "registry.cn-hangzhou.aliyuncs.com/baymin/darknet:latest"
         },
         "gpu_numb": {
             "type": "number",
             "title": "GPU数量",
-            "default": 6
+            "default": 5
         },
         "yolov3net":{
             "title": "",

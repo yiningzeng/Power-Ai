@@ -2,7 +2,15 @@ import React, {Fragment, ReactElement} from "react";
 import * as shortid from "shortid";
 import {CanvasTools} from "powerai-ct";
 import {RegionData, RegionDataType} from "powerai-ct/lib/js/CanvasTools/Core/RegionData";
-import {EditorMode, IAssetMetadata, IPoint, IProject, IRegion, RegionType} from "../../../../models/applicationState";
+import {
+    EditorMode,
+    IAssetMetadata,
+    IPoint,
+    IProject,
+    IRegion,
+    IZoomMode,
+    RegionType,
+} from "../../../../models/applicationState";
 import CanvasHelpers from "./canvasHelpers";
 import {AssetPreview, ContentSource} from "../../common/assetPreview/assetPreview";
 import {Editor} from "powerai-ct/lib/js/CanvasTools/CanvasTools.Editor";
@@ -12,7 +20,7 @@ import {strings} from "../../../../common/strings";
 import {SelectionMode} from "powerai-ct/lib/js/CanvasTools/Interface/ISelectorSettings";
 import {Rect} from "powerai-ct/lib/js/CanvasTools/Core/Rect";
 import {createContentBoundingBox} from "../../../../common/layout";
-import {Point2D} from "vott-ct/lib/js/CanvasTools/Core/Point2D";
+import {Point2D} from "powerai-ct/lib/js/CanvasTools/Core/Point2D";
 
 export interface ICanvasProps extends React.Props<Canvas> {
     selectedAsset: IAssetMetadata;
@@ -21,6 +29,7 @@ export interface ICanvasProps extends React.Props<Canvas> {
     project: IProject;
     lockedTags: string[];
     children?: ReactElement<AssetPreview>;
+    zoomModeChange?: number|string;
     onAssetMetadataChanged?: (assetMetadata: IAssetMetadata) => void;
     onSelectedRegionsChanged?: (regions: IRegion[]) => void;
     onCanvasRendered?: (canvas: HTMLCanvasElement) => void;
@@ -99,9 +108,13 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
         // When the selected asset has changed but is still the same asset id
         if (!assetIdChanged && this.state.currentAsset !== prevState.currentAsset) {
             console.log("updateAssetRegions: 多标记的时候造成卡顿， 去掉下面这行就不卡");
-            this.refreshCanvasToolsRegions();
+            // this.refreshCanvasToolsRegions();
         }
-
+        if (this.props.zoomModeChange !== prevProps.zoomModeChange) {
+            console.log(`缩放重置${this.props.zoomModeChange}`);
+            // this.setContentSource(this.state.contentSource);
+            this.positionCanvas(this.state.contentSource);
+        }
         // When the project tags change re-apply tags to regions
         if (this.props.project.tags !== prevProps.project.tags) {
             this.updateCanvasToolsRegionTags();
@@ -111,7 +124,10 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
         if (prevState.enabled !== this.state.enabled) {
             // When the canvas is ready to display
             if (this.state.enabled) {
-                this.refreshCanvasToolsRegions();
+                const startTime = new Date().valueOf(); // 开始时间
+                await this.refreshCanvasToolsRegions();
+                const endTime = new Date().valueOf(); // 结束时间
+                console.log(`加载啦啦 refreshCanvasToolsRegions ${(endTime - startTime).toString()} 毫秒`);
                 this.setContentSource(this.state.contentSource);
                 this.editor.AS.setSelectionMode(this.props.selectionMode);
                 this.editor.AS.enable();
@@ -126,7 +142,7 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
             }
         }
         console.log("updateAssetRegions: 多标记的时候造成卡顿， 去掉下面这行就不卡，但是会造成缩放有问题");
-        this.positionCanvas(this.state.contentSource);
+        // this.positionCanvas(this.state.contentSource);
     }
 
     public render = () => {
@@ -215,17 +231,25 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
     }
 
     public getSelectedRegions = (): IRegion[] => {
+        console.log(`加载啦啦 getSelectedRegions`);
+        const startTime = new Date().valueOf(); // 开始时间
         const selectedRegions = this.editor.RM.getSelectedRegionsBounds().map((rb) => rb.id);
         return this.state.currentAsset.regions.filter((r) => selectedRegions.find((id) => r.id === id));
+        const endTime = new Date().valueOf(); // 结束时间
+        console.log(`加载啦啦 getSelectedRegions ${(endTime - startTime).toString()} 毫秒`);
     }
 
     public updateCanvasToolsRegionTags = (): void => {
+        console.log(`加载啦啦 updateCanvasToolsRegionTags`);
+        const startTime = new Date().valueOf(); // 开始时间
         for (const region of this.state.currentAsset.regions) {
             this.editor.RM.updateTagsById(
                 region.id,
                 CanvasHelpers.getTagsDescriptor(this.props.project.tags, region),
             );
         }
+        const endTime = new Date().valueOf(); // 结束时间
+        console.log(`加载啦啦 updateCanvasToolsRegionTags ${(endTime - startTime).toString()} 毫秒`);
     }
 
     public forceResize = (): void => {
@@ -241,17 +265,27 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
     }
 
     private addRegions = (regions: IRegion[]) => {
+        console.log(`加载啦啦 addRegions`);
+        const startTime = new Date().valueOf(); // 开始时间
         this.addRegionsToCanvasTools(regions);
         this.addRegionsToAsset(regions);
+        const endTime = new Date().valueOf(); // 结束时间
+        console.log(`加载啦啦 addRegions ${(endTime - startTime).toString()} 毫秒`);
     }
 
     private addRegionsToAsset = (regions: IRegion[]) => {
+        console.log(`加载啦啦 addRegionsToAsset`);
+        const startTime = new Date().valueOf(); // 开始时间
         this.updateAssetRegions(
             this.state.currentAsset.regions.concat(regions),
         );
+        const endTime = new Date().valueOf(); // 结束时间
+        console.log(`加载啦啦 addRegionsToAsset ${(endTime - startTime).toString()} 毫秒`);
     }
 
     private addRegionsToCanvasTools = (regions: IRegion[]) => {
+        console.log(`加载啦啦 addRegionsToCanvasTools`);
+        const startTime = new Date().valueOf(); // 开始时间
         for (const region of regions) {
             const regionData = CanvasHelpers.getRegionData(region);
             const scaledRegionData = this.editor.scaleRegionToFrameSize(
@@ -264,6 +298,8 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
                 CanvasHelpers.getTagsDescriptor(this.props.project.tags, region),
             );
         }
+        const endTime = new Date().valueOf(); // 结束时间
+        console.log(`加载啦啦 addRegionsToCanvasTools ${(endTime - startTime).toString()} 毫秒`);
     }
 
     private deleteRegions = (regions: IRegion[]) => {
@@ -344,6 +380,8 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
      * @param selectedRegions
      */
     private updateAssetRegions = (regions: IRegion[]) => {
+        console.log(`加载啦啦 updateAssetRegions`);
+        const startTime = new Date().valueOf(); // 开始时间
         const currentAsset: IAssetMetadata = {
             ...this.state.currentAsset,
             regions,
@@ -354,6 +392,8 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
         }, () => {
             this.props.onAssetMetadataChanged(currentAsset);
         });
+        const endTime = new Date().valueOf(); // 结束时间
+        console.log(`加载啦啦 updateAssetRegions ${(endTime - startTime).toString()} 毫秒`);
     }
 
     /**
@@ -434,6 +474,8 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
     }
 
     private renderChildren = () => {
+        console.log(`加载啦啦 renderChildren`);
+        const startTime = new Date().valueOf(); // 开始时间
         return React.cloneElement(this.props.children, {
             onAssetChanged: this.onAssetChanged,
             onLoaded: this.onAssetLoaded,
@@ -441,6 +483,8 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
             onActivated: this.onAssetActivated,
             onDeactivated: this.onAssetDeactivated,
         });
+        const endTime = new Date().valueOf(); // 结束时间
+        console.log(`加载啦啦 renderChildren ${(endTime - startTime).toString()} 毫秒`);
     }
 
     /**
@@ -454,8 +498,12 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
      * Raised when the underlying asset has completed loading
      */
     private onAssetLoaded = (contentSource: ContentSource) => {
+        console.log(`加载啦啦 onAssetLoaded`);
+        const startTime = new Date().valueOf(); // 开始时间
         this.setState({ contentSource });
         this.positionCanvas(contentSource);
+        const endTime = new Date().valueOf(); // 结束时间
+        console.log(`加载啦啦 onAssetLoaded ${(endTime - startTime).toString()} 毫秒`);
     }
 
     private onAssetError = () => {
@@ -486,6 +534,8 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
      * 将加载的资产内容源设置到画布工具画布中
      */
     private setContentSource = async (contentSource: ContentSource) => {
+        console.log(`加载啦啦 setContentSource`);
+        const startTime = new Date().valueOf(); // 开始时间
         try {
             await this.editor.addContentSource(contentSource as any);
 
@@ -496,6 +546,8 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
         } catch (e) {
             console.warn(e);
         }
+        const endTime = new Date().valueOf(); // 结束时间
+        console.log(`加载啦啦 setContentSource ${(endTime - startTime).toString()} 毫秒`);
     }
 
     private mousedown = (e) => {
@@ -688,12 +740,16 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
      * @param updatedSelectedRegions Selected regions with any changes already applied
      */
     private updateRegions = (updates: IRegion[]) => {
+        console.log(`加载啦啦 updateRegions`);
+        const startTime = new Date().valueOf(); // 开始时间
         const updatedRegions = CanvasHelpers.updateRegions(this.state.currentAsset.regions, updates);
         for (const update of updates) {
             this.editor.RM.updateTagsById(update.id, CanvasHelpers.getTagsDescriptor(this.props.project.tags, update));
         }
         this.updateAssetRegions(updatedRegions);
-        this.updateCanvasToolsRegionTags();
+        // this.updateCanvasToolsRegionTags();
+        const endTime = new Date().valueOf(); // 结束时间
+        console.log(`加载啦啦 updateRegions ${(endTime - startTime).toString()} 毫秒`);
     }
 
     /**
@@ -711,6 +767,7 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
         }
 
         // Add regions to the canvas
+        // 加载卡顿基本问题定位在这里
         this.state.currentAsset.regions.forEach((region: IRegion) => {
             const loadedRegionData = CanvasHelpers.getRegionData(region);
             this.editor.RM.addRegion(
@@ -720,7 +777,7 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
                     this.state.currentAsset.asset.size.width,
                     this.state.currentAsset.asset.size.height,
                 ),
-                CanvasHelpers.getTagsDescriptor(this.props.project.tags, region));
+                CanvasHelpers.getTagsDescriptor2(this.props.project.tags, region));
         });
     }
 

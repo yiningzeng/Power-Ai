@@ -221,6 +221,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         // retrieved.
         // console.log("editorPage: componentDidUpdate prevProps: " + JSON.stringify(prevProps));
         if (this.props.project && !prevProps.project) {
+            console.log("componentDidUpdate: project");
             this.setState({
                 treeList: this.props.project.sourceConnection.providerOptionsOthers,
                 additionalSettings: {
@@ -231,6 +232,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         }
         // console.log("editorPage: componentDidUpdate this.state" + JSON.stringify(this.state));
         if (this.props.project && prevProps.project && this.props.project.tags !== prevProps.project.tags) {
+            console.log("componentDidUpdate: tags");
             this.updateRootAssets();
         }
     }
@@ -440,8 +442,9 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                         });
                                     }}
                                     onWheel={ (e) => Zoom(e, (deltaY) => {
-                                        const w = document.getElementById("ct-zone").offsetWidth;
-                                        const h = document.getElementById("ct-zone").offsetHeight;
+                                        const zone = document.getElementById("ct-zone");
+                                        const w = zone.offsetWidth;
+                                        const h = zone.offsetHeight;
                                         if ((h - deltaY) < this.state.zoomMode.miniHeight) { return; }
                                         this.setState({
                                             zoomMode: {
@@ -449,7 +452,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                                 width: ( w - deltaY * 2),
                                                 height: ( h - deltaY * 2),
                                                 x: this.state.zoomMode.x + deltaY,
-                                                y: this.state.zoomMode.y + deltaY,
+                                                y: this.state.zoomMode.x + deltaY,
                                             },
                                         });
                                         if (this.state.zoomMode.height === "auto") {
@@ -469,6 +472,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                         onCanvasRendered={this.onCanvasRendered}
                                         onSelectedRegionsChanged={this.onSelectedRegionsChanged}
                                         editorMode={this.state.editorMode}
+                                        zoomModeChange={this.state.zoomMode.width}
                                         selectionMode={this.state.selectionMode}
                                         project={this.props.project}
                                         lockedTags={this.state.lockedTags}>
@@ -592,7 +596,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
      */
     private onImportTaggedAssets = async (): Promise<void> => {
         const fileFolder = await this.localFileSystem.selectContainer();
-        if (!fileFolder) return;
+        if (!fileFolder) { return; }
         this.draggableDialog.current.open();
         const updateProject = await this.props.actions.importTaggedAssets(this.props.project, fileFolder);
         await this.props.actions.saveProject(updateProject);
@@ -763,6 +767,8 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
      * This can either be a parent or child asset
      */
     private onAssetMetadataChanged = async (assetMetadata: IAssetMetadata): Promise<void> => {
+        console.log(`editorpage加载啦啦 onAssetMetadataChanged`);
+        const startTime = new Date().valueOf(); // 开始时间
         // If the asset contains any regions without tags, don't proceed.
         const regionsWithoutTags = assetMetadata.regions.filter((region) => region.tags.length === 0);
 
@@ -827,17 +833,23 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         }
 
         this.setState({ childAssets, assets, isValid: true });
+        const endTime = new Date().valueOf(); // 结束时间
+        console.log(`editorpage加载啦啦 onAssetMetadataChanged ${(endTime - startTime).toString()} 毫秒`);
     }
 
     /**
      * Raised when the asset binary has been painted onto the canvas tools rendering canvas
      */
     private onCanvasRendered = async (canvas: HTMLCanvasElement) => {
+        console.log(`editorpage加载啦啦 onCanvasRendered`);
+        const startTime = new Date().valueOf(); // 开始时间
         // When active learning auto-detect is enabled
         // run predictions when asset changes
         if (this.props.project.activeLearningSettings.autoDetect && !this.state.selectedAsset.asset.predicted) {
             await this.predictRegions(canvas);
         }
+        const endTime = new Date().valueOf(); // 结束时间
+        console.log(`editorpage加载啦啦 onCanvasRendered ${(endTime - startTime).toString()} 毫秒`);
     }
 
     private onSelectedRegionsChanged = (selectedRegions: IRegion[]) => {

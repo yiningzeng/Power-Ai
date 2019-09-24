@@ -140,14 +140,21 @@ export default class CanvasHelpers {
             return null;
         }
         Guard.null(region);
-
+        console.log(`getTagsDescriptor region:${JSON.stringify(region)} \n projectTags:${JSON.stringify(projectTags)}`);
         const tags = region.tags
             .map((tagName) => {
                 const projectTag = projectTags.find((projectTag) => projectTag.name === tagName);
                 return projectTag ? new Tag(projectTag.name, projectTag.color) : null;
             })
             .filter((tag) => tag !== null);
+        console.log(`getTagsDescriptor tags:${JSON.stringify(tags)}`);
+        return new TagsDescriptor(tags);
+    }
 
+    public static getTagsDescriptor2(projectTags: ITag[], region: IRegion): TagsDescriptor {
+        const tt = new Tag("ssss", "#e81123");
+        const tags = [tt];
+        console.log(`getTagsDescriptor tags:${JSON.stringify(tags)}`);
         return new TagsDescriptor(tags);
     }
 
