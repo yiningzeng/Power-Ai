@@ -403,8 +403,8 @@ export const chinese: IAppStrings = {
             pascalVoc: {
                 displayName: "Pascal VOC",
                 exportUnassigned: {
-                    title: "导出未分配的标签",
-                    description: "是否导出数据中包含未处理的标签信息",
+                    title: "导出没有标记过的标签",
+                    description: "",
                 },
             },
             cntk: {

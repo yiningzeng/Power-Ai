@@ -777,7 +777,7 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
                     this.state.currentAsset.asset.size.width,
                     this.state.currentAsset.asset.size.height,
                 ),
-                CanvasHelpers.getTagsDescriptor2(this.props.project.tags, region));
+                CanvasHelpers.getTagsDescriptor(this.props.project.tags, region));
         });
     }
 
