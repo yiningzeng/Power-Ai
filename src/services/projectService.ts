@@ -4,7 +4,7 @@ import shortid from "shortid";
 import { StorageProviderFactory } from "../providers/storage/storageProviderFactory";
 import {
     IProject, ISecurityToken, AppError,
-    ErrorCode, ModelPathType, IActiveLearningSettings, ITrainFormat, IProviderOptions, IConnection, IAsset,
+    ErrorCode, ModelPathType, IActiveLearningSettings, ITrainFormat, IProviderOptions, IConnection, IAsset, AssetState,
 } from "../models/applicationState";
 import Guard from "../common/guard";
 import { constants } from "../common/constants";
@@ -190,17 +190,21 @@ export default class ProjectService implements IProjectService {
             // 重新计算需要导入的图像素材的id,并存储在项目目录
             const tempAssets: IAsset[] = [];
             for (const one of _.values(jsonImportProject.assets)) {
-                const itemJsonText = interpolate(await importStorageProvider.readText(`${one.id}-asset.json`), params);
-                const json = JSON.parse(itemJsonText);
-                const md5Hash = new MD5().update(one.path).digest("hex");
-                json["asset"]["id"] = md5Hash;
+                console.log(`导入计算 one.path=${one.path}\n path.normalize(one.path)=${path.normalize(one.path)}\n md5: ${path.normalize(one.path)}`);
+                const md5Hash = new MD5().update(path.normalize(one.path)).digest("hex");
                 const oneTemp = {
                     ...one,
                     id: md5Hash,
                 };
                 tempAssets.push(oneTemp);
-                await projectStorageProvider.writeText(`${md5Hash}-asset.json`,
-                    JSON.stringify(json, null, 4));
+                if (one.state === AssetState.Tagged) {
+                    const itemJsonText = interpolate(
+                        await importStorageProvider.readText(`${one.id}-asset.json`), params);
+                    const json = JSON.parse(itemJsonText);
+                    json["asset"]["id"] = md5Hash;
+                    await projectStorageProvider.writeText(`${md5Hash}-asset.json`,
+                        JSON.stringify(json, null, 4));
+                }
             }
 
             // 合并素材
@@ -263,6 +267,7 @@ export default class ProjectService implements IProjectService {
                 JSON.stringify(updateProject, null, 4));
             return updateProject;
         } catch (e) {
+            console.log(e);
             return project;
         }
     }
