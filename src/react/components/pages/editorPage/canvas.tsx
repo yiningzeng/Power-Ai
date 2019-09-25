@@ -124,10 +124,7 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
         if (prevState.enabled !== this.state.enabled) {
             // When the canvas is ready to display
             if (this.state.enabled) {
-                const startTime = new Date().valueOf(); // 开始时间
-                await this.refreshCanvasToolsRegions();
-                const endTime = new Date().valueOf(); // 结束时间
-                console.log(`加载啦啦 refreshCanvasToolsRegions ${(endTime - startTime).toString()} 毫秒`);
+                this.refreshCanvasToolsRegions();
                 this.setContentSource(this.state.contentSource);
                 this.editor.AS.setSelectionMode(this.props.selectionMode);
                 this.editor.AS.enable();
@@ -141,7 +138,6 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
                 this.editor.AS.setSelectionMode(SelectionMode.NONE);
             }
         }
-        console.log("updateAssetRegions: 多标记的时候造成卡顿， 去掉下面这行就不卡，但是会造成缩放有问题");
         // this.positionCanvas(this.state.contentSource);
     }
 
@@ -359,7 +355,6 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
             },
             points: scaledRegionData.points,
         };
-        console.log(`onSelectionEnd： ${JSON.stringify(newRegion)}`);
         // console.log(`画笔： onSelectionEnd->regionData(初始数据) ${JSON.stringify(regionData)}`);
         // console.log(`画笔： onSelectionEnd->scaledRegionData(转换后数据) ${JSON.stringify(scaledRegionData)}`);
         // console.log(`画笔： onSelectionEnd->newRegion ${JSON.stringify(newRegion)}`);
@@ -380,20 +375,15 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
      * @param selectedRegions
      */
     private updateAssetRegions = (regions: IRegion[]) => {
-        console.log(`加载啦啦 updateAssetRegions`);
-        const startTime = new Date().valueOf(); // 开始时间
         const currentAsset: IAssetMetadata = {
             ...this.state.currentAsset,
             regions,
         };
-        console.log(`updateAssetRegions: ${JSON.stringify(currentAsset)}`);
         this.setState({
             currentAsset,
         }, () => {
             this.props.onAssetMetadataChanged(currentAsset);
         });
-        const endTime = new Date().valueOf(); // 结束时间
-        console.log(`加载啦啦 updateAssetRegions ${(endTime - startTime).toString()} 毫秒`);
     }
 
     /**
@@ -474,8 +464,6 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
     }
 
     private renderChildren = () => {
-        console.log(`加载啦啦 renderChildren`);
-        const startTime = new Date().valueOf(); // 开始时间
         return React.cloneElement(this.props.children, {
             onAssetChanged: this.onAssetChanged,
             onLoaded: this.onAssetLoaded,
@@ -483,8 +471,6 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
             onActivated: this.onAssetActivated,
             onDeactivated: this.onAssetDeactivated,
         });
-        const endTime = new Date().valueOf(); // 结束时间
-        console.log(`加载啦啦 renderChildren ${(endTime - startTime).toString()} 毫秒`);
     }
 
     /**
