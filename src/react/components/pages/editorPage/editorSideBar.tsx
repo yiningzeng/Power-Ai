@@ -118,7 +118,7 @@ export default class EditorSideBar extends React.Component<IEditorSideBarProps, 
                 <div className="asset-item-metadata">
                     <span className="asset-filename" title={decodeURI(asset.name)}>{decodeURI(asset.name)}</span>
                     {asset.size &&
-                        <span>
+                        <span className="asset-filename2">
                             {asset.size.width} x {asset.size.height}
                         </span>
                     }
