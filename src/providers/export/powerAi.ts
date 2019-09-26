@@ -41,7 +41,7 @@ export class PowerAiExportProvider extends ExportProvider<IPowerAiExportProvider
                         ...assetMetadata,
                         asset: {
                             ...assetMetadata.asset,
-                            path: "file:${path}/" + assetMetadata.asset.name,
+                            path: "file:${path}" + assetMetadata.asset.name,
                         },
                     };
                     console.log(`filename: ${decodeURI(assetMetadata.asset.name)}`);
@@ -66,7 +66,7 @@ export class PowerAiExportProvider extends ExportProvider<IPowerAiExportProvider
                             ...assetMetadata,
                             asset: {
                                 ...assetMetadata["asset"],
-                                path: "file:${path}/" + assetMetadata["asset"]["name"],
+                                path: "file:${path}" + assetMetadata["asset"]["name"],
                             },
                         };
                         console.log(`导出Power-ai ${assetMetadata.asset.id}: ${JSON.stringify(changeTagAsset)}`);

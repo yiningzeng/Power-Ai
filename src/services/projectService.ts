@@ -177,7 +177,7 @@ export default class ProjectService implements IProjectService {
             const projectStorageProvider = StorageProviderFactory.createFromConnection(project.targetConnection);
             const importStorageProvider = StorageProviderFactory.createFromConnection(newSource);
             const params = {
-                path: encodeURI(folder),
+                path: encodeURI(path.normalize(folder.replace(/\\/g, "/") + "/")),
             };
             const jsonImportProject: IProject = JSON.parse(interpolate(await importStorageProvider.readText(`${constants.importFileExtension}`), params));
 
@@ -190,8 +190,8 @@ export default class ProjectService implements IProjectService {
             // 重新计算需要导入的图像素材的id,并存储在项目目录
             const tempAssets: IAsset[] = [];
             for (const one of _.values(jsonImportProject.assets)) {
-                console.log(`导入计算 one.path=${one.path}\n path.normalize(one.path)=${path.normalize(one.path)}\n md5: ${path.normalize(one.path)}`);
-                const md5Hash = new MD5().update(path.normalize(one.path)).digest("hex");
+                const md5Hash = new MD5().update(one.path).digest("hex");
+                console.log(`导入计算 路径=${path.normalize(folder + "/")} one.path=${one.path}\n path.normalize(one.path)=${path.normalize(one.path)}\n md5: ${md5Hash}`);
                 const oneTemp = {
                     ...one,
                     id: md5Hash,
