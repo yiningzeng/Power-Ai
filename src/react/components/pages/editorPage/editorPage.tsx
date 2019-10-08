@@ -290,7 +290,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                 <SplitPane split="vertical"
                     defaultSize={this.state.thumbnailSize.width}
                     minSize={300}
-                    maxSize={400}
+                    maxSize={500}
                     paneStyle={{ display: "flex" }}
                     onChange={this.onSideBarResize}
                     onDragFinished={this.onSideBarResizeComplete}>
@@ -386,6 +386,17 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                     // await this.props.actions.saveProject(project);
                                 }}
                                 showToolbar={true}/>
+                            <TagInput
+                                tags={this.props.project.tags}
+                                lockedTags={this.state.lockedTags}
+                                selectedRegions={this.state.selectedRegions}
+                                onChange={this.onTagsChanged}
+                                onLockedTagsChange={this.onLockedTagsChanged}
+                                onTagClick={this.onTagClicked}
+                                onCtrlTagClick={this.onCtrlTagClicked}
+                                onTagRenamed={this.confirmTagRenamed}
+                                onTagDeleted={this.confirmTagDeleted}
+                            />
                         </div>
                         <EditorSideBar
                             assets={rootAssets}
@@ -489,19 +500,19 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                 }
                             </div>
                         </div>
-                        <div className="editor-page-right-sidebar">
-                            <TagInput
-                                tags={this.props.project.tags}
-                                lockedTags={this.state.lockedTags}
-                                selectedRegions={this.state.selectedRegions}
-                                onChange={this.onTagsChanged}
-                                onLockedTagsChange={this.onLockedTagsChanged}
-                                onTagClick={this.onTagClicked}
-                                onCtrlTagClick={this.onCtrlTagClicked}
-                                onTagRenamed={this.confirmTagRenamed}
-                                onTagDeleted={this.confirmTagDeleted}
-                            />
-                        </div>
+                        {/*<div className="editor-page-right-sidebar">*/}
+                        {/*    <TagInput*/}
+                        {/*        tags={this.props.project.tags}*/}
+                        {/*        lockedTags={this.state.lockedTags}*/}
+                        {/*        selectedRegions={this.state.selectedRegions}*/}
+                        {/*        onChange={this.onTagsChanged}*/}
+                        {/*        onLockedTagsChange={this.onLockedTagsChanged}*/}
+                        {/*        onTagClick={this.onTagClicked}*/}
+                        {/*        onCtrlTagClick={this.onCtrlTagClicked}*/}
+                        {/*        onTagRenamed={this.confirmTagRenamed}*/}
+                        {/*        onTagDeleted={this.confirmTagDeleted}*/}
+                        {/*    />*/}
+                        {/*</div>*/}
                         <Confirm title={strings.editorPage.tags.rename.title}
                             ref={this.renameTagConfirm}
                             message={strings.editorPage.tags.rename.confirmation}
