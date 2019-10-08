@@ -243,6 +243,10 @@ export interface IAppStrings {
                     title: string;
                     content: string;
                 },
+                error: {
+                    title: string;
+                    content: string;
+                },
             },
         };
         toolbar: {

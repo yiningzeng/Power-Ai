@@ -244,6 +244,10 @@ export const english: IAppStrings = {
                     title: "Import success",
                     content: "Assets has been successfully imported",
                 },
+                error: {
+                    title: "Import failed",
+                    content: "Check that the folder contains the import.power-ai file",
+                },
             },
         },
         toolbar: {
