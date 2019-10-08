@@ -18,6 +18,7 @@ import {toast} from "react-toastify";
 import {ILocalFileSystemProxyOptions} from "../providers/storage/localFileSystemProxy";
 import {interpolate} from "../common/strings";
 import path from "path";
+import cv from "opencv4nodejs";
 
 /**
  * Functions required for a project service
@@ -113,8 +114,14 @@ export default class ProjectService implements IProjectService {
      */
     public async save(project: IProject, securityToken: ISecurityToken): Promise<IProject> {
         Guard.null(project);
+//         const rows = 100; // height
+//         const cols = 100; // width
+//
+// // empty Mat
+//         const emptyMat = new cv.Mat(rows, cols, cv.CV_8UC3);
+//         alert("白村");
         if (!project.id) {
-            project.id = shortid.generate();
+            project.id = `powerAi-${shortid.generate()}`;
         }
 
         // Ensure tags is always initialized to an array
@@ -160,6 +167,7 @@ export default class ProjectService implements IProjectService {
 
     public async importTaggedAssets(project: IProject, folder: string): Promise<IProject> {
         Guard.null(project);
+
         // if (project.version.includes("删除")) {
         //     console.log(`删除保存: ${JSON.stringify(project)}`);
         // }
@@ -179,6 +187,11 @@ export default class ProjectService implements IProjectService {
             const params = {
                 path: encodeURI(path.normalize(folder.replace(/\\/g, "/") + "/")),
             };
+            let importFileList = await importStorageProvider.listFiles();
+            importFileList = importFileList.filter((v) => v.includes(constants.importFileExtension));
+            if (importFileList.length === 0) {
+                return null;
+            }
             const jsonImportProject: IProject = JSON.parse(interpolate(await importStorageProvider.readText(`${constants.importFileExtension}`), params));
 
             // 合并标签
@@ -190,20 +203,24 @@ export default class ProjectService implements IProjectService {
             // 重新计算需要导入的图像素材的id,并存储在项目目录
             const tempAssets: IAsset[] = [];
             for (const one of _.values(jsonImportProject.assets)) {
-                const md5Hash = new MD5().update(one.path).digest("hex");
-                console.log(`导入计算 路径=${path.normalize(folder + "/")} one.path=${one.path}\n path.normalize(one.path)=${path.normalize(one.path)}\n md5: ${md5Hash}`);
-                const oneTemp = {
-                    ...one,
-                    id: md5Hash,
-                };
-                tempAssets.push(oneTemp);
-                if (one.state === AssetState.Tagged) {
-                    const itemJsonText = interpolate(
-                        await importStorageProvider.readText(`${one.id}-asset.json`), params);
-                    const json = JSON.parse(itemJsonText);
-                    json["asset"]["id"] = md5Hash;
-                    await projectStorageProvider.writeText(`${md5Hash}-asset.json`,
-                        JSON.stringify(json, null, 4));
+                try {
+                    const md5Hash = new MD5().update(one.path).digest("hex");
+                    console.log(`导入计算 路径=${path.normalize(folder + "/")} one.path=${one.path}\n path.normalize(one.path)=${path.normalize(one.path)}\n md5: ${md5Hash}`);
+                    const oneTemp = {
+                        ...one,
+                        id: md5Hash,
+                    };
+                    tempAssets.push(oneTemp);
+                    if (one.state === AssetState.Tagged) {
+                        const itemJsonText = interpolate(
+                            await importStorageProvider.readText(`${one.id}-asset.json`), params);
+                        const json = JSON.parse(itemJsonText);
+                        json["asset"]["id"] = md5Hash;
+                        await projectStorageProvider.writeText(`${md5Hash}-asset.json`,
+                            JSON.stringify(json, null, 4));
+                    }
+                } catch (e) {
+                    console.log(e);
                 }
             }
 
@@ -275,7 +292,7 @@ export default class ProjectService implements IProjectService {
     public async transfer(project: IProject, securityToken: ISecurityToken): Promise<IProject> {
         Guard.null(project);
         if (!project.id) {
-            project.id = shortid.generate();
+            project.id = `powerAi-${shortid.generate()}`;
         }
 
         // Ensure tags is always initialized to an array

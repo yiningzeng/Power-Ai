@@ -1,6 +1,6 @@
 {
     "name": "Power-Ai",
-    "version": "3.1.0",
+    "version": "3.1.7",
     "author": {
         "name": "Microsoft",
         "url": "https://github.com/Microsoft/VoTT"
@@ -39,7 +39,7 @@
         "moment": "^2.24.0",
         "node-fetch": "^2.3.0",
         "node-int64": "^0.4.0",
-        "powerai-ct": "^2.2.8",
+        "powerai-ct": "^2.3.1",
         "rc-align": "^2.4.5",
         "rc-checkbox": "^2.1.6",
         "rc-menu": "^7.4.21",
@@ -74,12 +74,13 @@
     },
     "scripts": {
         "start": "nf start -p 3000",
-        "pack-all": "npm run build && npm run webpack:prod && electron-builder && electron-packager . Power-Ai --all --out ./all  --icon=./qt.ico --overwrite --app-version=0.0.1",
-        "pack-win32": "npm run build && npm run webpack:prod && electron-builder && electron-builder && electron-packager . Power-Ai --platform=win32 --out ./all --arch=ia32 --overwrite --app-version=2.0.1 --icon=./qt.ico",
-        "pack-win64": "npm run build && npm run webpack:prod && electron-builder && electron-builder && electron-packager . Power-Ai --platform=win32 --out ./all --arch=x64 --overwrite --app-version=2.0.1 --icon=./qt.ico",
-        "pack-linux": "npm run build && npm run webpack:prod && electron-builder && electron-packager . Power-Ai --platform=linux --out ./all --arch=x64 --overwrite --app-version=2.0.0 --icon=./qt.ico",
-        "pack-arm-linux": "npm run build && npm run webpack:prod && electron-builder && electron-packager . Power-Ai --platform=linux --out ./all --arch=arm64 --overwrite --app-version=2.0.0 --icon=./qt.ico",
-        "pack-mac": "npm run build && npm run webpack:prod && electron-builder && electron-packager . Power-Ai --platform=darwin --out ./all --arch=x64 --overwrite --app-version=2.0.0",
+        "pack-first": "npm run build && npm run webpack:prod",
+        "pack-all": "electron-builder && electron-packager . Power-Ai --all --out ./all  --icon=./qt.ico --overwrite --app-version=0.0.1",
+        "pack-win32": "electron-builder && electron-builder && electron-packager . Power-Ai --platform=win32 --out ./all --arch=ia32 --overwrite --app-version=2.0.1 --icon=./qt.ico",
+        "pack-win64": "electron-builder && electron-builder && electron-packager . Power-Ai --platform=win32 --out ./all --arch=x64 --overwrite --app-version=2.0.1 --icon=./qt.ico",
+        "pack-linux": "electron-builder && electron-packager . Power-Ai --platform=linux --out ./all --arch=x64 --overwrite --app-version=2.0.0 --icon=./qt.ico",
+        "pack-arm-linux": "electron-builder && electron-packager . Power-Ai --platform=linux --out ./all --arch=arm64 --overwrite --app-version=2.0.0 --icon=./qt.ico",
+        "pack-mac": "electron-builder && electron-packager . Power-Ai --platform=darwin --out ./all --arch=x64 --overwrite --app-version=2.0.0",
         "compile": "tsc",
         "build": "react-scripts build",
         "webpack:dev": "webpack --config ./config/webpack.dev.js",

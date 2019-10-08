@@ -370,10 +370,12 @@ export function importTaggedAssets(project: IProject, folder: string):
             throw new AppError(ErrorCode.SecurityTokenNotFound, "Security Token Not Found");
         }
         const updatedProject = await projectService.importTaggedAssets(project, folder);
-        await saveProject(updatedProject)(dispatch, getState);
-        dispatch(saveProjectAction(updatedProject));
-        // Reload project after save actions
-        await loadProject(updatedProject)(dispatch, getState);
+        if (updatedProject !== null) {
+            await saveProject(updatedProject)(dispatch, getState);
+            dispatch(saveProjectAction(updatedProject));
+            // Reload project after save actions
+            await loadProject(updatedProject)(dispatch, getState);
+        }
         return updatedProject;
     };
 }

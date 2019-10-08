@@ -599,10 +599,16 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         if (!fileFolder) { return; }
         this.draggableDialog.current.open();
         const updateProject = await this.props.actions.importTaggedAssets(this.props.project, fileFolder);
-        await this.props.actions.saveProject(updateProject);
-        this.draggableDialog.current.change(strings.editorPage.assetsFolderBar.importTaggedAssets.done.title,
-            strings.editorPage.assetsFolderBar.importTaggedAssets.done.content,
-            true);
+        if (updateProject !== null) {
+            await this.props.actions.saveProject(updateProject);
+            this.draggableDialog.current.change(strings.editorPage.assetsFolderBar.importTaggedAssets.done.title,
+                strings.editorPage.assetsFolderBar.importTaggedAssets.done.content,
+                true);
+        } else {
+            this.draggableDialog.current.change(strings.editorPage.assetsFolderBar.importTaggedAssets.error.title,
+                strings.editorPage.assetsFolderBar.importTaggedAssets.error.content,
+                true);
+        }
     }
 
     /**
