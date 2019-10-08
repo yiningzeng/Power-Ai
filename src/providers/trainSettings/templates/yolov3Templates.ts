@@ -605,7 +605,7 @@ export const yolov3Template = "[net]\n" +
     "\n" +
     "[yolo]\n" +
     "mask = 6,7,8\n" +
-    "anchors = @anchors@\n" +
+    "anchors=@anchors@\n" +
     "classes=@classes@\n" +
     "num=9\n" +
     "jitter=.3\n" +
@@ -689,7 +689,7 @@ export const yolov3Template = "[net]\n" +
     "\n" +
     "[yolo]\n" +
     "mask = 3,4,5\n" +
-    "anchors = @anchors@\n" +
+    "anchors=@anchors@\n" +
     "classes=@classes@\n" +
     "num=9\n" +
     "jitter=.3\n" +
@@ -773,12 +773,11 @@ export const yolov3Template = "[net]\n" +
     "\n" +
     "[yolo]\n" +
     "mask = 0,1,2\n" +
-    "anchors = @anchors@\n" +
+    "anchors=@anchors@\n" +
     "classes=@classes@\n" +
     "num=9\n" +
     "jitter=.3\n" +
     "ignore_thresh = .5\n" +
     "truth_thresh = 1\n" +
-    "random=1\n" +
     "random=1\n" +
     "\n";
