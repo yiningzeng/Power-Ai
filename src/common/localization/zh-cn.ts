@@ -419,6 +419,10 @@ export const chinese: IAppStrings = {
             },
             powerAi: {
                 displayName: "PowerAi(可导入到其他项目)",
+                subdirectories: {
+                    title: "根据标签名分文件夹",
+                    description: "如果一个素材包含多个标签名会被分到multi-tag文件夹",
+                },
             },
         },
         messages: {

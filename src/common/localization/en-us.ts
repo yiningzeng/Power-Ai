@@ -421,6 +421,10 @@ export const english: IAppStrings = {
             },
             powerAi: {
                 displayName: "PowerAi",
+                subdirectories: {
+                    title: "classify by tag name",
+                    description: "If a material contains more than one tag name, it will be assigned to the multi-tag folder.",
+                },
             },
         },
         messages: {

@@ -4,6 +4,9 @@ import {IProject, IExportProviderOptions, IAssetMetadata, IAsset, AssetState} fr
 import Guard from "../../common/guard";
 import { constants } from "../../common/constants";
 import HtmlFileReader from "../../common/htmlFileReader";
+import path from "path";
+import {Simulate} from "react-dom/test-utils";
+import animationIteration = Simulate.animationIteration;
 
 /**
  * VoTT Json Export Provider options
@@ -29,8 +32,24 @@ export class PowerAiExportProvider extends ExportProvider<IPowerAiExportProvider
     public async export(): Promise<void> {
         const results = await this.getAssetsForExport();
         const exportFolderName = `${this.project.name.replace(/\s/g, "-")}-power-ai-export`;
+        // tslint:disable-next-line:max-line-length
+        let isSubdirectories = false;
+        try {
+            isSubdirectories = JSON.parse(JSON.stringify(this.project.exportFormat.providerOptions))["subdirectories"];
+        } catch (e) {
+            console.error(e);
+        }
+        console.log(`是否分文件夹: ${isSubdirectories}`);
         await this.storageProvider.deleteContainer(exportFolderName);
         await this.storageProvider.createContainer(exportFolderName);
+        if (isSubdirectories) {
+            console.log(`老子分文件夹，所以创建先`);
+            await this.project.tags.mapAsync(async (v) => {
+                await this.storageProvider.createContainer(path.normalize(`${exportFolderName}/${v.name}`));
+            });
+            await this.storageProvider.createContainer(path.normalize(`${exportFolderName}/multi-tag`));
+            await this.storageProvider.createContainer(path.normalize(`${exportFolderName}/ok`));
+        }
         const finalResults: IAsset[] = [];
         // console.log(`数据:${JSON.stringify(results)}`);
         // await this.storageProvider.writeText(`${exportFolderName}/数据.json`, JSON.stringify(results, null, 4));
@@ -51,8 +70,22 @@ export class PowerAiExportProvider extends ExportProvider<IPowerAiExportProvider
                         resolve();
                         return;
                     }
-                    const assetFilePath = `${exportFolderName}/${assetMetadata.asset.name}`;
-                    if (assetMetadata && assetMetadata.asset.state === AssetState.Tagged) {
+                    let assetFilePath = `${exportFolderName}/${assetMetadata.asset.name}`;
+                    if (assetMetadata && assetMetadata.asset.state === AssetState.Tagged &&
+                        assetMetadata.regions.length > 0) {
+
+                        let lastTagName = "";
+                        if (isSubdirectories) {
+                            assetMetadata.regions.mapAsync(async (v) => {
+                                if (lastTagName === "") {
+                                    lastTagName = `${v.tags[0]}/`;
+                                } else if (lastTagName !== v.tags[0]) {
+                                    lastTagName = "multi-tag/";
+                                }
+                            });
+                        }
+                        这里做个分类把所有分开的素材的import.power-ai分别保存在相应的目录下
+
                         // region 导出异常问题在这
                         // 已经找到问题所在 主要原因是个别图片对应的标文件不存在
                         console.log(`导出Power-ai ===========start=================`);
@@ -70,11 +103,16 @@ export class PowerAiExportProvider extends ExportProvider<IPowerAiExportProvider
                             },
                         };
                         console.log(`导出Power-ai ${assetMetadata.asset.id}: ${JSON.stringify(changeTagAsset)}`);
-                        await this.storageProvider.writeText(`${exportFolderName}/${assetMetadata.asset.id}${constants.assetMetadataFileExtension}`,
+                        await this.storageProvider.writeText(`${exportFolderName}/${lastTagName}${assetMetadata.asset.id}${constants.assetMetadataFileExtension}`,
                             JSON.stringify(changeTagAsset, null, 4));
                         console.log(`导出Power-ai ${assetMetadata.asset.id}: 保存本地`);
+                        assetFilePath = `${exportFolderName}/${lastTagName}${assetMetadata.asset.name}`;
                         console.log(`导出Power-ai ===========end=================`);
                         // endregion
+                    } else if (assetMetadata && assetMetadata.asset.state !== AssetState.Tagged) {
+                        if (isSubdirectories) {
+                            assetFilePath = `${exportFolderName}/ok/${assetMetadata.asset.name}`;
+                        }
                     }
                     const fileReader = new FileReader();
                     fileReader.onload = async () => {

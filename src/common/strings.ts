@@ -418,6 +418,10 @@ export interface IAppStrings {
             },
             powerAi: {
                 displayName: string,
+                subdirectories: {
+                    title: string,
+                    description: string,
+                },
             },
         },
         messages: {
