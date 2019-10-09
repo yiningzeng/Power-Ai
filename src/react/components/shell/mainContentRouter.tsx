@@ -7,6 +7,7 @@ import TrainPage from "../pages/train/trainPage";
 import RemoteTrainPage from "../pages/remoteTrain/remoteTrainPage";
 import AppSettingsPage from "../pages/appSettings/appSettingsPage";
 import ConnectionPage from "../pages/connections/connectionsPage";
+import Manage from "../pages/webManage/manage";
 import EditorPage from "../pages/editorPage/editorPage";
 import ExportPage from "../pages/export/exportPage";
 import ProjectSettingsPage from "../pages/projectSettings/projectSettingsPage";
@@ -24,6 +25,7 @@ export default function MainContentRouter() {
                 <Route path="/settings" component={AppSettingsPage} />
                 <Route path="/connections/:connectionId" component={ConnectionPage} />
                 <Route path="/connections" exact component={ConnectionPage} />
+                <Route path="/web-manage" exact component={Manage} />
                 <Route path="/projects/:projectId/edit" component={EditorPage} />
                 <Route path="/projects/create" component={ProjectSettingsPage} />
                 <Route path="/projects/:projectId/settings" component={ProjectSettingsPage} />

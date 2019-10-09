@@ -18,7 +18,6 @@ import {toast} from "react-toastify";
 import {ILocalFileSystemProxyOptions} from "../providers/storage/localFileSystemProxy";
 import {interpolate} from "../common/strings";
 import path from "path";
-import cv from "opencv4nodejs";
 
 /**
  * Functions required for a project service

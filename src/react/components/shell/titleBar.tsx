@@ -75,7 +75,7 @@ export class TitleBar extends React.Component<ITitleBarProps, ITitleBarState> {
                 {/*}*/}
                 <div className="title-bar-menu">
                     <Menu mode="horizontal"
-                          selectable={false}>
+                          selectable={true}>
                         <MenuItem key={"首页"} disabled={false}>
                             <div className="menu-item-container">
                                 <NavLink title={"Home"} to={`/`}>
@@ -86,9 +86,18 @@ export class TitleBar extends React.Component<ITitleBarProps, ITitleBarState> {
                         <MenuItem key={"工作台"} disabled={false}>
                             <div className="menu-item-container">
                                 <ConditionalNavLink disabled={!this.props.projectId}
-                                                    title={strings.tags.editor}
+                                                    title={"workspace"}
                                                     to={`/projects/${this.props.projectId}/edit`}>
                                     工作台
+                                </ConditionalNavLink>
+                            </div>
+                        </MenuItem>
+                        <MenuItem key={"管理页面"} disabled={false} selectable={false}>
+                            <div className="menu-item-container">
+                                <ConditionalNavLink disabled={!this.props.projectId}
+                                                    title={"manage"}
+                                                    to={`/web-manage`}>
+                                    管理页面
                                 </ConditionalNavLink>
                             </div>
                         </MenuItem>
