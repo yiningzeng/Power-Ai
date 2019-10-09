@@ -60,7 +60,6 @@ export default class App extends React.Component<IAppProps> {
 
     public render() {
         const platform = global && global.process ? global.process.platform : "web";
-
         return (
             <Fragment>
                 <ErrorHandler
@@ -73,11 +72,12 @@ export default class App extends React.Component<IAppProps> {
                         <Router history={history}>
                             <div className={`app-shell platform-${platform}`}>
                                 <TitleBar icon="fas fa-tags"
-                                    title={this.props.currentProject ? this.props.currentProject.name : ""}>
+                                          title={this.props.currentProject ? this.props.currentProject.name : ""}
+                                          projectId={this.props.currentProject ? this.props.currentProject.id : ""}>
                                     <div className="app-help-menu-icon"><HelpMenu/></div>
                                 </TitleBar>
                                 <div className="app-main">
-                                    <Sidebar project={this.props.currentProject} />
+                                    {/*<Sidebar project={this.props.currentProject} />*/}
                                     <MainContentRouter />
                                 </div>
                                 <StatusBar>

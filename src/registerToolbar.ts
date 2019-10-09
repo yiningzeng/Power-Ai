@@ -207,6 +207,15 @@ export default function registerToolbar() {
         accelerators: ["CmdOrCtrl+D", "CmdOrCtrl+d"],
     });
 
+    // ToolbarItemFactory.register({
+    //     name: ToolbarItemName.SaveProject,
+    //     tooltip: strings.editorPage.toolbar.saveProject,
+    //     icon: "fa-save",
+    //     group: ToolbarItemGroup.Project,
+    //     type: ToolbarItemType.Action,
+    //     accelerators: ["CmdOrCtrl+S", "CmdOrCtrl+s"],
+    // }, SaveProject);
+
     ToolbarItemFactory.register({
         name: ToolbarItemName.SaveProject,
         tooltip: strings.editorPage.toolbar.saveProject,
@@ -214,7 +223,7 @@ export default function registerToolbar() {
         group: ToolbarItemGroup.Project,
         type: ToolbarItemType.Action,
         accelerators: ["CmdOrCtrl+S", "CmdOrCtrl+s"],
-    }, SaveProject);
+    });
 
     ToolbarItemFactory.register({
         name: ToolbarItemName.ExportProject,

@@ -3,11 +3,13 @@ import Menu, { MenuItem, SubMenu, Divider } from "rc-menu";
 import { PlatformType } from "../../../common/hostProcess";
 import "./titleBar.scss";
 import { strings } from "../../../common/strings";
-import { HelpMenu } from "./helpMenu";
+import {NavLink} from "react-router-dom";
+import ConditionalNavLink from "../common/conditionalNavLink/conditionalNavLink";
 
 export interface ITitleBarProps extends React.Props<TitleBar> {
     icon?: string | JSX.Element;
     title?: string;
+    projectId?: string;
 }
 
 export interface ITitleBarState {
@@ -71,17 +73,38 @@ export class TitleBar extends React.Component<ITitleBarProps, ITitleBarState> {
                 {/*{(this.state.platform === PlatformType.Windows || this.state.platform === PlatformType.Web) &&*/}
                  {/**/}
                 {/*}*/}
-                {this.state.platform === PlatformType.Windows &&
-                    <div className="title-bar-menu">
-                        {/*<Menu ref={this.menu}*/}
-                            {/*mode="horizontal"*/}
-                            {/*selectable={false}*/}
-                            {/*triggerSubMenuAction="click"*/}
-                            {/*onClick={this.onMenuItemSelected}>*/}
-                            {/*{this.renderMenu(this.state.menu)}*/}
-                        {/*</Menu>*/}
-                    </div>
-                }
+                <div className="title-bar-menu">
+                    <Menu mode="horizontal"
+                          selectable={false}>
+                        <MenuItem key={"首页"} disabled={false}>
+                            <div className="menu-item-container">
+                                <NavLink title={"Home"} to={`/`}>
+                                    首页
+                                </NavLink>
+                            </div>
+                        </MenuItem>
+                        <MenuItem key={"工作台"} disabled={false}>
+                            <div className="menu-item-container">
+                                <ConditionalNavLink disabled={!this.props.projectId}
+                                                    title={strings.tags.editor}
+                                                    to={`/projects/${this.props.projectId}/edit`}>
+                                    工作台
+                                </ConditionalNavLink>
+                            </div>
+                        </MenuItem>
+                    </Menu>
+
+                    {/*<Menu ref={this.menu}*/}
+                    {/*    mode="horizontal"*/}
+                    {/*    selectable={false}*/}
+                    {/*    triggerSubMenuAction="click"*/}
+                    {/*    onClick={this.onMenuItemSelected}>*/}
+                    {/*    {this.renderMenu(this.state.menu)}*/}
+                    {/*</Menu>*/}
+                </div>
+                {/*{this.state.platform === PlatformType.Linux &&*/}
+                {/*    <div>aa</div>*/}
+                {/*}*/}
                 <div className="title-bar-main">{this.props.title || "欢迎"} - Power Ai</div>
                 <div className="title-bar-controls">
                     {this.props.children}

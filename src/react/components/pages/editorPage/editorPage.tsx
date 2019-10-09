@@ -289,7 +289,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                 })}
                 <SplitPane split="vertical"
                     defaultSize={this.state.thumbnailSize.width}
-                    minSize={300}
+                    minSize={350}
                     maxSize={500}
                     paneStyle={{ display: "flex" }}
                     onChange={this.onSideBarResize}
@@ -1026,6 +1026,10 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                 break;
             case ToolbarItemName.ActiveLearning:
                 await this.predictRegions();
+                break;
+            case ToolbarItemName.SaveProject:
+                // toast.error("开始到处");
+                this.props.history.push(`/projects/${projectId}/settings`);
                 break;
             case ToolbarItemName.ExportProject:
                 // toast.error("开始到处");

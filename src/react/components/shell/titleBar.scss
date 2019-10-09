@@ -83,6 +83,16 @@
         }
     }
 }
+.title-menu-icon {
+    color: #ccc;
+    display: inline-block;
+
+    &:hover {
+        color: #fff;
+        background-color: $lighter-2;
+        cursor: pointer;
+    }
+}
 
 .menu-item {
     &-container {
