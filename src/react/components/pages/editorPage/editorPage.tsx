@@ -6,7 +6,7 @@ import SplitPane from "react-split-pane";
 import {bindActionCreators} from "redux";
 import {SelectionMode} from "powerai-ct/lib/js/CanvasTools/Interface/ISelectorSettings";
 import HtmlFileReader from "../../../../common/htmlFileReader";
-import {strings} from "../../../../common/strings";
+import {strings,interpolate} from "../../../../common/strings";
 import {
     AppError,
     AssetState,
@@ -606,14 +606,29 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
      * 导入已经标记的素材
      */
     private onImportTaggedAssets = async (): Promise<void> => {
-        const fileFolder = await this.localFileSystem.selectContainer();
+        const fileFolder = await this.localFileSystem.importTaggedContainer();
         if (!fileFolder) { return; }
         this.draggableDialog.current.open();
-        const updateProject = await this.props.actions.importTaggedAssets(this.props.project, fileFolder);
-        if (updateProject !== null) {
-            await this.props.actions.saveProject(updateProject);
+        const folder = fileFolder.toString().split(",");
+        const allNum = folder.length;
+        let i = 0;
+        await folder.mapAsync(async (item) => {
+            try {
+                console.log(`导入已经标记的素材: ${item}`);
+                const updateProject = await this.props.actions.importTaggedAssets(this.props.project, item);
+                await this.props.actions.saveProject(updateProject);
+                i++;
+            } catch (e) {
+                console.error(e);
+            }
+        });
+        if (i >= allNum) {
             this.draggableDialog.current.change(strings.editorPage.assetsFolderBar.importTaggedAssets.done.title,
                 strings.editorPage.assetsFolderBar.importTaggedAssets.done.content,
+                true);
+        } else if (i > 0 && i < allNum) {
+            this.draggableDialog.current.change(strings.editorPage.assetsFolderBar.importTaggedAssets.errorPart.title,
+                interpolate(strings.editorPage.assetsFolderBar.importTaggedAssets.errorPart.content, { part: `${i}/${allNum}`}),
                 true);
         } else {
             this.draggableDialog.current.change(strings.editorPage.assetsFolderBar.importTaggedAssets.error.title,

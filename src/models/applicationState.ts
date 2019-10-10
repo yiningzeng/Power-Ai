@@ -275,6 +275,7 @@ export interface IAssetVideoSettings {
  * @member path - Relative path to asset within the underlying data source
  * @member size - Size / dimensions of asset
  * @member format - The asset format (jpg, png, mp4, etc)
+ * @member tagType - 用于在导出power-ai格式的数据时，区分标签文件夹所设的 用于判断当前的素材，已经标记的标签的多样性
  */
 export interface IAsset {
     id: string;
@@ -287,6 +288,7 @@ export interface IAsset {
     timestamp?: number;
     parent?: IAsset;
     predicted?: boolean;
+    tagType?: string;
 }
 
 /**

@@ -28,6 +28,20 @@ export default class LocalFileSystem implements IStorageProvider {
         });
     }
 
+    public importTaggedContainer(): Promise<object> {
+        return new Promise<object>((resolve, reject) => {
+            const filePaths = dialog.showOpenDialog({
+                title: strings.connections.providers.local.selectFolder,
+                buttonLabel: strings.connections.providers.local.chooseFolder,
+                properties: ["openDirectory", "multiSelections"],
+            });
+            if (!filePaths || filePaths.length === 0) {
+                return reject();
+            }
+            resolve(filePaths);
+        });
+    }
+
     public readText(filePath: string): Promise<string> {
         return new Promise<string>((resolve, reject) => {
             fs.readFile(path.normalize(filePath), (err: NodeJS.ErrnoException, data: Buffer) => {

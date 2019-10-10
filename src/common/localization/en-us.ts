@@ -244,6 +244,10 @@ export const english: IAppStrings = {
                     title: "Import success",
                     content: "Assets has been successfully imported",
                 },
+                errorPart: {
+                    title: "注意！部分导入完成",
+                    content: "个别目录导入失败，成功导入 (${part}) 个素材文件夹，可在素材文件夹列表查看",
+                },
                 error: {
                     title: "Import failed",
                     content: "Check that the folder contains the import.power-ai file",

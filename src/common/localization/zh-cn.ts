@@ -243,6 +243,10 @@ export const chinese: IAppStrings = {
                     title: "导入完成",
                     content: "已经成功导入，可在素材文件夹列表查看",
                 },
+                errorPart: {
+                    title: "注意！部分导入完成",
+                    content: "个别目录导入失败，成功导入 (${part}) 个素材文件夹，可在素材文件夹列表查看",
+                },
                 error: {
                     title: "导入失败",
                     content: "请检查文件夹下是否包含import.power-ai文件",
