@@ -6,7 +6,6 @@ import { constants } from "../../common/constants";
 import HtmlFileReader from "../../common/htmlFileReader";
 import path from "path";
 import {Simulate} from "react-dom/test-utils";
-import animationIteration = Simulate.animationIteration;
 
 /**
  * VoTT Json Export Provider options
@@ -84,7 +83,7 @@ export class PowerAiExportProvider extends ExportProvider<IPowerAiExportProvider
                                 }
                             });
                         }
-                        这里做个分类把所有分开的素材的import.power-ai分别保存在相应的目录下
+                        // 这里做个分类把所有分开的素材的import.power-ai分别保存在相应的目录下
 
                         // region 导出异常问题在这
                         // 已经找到问题所在 主要原因是个别图片对应的标文件不存在
