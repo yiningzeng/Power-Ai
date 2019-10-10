@@ -203,20 +203,22 @@ export default class ProjectService implements IProjectService {
             const tempAssets: IAsset[] = [];
             for (const one of _.values(jsonImportProject.assets)) {
                 try {
-                    const md5Hash = new MD5().update(one.path).digest("hex");
-                    console.log(`导入计算 路径=${path.normalize(folder + "/")} one.path=${one.path}\n path.normalize(one.path)=${path.normalize(one.path)}\n md5: ${md5Hash}`);
-                    const oneTemp = {
-                        ...one,
-                        id: md5Hash,
-                    };
-                    tempAssets.push(oneTemp);
-                    if (one.state === AssetState.Tagged) {
-                        const itemJsonText = interpolate(
-                            await importStorageProvider.readText(`${one.id}-asset.json`), params);
-                        const json = JSON.parse(itemJsonText);
-                        json["asset"]["id"] = md5Hash;
-                        await projectStorageProvider.writeText(`${md5Hash}-asset.json`,
-                            JSON.stringify(json, null, 4));
+                    if (one.state !== AssetState.NotVisited) {
+                        const md5Hash = new MD5().update(one.path).digest("hex");
+                        console.log(`导入计算 路径=${path.normalize(folder + "/")} one.path=${one.path}\n path.normalize(one.path)=${path.normalize(one.path)}\n md5: ${md5Hash}`);
+                        const oneTemp = {
+                            ...one,
+                            id: md5Hash,
+                        };
+                        tempAssets.push(oneTemp);
+                        if (one.state === AssetState.Tagged) {
+                            const itemJsonText = interpolate(
+                                await importStorageProvider.readText(`${one.id}-asset.json`), params);
+                            const json = JSON.parse(itemJsonText);
+                            json["asset"]["id"] = md5Hash;
+                            await projectStorageProvider.writeText(`${md5Hash}-asset.json`,
+                                JSON.stringify(json, null, 4));
+                        }
                     }
                 } catch (e) {
                     console.log(e);
