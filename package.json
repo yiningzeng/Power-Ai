@@ -1,6 +1,6 @@
 {
     "name": "Power-Ai",
-    "version": "3.1.7",
+    "version": "3.2.9",
     "author": {
         "name": "Microsoft",
         "url": "https://github.com/Microsoft/VoTT"
@@ -47,7 +47,7 @@
         "rc-tree-select": "^2.7.1",
         "react": "^16.8.6",
         "react-appinsights": "^3.0.0-rc.5",
-        "react-color": "^2.17.0",
+        "react-color": "^2.17.3",
         "react-dnd": "^5.0.0",
         "react-dnd-html5-backend": "^3.0.2",
         "react-dom": "^16.9.0",

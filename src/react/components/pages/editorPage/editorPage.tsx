@@ -6,7 +6,7 @@ import SplitPane from "react-split-pane";
 import {bindActionCreators} from "redux";
 import {SelectionMode} from "powerai-ct/lib/js/CanvasTools/Interface/ISelectorSettings";
 import HtmlFileReader from "../../../../common/htmlFileReader";
-import {strings,interpolate} from "../../../../common/strings";
+import {strings, interpolate} from "../../../../common/strings";
 import {
     AppError,
     AssetState,
