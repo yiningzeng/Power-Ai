@@ -2,10 +2,26 @@
 const zoom = (onWheelEvent, callback) => {
 
     console.log(onWheelEvent);
-    console.log(`啦啦: ${onWheelEvent.deltaX}, ${onWheelEvent.deltaY}, ${onWheelEvent.deltaZ}`);
+    console.log(`啦啦: ${onWheelEvent.nativeEvent.deltaX}, ${onWheelEvent.nativeEvent.deltaY}, ${onWheelEvent.nativeEvent.deltaZ}`);
     // // console.log("zoom: width" + dom.style.width +" left" +dom.style.left);
     let e = onWheelEvent;
     e.preventDefault();
+    // const ele = rdom.findDOMNode(this);
+    if (e.nativeEvent.deltaY <= 0) {
+        e.preventDefault();
+        console.log("scrolling up");
+        /* scrolling up */
+        // if ( ele.scrollTop <= 0) {
+        //
+        // }
+    } else {
+        e.preventDefault();
+        console.log("scrolling down");
+        /* scrolling down */
+        // if ( ele.scrollTop + ele.clientHeight >= ele.scrollHeight) {
+        //
+        // }
+    }
     callback(e.deltaY);
     // var ratioL = (this.clientX - onWheelEvent.offsetLeft) / onWheelEvent.offsetWidth,
     //     ratioT = (this.clientY - onWheelEvent.offsetTop) / onWheelEvent.offsetHeight,

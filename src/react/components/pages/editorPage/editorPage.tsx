@@ -190,6 +190,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
     private deleteSourceProviderConfirm: React.RefObject<Confirm> = React.createRef();
     private deleteConfirm: React.RefObject<Confirm> = React.createRef();
     private draggableDialog: React.RefObject<DraggableDialog> = React.createRef();
+    private myZoomDom: React.RefObject<Rnd> = React.createRef();
 
     constructor(props, context) {
         super(props, context);
@@ -418,7 +419,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                             <div className="editor-page-content-main-body">
                                 {selectedAsset &&
                                 <Rnd
-                                    ref="editorDom"
+                                    ref={this.myZoomDom}
                                     disableDragging={this.state.zoomMode.disableDrag}
                                     size={{ width: this.state.zoomMode.width,  height: this.state.zoomMode.height }}
                                     position={{ x: this.state.zoomMode.x, y: this.state.zoomMode.y }}
@@ -443,7 +444,25 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                             },
                                         });
                                     }}
+                                    onMouseDown={(e) => {
+                                        const zone = document.getElementById("ct-zone");
+                                        console.log(this.myZoomDom.current.getOffsetFromParent().left);
+                                        console.log(this.myZoomDom.current.getSelfElement().offsetLeft);
+                                        console.log(this.myZoomDom.current.getSelfElement().style.marginLeft);
+                                        console.log(this.myZoomDom.current.getSelfElement().style.left);
+                                        console.log(this.myZoomDom.current.getSelfElement().style.paddingLeft);
+                                        console.log(`zone.offsetLeft: ${e.pageX} ${e.screenX}我是鼠标点击x: ${e.clientX} 我是鼠标点击Y: ${e.layerY}`);
+                                        this.setState({
+                                            zoomMode: {
+                                                ...this.state.zoomMode,
+                                                zoomCenterX: e.clientX,
+                                                zoomCenterY: e.clientY,
+                                            },
+                                        });
+                                    }}
                                     onMouseMove={(e) => {
+                                        // console.log(e);
+                                        // console.log(`我是鼠标点x: ${e.} 我是鼠标点y: ${e.offsetY}`);
                                         this.setState({
                                             zoomMode: {
                                                 ...this.state.zoomMode,
@@ -454,6 +473,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                     }}
                                     onWheel={ (e) => Zoom(e, (deltaY) => {
                                         const zone = document.getElementById("ct-zone");
+                                        console.log(`我是图像左上角点x: ${this.myZoomDom.current.getDraggablePosition().x} 我是图像左上角点y: ${this.myZoomDom.current.getDraggablePosition().y}`);
                                         const w = zone.offsetWidth;
                                         const h = zone.offsetHeight;
                                         if ((h - deltaY) < this.state.zoomMode.miniHeight) { return; }
