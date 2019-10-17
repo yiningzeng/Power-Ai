@@ -97,10 +97,8 @@ export default class TrainPage extends React.Component<ITrainPageProps> {
                     disableBackdropClick={true}
                     disableEscapeKeyDown={true}
                     fullWidth={true}
-                    onDone={() => this.props.history.goBack()}
-                    onCancel={() => {
-                        this.props.history.goBack();
-                    }}
+                    onDone={() => this.props.history.push(`/web-manage`)}
+                    onCancel={() => this.props.history.push(`/web-manage`)}
                 />
                 <h3>
                     <i className="fas fa-sliders-h fa-1x"></i>
