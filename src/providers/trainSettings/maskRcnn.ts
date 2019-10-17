@@ -5,7 +5,7 @@ import Guard from "../../common/guard";
 import { IMaskRcnnCondig} from "../../models/trainConfig";
 import YAML from "json2yaml";
 import {interpolate} from "../../common/strings";
-import {maskRcnnTemplate} from "./templates/maskRcnnTemplates";
+import {maskRcnnTemplate} from "./templates/detectron/maskRcnnTemplates";
 
 const trainSettings: IMaskRcnnCondig  = {
 // MODEL:,

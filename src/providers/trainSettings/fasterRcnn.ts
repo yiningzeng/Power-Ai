@@ -5,7 +5,7 @@ import Guard from "../../common/guard";
 import {IDetectron, IFasterRcnnCondig} from "../../models/trainConfig";
 import YAML from "json2yaml";
 import {interpolate} from "../../common/strings";
-import { fasterRcnnTemplate } from "./templates/fasterRcnnTemplates";
+import { fasterRcnnTemplate } from "./templates/detectron/fasterRcnnTemplates";
 
 const trainSettings: IFasterRcnnCondig  = {
     // MODEL: {
