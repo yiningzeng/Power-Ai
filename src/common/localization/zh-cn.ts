@@ -440,14 +440,23 @@ export const chinese: IAppStrings = {
         settings: "训练参数设置",
         saveSettings: "保存",
         providers: {
+            fasterRcnn2: {
+                displayName: "[detectron2] Faster Rcnn",
+            },
+            maskRcnn2: {
+                displayName: "[detectron2] Mask Rcnn",
+            },
+            keypointRcnn2: {
+                displayName: "[detectron2] Keypoint Rcnn",
+            },
             fasterRcnn: {
-                displayName: "Faster Rcnn",
+                displayName: "[detectron] Faster Rcnn (弃用)",
             },
             maskRcnn: {
-                displayName: "Mask Rcnn",
+                displayName: "[detectron] Mask Rcnn (弃用)",
             },
             yolov3: {
-                displayName: "Yolo v3",
+                displayName: "[darknet] Yolo v3",
             },
         },
         messages: {

@@ -20,7 +20,7 @@ let workerProcess;
 export default class TrainingSystem {
 
     constructor(private browserWindow: BrowserWindow) { }
-
+    // region 弃用
     public fasterRcnn(project: IProject): Promise<string> {
         return new Promise<string>((resolve, reject) => {
             if (project.trainFormat.ip !== "localhost") {
@@ -184,6 +184,7 @@ export default class TrainingSystem {
             resolve("成功");
         });
     }
+    // endregion
 
     public remoteTrain(project: IProject): Promise<string> {
         return new Promise<string>((resolve, reject) => {
@@ -280,19 +281,19 @@ export default class TrainingSystem {
                         //     });
                         // }).catch(console.warn);
 
-                        const form = new FormData();
-                        form.append("username", "baymin");
-                        form.append("password", "e10adc3949ba59abbe56e057f20f883e");
-                        got("http://rest.yining.site:8080/api/v1/u2", {
-                            body: form,
-                            method: "POST",
-                        }).then((response) => {
-                            console.log("进来了大爷");
-                            console.log(response.body);
-                        }).catch((error) => {
-                            console.log("错误了");
-                            console.log(error.response.body);
-                        });
+                        // const form = new FormData();
+                        // form.append("username", "baymin");
+                        // form.append("password", "e10adc3949ba59abbe56e057f20f883e");
+                        // got("http://rest.yining.site:8080/api/v1/u2", {
+                        //     body: form,
+                        //     method: "POST",
+                        // }).then((response) => {
+                        //     console.log("进来了大爷");
+                        //     console.log(response.body);
+                        // }).catch((error) => {
+                        //     console.log("错误了");
+                        //     console.log(error.response.body);
+                        // });
 
                     });
                 });
@@ -574,12 +575,12 @@ export default class TrainingSystem {
                 resolve(res);
             });
 
-            let win = new BrowserWindow({ width: 1800, height: 1000, show: false });
-            win.on("closed", () => {
-                win = null;
-            });
-            win.loadURL(`http://${project.trainFormat.ip}`);
-            win.show();
+            // let win = new BrowserWindow({ width: 1800, height: 1000, show: false });
+            // win.on("closed", () => {
+            //     win = null;
+            // });
+            // win.loadURL(`http://${project.trainFormat.ip}`);
+            // win.show();
         });
     }
 
@@ -595,7 +596,7 @@ export default class TrainingSystem {
                 packageDir: source.tarBaseName,
                 packageName: source.tarName,
             };
-            got("http://localhost:18888/power-ai-train", {
+            got("http://server.qtingvision.com:888/power-ai-train", {
                 body: packageInfo,
                 method: "POST",
                 json: true,

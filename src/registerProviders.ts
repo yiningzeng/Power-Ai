@@ -16,6 +16,8 @@ import {CocoExportProvider} from "./providers/export/coco";
 import {Yolov3Provider} from "./providers/trainSettings/yolov3";
 import {FasterRcnnProvider} from "./providers/trainSettings/fasterRcnn";
 import {MaskRcnnProvider} from "./providers/trainSettings/maskRcnn";
+import {FasterRcnn2Provider} from "./providers/trainSettings/fasterRcnn2";
+import {MaskRcnn2Provider} from "./providers/trainSettings/maskRcnn2";
 
 /**
  * Registers storage, asset and export providers, as well as all toolbar items
@@ -94,6 +96,22 @@ export default function registerProviders() {
         displayName: strings.train.providers.maskRcnn.displayName,
         factory: (project, options) => new MaskRcnnProvider(project, options),
     });
+
+    TrainProviderFactory.register({
+        name: "fasterRcnn2",
+        displayName: strings.train.providers.fasterRcnn2.displayName,
+        factory: (project, options) => new FasterRcnn2Provider(project, options),
+    });
+    TrainProviderFactory.register({
+        name: "maskRcnn2",
+        displayName: strings.train.providers.maskRcnn2.displayName,
+        factory: (project, options) => new MaskRcnn2Provider(project, options),
+    });
+    // TrainProviderFactory.register({
+    //     name: "maskRcnn",
+    //     displayName: strings.train.providers.maskRcnn.displayName,
+    //     factory: (project, options) => new MaskRcnnProvider(project, options),
+    // });
     // TrainProviderFactory.register({
     //     name: "remoteTrain",
     //     displayName: strings.train.providers.maskRcnn.displayName,

@@ -442,14 +442,23 @@ export const english: IAppStrings = {
         settings: "",
         saveSettings: "save",
         providers: {
+            fasterRcnn2: {
+                displayName: "[detectron2] Faster Rcnn",
+            },
+            maskRcnn2: {
+                displayName: "[detectron2] Mask Rcnn",
+            },
+            keypointRcnn2: {
+                displayName: "[detectron2] Keypoint Rcnn",
+            },
             fasterRcnn: {
-                displayName: "Faster Rcnn",
+                displayName: "[detectron] Faster Rcnn (discards)",
             },
             maskRcnn: {
-                displayName: "Mask Rcnn",
+                displayName: "[detectron] Mask Rcnn (discards)",
             },
             yolov3: {
-                displayName: "Yolo v3",
+                displayName: "[darknet] Yolo v3",
             },
         },
         messages: {

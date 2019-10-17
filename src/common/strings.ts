@@ -445,6 +445,15 @@ export interface IAppStrings {
             maskRcnn: {
                 displayName: string,
             },
+            fasterRcnn2: {
+                displayName: string,
+            },
+            maskRcnn2: {
+                displayName: string,
+            },
+            keypointRcnn2: {
+                displayName: string,
+            },
             yolov3: {
                 displayName: string,
             },
