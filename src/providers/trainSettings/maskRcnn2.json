@@ -36,11 +36,23 @@
                                 }
                             }
                         },
+                        "ROI_HEADS": {
+                            "title": "",
+                            "type": "object",
+                            "properties": {
+                                "NUM_CLASSES": {
+                                    "type": "string",
+                                    "title": "标签数目",
+                                    "default": "auto",
+                                    "description": "设置为auto，Power-Ai会自动配置"
+                                }
+                            }
+                        },
                         "PIXEL_STD": {
                             "type": "string",
                             "title": "像素标准差",
                             "description": "如果使用的是detectron1或者mask，需要设置为[1.0, 1.0, 1.0]。",
-                            "default": "[1.0, 1.0, 1.0]"
+                            "default": "[57.375, 57.120, 58.395]"
                         }
                     }
                 },
@@ -59,6 +71,12 @@
                             "title": "学习率开始下降的轮数",
                             "description": "默认为auto，Power-Ai会自动根据最大训练轮数设置合理的值",
                             "default": "auto"
+                        },
+                        "IMS_PER_BATCH": {
+                            "type": "string",
+                            "title": "所有GPU上每批图像的数量",
+                            "description": "设置为auto，Power-Ai会自动根据GPU数量设置稳定的值，但不是GPU利用率最高的值",
+                            "default": "40"
                         }
                     }
                 },
@@ -136,7 +154,9 @@
                         "REPEAT_THRESHOLD": {
                             "type": "number",
                             "title": "RepeatFactorTrainingSampler的重复阈值",
-                            "default": 0.0,
+                            "maximum": 1.0,
+                            "default": 0.1,
+                            "minimum": 0.0,
                             "description": "如果选择RepeatFactorTrainingSampler那么这个参数会起作用，表示数据重复采集的阈值"
                         }
                     }

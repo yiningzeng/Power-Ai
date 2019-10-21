@@ -1,5 +1,6 @@
 export const detectron2Template = "" +
     "_BASE_: ${_BASE_}\n" +
+    "VERSION: 2\n" +
     "MODEL:\n" +
     "  WEIGHTS: ${WEIGHTS}\n" +
     "  MASK_ON: ${MASK_ON}\n" +
@@ -27,4 +28,4 @@ export const detectron2Template = "" +
     "    ENABLED: ${ENABLED}\n" +
     "    TYPE: ${TYPE}\n" +
     "    SIZE: ${SIZE}\n" +
-    "OUTPUT_DIR: \"/detectron2/datasets/output\"\n"
+    "OUTPUT_DIR: \"/detectron2/datasets/output\"\n";

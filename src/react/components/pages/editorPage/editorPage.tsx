@@ -463,13 +463,13 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                     onMouseMove={(e) => {
                                         // console.log(e);
                                         // console.log(`我是鼠标点x: ${e.} 我是鼠标点y: ${e.offsetY}`);
-                                        this.setState({
-                                            zoomMode: {
-                                                ...this.state.zoomMode,
-                                                zoomCenterX: e.clientX,
-                                                zoomCenterY: e.clientY,
-                                            },
-                                        });
+                                        // this.setState({
+                                        //     zoomMode: {
+                                        //         ...this.state.zoomMode,
+                                        //         zoomCenterX: e.clientX,
+                                        //         zoomCenterY: e.clientY,
+                                        //     },
+                                        // });
                                     }}
                                     onWheel={ (e) => Zoom(e, (deltaY) => {
                                         const zone = document.getElementById("ct-zone");

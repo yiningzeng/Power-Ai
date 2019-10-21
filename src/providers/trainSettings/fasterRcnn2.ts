@@ -10,7 +10,7 @@ import Guard from "../../common/guard";
 import YAML from "json2yaml";
 import {interpolate} from "../../common/strings";
 import {detectron2Template} from "./templates/detectron2/detectron2Templates";
-
+import hexrgb from "hexrgb";
 /**
  * Export options for Pascal VOC Export Provider
  */
@@ -49,7 +49,9 @@ export class FasterRcnn2Provider extends TrainProvider<IFasterRcnnProviderOption
                 weights = "/detectron2/models/R-101.pkl";
                 break;
         }
-
+        // alert(config.detectron2.DATALOADER.REPEAT_THRESHOLD);
+        // alert(config.detectron2.DATALOADER.REPEAT_THRESHOLD.toString().indexOf(".") > 0 ?
+        //     config.detectron2.DATALOADER.REPEAT_THRESHOLD : `${config.detectron2.DATALOADER.REPEAT_THRESHOLD}.0`)
         const newConfig: IDetectron2 = {
             ...config,
             detectron2: {
@@ -67,11 +69,17 @@ export class FasterRcnn2Provider extends TrainProvider<IFasterRcnnProviderOption
                 SOLVER: {
                     ...config.detectron2.SOLVER,
                     STEPS: `(${config.detectron2.SOLVER.MAX_ITER * 0.8},${config.detectron2.SOLVER.MAX_ITER * 0.9})`,
-                    IMS_PER_BATCH: `${config.use_gpus * 2}`,
+                    IMS_PER_BATCH: config.detectron2.SOLVER.IMS_PER_BATCH === "auto" ?
+                        `${config.use_gpus * 2}` : config.detectron2.SOLVER.IMS_PER_BATCH,
                 },
                 DATASETS: {
                     TRAIN: "(\"coco_2014_train\",)",
                     TEST: "(\"coco_2014_val\",)",
+                },
+                DATALOADER: {
+                    ...config.detectron2.DATALOADER,
+                    REPEAT_THRESHOLD: config.detectron2.DATALOADER.REPEAT_THRESHOLD.toString().indexOf(".") > 0 ?
+                        config.detectron2.DATALOADER.REPEAT_THRESHOLD : `${config.detectron2.DATALOADER.REPEAT_THRESHOLD}.0`,
                 },
                 OUTPUT_DIR: "/detectron2/datasets/output",
             },
@@ -85,7 +93,7 @@ export class FasterRcnn2Provider extends TrainProvider<IFasterRcnnProviderOption
         await this.project.tags.mapAsync(async (v) => {
             const item: ITagDetectron2 = {
                 id: i,
-                color: [2220, 20, 60],
+                color: hexrgb.hex2rgb(v.color, true),
                 isthing: 1,
                 name: v.name,
             };
