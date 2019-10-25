@@ -260,6 +260,7 @@ export interface IAppStrings {
             drawWithPencil: string;
             drawPolygon: string;
             copyRectangle: string;
+            drawPolygon2MinBox: string;
             copy: string;
             cut: string;
             paste: string;

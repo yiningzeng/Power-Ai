@@ -47,7 +47,6 @@ import CondensedList from "../../common/condensedList/condensedList";
 import SourceItem from "../../common/condensedList/sourceItem";
 import {Rnd} from "react-rnd";
 import Zoom from "../../common/zoom/zoom";
-
 import {ILocalFileSystemProxyOptions, LocalFileSystemProxy} from "../../../../providers/storage/localFileSystemProxy";
 import {async} from "q";
 import * as connectionActions from "../../../../redux/actions/connectionActions";
@@ -68,6 +67,8 @@ import {constants} from "../../../../common/constants";
 import DraggableDialog from "../../common/draggableDialog/draggableDialog";
 import {IStartTestResults} from "../../../../providers/export/exportProvider";
 import AiTestSettingsPage from "../aitest/testSettingsPage";
+
+import {Point2D} from "powerai-ct/lib/js/CanvasTools/Core/Point2D";
 function PaperComponent(props: PaperProps) {
     return (
         <Draggable cancel={'[class*="MuiDialogContent-root"]'}>
@@ -138,6 +139,7 @@ export interface IEditorPageState {
     showInvalidRegionWarning: boolean;
     zoomMode: IZoomMode;
     dialog: boolean;
+    isDrawPolygon2MinBox: boolean;
 }
 
 function mapStateToProps(state: IApplicationState) {
@@ -178,6 +180,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         showInvalidRegionWarning: false,
         zoomMode: emptyZoomMode,
         dialog: false,
+        isDrawPolygon2MinBox: false,
     };
     private localFileSystem: LocalFileSystemProxy;
 
@@ -506,6 +509,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                         zoomModeChange={this.state.zoomMode.width}
                                         selectionMode={this.state.selectionMode}
                                         project={this.props.project}
+                                        isDrawPolygon2MinBox={this.state.isDrawPolygon2MinBox}
                                         lockedTags={this.state.lockedTags}>
                                         <AssetPreview
                                             additionalSettings={this.state.additionalSettings}
@@ -820,6 +824,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
      */
     private onAssetMetadataChanged = async (assetMetadata: IAssetMetadata): Promise<void> => {
         console.log(`editorpage加载啦啦 onAssetMetadataChanged`);
+
         const startTime = new Date().valueOf(); // 开始时间
         // If the asset contains any regions without tags, don't proceed.
         const regionsWithoutTags = assetMetadata.regions.filter((region) => region.tags.length === 0);
@@ -886,14 +891,14 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
 
         this.setState({ childAssets, assets, isValid: true });
         const endTime = new Date().valueOf(); // 结束时间
-        console.log(`editorpage加载啦啦 onAssetMetadataChanged ${(endTime - startTime).toString()} 毫秒`);
+        console.log(`editorpage加载啦啦 onAssetMetadataChanged end ${(endTime - startTime).toString()} 毫秒`);
     }
 
     /**
      * Raised when the asset binary has been painted onto the canvas tools rendering canvas
      */
     private onCanvasRendered = async (canvas: HTMLCanvasElement) => {
-        console.log(`editorpage加载啦啦 onCanvasRendered`);
+        console.log(`变变变editorpage加载啦啦 onCanvasRendered`);
         const startTime = new Date().valueOf(); // 开始时间
         // When active learning auto-detect is enabled
         // run predictions when asset changes
@@ -901,7 +906,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
             await this.predictRegions(canvas);
         }
         const endTime = new Date().valueOf(); // 结束时间
-        console.log(`editorpage加载啦啦 onCanvasRendered ${(endTime - startTime).toString()} 毫秒`);
+        console.log(`变变变editorpage加载啦啦 onCanvasRendered ${(endTime - startTime).toString()} 毫秒`);
     }
 
     private onSelectedRegionsChanged = (selectedRegions: IRegion[]) => {
@@ -934,6 +939,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                             ...this.state.zoomMode,
                             disableDrag: true,
                         },
+                        isDrawPolygon2MinBox: false,
                     });
                 } else {
                     toast.warn("试用版本未开放");
@@ -951,6 +957,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                         ...this.state.zoomMode,
                         disableDrag: true,
                     },
+                    isDrawPolygon2MinBox: false,
                 });
                 this.canvas.current.enableCanvas(true);
                 break;
@@ -962,6 +969,19 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                         ...this.state.zoomMode,
                         disableDrag: true,
                     },
+                    isDrawPolygon2MinBox: false,
+                });
+                this.canvas.current.enableCanvas(true);
+                break;
+            case ToolbarItemName.DrawPolygon2MinBox:
+                this.setState({
+                    selectionMode: SelectionMode.POLYGON,
+                    editorMode: EditorMode.Polygon,
+                    zoomMode: {
+                        ...this.state.zoomMode,
+                        disableDrag: true,
+                    },
+                    isDrawPolygon2MinBox: true,
                 });
                 this.canvas.current.enableCanvas(true);
                 break;
@@ -984,6 +1004,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                         ...this.state.zoomMode,
                         disableDrag: false,
                     },
+                    isDrawPolygon2MinBox: false,
                 });
                 this.canvas.current.enableCanvas(false);
                 break;
@@ -1021,8 +1042,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
             case ToolbarItemName.PreviousAsset:
                 await this.goToRootAsset(-1);
                 this.setState({
-                    selectionMode: SelectionMode.RECT,
-                    editorMode: EditorMode.Rectangle,
+                    ...this.state,
                     zoomMode: {
                         ...this.state.zoomMode,
                         disableDrag: true,
@@ -1033,8 +1053,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
             case ToolbarItemName.NextAsset:
                 await this.goToRootAsset(1);
                 this.setState({
-                    selectionMode: SelectionMode.RECT,
-                    editorMode: EditorMode.Rectangle,
+                    ...this.state,
                     zoomMode: {
                         ...this.state.zoomMode,
                         disableDrag: true,
@@ -1063,8 +1082,30 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                 await this.predictRegions();
                 break;
             case ToolbarItemName.SaveProject:
+                this.props.actions.test();
                 // toast.error("开始到处");
-                this.props.history.push(`/projects/${projectId}/settings`);
+                // cv.readImage("/home/baymin/图片/crop9.bmp", (err, im) => {
+                //     im.save("/home/baymin/图片/crop9.jpg");
+                // });
+                // const mat = cv.imread("/home/baymin/图片/1964668478.jpg");
+                // toast.error("开始到处");
+                // load image from file
+                // imread ( filePath : string , flags : int = cv.IMREAD_COLOR ) : Result
+                // const mat =  imread("/home/baymin/图片/1964668478.jpg", cv.IMREAD_COLOR);
+                // cv.imreadAsync('./path/img.jpg', (err, mat) => {
+                // ...
+                // })
+
+// save image
+//                 cv.imwrite("/home/baymin/图片/1964668478sssss.jpg", mat);
+                // cv.imwriteAsync('./path/img.jpg', mat,(err) => {
+                // ...
+                // })
+
+// show image
+//                 cv.imshow("a window name", mat);
+//                 cv.waitKey();
+//                 this.props.history.push(`/projects/${projectId}/settings`);
                 break;
             case ToolbarItemName.ExportProject:
                 // toast.error("开始到处");

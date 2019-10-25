@@ -703,6 +703,7 @@ export default class MockFactory {
             onAssetMetadataChanged: jest.fn(),
             editorMode: EditorMode.Rectangle,
             selectionMode: SelectionMode.RECT,
+            isDrawPolygon2MinBox: false,
             children: null,
             lockedTags: [],
         };
@@ -830,6 +831,7 @@ export default class MockFactory {
             deleteAsset: jest.fn(() => Promise.resolve()),
             updateProjectTag: jest.fn(() => Promise.resolve()),
             deleteProjectTag: jest.fn(() => Promise.resolve()),
+            test: jest.fn(() => Promise.resolve()),
         };
     }
 

@@ -9,6 +9,7 @@ export enum ToolbarItemName {
     SelectCanvas = "selectCanvas",
     DrawRectangle = "drawRectangle",
     DrawPolygon = "drawPolygon",
+    DrawPolygon2MinBox = "drawPolygon2MinBox",
     DrawWithPencil = "drawWithPencil",
     CopyRectangle = "copyRectangle",
     CopyRegions = "copyRegions",
@@ -79,7 +80,14 @@ export default function registerToolbar() {
         type: ToolbarItemType.State,
         accelerators: ["D", "d"],
     });
-
+    ToolbarItemFactory.register({
+        name: ToolbarItemName.DrawPolygon2MinBox,
+        tooltip: strings.editorPage.toolbar.drawPolygon2MinBox,
+        icon: "fa-border-none",
+        group: ToolbarItemGroup.Canvas,
+        type: ToolbarItemType.State,
+        accelerators: ["F", "f"],
+    });
     ToolbarItemFactory.register({
         name: ToolbarItemName.CopyRectangle,
         tooltip: strings.editorPage.toolbar.copyRectangle,

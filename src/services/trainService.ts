@@ -12,6 +12,7 @@ export interface ITrainService {
     trainPackageProject(project: IProject): Promise<ITrainConfigResults>;
     trainUploadProject(project: IProject, source: IStartTrainResults): Promise<IStartTrainResults>;
     trainAddQueueProject(project: IProject, source: IStartTrainResults): Promise<IStartTrainResults>;
+    test(): void;
 }
 
 /**
@@ -41,5 +42,20 @@ export default class TrainService implements ITrainService {
     public async trainAddSql(project: IProject, source: IStartTrainResults): Promise<IStartTrainResults> {
         Guard.null(project);
         return await IpcRendererProxy.send(`TrainingSystem:trainAddSql`, [project, source]);
+    }
+    public async test(): Promise<void> {
+        console.log("进来了");
+
+        // cv.readImage("/home/baymin/图片/1964668478.jpg", function (err, im) {
+        //     // im.detectObject(cv.FACE_CASCADE, {}, function (err, faces) {
+        //     //     for (var i=0;i<faces.length; i++){
+        //     //         var x = faces[i]
+        //     //         im.ellipse(x.x + x.width/2, x.y + x.height/2, x.width/2, x.height/2);
+        //     //     }
+        //     //     im.save("/home/baymin/图片/out.jpg");
+        //     // });
+        //     im.save("/home/baymin/图片/out.jpg");
+        // });
+        await IpcRendererProxy.send(`TrainingSystem:opencvTest`);
     }
 }

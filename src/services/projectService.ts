@@ -374,7 +374,6 @@ export default class ProjectService implements IProjectService {
         toast.success(`导出转移的项目文件 ${transProject.name}-transfer${constants.projectFileExtension} 成功`);
         return project;
     }
-
     /**
      * Delete a project
      * @param project - Project to delete

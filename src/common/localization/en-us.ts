@@ -259,6 +259,7 @@ export const english: IAppStrings = {
             pan: "Pan",
             drawRectangle: "Draw Rectangle",
             drawPolygon: "Draw Polygon",
+            drawPolygon2MinBox: "Draw the smallest circumscribed rectangle of polygon",
             drawWithPencil: "Draw with a pencil",
             copyRectangle: "Copy Rectangle",
             copy: "Copy Regions",

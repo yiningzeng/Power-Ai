@@ -53,6 +53,15 @@ export default interface IProjectActions {
     deleteAsset(project: IProject, selectAsset: IAsset): Promise<IProject>;
     updateProjectTag(project: IProject, oldTagName: string, newTagName: string): Promise<IAssetMetadata[]>;
     deleteProjectTag(project: IProject, tagName): Promise<IAssetMetadata[]>;
+    test(): void;
+}
+
+export function test(): (dispatch: Dispatch) => void {
+    return (dispatch: Dispatch): void => {
+        const trainService = new TrainService();
+        trainService.test();
+        // dispatch({ type: ActionTypes.CLOSE_PROJECT_SUCCESS });
+    };
 }
 
 /**

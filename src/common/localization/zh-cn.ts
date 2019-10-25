@@ -258,6 +258,7 @@ export const chinese: IAppStrings = {
             pan: "Pan",
             drawRectangle: "矩形",
             drawPolygon: "多边形",
+            drawPolygon2MinBox: "多边形最小外接矩形",
             drawWithPencil: "画笔",
             copyRectangle: "标签印章",
             copy: "复制",

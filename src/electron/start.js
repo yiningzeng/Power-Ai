@@ -1,8 +1,20 @@
 const net = require('net');
+// const cv = require("opencv");
 const port = process.env.PORT ? (process.env.PORT - 100) : 3000;
 
-process.env.ELECTRON_START_URL = `http://localhost:${port}`;
 
+// cv.readImage("/home/baymin/图片/1964668478.jpg", (err, im) => {
+//     im.detectObject(cv.FACE_CASCADE, {}, function(err, faces){
+//         for (var i=0;i<faces.length; i++){
+//             var x = faces[i]
+//             im.ellipse(x.x + x.width/2, x.y + x.height/2, x.width/2, x.height/2);
+//         }
+//         im.save("/home/baymin/图片/test.jpg");
+//     });
+//
+// });
+
+process.env.ELECTRON_START_URL = `http://localhost:${port}`;
 const client = new net.Socket();
 
 let startedElectron = false;

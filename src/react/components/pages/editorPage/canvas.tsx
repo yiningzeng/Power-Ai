@@ -21,12 +21,14 @@ import {SelectionMode} from "powerai-ct/lib/js/CanvasTools/Interface/ISelectorSe
 import {Rect} from "powerai-ct/lib/js/CanvasTools/Core/Rect";
 import {createContentBoundingBox} from "../../../../common/layout";
 import {Point2D} from "powerai-ct/lib/js/CanvasTools/Core/Point2D";
-
+import RotatingCalipers from "rotating-calipers";
+import getBounds from "bound-points";
 export interface ICanvasProps extends React.Props<Canvas> {
     selectedAsset: IAssetMetadata;
     editorMode: EditorMode;
     selectionMode: SelectionMode;
     project: IProject;
+    isDrawPolygon2MinBox: boolean;
     lockedTags: string[];
     children?: ReactElement<AssetPreview>;
     zoomModeChange?: number|string;
@@ -47,6 +49,7 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
         editorMode: EditorMode.Select,
         selectedAsset: null,
         project: null,
+        isDrawPolygon2MinBox: false,
         lockedTags: [],
     };
 
@@ -167,6 +170,46 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
            enabled: b,
        });
     }
+
+    public drawPolygon2MinBox = (minPoint: Point2D, maxPoint: Point2D, points: Point2D[]) => {
+        alert(JSON.stringify(minPoint));
+        alert(JSON.stringify(maxPoint));
+        alert(JSON.stringify(points));
+        const id = shortid.generate();
+        const lockedTags = this.props.lockedTags;
+        const myRegionData = new RegionData(minPoint.x,
+            minPoint.y,
+            maxPoint.x - minPoint.x,
+            maxPoint.y - minPoint.y,
+            points,
+            RegionDataType.Polygon);
+        alert(JSON.stringify(myRegionData));
+        const scaledRegionData = this.editor.scaleRegionToSourceSize(myRegionData,
+            this.state.currentAsset.asset.size.width,
+            this.state.currentAsset.asset.size.height,
+        );
+        const newRegion = {
+            id,
+            type: this.editorModeToType(EditorMode.Polygon),
+            tags: lockedTags || [],
+            boundingBox: {
+                height: scaledRegionData.height,
+                width: scaledRegionData.width,
+                left: scaledRegionData.x,
+                top: scaledRegionData.y,
+            },
+            points: scaledRegionData.points,
+        };
+        if (lockedTags && lockedTags.length) {
+            this.editor.RM.updateTagsById(id,
+                CanvasHelpers.getTagsDescriptor(this.props.project.tags, newRegion));
+        }
+        this.updateAssetRegions([...this.state.currentAsset.regions, newRegion]);
+        if (this.props.onSelectedRegionsChanged) {
+            this.props.onSelectedRegionsChanged([newRegion]);
+        }
+    }
+
     /**
      * Toggles tag on all selected regions
      * @param selectedTag Tag name
@@ -219,6 +262,7 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
             asset.asset.size.width,
             asset.asset.size.height,
         );
+        console.log(`加载啦啦: 复制 ${JSON.stringify(duplicates)}`);
         this.addRegions(duplicates);
     }
 
@@ -328,16 +372,86 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
         if (CanvasHelpers.isAreaEmpty(regionData)) {
             return;
         }
-
+        let newRegionData = regionData;
         const id = shortid.generate();
+        if (this.props.isDrawPolygon2MinBox) {
+            console.log("最小框，true");
+            try {
+                console.log(`onSelectedRegionsChanged： onSelectedRegionsChanged\n
+                变变变points: ${JSON.stringify(newRegionData.points)}`);
+                const points = newRegionData.points.map((value) => [value.x, value.y]);
+                const rotatingCalipers = new RotatingCalipers(points);
+                const minBboxs: Point2D[] = []; // 最小边框4个点的Point2d 数组 用于画图在界面上
+                const minBboxsNotP = []; // 最小边框4个点的[] 数组 用于后面计算轴对称的边框
+                let isOut = false; // 表示是否超出边界
+                rotatingCalipers.minAreaEnclosingRectangle().vertices.map(
+                    (value) => {
+                        const x = +value[0].toFixed();
+                        const y = +value[1].toFixed();
+                        if (x < 0 || y < 0) {
+                            console.log(`最小框，超出边界判断,有一个小于0了 x: ${x}  y: ${y}`);
+                            isOut = true;
+                        }
+                        minBboxs.push(new Point2D(x, y));
+                        minBboxsNotP.push([x, y]);
+                    },
+                );
+                console.log(`变变变我是最小点${JSON.stringify(minBboxs)}`);
+                console.log(`变变变我是最小点${JSON.stringify(minBboxsNotP)}`);
+                if (!isOut) {
+                    console.log("最小框，没有超出边界了");
+                    const bboxs = getBounds(minBboxsNotP);
+                    console.log(`变变变RegionData: ${JSON.stringify(regionData)}\n\nbbox${JSON.stringify(bboxs)}`);
+                    newRegionData = new RegionData(
+                        bboxs[0][0],
+                        bboxs[0][1],
+                        bboxs[1][0] - bboxs[0][0],
+                        bboxs[1][1] - bboxs[0][1],
+                        minBboxs);
+                } else {
+                    console.log("最小框，超出边界了");
+                    const bb: Point2D[] = [];
+                    bb.push(new Point2D(regionData.x, regionData.y));
+                    bb.push(new Point2D(regionData.x + regionData.width, regionData.y));
+                    bb.push(new Point2D(regionData.x + regionData.width, regionData.y + regionData.height));
+                    bb.push(new Point2D(regionData.x, regionData.y + regionData.height));
+                    newRegionData = new RegionData(
+                        newRegionData.x,
+                        newRegionData.y,
+                        newRegionData.width,
+                        newRegionData.height,
+                        bb);
+                }
+            } catch (e) {
+                console.log(`变变变${e}`);
+            }
+            const scaledRegionData = this.editor.scaleRegionToSourceSize(
+                newRegionData,
+                this.state.currentAsset.asset.size.width,
+                this.state.currentAsset.asset.size.height,
+            );
+            const myRegion = {
+                id,
+                type: this.editorModeToType(this.props.editorMode),
+                tags: this.props.lockedTags || [],
+                boundingBox: {
+                    height: scaledRegionData.height,
+                    width: scaledRegionData.width,
+                    left: scaledRegionData.x,
+                    top: scaledRegionData.y,
+                },
+                points: scaledRegionData.points,
+            };
+            this.addRegions([myRegion]);
+            return;
+        }
+        this.editor.RM.addRegion(id, newRegionData, null);
 
-        this.editor.RM.addRegion(id, regionData, null);
-
-        this.template = new Rect(regionData.width, regionData.height);
+        this.template = new Rect(newRegionData.width, newRegionData.height);
 
         // RegionData not serializable so need to extract data
         const scaledRegionData = this.editor.scaleRegionToSourceSize(
-            regionData,
+            newRegionData,
             this.state.currentAsset.asset.size.width,
             this.state.currentAsset.asset.size.height,
         );
@@ -355,6 +469,8 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
             },
             points: scaledRegionData.points,
         };
+        console.log(`加载啦啦onSelectionEnd： onSelectionEnd\n points: ${JSON.stringify(newRegion)}`);
+
         // console.log(`画笔： onSelectionEnd->regionData(初始数据) ${JSON.stringify(regionData)}`);
         // console.log(`画笔： onSelectionEnd->scaledRegionData(转换后数据) ${JSON.stringify(scaledRegionData)}`);
         // console.log(`画笔： onSelectionEnd->newRegion ${JSON.stringify(newRegion)}`);
@@ -411,7 +527,6 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
                 top: scaledRegionData.y,
             };
         }
-        console.log(`onRegionMoveEnd： onRegionMoveEnd`);
         currentRegions[movedRegionIndex] = movedRegion;
         this.updateAssetRegions(currentRegions);
     }

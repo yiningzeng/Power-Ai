@@ -6,7 +6,8 @@ import { IpcMainProxy } from "./common/ipcMainProxy";
 import LocalFileSystem from "./providers/storage/localFileSystem";
 import TrainingSystem from "./providers/training/trainingSystem";
 import TestingSystem from "./providers/testing/testingSystem";
-
+// import { remote } from "electron";
+//
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow: BrowserWindow;
@@ -22,6 +23,10 @@ function createWindow() {
         show: false,
     };
 
+    // const mat = cv.imread("/home/baymin/图片/1964668478.jpg");
+    // cv.imshow("a window name", mat);
+    // console.log(mat);
+    // cv.waitKey();
     const staticUrl = process.env.ELECTRON_START_URL || `file:///${__dirname}/index.html`;
     if (process.env.ELECTRON_START_URL) {
         windowOptions.webPreferences = {

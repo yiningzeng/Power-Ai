@@ -46,6 +46,7 @@ describe("Editor Canvas", () => {
             selectedAsset: getAssetMetadata(),
             onAssetMetadataChanged: jest.fn(),
             onCanvasRendered: jest.fn(),
+            isDrawPolygon2MinBox: false,
             editorMode: EditorMode.Rectangle,
             selectionMode: SelectionMode.RECT,
             project: MockFactory.createTestProject(),
