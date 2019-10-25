@@ -374,6 +374,7 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
         }
         let newRegionData = regionData;
         const id = shortid.generate();
+        // region 最小外接框代码
         if (this.props.isDrawPolygon2MinBox) {
             console.log("最小框，true");
             try {
@@ -445,6 +446,7 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
             this.addRegions([myRegion]);
             return;
         }
+        // endregion 最小外接框代码
         this.editor.RM.addRegion(id, newRegionData, null);
 
         this.template = new Rect(newRegionData.width, newRegionData.height);

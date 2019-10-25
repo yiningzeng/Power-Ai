@@ -619,6 +619,17 @@ export default class TrainingSystem {
             resolve(res);
         });
     }
+
+    public opencvTest() {
+        console.log("进来了");
+        // const mat = cv.imread("/home/baymin/图片/1964668478.jpg");
+        // cv.imwrite("/home/baymin/图片/opencv4nodejs.jpg", mat);
+        // cv.imshow("a window name", mat);
+        // cv.waitKey();
+        // const mat = cv.imread("/home/baymin/图片/1964668478.jpg");
+        // cv.imshow("a window name", mat);
+        // cv.waitKey();
+    }
     /**
      * Gets the node file system stats for the specified path
      * @param  {string} path
