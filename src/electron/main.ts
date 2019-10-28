@@ -21,6 +21,12 @@ function createWindow() {
         titleBarStyle: "hidden",
         backgroundColor: "#272B30",
         show: false,
+        webPreferences: {
+            nodeIntegration: true,
+            plugins: true,
+            webSecurity: false,
+            webviewTag: true,
+        },
     };
 
     // const mat = cv.imread("/home/baymin/图片/1964668478.jpg");
@@ -30,6 +36,7 @@ function createWindow() {
     const staticUrl = process.env.ELECTRON_START_URL || `file:///${__dirname}/index.html`;
     if (process.env.ELECTRON_START_URL) {
         windowOptions.webPreferences = {
+            ...windowOptions.webPreferences,
             webSecurity: false,
         };
     }
@@ -80,7 +87,6 @@ function registerContextMenu(browserWindow: BrowserWindow): void {
     const selectionMenu = Menu.buildFromTemplate([
         { role: "copy", accelerator: "CmdOrCtrl+C" },
         { type: "separator" },
-        { role: "selectall", accelerator: "CmdOrCtrl+A" },
     ]);
 
     const inputMenu = Menu.buildFromTemplate([
@@ -91,7 +97,8 @@ function registerContextMenu(browserWindow: BrowserWindow): void {
         { role: "copy", accelerator: "CmdOrCtrl+C" },
         { role: "paste", accelerator: "CmdOrCtrl+V" },
         { type: "separator" },
-        { role: "selectall", accelerator: "CmdOrCtrl+A" },
+        { role: "minimize"},
+        { role: "close"},
     ]);
 
     browserWindow.webContents.on("context-menu", (e, props) => {
@@ -119,7 +126,6 @@ function registerContextMenu(browserWindow: BrowserWindow): void {
                 { role: "reload" },
                 { type: "separator" },
                 { role: "toggleDevTools" },
-                { role: "toggleFullScreen" },
                 { type: "separator" },
                 { role: "resetZoom" },
                 { role: "zoomIn" },

@@ -454,7 +454,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                         console.log(this.myZoomDom.current.getSelfElement().style.marginLeft);
                                         console.log(this.myZoomDom.current.getSelfElement().style.left);
                                         console.log(this.myZoomDom.current.getSelfElement().style.paddingLeft);
-                                        console.log(`zone.offsetLeft: ${e.pageX} ${e.screenX}我是鼠标点击x: ${e.clientX} 我是鼠标点击Y: ${e.layerY}`);
+                                        console.log(`zone.offsetLeft: ${e.pageX} ${e.screenX}我是鼠标点击x: ${e.clientX} 我是鼠标点击Y: ${e.pageY}`);
                                         this.setState({
                                             zoomMode: {
                                                 ...this.state.zoomMode,
@@ -989,6 +989,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                 this.setState({
                     selectionMode: SelectionMode.COPYRECT,
                     editorMode: EditorMode.CopyRect,
+                    isDrawPolygon2MinBox: false,
                 });
                 this.canvas.current.enableCanvas(true);
                 break;

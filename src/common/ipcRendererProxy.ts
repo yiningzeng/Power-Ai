@@ -11,7 +11,7 @@ export class IpcRendererProxy {
             return;
         }
 
-        IpcRendererProxy.ipcRenderer = (window as any).require("electron").ipcRenderer;
+        IpcRendererProxy.ipcRenderer = (window as any & typeof globalThis).require("electron").ipcRenderer;
         IpcRendererProxy.ipcRenderer.on("ipc-renderer-proxy", (sender, message: IpcProxyMessage<any>) => {
             const deferred = IpcRendererProxy.pending[message.id];
 

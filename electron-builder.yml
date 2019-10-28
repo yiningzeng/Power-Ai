@@ -9,6 +9,8 @@ extends: null # need this otherwise it won't use the entry point we set in "main
 files:
   - filter:
       - build/  # copy this directory to the asar directory that electron-builder use to look for the main entry file
+      - "!**/node_modules/*"
+      - "!**/releases/*"
 mac:
   icon: app-icons/icon.icns
   target: dmg
