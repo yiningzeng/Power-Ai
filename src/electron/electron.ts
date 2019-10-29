@@ -14,6 +14,9 @@ let mainWindow: BrowserWindow;
 let ipcMainProxy: IpcMainProxy;
 
 function createWindow() {
+    app.getGPUInfo("complete").then((result) => {
+        console.log(`获取GPU信息 ${JSON.stringify(result)}`);
+    });
     const windowOptions: BrowserWindowConstructorOptions = {
         width: 1024,
         height: 768,
@@ -22,10 +25,14 @@ function createWindow() {
         backgroundColor: "#272B30",
         show: false,
         webPreferences: {
+            contextIsolation: false,
+            // nativeWindowOpen: true,
+            // nodeIntegrationInWorker: true,
             nodeIntegration: true,
-            plugins: true,
-            webSecurity: false,
+            // plugins: true,
+            // webSecurity: false,
             webviewTag: true,
+            // preload: __dirname + "/preload.js",
         },
     };
 

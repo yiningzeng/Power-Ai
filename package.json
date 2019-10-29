@@ -1,11 +1,11 @@
 {
     "name": "Power-Ai",
-    "version": "3.4.0",
+    "version": "3.5.0",
     "author": {
         "name": "Microsoft",
         "url": "https://github.com/Microsoft/VoTT"
     },
-    "description": "Visual Object Tagging Tool (VoTT) - an annotation and labeling tool for images and video.",
+    "description": "Power Ai (PA) - an annotation and labeling tool for images and video.",
     "homepage": "https://github.com/Microsoft/VoTT",
     "repository": {
         "type": "git",
@@ -13,7 +13,7 @@
     },
     "license": "MIT",
     "private": true,
-    "main": "build/main.js",
+    "main": "build/electron.js",
     "dependencies": {
         "@azure/storage-blob": "^10.3.0",
         "@material-ui/core": "^4.5.1",
@@ -30,7 +30,7 @@
         "child_process": "^1.0.2",
         "crypto-js": "^3.1.9-1",
         "dotenv": "^7.0.0",
-        "electron-packager": "^13.1.1",
+        "electron-packager": "^14.1.0",
         "ftp": "^0.3.10",
         "google-protobuf": "^3.6.1",
         "got": "^9.6.0",
@@ -54,7 +54,7 @@
         "react-color": "^2.17.3",
         "react-dnd": "^5.0.0",
         "react-dnd-html5-backend": "^3.0.2",
-        "react-dom": "^16.9.0",
+        "react-dom": "^16.11.0",
         "react-iframe": "^1.8.0",
         "react-jsonschema-form": "^1.3.0",
         "react-localization": "^1.0.13",
@@ -76,18 +76,19 @@
         "shortid": "^2.2.14",
         "tar": "^4.4.10",
         "typescript": "^3.7.1-rc",
-        "video-react": "^0.13.2",
+        "video-react": "^0.14.1",
         "vott-react": "^0.2.10"
     },
     "scripts": {
         "start": "nf start -p 3000",
         "pack-first": "npm run build && npm run webpack:prod",
-        "pack-all": "electron-builder && electron-packager . Power-Ai --all --out ./all  --icon=./qt.ico --overwrite --app-version=0.0.1",
-        "pack-win32": "electron-builder && electron-builder && electron-packager . Power-Ai --platform=win32 --out ./all --arch=ia32 --overwrite --app-version=2.0.1 --icon=./qt.ico",
-        "pack-win64": "electron-builder && electron-builder && electron-packager . Power-Ai --platform=win32 --out ./all --arch=x64 --overwrite --app-version=2.0.1 --icon=./qt.ico",
-        "pack-linux": "electron-builder && electron-packager . Power-Ai --platform=linux --out ./all --arch=x64 --overwrite --app-version=2.0.0 --icon=./qt.ico",
-        "pack-arm-linux": "electron-builder && electron-packager . Power-Ai --platform=linux --out ./all --arch=arm64 --overwrite --app-version=2.0.0 --icon=./qt.ico",
-        "pack-mac": "electron-builder && electron-packager . Power-Ai --platform=darwin --out ./all --arch=x64 --overwrite --app-version=2.0.0",
+        "pack-all": "ectron-packager . Power-Ai --all --out ./all  --icon=./qt.ico --overwrite --app-version=0.0.1",
+        "pack-win32": "electron-packager . Power-Ai --platform=win32 --out ./releases --arch=ia32 --overwrite --icon=./qt.ico",
+        "pack-win64": "electron-builder && electron-packager . Power-Ai --platform=win32 --out ./all --arch=x64 --overwrite --app-version=2.0.1 --icon=./qt.ico",
+        "pack-linux": "electron-packager . Power-Ai --platform=linux --out ./all --arch=x64 --overwrite --app-version=2.0.0 --icon=./qt.ico",
+        "pack-arm-linux": "electron-packager . Power-Ai --platform=linux --out ./all --arch=arm64 --overwrite --app-version=2.0.0 --icon=./qt.ico",
+        "pack-mac": "electron-packager . Power-Ai --platform=darwin --out ./all --arch=x64 --overwrite --app-version=2.0.0",
+        "pack-win-nsis": "electron-builder --win --ia32 nsis",
         "compile": "tsc",
         "build": "react-scripts build",
         "webpack:dev": "webpack --config ./config/webpack.dev.js",
@@ -138,15 +139,16 @@
         "@types/redux-logger": "^3.0.6",
         "@types/redux-mock-store": "^1.0.0",
         "cross-env": "^5.2.0",
-        "electron": "^8.0.0-beta.1",
+        "electron": "^7.0.0",
         "electron-builder": "^21.2.0",
         "electron-rebuild": "^1.7.3",
+        "electron-wix-msi": "^2.1.1",
         "enzyme": "^3.7.0",
         "enzyme-adapter-react-16": "^1.7.0",
         "foreman": "^3.0.1",
         "jest-enzyme": "^7.0.1",
         "jquery": "^3.3.1",
-        "node-sass": "^4.10.0",
+        "node-sass": "^4.13.0",
         "popper.js": "^1.14.6",
         "redux-immutable-state-invariant": "^2.1.0",
         "redux-logger": "^3.0.6",
@@ -158,7 +160,49 @@
         "webpack-merge": "^4.1.5"
     },
     "engines": {
-        "node": ">=10.14.2",
-        "npm": ">=6.4.1"
+        "node": ">=13.0.1",
+        "npm": ">=6.12.0"
+    },
+    "build": {
+        "appId": "com.yiningzeng.power-ai",
+        "directories": {
+            "output": "releases",
+            "buildResources": "app-icons"
+        },
+        "artifactName": "${productName}-${version}-${platform}.${ext}",
+        "files": [
+            "**/*",
+            "**/releases/*",
+            "!**/node_modules/*/{CHANGELOG.md,README.md,README,readme.md,readme}",
+            "!**/node_modules/*/{test,__tests__,tests,powered-test,example,examples}",
+            "!**/node_modules/*.d.ts",
+            "!**/node_modules/.bin",
+            "!**/*.{iml,o,hprof,orig,pyc,pyo,rbc,swp,csproj,sln,xproj}",
+            "!.editorconfig",
+            "!**/._*",
+            "!**/{.DS_Store,.git,.hg,.svn,CVS,RCS,SCCS,.gitignore,.gitattributes}",
+            "!**/{__pycache__,thumbs.db,.flowconfig,.idea,.vs,.nyc_output}",
+            "!**/{appveyor.yml,.travis.yml,circle.yml}",
+            "!**/{npm-debug.log,yarn.lock,.yarn-integrity,.yarn-metadata.json}"
+        ],
+        "extraFiles": "cocoSSDModel",
+        "nsis": {
+            "artifactName": "${productName}-${os}-${version}.${ext}",
+            "oneClick": false,
+            "allowToChangeInstallationDirectory": true,
+            "installerIcon": "/home/baymin/daily-work/Power-Ai/app-icons/ico.ico",
+            "uninstallerIcon": "/home/baymin/daily-work/Power-Ai/app-icons/ico.ico"
+        },
+        "win": {
+            "target": "nsis",
+            "legalTrademarks": "宁波轻蜓科技技术有限公司"
+        },
+        "linux": {
+            "target": "snap",
+            "maintainer": "yiningzeng",
+            "vendor": "宁波轻蜓科技技术有限公司",
+            "category": "Development",
+            "desktop": "Power Ai"
+        }
     }
 }

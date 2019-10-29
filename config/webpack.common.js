@@ -5,7 +5,7 @@ module.exports = {
         __dirname: false,
     },
     target: "electron-main",
-    entry: "./src/electron/main.ts",
+    entry: "./src/electron/electron.ts",
     module: {
         rules: [
             {
@@ -26,7 +26,7 @@ module.exports = {
         extensions: [".ts", ".js"]
     },
     output: {
-        filename: "main.js",
+        filename: "electron.js",
         path: path.resolve(__dirname, "../build")
     }
 };
