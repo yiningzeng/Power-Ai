@@ -1,15 +1,15 @@
 {
     "name": "Power-Ai",
-    "version": "3.5.0",
+    "version": "0.5.0",
     "author": {
-        "name": "Microsoft",
-        "url": "https://github.com/Microsoft/VoTT"
+        "name": "宁波轻蜓视觉科技有限公司",
+        "url": "https://github.com/yiningzeng/Power-Ai.git"
     },
     "description": "Power Ai (PA) - an annotation and labeling tool for images and video.",
-    "homepage": "https://github.com/Microsoft/VoTT",
+    "homepage": "https://github.com/yiningzeng/Power-Ai.git",
     "repository": {
         "type": "git",
-        "url": "https://github.com/Microsoft/VoTT.git"
+        "url": "https://github.com/yiningzeng/Power-Ai.git"
     },
     "license": "MIT",
     "private": true,
@@ -30,7 +30,9 @@
         "child_process": "^1.0.2",
         "crypto-js": "^3.1.9-1",
         "dotenv": "^7.0.0",
+        "electron-log": "^3.0.8",
         "electron-packager": "^14.1.0",
+        "electron-updater": "^4.2.0",
         "ftp": "^0.3.10",
         "google-protobuf": "^3.6.1",
         "got": "^9.6.0",
@@ -42,6 +44,7 @@
         "moment": "^2.24.0",
         "node-fetch": "^2.3.0",
         "node-int64": "^0.4.0",
+        "omnizoom": "^1.1.5",
         "polygon-aabb": "^1.0.0",
         "powerai-ct": "^2.3.1",
         "rc-align": "^2.4.5",
@@ -76,19 +79,16 @@
         "shortid": "^2.2.14",
         "tar": "^4.4.10",
         "typescript": "^3.7.1-rc",
+        "update-electron-app": "^1.5.0",
         "video-react": "^0.14.1",
         "vott-react": "^0.2.10"
     },
     "scripts": {
         "start": "nf start -p 3000",
-        "pack-first": "npm run build && npm run webpack:prod",
-        "pack-all": "ectron-packager . Power-Ai --all --out ./all  --icon=./qt.ico --overwrite --app-version=0.0.1",
-        "pack-win32": "electron-packager . Power-Ai --platform=win32 --out ./releases --arch=ia32 --overwrite --icon=./qt.ico",
-        "pack-win64": "electron-builder && electron-packager . Power-Ai --platform=win32 --out ./all --arch=x64 --overwrite --app-version=2.0.1 --icon=./qt.ico",
-        "pack-linux": "electron-packager . Power-Ai --platform=linux --out ./all --arch=x64 --overwrite --app-version=2.0.0 --icon=./qt.ico",
-        "pack-arm-linux": "electron-packager . Power-Ai --platform=linux --out ./all --arch=arm64 --overwrite --app-version=2.0.0 --icon=./qt.ico",
-        "pack-mac": "electron-packager . Power-Ai --platform=darwin --out ./all --arch=x64 --overwrite --app-version=2.0.0",
-        "pack-win-nsis": "electron-builder --win --ia32 nsis",
+        "build-win32-nsis": "electron-builder --win --ia32 nsis",
+        "build-win64-nsis": "electron-builder --win --x64 nsis",
+        "build-mac-dmg": "electron-builder --mac zip",
+        "build-linux-deb-snap-tar": "electron-builder --linux snap deb tar.xz",
         "compile": "tsc",
         "build": "react-scripts build",
         "webpack:dev": "webpack --config ./config/webpack.dev.js",
@@ -169,7 +169,7 @@
             "output": "releases",
             "buildResources": "app-icons"
         },
-        "artifactName": "${productName}-${version}-${platform}.${ext}",
+        "artifactName": "${productName}-${os}-${arch}-${version}.${ext}",
         "files": [
             "**/*",
             "**/releases/*",
@@ -186,23 +186,37 @@
             "!**/{npm-debug.log,yarn.lock,.yarn-integrity,.yarn-metadata.json}"
         ],
         "extraFiles": "cocoSSDModel",
+        "publish": [
+            {
+                "provider": "generic",
+                "url": "http://192.168.31.157"
+            }
+        ],
         "nsis": {
-            "artifactName": "${productName}-${os}-${version}.${ext}",
+            "artifactName": "${productName}-${os}-${arch}-${version}-setup.${ext}",
             "oneClick": false,
             "allowToChangeInstallationDirectory": true,
-            "installerIcon": "/home/baymin/daily-work/Power-Ai/app-icons/ico.ico",
-            "uninstallerIcon": "/home/baymin/daily-work/Power-Ai/app-icons/ico.ico"
+            "installerIcon": "app-icons/ico.ico",
+            "uninstallerIcon": "app-icons/ico.ico"
         },
         "win": {
             "target": "nsis",
             "legalTrademarks": "宁波轻蜓科技技术有限公司"
         },
+        "mac": {
+            "icon": "app-icons/icon.icns"
+        },
         "linux": {
             "target": "snap",
+            "icon": "app-icons/ico.png",
             "maintainer": "yiningzeng",
             "vendor": "宁波轻蜓科技技术有限公司",
             "category": "Development",
-            "desktop": "Power Ai"
+            "desktop": "Power Ai",
+            "publish": {
+                "provider": "generic",
+                "url": "http://192.168.31.75/linux/"
+            }
         }
     }
 }

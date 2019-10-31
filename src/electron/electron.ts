@@ -6,6 +6,10 @@ import { IpcMainProxy } from "./common/ipcMainProxy";
 import LocalFileSystem from "./providers/storage/localFileSystem";
 import TrainingSystem from "./providers/training/trainingSystem";
 import TestingSystem from "./providers/testing/testingSystem";
+import log from "electron-log";
+
+import { updater } from "update-electron-app";
+import { autoUpdater } from "electron-updater";
 // import { remote } from "electron";
 //
 // Keep a global reference of the window object, if you don't, the window will
@@ -13,9 +17,41 @@ import TestingSystem from "./providers/testing/testingSystem";
 let mainWindow: BrowserWindow;
 let ipcMainProxy: IpcMainProxy;
 
+// const feedUrl = `http://192.168.31.157`; // 更新包位置
+
+log.transports.file.level = "info";
+autoUpdater.logger = log;
+autoUpdater.setFeedURL("http://192.168.31.157");
+
 function createWindow() {
+    // autoUpdater.setFeedURL(feedUrl);
+    // region update
+    autoUpdater.on("checking-for-update", () => {
+        log.info("Checking for update...");
+    });
+    autoUpdater.on("update-available", (info) => {
+        log.info("Update available.");
+    });
+    autoUpdater.on("update-not-available", (info) => {
+        log.info("Update not available.");
+    });
+    autoUpdater.on("error", (err) => {
+        log.error("Error in auto-updater. " + err);
+    });
+    autoUpdater.on("download-progress", (progressObj) => {
+        let logMessage = "Download speed: " + progressObj.bytesPerSecond;
+        logMessage = logMessage + " - Downloaded " + progressObj.percent + "%";
+        logMessage = logMessage + " (" + progressObj.transferred + "/" + progressObj.total + ")";
+        log.info(logMessage);
+    });
+    autoUpdater.on("update-downloaded", (info) => {
+        log.info("Update downloaded");
+        autoUpdater.quitAndInstall();
+    });
+    // endregion
+    autoUpdater.checkForUpdates();
     app.getGPUInfo("complete").then((result) => {
-        console.log(`获取GPU信息 ${JSON.stringify(result)}`);
+        log.info(`获取GPU信息 ${JSON.stringify(result)}`);
     });
     const windowOptions: BrowserWindowConstructorOptions = {
         width: 1024,
@@ -29,8 +65,8 @@ function createWindow() {
             // nativeWindowOpen: true,
             // nodeIntegrationInWorker: true,
             nodeIntegration: true,
-            // plugins: true,
-            // webSecurity: false,
+            plugins: true,
+            webSecurity: false,
             webviewTag: true,
             // preload: __dirname + "/preload.js",
         },
@@ -75,6 +111,10 @@ function createWindow() {
     ipcMainProxy.registerProxy("TestingSystem", new TestingSystem(mainWindow));
     const localFileSystem = new LocalFileSystem(mainWindow);
     ipcMainProxy.registerProxy("LocalFileSystem", localFileSystem);
+
+    autoUpdater.checkForUpdatesAndNotify().then((() => {
+        log.info(`我检查了更新${autoUpdater.getFeedURL()}`);
+    }));
 }
 
 function onReloadApp() {
