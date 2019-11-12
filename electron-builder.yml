@@ -7,6 +7,8 @@ appId: com.yiningzeng.power-ai
 artifactName: '${productName}-${version}-${platform}.${ext}'
 extends: null # need this otherwise it won't use the entry point we set in "main" in package.json
 files:
+  - "!**/node_modules/*"
+  - "!**/releases/*"
   - filter:
       - build/  # copy this directory to the asar directory that electron-builder use to look for the main entry file
 mac:
@@ -21,6 +23,6 @@ linux:
   target:
     - snap
 publish: null
-electronVersion: 3.0.13
+electronVersion: 7.0.0
 extraFiles:
   - "cocoSSDModel"

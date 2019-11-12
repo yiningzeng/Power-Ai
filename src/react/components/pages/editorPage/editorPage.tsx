@@ -67,7 +67,7 @@ import {constants} from "../../../../common/constants";
 import DraggableDialog from "../../common/draggableDialog/draggableDialog";
 import {IStartTestResults} from "../../../../providers/export/exportProvider";
 import AiTestSettingsPage from "../aitest/testSettingsPage";
-
+import * as omnizoom from "omnizoom";
 import {Point2D} from "powerai-ct/lib/js/CanvasTools/Core/Point2D";
 function PaperComponent(props: PaperProps) {
     return (
@@ -422,6 +422,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                             <div className="editor-page-content-main-body">
                                 {selectedAsset &&
                                 <Rnd
+                                    id="fuck"
                                     ref={this.myZoomDom}
                                     disableDragging={this.state.zoomMode.disableDrag}
                                     size={{ width: this.state.zoomMode.width,  height: this.state.zoomMode.height }}
@@ -454,7 +455,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                         console.log(this.myZoomDom.current.getSelfElement().style.marginLeft);
                                         console.log(this.myZoomDom.current.getSelfElement().style.left);
                                         console.log(this.myZoomDom.current.getSelfElement().style.paddingLeft);
-                                        console.log(`zone.offsetLeft: ${e.pageX} ${e.screenX}我是鼠标点击x: ${e.clientX} 我是鼠标点击Y: ${e.layerY}`);
+                                        console.log(`zone.offsetLeft : ${e.pageX} ${e.screenX}我是鼠标点击x: ${e.clientX} 我是鼠标点击Y: ${e.pageY}`);
                                         this.setState({
                                             zoomMode: {
                                                 ...this.state.zoomMode,
@@ -989,6 +990,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                 this.setState({
                     selectionMode: SelectionMode.COPYRECT,
                     editorMode: EditorMode.CopyRect,
+                    isDrawPolygon2MinBox: false,
                 });
                 this.canvas.current.enableCanvas(true);
                 break;
@@ -1267,6 +1269,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
             }
             this.loadingProjectAssets = false;
         });
+
     }
 
     private deleteAssetsAndRefreshProjectAssets = async (finalProject): Promise<void> => {

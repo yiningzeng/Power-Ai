@@ -6,6 +6,10 @@ import { IpcMainProxy } from "./common/ipcMainProxy";
 import LocalFileSystem from "./providers/storage/localFileSystem";
 import TrainingSystem from "./providers/training/trainingSystem";
 import TestingSystem from "./providers/testing/testingSystem";
+import log from "electron-log";
+
+import { updater } from "update-electron-app";
+import { autoUpdater } from "electron-updater";
 // import { remote } from "electron";
 //
 // Keep a global reference of the window object, if you don't, the window will
@@ -13,7 +17,42 @@ import TestingSystem from "./providers/testing/testingSystem";
 let mainWindow: BrowserWindow;
 let ipcMainProxy: IpcMainProxy;
 
+// const feedUrl = `http://192.168.31.157`; // 更新包位置
+
+log.transports.file.level = "info";
+autoUpdater.logger = log;
+// autoUpdater.setFeedURL("http://192.168.31.157");
+
 function createWindow() {
+    // autoUpdater.setFeedURL(feedUrl);
+    // region update
+    autoUpdater.on("checking-for-update", () => {
+        log.info("Checking for update...");
+    });
+    autoUpdater.on("update-available", (info) => {
+        log.info("Update available.");
+    });
+    autoUpdater.on("update-not-available", (info) => {
+        log.info("Update not available.");
+    });
+    autoUpdater.on("error", (err) => {
+        log.error("Error in auto-updater. " + err);
+    });
+    autoUpdater.on("download-progress", (progressObj) => {
+        let logMessage = "Download speed: " + progressObj.bytesPerSecond;
+        logMessage = logMessage + " - Downloaded " + progressObj.percent + "%";
+        logMessage = logMessage + " (" + progressObj.transferred + "/" + progressObj.total + ")";
+        log.info(logMessage);
+    });
+    autoUpdater.on("update-downloaded", (info) => {
+        log.info("Update downloaded");
+        autoUpdater.quitAndInstall();
+    });
+    // endregion
+    autoUpdater.checkForUpdates();
+    app.getGPUInfo("complete").then((result) => {
+        log.info(`获取GPU信息 ${JSON.stringify(result)}`);
+    });
     const windowOptions: BrowserWindowConstructorOptions = {
         width: 1024,
         height: 768,
@@ -21,6 +60,16 @@ function createWindow() {
         titleBarStyle: "hidden",
         backgroundColor: "#272B30",
         show: false,
+        webPreferences: {
+            contextIsolation: false,
+            // nativeWindowOpen: true,
+            // nodeIntegrationInWorker: true,
+            nodeIntegration: true,
+            plugins: true,
+            webSecurity: false,
+            webviewTag: true,
+            // preload: __dirname + "/preload.js",
+        },
     };
 
     // const mat = cv.imread("/home/baymin/图片/1964668478.jpg");
@@ -30,6 +79,7 @@ function createWindow() {
     const staticUrl = process.env.ELECTRON_START_URL || `file:///${__dirname}/index.html`;
     if (process.env.ELECTRON_START_URL) {
         windowOptions.webPreferences = {
+            ...windowOptions.webPreferences,
             webSecurity: false,
         };
     }
@@ -61,6 +111,17 @@ function createWindow() {
     ipcMainProxy.registerProxy("TestingSystem", new TestingSystem(mainWindow));
     const localFileSystem = new LocalFileSystem(mainWindow);
     ipcMainProxy.registerProxy("LocalFileSystem", localFileSystem);
+
+    try {
+        // autoUpdater.checkForUpdates().then((result) => {
+        //     log.info(`我检查了更新${autoUpdater.getFeedURL()}`);
+        // });
+        autoUpdater.checkForUpdatesAndNotify().then((() => {
+            log.info(`我检查了更新${autoUpdater.getFeedURL()}`);
+        }));
+    } catch (e) {
+        log.error(e);
+    }
 }
 
 function onReloadApp() {
@@ -80,7 +141,6 @@ function registerContextMenu(browserWindow: BrowserWindow): void {
     const selectionMenu = Menu.buildFromTemplate([
         { role: "copy", accelerator: "CmdOrCtrl+C" },
         { type: "separator" },
-        { role: "selectall", accelerator: "CmdOrCtrl+A" },
     ]);
 
     const inputMenu = Menu.buildFromTemplate([
@@ -91,7 +151,8 @@ function registerContextMenu(browserWindow: BrowserWindow): void {
         { role: "copy", accelerator: "CmdOrCtrl+C" },
         { role: "paste", accelerator: "CmdOrCtrl+V" },
         { type: "separator" },
-        { role: "selectall", accelerator: "CmdOrCtrl+A" },
+        { role: "minimize"},
+        { role: "close"},
     ]);
 
     browserWindow.webContents.on("context-menu", (e, props) => {
@@ -119,7 +180,6 @@ function registerContextMenu(browserWindow: BrowserWindow): void {
                 { role: "reload" },
                 { type: "separator" },
                 { role: "toggleDevTools" },
-                { role: "toggleFullScreen" },
                 { type: "separator" },
                 { role: "resetZoom" },
                 { role: "zoomIn" },
