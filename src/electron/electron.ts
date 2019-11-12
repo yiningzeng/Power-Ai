@@ -21,7 +21,7 @@ let ipcMainProxy: IpcMainProxy;
 
 log.transports.file.level = "info";
 autoUpdater.logger = log;
-autoUpdater.setFeedURL("http://192.168.31.157");
+// autoUpdater.setFeedURL("http://192.168.31.157");
 
 function createWindow() {
     // autoUpdater.setFeedURL(feedUrl);
@@ -112,9 +112,16 @@ function createWindow() {
     const localFileSystem = new LocalFileSystem(mainWindow);
     ipcMainProxy.registerProxy("LocalFileSystem", localFileSystem);
 
-    autoUpdater.checkForUpdatesAndNotify().then((() => {
-        log.info(`我检查了更新${autoUpdater.getFeedURL()}`);
-    }));
+    try {
+        // autoUpdater.checkForUpdates().then((result) => {
+        //     log.info(`我检查了更新${autoUpdater.getFeedURL()}`);
+        // });
+        autoUpdater.checkForUpdatesAndNotify().then((() => {
+            log.info(`我检查了更新${autoUpdater.getFeedURL()}`);
+        }));
+    } catch (e) {
+        log.error(e);
+    }
 }
 
 function onReloadApp() {

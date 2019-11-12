@@ -1,6 +1,6 @@
 {
     "name": "Power-Ai",
-    "version": "0.5.0",
+    "version": "3.6.0",
     "author": {
         "name": "宁波轻蜓视觉科技有限公司",
         "url": "https://github.com/yiningzeng/Power-Ai.git"
@@ -85,6 +85,7 @@
     },
     "scripts": {
         "start": "nf start -p 3000",
+        "build-first": "npm run build && npm run webpack:prod",
         "build-win32-nsis": "electron-builder --win --ia32 nsis",
         "build-win64-nsis": "electron-builder --win --x64 nsis",
         "build-mac-dmg": "electron-builder --mac zip",
@@ -189,7 +190,7 @@
         "publish": [
             {
                 "provider": "generic",
-                "url": "http://192.168.31.157"
+                "url": "http://updater.qtingvision.com:888"
             }
         ],
         "nsis": {
@@ -212,11 +213,7 @@
             "maintainer": "yiningzeng",
             "vendor": "宁波轻蜓科技技术有限公司",
             "category": "Development",
-            "desktop": "Power Ai",
-            "publish": {
-                "provider": "generic",
-                "url": "http://192.168.31.75/linux/"
-            }
+            "desktop": "Power Ai"
         }
     }
 }
