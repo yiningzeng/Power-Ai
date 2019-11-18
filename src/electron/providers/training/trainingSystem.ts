@@ -3,6 +3,7 @@ import fs from "fs";
 import ftp from "ftp";
 import got from "got";
 import archiver from "archiver";
+import hddserial from "hddserial";
 import FormData from "form-data";
 // const Client = require("ftp");
 import path from "path";
@@ -622,6 +623,10 @@ export default class TrainingSystem {
 
     public opencvTest() {
         console.log("进来了");
+
+        hddserial.first((err, serial) => {
+            console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaahdd serial for first hdd : %s", serial);
+        });
         // const mat = cv.imread("/home/baymin/图片/1964668478.jpg");
         // cv.imwrite("/home/baymin/图片/opencv4nodejs.jpg", mat);
         // cv.imshow("a window name", mat);

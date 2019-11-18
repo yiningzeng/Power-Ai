@@ -7,7 +7,6 @@ import LocalFileSystem from "./providers/storage/localFileSystem";
 import TrainingSystem from "./providers/training/trainingSystem";
 import TestingSystem from "./providers/testing/testingSystem";
 import log from "electron-log";
-
 import { updater } from "update-electron-app";
 import { autoUpdater } from "electron-updater";
 // import { remote } from "electron";
@@ -16,6 +15,7 @@ import { autoUpdater } from "electron-updater";
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow: BrowserWindow;
 let ipcMainProxy: IpcMainProxy;
+
 
 // const feedUrl = `http://192.168.31.157`; // 更新包位置
 
@@ -50,6 +50,7 @@ function createWindow() {
     });
     // endregion
     autoUpdater.checkForUpdates();
+
     app.getGPUInfo("complete").then((result) => {
         log.info(`获取GPU信息 ${JSON.stringify(result)}`);
     });

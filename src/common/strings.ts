@@ -458,6 +458,9 @@ export interface IAppStrings {
             yolov3: {
                 displayName: string,
             },
+            yolov3Pytorch: {
+                displayName: string,
+            },
         }
         messages: {
             title: string,

@@ -459,7 +459,10 @@ export const english: IAppStrings = {
                 displayName: "[detectron] Mask Rcnn (discards)",
             },
             yolov3: {
-                displayName: "[darknet] Yolo v3",
+                displayName: "[yolov3] Yolo v3",
+            },
+            yolov3Pytorch: {
+                displayName: "[pytorch] Yolo v3",
             },
         },
         messages: {
