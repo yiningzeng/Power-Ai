@@ -18,6 +18,7 @@ import {FasterRcnnProvider} from "./providers/trainSettings/fasterRcnn";
 import {MaskRcnnProvider} from "./providers/trainSettings/maskRcnn";
 import {FasterRcnn2Provider} from "./providers/trainSettings/fasterRcnn2";
 import {MaskRcnn2Provider} from "./providers/trainSettings/maskRcnn2";
+import {Yolov3PytorchProvider} from "./providers/trainSettings/yolov3Pytorch";
 
 /**
  * Registers storage, asset and export providers, as well as all toolbar items
@@ -80,22 +81,27 @@ export default function registerProviders() {
     //     factory: (project, options) => new CntkExportProvider(project, options),
     // });
 
-    // treain
+    // train
     TrainProviderFactory.register({
         name: "yolov3",
         displayName: strings.train.providers.yolov3.displayName,
         factory: (project, options) => new Yolov3Provider(project, options),
     });
     TrainProviderFactory.register({
-        name: "fasterRcnn",
-        displayName: strings.train.providers.fasterRcnn.displayName,
-        factory: (project, options) => new FasterRcnnProvider(project, options),
+        name: "yolov3Pytorch",
+        displayName: strings.train.providers.yolov3Pytorch.displayName,
+        factory: (project, options) => new Yolov3PytorchProvider(project, options),
     });
-    TrainProviderFactory.register({
-        name: "maskRcnn",
-        displayName: strings.train.providers.maskRcnn.displayName,
-        factory: (project, options) => new MaskRcnnProvider(project, options),
-    });
+    // TrainProviderFactory.register({
+    //     name: "fasterRcnn",
+    //     displayName: strings.train.providers.fasterRcnn.displayName,
+    //     factory: (project, options) => new FasterRcnnProvider(project, options),
+    // });
+    // TrainProviderFactory.register({
+    //     name: "maskRcnn",
+    //     displayName: strings.train.providers.maskRcnn.displayName,
+    //     factory: (project, options) => new MaskRcnnProvider(project, options),
+    // });
 
     TrainProviderFactory.register({
         name: "fasterRcnn2",

@@ -7,7 +7,6 @@ import LocalFileSystem from "./providers/storage/localFileSystem";
 import TrainingSystem from "./providers/training/trainingSystem";
 import TestingSystem from "./providers/testing/testingSystem";
 import log from "electron-log";
-
 import { updater } from "update-electron-app";
 import { autoUpdater } from "electron-updater";
 // import { remote } from "electron";
@@ -50,6 +49,7 @@ function createWindow() {
     });
     // endregion
     autoUpdater.checkForUpdates();
+
     app.getGPUInfo("complete").then((result) => {
         log.info(`获取GPU信息 ${JSON.stringify(result)}`);
     });

@@ -457,7 +457,10 @@ export const chinese: IAppStrings = {
                 displayName: "[detectron] Mask Rcnn (弃用)",
             },
             yolov3: {
-                displayName: "[darknet] Yolo v3",
+                displayName: "[yolov3] Yolo v3",
+            },
+            yolov3Pytorch: {
+                displayName: "[pytorch] Yolo v3",
             },
         },
         messages: {

@@ -8,7 +8,7 @@ import { interpolate } from "../../common/strings";
 import os from "os";
 import {IDetectron, IYoloV3} from "../../models/trainConfig";
 import {constants} from "../../common/constants";
-import {yolov3Template} from "./templates/yolov3/yolov3Templates";
+import {yolov3Template} from "./templates/yolov3/yolov3SppTemplates";
 
 interface IObjectInfo {
     name: string;
@@ -61,7 +61,7 @@ export interface IYoloV3ProviderOptions extends IExportProviderOptions {
  * @name - PascalVOC Export Provider
  * @description - Exports a project into a Pascal VOC
  */
-export class Yolov3Provider extends TrainProvider<IYoloV3ProviderOptions> {
+export class Yolov3PytorchProvider extends TrainProvider<IYoloV3ProviderOptions> {
     private imagesInfo = new Map<string, IImageInfo>();
 
     constructor(project: IProject, options: IYoloV3ProviderOptions) {
@@ -94,8 +94,10 @@ export class Yolov3Provider extends TrainProvider<IYoloV3ProviderOptions> {
         await this.storageProvider.writeText(`${exportFolderName}/use_gpus`, gps);
         console.log(`导出1：${JSON.stringify(this.project.trainFormat.providerOptions)}`);
         console.log(`导出2：${JSON.stringify(config)}`);
-        const fileName = `${exportFolderName}/yolov3-voc.cfg`;
+        const fileName = `${exportFolderName}/yolov3-spp.cfg`;
         await this.storageProvider.writeText(fileName, interpolate(yolov3Template, config.yolov3net));
+        const runFile = `${exportFolderName}/run`;
+        await this.storageProvider.writeText(runFile, "python train.py --data data/voc/voc.data --device 0,1,2,3,4 --batch-size 35 --epochs 25 > data/voc/train.log");
 
     }
 
