@@ -16,7 +16,6 @@ import { autoUpdater } from "electron-updater";
 let mainWindow: BrowserWindow;
 let ipcMainProxy: IpcMainProxy;
 
-
 // const feedUrl = `http://192.168.31.157`; // 更新包位置
 
 log.transports.file.level = "info";
