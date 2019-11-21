@@ -243,6 +243,14 @@ export const chinese: IAppStrings = {
                     title: "导入完成",
                     content: "已经成功导入，可在素材文件夹列表查看",
                 },
+                errorPart: {
+                    title: "注意！部分导入完成",
+                    content: "个别目录导入失败，成功导入 (${part}) 个素材文件夹，可在素材文件夹列表查看",
+                },
+                error: {
+                    title: "导入失败",
+                    content: "请检查文件夹下是否包含import.power-ai文件",
+                },
             },
         },
         toolbar: {
@@ -250,6 +258,7 @@ export const chinese: IAppStrings = {
             pan: "Pan",
             drawRectangle: "矩形",
             drawPolygon: "多边形",
+            drawPolygon2MinBox: "多边形最小外接矩形",
             drawWithPencil: "画笔",
             copyRectangle: "标签印章",
             copy: "复制",
@@ -263,6 +272,7 @@ export const chinese: IAppStrings = {
             transferProject: "迁移项目",
             activeLearning: "自动标注当前素材",
             trainAi: "开始训练",
+            onlineTest: "在线测试",
         },
         videoPlayer: {
             previousTaggedFrame: {
@@ -402,8 +412,8 @@ export const chinese: IAppStrings = {
             pascalVoc: {
                 displayName: "Pascal VOC",
                 exportUnassigned: {
-                    title: "导出未分配的标签",
-                    description: "是否导出数据中包含未处理的标签信息",
+                    title: "导出没有标记过的标签",
+                    description: "",
                 },
             },
             cntk: {
@@ -414,6 +424,10 @@ export const chinese: IAppStrings = {
             },
             powerAi: {
                 displayName: "PowerAi(可导入到其他项目)",
+                subdirectories: {
+                    title: "根据标签名分文件夹",
+                    description: "如果一个素材包含多个标签名会被分到multi-tag文件夹",
+                },
             },
         },
         messages: {
@@ -427,14 +441,26 @@ export const chinese: IAppStrings = {
         settings: "训练参数设置",
         saveSettings: "保存",
         providers: {
+            fasterRcnn2: {
+                displayName: "[detectron2] Faster Rcnn",
+            },
+            maskRcnn2: {
+                displayName: "[detectron2] Mask Rcnn",
+            },
+            keypointRcnn2: {
+                displayName: "[detectron2] Keypoint Rcnn",
+            },
             fasterRcnn: {
-                displayName: "Faster Rcnn",
+                displayName: "[detectron] Faster Rcnn (弃用)",
             },
             maskRcnn: {
-                displayName: "Mask Rcnn",
+                displayName: "[detectron] Mask Rcnn (弃用)",
             },
             yolov3: {
-                displayName: "Yolo v3",
+                displayName: "[yolov3] Yolo v3",
+            },
+            yolov3Pytorch: {
+                displayName: "[pytorch] Yolo v3",
             },
         },
         messages: {

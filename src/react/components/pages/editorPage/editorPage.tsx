@@ -1,12 +1,12 @@
 import _ from "lodash";
 import React, {RefObject} from "react";
 import {connect} from "react-redux";
-import {RouteComponentProps} from "react-router-dom";
+import {Route, RouteComponentProps, Switch} from "react-router-dom";
 import SplitPane from "react-split-pane";
 import {bindActionCreators} from "redux";
-import {SelectionMode} from "aipower-ct/lib/js/CanvasTools/Interface/ISelectorSettings";
+import {SelectionMode} from "powerai-ct/lib/js/CanvasTools/Interface/ISelectorSettings";
 import HtmlFileReader from "../../../../common/htmlFileReader";
-import {strings} from "../../../../common/strings";
+import {strings, interpolate} from "../../../../common/strings";
 import {
     AppError,
     AssetState,
@@ -47,7 +47,6 @@ import CondensedList from "../../common/condensedList/condensedList";
 import SourceItem from "../../common/condensedList/sourceItem";
 import {Rnd} from "react-rnd";
 import Zoom from "../../common/zoom/zoom";
-
 import {ILocalFileSystemProxyOptions, LocalFileSystemProxy} from "../../../../providers/storage/localFileSystemProxy";
 import {async} from "q";
 import * as connectionActions from "../../../../redux/actions/connectionActions";
@@ -66,6 +65,10 @@ import { makeStyles } from "@material-ui/styles";
 import LinearProgress from "@material-ui/core/LinearProgress";
 import {constants} from "../../../../common/constants";
 import DraggableDialog from "../../common/draggableDialog/draggableDialog";
+import {IStartTestResults} from "../../../../providers/export/exportProvider";
+import AiTestSettingsPage from "../aitest/testSettingsPage";
+import * as omnizoom from "omnizoom";
+import {Point2D} from "powerai-ct/lib/js/CanvasTools/Core/Point2D";
 function PaperComponent(props: PaperProps) {
     return (
         <Draggable cancel={'[class*="MuiDialogContent-root"]'}>
@@ -136,6 +139,7 @@ export interface IEditorPageState {
     showInvalidRegionWarning: boolean;
     zoomMode: IZoomMode;
     dialog: boolean;
+    isDrawPolygon2MinBox: boolean;
 }
 
 function mapStateToProps(state: IApplicationState) {
@@ -176,6 +180,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         showInvalidRegionWarning: false,
         zoomMode: emptyZoomMode,
         dialog: false,
+        isDrawPolygon2MinBox: false,
     };
     private localFileSystem: LocalFileSystemProxy;
 
@@ -188,6 +193,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
     private deleteSourceProviderConfirm: React.RefObject<Confirm> = React.createRef();
     private deleteConfirm: React.RefObject<Confirm> = React.createRef();
     private draggableDialog: React.RefObject<DraggableDialog> = React.createRef();
+    private myZoomDom: React.RefObject<Rnd> = React.createRef();
 
     constructor(props, context) {
         super(props, context);
@@ -219,6 +225,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         // retrieved.
         // console.log("editorPage: componentDidUpdate prevProps: " + JSON.stringify(prevProps));
         if (this.props.project && !prevProps.project) {
+            console.log("componentDidUpdate: project");
             this.setState({
                 treeList: this.props.project.sourceConnection.providerOptionsOthers,
                 additionalSettings: {
@@ -229,6 +236,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         }
         // console.log("editorPage: componentDidUpdate this.state" + JSON.stringify(this.state));
         if (this.props.project && prevProps.project && this.props.project.tags !== prevProps.project.tags) {
+            console.log("componentDidUpdate: tags");
             this.updateRootAssets();
         }
     }
@@ -285,8 +293,8 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                 })}
                 <SplitPane split="vertical"
                     defaultSize={this.state.thumbnailSize.width}
-                    minSize={300}
-                    maxSize={400}
+                    minSize={350}
+                    maxSize={500}
                     paneStyle={{ display: "flex" }}
                     onChange={this.onSideBarResize}
                     onDragFinished={this.onSideBarResizeComplete}>
@@ -382,6 +390,17 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                     // await this.props.actions.saveProject(project);
                                 }}
                                 showToolbar={true}/>
+                            <TagInput
+                                tags={this.props.project.tags}
+                                lockedTags={this.state.lockedTags}
+                                selectedRegions={this.state.selectedRegions}
+                                onChange={this.onTagsChanged}
+                                onLockedTagsChange={this.onLockedTagsChanged}
+                                onTagClick={this.onTagClicked}
+                                onCtrlTagClick={this.onCtrlTagClicked}
+                                onTagRenamed={this.confirmTagRenamed}
+                                onTagDeleted={this.confirmTagDeleted}
+                            />
                         </div>
                         <EditorSideBar
                             assets={rootAssets}
@@ -403,7 +422,8 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                             <div className="editor-page-content-main-body">
                                 {selectedAsset &&
                                 <Rnd
-                                    ref="editorDom"
+                                    id="fuck"
+                                    ref={this.myZoomDom}
                                     disableDragging={this.state.zoomMode.disableDrag}
                                     size={{ width: this.state.zoomMode.width,  height: this.state.zoomMode.height }}
                                     position={{ x: this.state.zoomMode.x, y: this.state.zoomMode.y }}
@@ -428,7 +448,14 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                             },
                                         });
                                     }}
-                                    onMouseMove={(e) => {
+                                    onMouseDown={(e) => {
+                                        const zone = document.getElementById("ct-zone");
+                                        console.log(this.myZoomDom.current.getOffsetFromParent().left);
+                                        console.log(this.myZoomDom.current.getSelfElement().offsetLeft);
+                                        console.log(this.myZoomDom.current.getSelfElement().style.marginLeft);
+                                        console.log(this.myZoomDom.current.getSelfElement().style.left);
+                                        console.log(this.myZoomDom.current.getSelfElement().style.paddingLeft);
+                                        console.log(`zone.offsetLeft : ${e.pageX} ${e.screenX}我是鼠标点击x: ${e.clientX} 我是鼠标点击Y: ${e.pageY}`);
                                         this.setState({
                                             zoomMode: {
                                                 ...this.state.zoomMode,
@@ -437,9 +464,22 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                             },
                                         });
                                     }}
+                                    onMouseMove={(e) => {
+                                        // console.log(e);
+                                        // console.log(`我是鼠标点x: ${e.} 我是鼠标点y: ${e.offsetY}`);
+                                        // this.setState({
+                                        //     zoomMode: {
+                                        //         ...this.state.zoomMode,
+                                        //         zoomCenterX: e.clientX,
+                                        //         zoomCenterY: e.clientY,
+                                        //     },
+                                        // });
+                                    }}
                                     onWheel={ (e) => Zoom(e, (deltaY) => {
-                                        const w = document.getElementById("ct-zone").offsetWidth;
-                                        const h = document.getElementById("ct-zone").offsetHeight;
+                                        const zone = document.getElementById("ct-zone");
+                                        console.log(`我是图像左上角点x: ${this.myZoomDom.current.getDraggablePosition().x} 我是图像左上角点y: ${this.myZoomDom.current.getDraggablePosition().y}`);
+                                        const w = zone.offsetWidth;
+                                        const h = zone.offsetHeight;
                                         if ((h - deltaY) < this.state.zoomMode.miniHeight) { return; }
                                         this.setState({
                                             zoomMode: {
@@ -447,7 +487,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                                 width: ( w - deltaY * 2),
                                                 height: ( h - deltaY * 2),
                                                 x: this.state.zoomMode.x + deltaY,
-                                                y: this.state.zoomMode.y + deltaY,
+                                                y: this.state.zoomMode.x + deltaY,
                                             },
                                         });
                                         if (this.state.zoomMode.height === "auto") {
@@ -467,8 +507,10 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                         onCanvasRendered={this.onCanvasRendered}
                                         onSelectedRegionsChanged={this.onSelectedRegionsChanged}
                                         editorMode={this.state.editorMode}
+                                        zoomModeChange={this.state.zoomMode.width}
                                         selectionMode={this.state.selectionMode}
                                         project={this.props.project}
+                                        isDrawPolygon2MinBox={this.state.isDrawPolygon2MinBox}
                                         lockedTags={this.state.lockedTags}>
                                         <AssetPreview
                                             additionalSettings={this.state.additionalSettings}
@@ -483,19 +525,19 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                 }
                             </div>
                         </div>
-                        <div className="editor-page-right-sidebar">
-                            <TagInput
-                                tags={this.props.project.tags}
-                                lockedTags={this.state.lockedTags}
-                                selectedRegions={this.state.selectedRegions}
-                                onChange={this.onTagsChanged}
-                                onLockedTagsChange={this.onLockedTagsChanged}
-                                onTagClick={this.onTagClicked}
-                                onCtrlTagClick={this.onCtrlTagClicked}
-                                onTagRenamed={this.confirmTagRenamed}
-                                onTagDeleted={this.confirmTagDeleted}
-                            />
-                        </div>
+                        {/*<div className="editor-page-right-sidebar">*/}
+                        {/*    <TagInput*/}
+                        {/*        tags={this.props.project.tags}*/}
+                        {/*        lockedTags={this.state.lockedTags}*/}
+                        {/*        selectedRegions={this.state.selectedRegions}*/}
+                        {/*        onChange={this.onTagsChanged}*/}
+                        {/*        onLockedTagsChange={this.onLockedTagsChanged}*/}
+                        {/*        onTagClick={this.onTagClicked}*/}
+                        {/*        onCtrlTagClick={this.onCtrlTagClicked}*/}
+                        {/*        onTagRenamed={this.confirmTagRenamed}*/}
+                        {/*        onTagDeleted={this.confirmTagDeleted}*/}
+                        {/*    />*/}
+                        {/*</div>*/}
                         <Confirm title={strings.editorPage.tags.rename.title}
                             ref={this.renameTagConfirm}
                             message={strings.editorPage.tags.rename.confirmation}
@@ -589,14 +631,35 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
      * 导入已经标记的素材
      */
     private onImportTaggedAssets = async (): Promise<void> => {
-        const fileFolder = await this.localFileSystem.selectContainer();
-        if (!fileFolder) return;
+        const fileFolder = await this.localFileSystem.importTaggedContainer();
+        if (!fileFolder) { return; }
         this.draggableDialog.current.open();
-        const updateProject = await this.props.actions.importTaggedAssets(this.props.project, fileFolder);
-        await this.props.actions.saveProject(updateProject);
-        this.draggableDialog.current.change(strings.editorPage.assetsFolderBar.importTaggedAssets.done.title,
-            strings.editorPage.assetsFolderBar.importTaggedAssets.done.content,
-            true);
+        const folder = fileFolder.toString().split(",");
+        const allNum = folder.length;
+        let i = 0;
+        await folder.mapAsync(async (item) => {
+            try {
+                console.log(`导入已经标记的素材: ${item}`);
+                const updateProject = await this.props.actions.importTaggedAssets(this.props.project, item);
+                await this.props.actions.saveProject(updateProject);
+                i++;
+            } catch (e) {
+                console.error(e);
+            }
+        });
+        if (i >= allNum) {
+            this.draggableDialog.current.change(strings.editorPage.assetsFolderBar.importTaggedAssets.done.title,
+                strings.editorPage.assetsFolderBar.importTaggedAssets.done.content,
+                true);
+        } else if (i > 0 && i < allNum) {
+            this.draggableDialog.current.change(strings.editorPage.assetsFolderBar.importTaggedAssets.errorPart.title,
+                interpolate(strings.editorPage.assetsFolderBar.importTaggedAssets.errorPart.content, { part: `${i}/${allNum}`}),
+                true);
+        } else {
+            this.draggableDialog.current.change(strings.editorPage.assetsFolderBar.importTaggedAssets.error.title,
+                strings.editorPage.assetsFolderBar.importTaggedAssets.error.content,
+                true);
+        }
     }
 
     /**
@@ -761,6 +824,9 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
      * This can either be a parent or child asset
      */
     private onAssetMetadataChanged = async (assetMetadata: IAssetMetadata): Promise<void> => {
+        console.log(`editorpage加载啦啦 onAssetMetadataChanged`);
+
+        const startTime = new Date().valueOf(); // 开始时间
         // If the asset contains any regions without tags, don't proceed.
         const regionsWithoutTags = assetMetadata.regions.filter((region) => region.tags.length === 0);
 
@@ -825,17 +891,23 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         }
 
         this.setState({ childAssets, assets, isValid: true });
+        const endTime = new Date().valueOf(); // 结束时间
+        console.log(`editorpage加载啦啦 onAssetMetadataChanged end ${(endTime - startTime).toString()} 毫秒`);
     }
 
     /**
      * Raised when the asset binary has been painted onto the canvas tools rendering canvas
      */
     private onCanvasRendered = async (canvas: HTMLCanvasElement) => {
+        console.log(`变变变editorpage加载啦啦 onCanvasRendered`);
+        const startTime = new Date().valueOf(); // 开始时间
         // When active learning auto-detect is enabled
         // run predictions when asset changes
         if (this.props.project.activeLearningSettings.autoDetect && !this.state.selectedAsset.asset.predicted) {
             await this.predictRegions(canvas);
         }
+        const endTime = new Date().valueOf(); // 结束时间
+        console.log(`变变变editorpage加载啦啦 onCanvasRendered ${(endTime - startTime).toString()} 毫秒`);
     }
 
     private onSelectedRegionsChanged = (selectedRegions: IRegion[]) => {
@@ -868,6 +940,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                             ...this.state.zoomMode,
                             disableDrag: true,
                         },
+                        isDrawPolygon2MinBox: false,
                     });
                 } else {
                     toast.warn("试用版本未开放");
@@ -878,12 +951,14 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                 break;
             case ToolbarItemName.DrawRectangle:
                 this.setState({
+                    ...this.state,
                     selectionMode: SelectionMode.RECT,
                     editorMode: EditorMode.Rectangle,
                     zoomMode: {
                         ...this.state.zoomMode,
                         disableDrag: true,
                     },
+                    isDrawPolygon2MinBox: false,
                 });
                 this.canvas.current.enableCanvas(true);
                 break;
@@ -895,6 +970,19 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                         ...this.state.zoomMode,
                         disableDrag: true,
                     },
+                    isDrawPolygon2MinBox: false,
+                });
+                this.canvas.current.enableCanvas(true);
+                break;
+            case ToolbarItemName.DrawPolygon2MinBox:
+                this.setState({
+                    selectionMode: SelectionMode.POLYGON,
+                    editorMode: EditorMode.Polygon,
+                    zoomMode: {
+                        ...this.state.zoomMode,
+                        disableDrag: true,
+                    },
+                    isDrawPolygon2MinBox: true,
                 });
                 this.canvas.current.enableCanvas(true);
                 break;
@@ -902,6 +990,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                 this.setState({
                     selectionMode: SelectionMode.COPYRECT,
                     editorMode: EditorMode.CopyRect,
+                    isDrawPolygon2MinBox: false,
                 });
                 this.canvas.current.enableCanvas(true);
                 break;
@@ -917,6 +1006,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                         ...this.state.zoomMode,
                         disableDrag: false,
                     },
+                    isDrawPolygon2MinBox: false,
                 });
                 this.canvas.current.enableCanvas(false);
                 break;
@@ -954,8 +1044,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
             case ToolbarItemName.PreviousAsset:
                 await this.goToRootAsset(-1);
                 this.setState({
-                    selectionMode: SelectionMode.RECT,
-                    editorMode: EditorMode.Rectangle,
+                    ...this.state,
                     zoomMode: {
                         ...this.state.zoomMode,
                         disableDrag: true,
@@ -966,8 +1055,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
             case ToolbarItemName.NextAsset:
                 await this.goToRootAsset(1);
                 this.setState({
-                    selectionMode: SelectionMode.RECT,
-                    editorMode: EditorMode.Rectangle,
+                    ...this.state,
                     zoomMode: {
                         ...this.state.zoomMode,
                         disableDrag: true,
@@ -994,6 +1082,32 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                 break;
             case ToolbarItemName.ActiveLearning:
                 await this.predictRegions();
+                break;
+            case ToolbarItemName.SaveProject:
+                await this.props.actions.saveProject(this.props.project);
+                // toast.error("开始到处");
+                // cv.readImage("/home/baymin/图片/crop9.bmp", (err, im) => {
+                //     im.save("/home/baymin/图片/crop9.jpg");
+                // });
+                // const mat = cv.imread("/home/baymin/图片/1964668478.jpg");
+                // toast.error("开始到处");
+                // load image from file
+                // imread ( filePath : string , flags : int = cv.IMREAD_COLOR ) : Result
+                // const mat =  imread("/home/baymin/图片/1964668478.jpg", cv.IMREAD_COLOR);
+                // cv.imreadAsync('./path/img.jpg', (err, mat) => {
+                // ...
+                // })
+
+// save image
+//                 cv.imwrite("/home/baymin/图片/1964668478sssss.jpg", mat);
+                // cv.imwriteAsync('./path/img.jpg', mat,(err) => {
+                // ...
+                // })
+
+// show image
+//                 cv.imshow("a window name", mat);
+//                 cv.waitKey();
+//                 this.props.history.push(`/projects/${projectId}/settings`);
                 break;
             case ToolbarItemName.ExportProject:
                 // toast.error("开始到处");
@@ -1023,6 +1137,14 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                 //         toast.success(`配置成功`);
                 //     });
                 // this.props.history.push(`/projects/${projectId}/train`);
+                break;
+            case ToolbarItemName.OnlineTest:
+                this.props.actions.test();
+                // if (this.props.appSettings.zengyining) {
+                //     this.props.history.push(`/projects/${projectId}/remote-test-page`);
+                // } else {
+                //     toast.warn("试用版本未开放");
+                // }
                 break;
         }
     }
@@ -1148,6 +1270,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
             }
             this.loadingProjectAssets = false;
         });
+
     }
 
     private deleteAssetsAndRefreshProjectAssets = async (finalProject): Promise<void> => {

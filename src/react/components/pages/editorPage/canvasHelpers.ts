@@ -1,8 +1,8 @@
 import shortid from "shortid";
-import { Point2D } from "aipower-ct/lib/js/CanvasTools/Core/Point2D";
-import { RegionData, RegionDataType } from "aipower-ct/lib/js/CanvasTools/Core/RegionData";
-import { Tag } from "aipower-ct/lib/js/CanvasTools/Core/Tag";
-import { TagsDescriptor } from "aipower-ct/lib/js/CanvasTools/Core/TagsDescriptor";
+import { Point2D } from "powerai-ct/lib/js/CanvasTools/Core/Point2D";
+import { RegionData, RegionDataType } from "powerai-ct/lib/js/CanvasTools/Core/RegionData";
+import { Tag } from "powerai-ct/lib/js/CanvasTools/Core/Tag";
+import { TagsDescriptor } from "powerai-ct/lib/js/CanvasTools/Core/TagsDescriptor";
 import Guard from "../../../../common/guard";
 import { IBoundingBox, IRegion, ITag, RegionType,
     IPoint, AppError, ErrorCode } from "../../../../models/applicationState";
@@ -127,6 +127,10 @@ export default class CanvasHelpers {
         return regionData.area === 0 && regionData.x === 0 && regionData.y === 0;
     }
 
+    public static isAreaEmpty(regionData: RegionData): boolean {
+        return regionData.area === 0;
+    }
+
     /**
      * Create TagsDescriptor (CanvasTools) from IRegion
      * @param region IRegion from Canvas
@@ -136,14 +140,21 @@ export default class CanvasHelpers {
             return null;
         }
         Guard.null(region);
-
+        console.log(`getTagsDescriptor region:${JSON.stringify(region)} \n projectTags:${JSON.stringify(projectTags)}`);
         const tags = region.tags
             .map((tagName) => {
                 const projectTag = projectTags.find((projectTag) => projectTag.name === tagName);
                 return projectTag ? new Tag(projectTag.name, projectTag.color) : null;
             })
             .filter((tag) => tag !== null);
+        console.log(`getTagsDescriptor tags:${JSON.stringify(tags)}`);
+        return new TagsDescriptor(tags);
+    }
 
+    public static getTagsDescriptor2(projectTags: ITag[], region: IRegion): TagsDescriptor {
+        const tt = new Tag("ssss", "#e81123");
+        const tags = [tt];
+        console.log(`getTagsDescriptor tags:${JSON.stringify(tags)}`);
         return new TagsDescriptor(tags);
     }
 

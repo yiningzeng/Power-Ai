@@ -7,7 +7,7 @@
         "ip": {
             "title": "${strings.remoteTrainSettings.ip}",
             "type": "string",
-            "default": "localhost"
+            "default": "192.168.31.75"
         },
         "providerType": {
             "title": "${strings.common.trainProvider}",

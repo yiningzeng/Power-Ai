@@ -18,13 +18,35 @@ export default class LocalFileSystem implements IStorageProvider {
                 title: strings.connections.providers.local.selectFolder,
                 buttonLabel: strings.connections.providers.local.chooseFolder,
                 properties: ["openDirectory", "createDirectory"],
+            }).then((result) => {
+                if (result.canceled || !result.filePaths || result.filePaths.length === 0) {
+                    return reject();
+                }
+                console.log(result.canceled);
+                console.log(result.filePaths);
+                resolve(result.filePaths[0]);
+            }).catch((err) => {
+                console.log(err);
             });
+        });
+    }
 
-            if (!filePaths || filePaths.length !== 1) {
-                return reject();
-            }
-
-            resolve(filePaths[0]);
+    public importTaggedContainer(): Promise<object> {
+        return new Promise<object>((resolve, reject) => {
+            const filePaths = dialog.showOpenDialog({
+                title: strings.connections.providers.local.selectFolder,
+                buttonLabel: strings.connections.providers.local.chooseFolder,
+                properties: ["openDirectory", "multiSelections"],
+            }).then((result) => {
+                if (result.canceled || !result.filePaths || result.filePaths.length === 0) {
+                    return reject();
+                }
+                console.log(result.canceled);
+                console.log(result.filePaths);
+                resolve(result.filePaths);
+            }).catch((err) => {
+                console.log(err);
+            });
         });
     }
 

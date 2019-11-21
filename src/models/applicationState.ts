@@ -126,6 +126,66 @@ export interface IProject {
     lastVisitedAssetId?: string;
 }
 
+// region detectron2
+export interface ITagDetectron2 {
+    id: number;
+    name: string;
+    isthing: number;
+    color: [number, number, number];
+}
+export interface ICocoCategories {
+    things_num: number;
+    not_things_num: number;
+    categories: ITagDetectron2[];
+}
+/**
+ * 最新的detectron2训练参数
+ */
+export interface IDetectron2 {
+    detectron2Image: string;
+    use_gpus: number;
+    detectron2: {
+        _BASE_: string; // 前端没有设置需要手动
+        MODEL: {
+            WEIGHTS: string; // 前端没有设置需要手动
+            MASK_ON: boolean; // 前端没有设置需要手动
+            ROI_HEADS: { NUM_CLASSES: string }; // 前端没有设置需要手动
+            RESNETS: { DEPTH: number };
+            PIXEL_STD: string;
+        };
+
+        SOLVER: {
+            MAX_ITER: number;
+            STEPS: string; // 前端没有设置需要手动
+            IMS_PER_BATCH: string; // 前端没有设置需要手动
+        };
+
+        INPUT: {
+            MIN_SIZE_TRAIN: string;
+            MAX_SIZE_TRAIN: string;
+            CROP: {
+                ENABLED: string;
+                TYPE: string;
+                SIZE: string;
+            }
+        };
+
+        DATALOADER: {
+            NUM_WORKERS: string;
+            ASPECT_RATIO_GROUPING: string;
+            SAMPLER_TRAIN: string;
+            REPEAT_THRESHOLD: string;
+        };
+
+        DATASETS: {
+            TRAIN: string; // 前端没有设置需要手动
+            TEST: string; // 前端没有设置需要手动
+        };
+
+        OUTPUT_DIR: string; // 前端没有设置需要手动
+    };
+}
+// endregion
 /**
  * @name - FileInfo
  * @description - Defines the file information and content for V1 projects
@@ -249,7 +309,8 @@ export interface IActiveLearningSettings {
 export interface ITrainFormat {
     ip: string;
     providerType: string;
-    providerOptions: IYoloV3 | IDetectron;
+    tarBaseName?: string;
+    providerOptions: IYoloV3 | IDetectron | IDetectron2;
 }
 
 /**
@@ -274,6 +335,7 @@ export interface IAssetVideoSettings {
  * @member path - Relative path to asset within the underlying data source
  * @member size - Size / dimensions of asset
  * @member format - The asset format (jpg, png, mp4, etc)
+ * @member tagType - 用于在导出power-ai格式的数据时，区分标签文件夹所设的 用于判断当前的素材，已经标记的标签的多样性
  */
 export interface IAsset {
     id: string;
@@ -286,6 +348,7 @@ export interface IAsset {
     timestamp?: number;
     parent?: IAsset;
     predicted?: boolean;
+    tagType?: string;
 }
 
 /**
@@ -320,8 +383,8 @@ export interface IZoomMode {
     y: number;
     miniWidth: number;
     miniHeight: number;
-    width: number | "auto";
-    height: number | "auto";
+    width: number | string;
+    height: number | string;
     zoomCenterX: number;
     zoomCenterY: number;
 }

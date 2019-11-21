@@ -97,10 +97,8 @@ export default class TrainPage extends React.Component<ITrainPageProps> {
                     disableBackdropClick={true}
                     disableEscapeKeyDown={true}
                     fullWidth={true}
-                    onDone={() => this.props.history.goBack()}
-                    onCancel={() => {
-                        this.props.history.goBack();
-                    }}
+                    onDone={() => this.props.history.push(`/web-manage`)}
+                    onCancel={() => this.props.history.push(`/web-manage`)}
                 />
                 <h3>
                     <i className="fas fa-sliders-h fa-1x"></i>
@@ -157,6 +155,14 @@ export default class TrainPage extends React.Component<ITrainPageProps> {
         this.draggableDialog.current.change("正在打包", "请耐心等待，去喝杯咖啡再来吧");
         const packageRes = await this.props.actions.trainPackageProject(this.props.project);
         if (packageRes.success) {
+            const updateProject = {
+                ...this.props.project,
+                trainFormat: {
+                    ...this.props.project.trainFormat,
+                    tarBaseName: packageRes.tarBaseName,
+                },
+            };
+            await this.props.actions.saveProject(updateProject);
             this.draggableDialog.current.change(`正在上传`, "请耐心等待，去喝杯咖啡再来吧");
             const upload = await this.props.actions.trainUploadProject(this.props.project, packageRes);
             if (upload.success) {

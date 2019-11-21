@@ -38,6 +38,13 @@ export class LocalFileSystemProxy implements IStorageProvider, IAssetProvider {
     }
 
     /**
+     * 打开已经标记的素材文件夹，支持多选
+     */
+    public importTaggedContainer(): Promise<object> {
+        return IpcRendererProxy.send(`${PROXY_NAME}:importTaggedContainer`);
+    }
+
+    /**
      * Read text from file
      * @param fileName - Name of file from which to read text
      */
@@ -75,7 +82,7 @@ export class LocalFileSystemProxy implements IStorageProvider, IAssetProvider {
      */
     public writeText(fileName: string, contents: string): Promise<void> {
         const filePath = [this.options.folderPath, fileName].join("/");
-        IpcRendererProxy.send(`${PROXY_NAME}:deleteFile`, [filePath]);
+        // IpcRendererProxy.send(`${PROXY_NAME}:deleteFile`, [filePath]);
         return IpcRendererProxy.send(`${PROXY_NAME}:writeText`, [filePath, contents]);
     }
 

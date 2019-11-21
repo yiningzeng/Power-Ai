@@ -118,7 +118,7 @@ export class TagInput extends React.Component<ITagInputProps, ITagInputState> {
                                 className="tag-input-box"
                                 type="text"
                                 onKeyDown={this.onAddTagKeyDown}
-                                placeholder="Add new tag"
+                                placeholder="新增标签名"
                                 autoFocus={true}
                             />
                             <i className="tag-input-row-icon fas fa-tag" />

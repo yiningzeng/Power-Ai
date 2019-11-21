@@ -6,8 +6,6 @@ export interface ILocalStorageMiddlewareOptions {
 
 export function createLocalStorage(config: ILocalStorageMiddlewareOptions): Middleware {
     return (store: MiddlewareAPI<Dispatch<AnyAction>>) => (next: Dispatch<AnyAction>) => (action: any) => {
-        console.log(`createLocalStorage：config ${JSON.stringify(action)}`);
-        console.log(`createLocalStorage：action ${JSON.stringify(action)}`);
         const result = next(action);
         const state = store.getState();
 

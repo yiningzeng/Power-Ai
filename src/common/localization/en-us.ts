@@ -244,6 +244,14 @@ export const english: IAppStrings = {
                     title: "Import success",
                     content: "Assets has been successfully imported",
                 },
+                errorPart: {
+                    title: "注意！部分导入完成",
+                    content: "个别目录导入失败，成功导入 (${part}) 个素材文件夹，可在素材文件夹列表查看",
+                },
+                error: {
+                    title: "Import failed",
+                    content: "Check that the folder contains the import.power-ai file",
+                },
             },
         },
         toolbar: {
@@ -251,6 +259,7 @@ export const english: IAppStrings = {
             pan: "Pan",
             drawRectangle: "Draw Rectangle",
             drawPolygon: "Draw Polygon",
+            drawPolygon2MinBox: "Draw the smallest circumscribed rectangle of polygon",
             drawWithPencil: "Draw with a pencil",
             copyRectangle: "Copy Rectangle",
             copy: "Copy Regions",
@@ -264,6 +273,7 @@ export const english: IAppStrings = {
             transferProject: "Transfer Project",
             activeLearning: "Active Learning",
             trainAi: "Start Learning",
+            onlineTest: "Start Test",
         },
         videoPlayer: {
             previousTaggedFrame: {
@@ -416,6 +426,10 @@ export const english: IAppStrings = {
             },
             powerAi: {
                 displayName: "PowerAi",
+                subdirectories: {
+                    title: "classify by tag name",
+                    description: "If a material contains more than one tag name, it will be assigned to the multi-tag folder.",
+                },
             },
         },
         messages: {
@@ -429,14 +443,26 @@ export const english: IAppStrings = {
         settings: "",
         saveSettings: "save",
         providers: {
+            fasterRcnn2: {
+                displayName: "[detectron2] Faster Rcnn",
+            },
+            maskRcnn2: {
+                displayName: "[detectron2] Mask Rcnn",
+            },
+            keypointRcnn2: {
+                displayName: "[detectron2] Keypoint Rcnn",
+            },
             fasterRcnn: {
-                displayName: "Faster Rcnn",
+                displayName: "[detectron] Faster Rcnn (discards)",
             },
             maskRcnn: {
-                displayName: "Mask Rcnn",
+                displayName: "[detectron] Mask Rcnn (discards)",
             },
             yolov3: {
-                displayName: "Yolo v3",
+                displayName: "[yolov3] Yolo v3",
+            },
+            yolov3Pytorch: {
+                displayName: "[pytorch] Yolo v3",
             },
         },
         messages: {

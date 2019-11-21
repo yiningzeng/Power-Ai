@@ -243,6 +243,14 @@ export interface IAppStrings {
                     title: string;
                     content: string;
                 },
+                errorPart: {
+                    title: string;
+                    content: string;
+                },
+                error: {
+                    title: string;
+                    content: string;
+                },
             },
         };
         toolbar: {
@@ -252,6 +260,7 @@ export interface IAppStrings {
             drawWithPencil: string;
             drawPolygon: string;
             copyRectangle: string;
+            drawPolygon2MinBox: string;
             copy: string;
             cut: string;
             paste: string;
@@ -263,6 +272,7 @@ export interface IAppStrings {
             transferProject: string;
             activeLearning: string;
             trainAi: string;
+            onlineTest: string;
         }
         videoPlayer: {
             nextTaggedFrame: {
@@ -413,6 +423,10 @@ export interface IAppStrings {
             },
             powerAi: {
                 displayName: string,
+                subdirectories: {
+                    title: string,
+                    description: string,
+                },
             },
         },
         messages: {
@@ -432,7 +446,19 @@ export interface IAppStrings {
             maskRcnn: {
                 displayName: string,
             },
+            fasterRcnn2: {
+                displayName: string,
+            },
+            maskRcnn2: {
+                displayName: string,
+            },
+            keypointRcnn2: {
+                displayName: string,
+            },
             yolov3: {
+                displayName: string,
+            },
+            yolov3Pytorch: {
                 displayName: string,
             },
         }

@@ -3,6 +3,7 @@ import fs from "fs";
 import ftp from "ftp";
 import got from "got";
 import archiver from "archiver";
+import hddserial from "hddserial";
 import FormData from "form-data";
 // const Client = require("ftp");
 import path from "path";
@@ -11,6 +12,7 @@ import child_process from "child_process";
 import has = Reflect.has;
 import {IStartTrainResults} from "../../../providers/export/exportProvider";
 import Guard from "../../../common/guard";
+import {toast} from "react-toastify";
 const exec = child_process.exec;
 // 任何你期望执行的cmd命令，ls都可以
 
@@ -20,7 +22,7 @@ let workerProcess;
 export default class TrainingSystem {
 
     constructor(private browserWindow: BrowserWindow) { }
-
+    // region 弃用
     public fasterRcnn(project: IProject): Promise<string> {
         return new Promise<string>((resolve, reject) => {
             if (project.trainFormat.ip !== "localhost") {
@@ -184,6 +186,7 @@ export default class TrainingSystem {
             resolve("成功");
         });
     }
+    // endregion
 
     public remoteTrain(project: IProject): Promise<string> {
         return new Promise<string>((resolve, reject) => {
@@ -280,19 +283,19 @@ export default class TrainingSystem {
                         //     });
                         // }).catch(console.warn);
 
-                        const form = new FormData();
-                        form.append("username", "baymin");
-                        form.append("password", "e10adc3949ba59abbe56e057f20f883e");
-                        got("http://rest.yining.site:8080/api/v1/u2", {
-                            body: form,
-                            method: "POST",
-                        }).then((response) => {
-                            console.log("进来了大爷");
-                            console.log(response.body);
-                        }).catch((error) => {
-                            console.log("错误了");
-                            console.log(error.response.body);
-                        });
+                        // const form = new FormData();
+                        // form.append("username", "baymin");
+                        // form.append("password", "e10adc3949ba59abbe56e057f20f883e");
+                        // got("http://rest.yining.site:8080/api/v1/u2", {
+                        //     body: form,
+                        //     method: "POST",
+                        // }).then((response) => {
+                        //     console.log("进来了大爷");
+                        //     console.log(response.body);
+                        // }).catch((error) => {
+                        //     console.log("错误了");
+                        //     console.log(error.response.body);
+                        // });
 
                     });
                 });
@@ -574,12 +577,12 @@ export default class TrainingSystem {
                 resolve(res);
             });
 
-            let win = new BrowserWindow({ width: 1800, height: 1000, show: false });
-            win.on("closed", () => {
-                win = null;
-            });
-            win.loadURL(`http://${project.trainFormat.ip}`);
-            win.show();
+            // let win = new BrowserWindow({ width: 1800, height: 1000, show: false });
+            // win.on("closed", () => {
+            //     win = null;
+            // });
+            // win.loadURL(`http://${project.trainFormat.ip}`);
+            // win.show();
         });
     }
 
@@ -595,7 +598,7 @@ export default class TrainingSystem {
                 packageDir: source.tarBaseName,
                 packageName: source.tarName,
             };
-            got("http://localhost:18888/power-ai-train", {
+            got("http://server.qtingvision.com:888/power-ai-train", {
                 body: packageInfo,
                 method: "POST",
                 json: true,
@@ -617,6 +620,72 @@ export default class TrainingSystem {
             });
             resolve(res);
         });
+    }
+
+    public opencvTest() {
+        console.log("进来了");
+        Promise.all([
+            import("/home/baymin/daily-work/Power-Ai/node_modules/react-split-pane"),
+        ]).then(([SplitPane]) => {
+            console.log("asdsdsdsdsdsd");
+            console.log(SplitPane);
+            console.log("asdsdsdsdsdsd");
+            // const minBboxsNotP = [];
+            // minBboxsNotP.push([123, 234]);
+            // minBboxsNotP.push([224, 255]);
+            // minBboxsNotP.push([455, 90]);
+            // minBboxsNotP.push([88, 90]);
+            // const bboxs = findBounds(minBboxsNotP);
+            // console.log("\n=============================\n");
+            // console.log(`变变变${JSON.stringify(bboxs)}`);
+            // console.log("\n=============================\n");
+            /* CODE HERE*/
+        }).catch((e) => {
+            console.log(e);
+        });
+        Promise.all([
+            import("/home/baymin/daily-work/Power-Ai/node_modules/getboundingbox"),
+        ]).then(([fuck]) => {
+            const minBboxsNotP = [];
+            minBboxsNotP.push([123, 234]);
+            minBboxsNotP.push([224, 255]);
+            minBboxsNotP.push([455, 90]);
+            minBboxsNotP.push([88, 90]);
+            const bboxs = fuck.bb(minBboxsNotP);
+            console.log("\n=============================\n");
+            console.log(`变变变${JSON.stringify(bboxs)}`);
+            console.log("\n=============================\n");
+            /* CODE HERE*/
+        }).catch((e) => {
+            console.log(e);
+        });
+
+        Promise.all([
+            import("/home/baymin/daily-work/Power-Ai/node_modules/getboundingbox"),
+        ]).then(([fuck]) => {
+            const minBboxsNotP = [];
+            minBboxsNotP.push([123, 234]);
+            minBboxsNotP.push([224, 255]);
+            minBboxsNotP.push([455, 90]);
+            minBboxsNotP.push([88, 90]);
+            const bboxs = fuck.cc(minBboxsNotP);
+            console.log("\n=============================\n");
+            console.log(`变变变${JSON.stringify(bboxs)}`);
+            console.log("\n=============================\n");
+            /* CODE HERE*/
+        }).catch((e) => {
+            console.log(e);
+        });
+        hddserial.first((err, serial) => {
+            console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaahdd serial for first hdd : %s", serial);
+        });
+        // const mat = cv.imread("/home/baymin/图片/1964668478.jpg");
+        // cv.imwrite("/home/baymin/图片/opencv4nodejs.jpg", mat);
+        // cv.imshow("a window name", mat);
+        // cv.waitKey();
+        // const mat = cv.imread("/home/baymin/图片/1964668478.jpg");
+        // cv.imshow("a window name", mat);
+        // cv.waitKey();
     }
     /**
      * Gets the node file system stats for the specified path

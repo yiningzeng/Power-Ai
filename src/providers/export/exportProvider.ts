@@ -37,6 +37,9 @@ export interface ITrainConfigResults {
     success: boolean;
 }
 
+/**
+ * 训练函数返回结果
+ */
 export interface IStartTrainResults {
     success: boolean;
     msg: string;
@@ -47,6 +50,14 @@ export interface IStartTrainResults {
     assetsBasePath?: string;
 }
 
+/**
+ * 测试接口返回
+ */
+export interface IStartTestResults {
+    success: boolean;
+    msg: string;
+    list?: [];
+}
 /**
  * @name - IExportProvider
  * @description - Defines the required interface for all VoTT export providers

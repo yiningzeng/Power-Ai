@@ -8,14 +8,14 @@ import Canvas, { ICanvasProps, ICanvasState } from "./canvas";
 import CanvasHelpers from "./canvasHelpers";
 import { appInfo } from "../../../../common/appInfo";
 
-jest.mock("aipower-ct/lib/js/CanvasTools/CanvasTools.Editor");
-import { Editor } from "aipower-ct/lib/js/CanvasTools/CanvasTools.Editor";
+jest.mock("powerai-ct/lib/js/CanvasTools/CanvasTools.Editor");
+import { Editor } from "powerai-ct/lib/js/CanvasTools/CanvasTools.Editor";
 
-jest.mock("aipower-ct/lib/js/CanvasTools/Region/RegionsManager");
-import { RegionsManager } from "aipower-ct/lib/js/CanvasTools/Region/RegionsManager";
+jest.mock("powerai-ct/lib/js/CanvasTools/Region/RegionsManager");
+import { RegionsManager } from "powerai-ct/lib/js/CanvasTools/Region/RegionsManager";
 import Confirm, { IConfirmProps } from "../../common/confirm/confirm";
-import { Rect } from "aipower-ct/lib/js/CanvasTools/Core/Rect";
-import { SelectionMode } from "aipower-ct/lib/js/CanvasTools/Interface/ISelectorSettings";
+import { Rect } from "powerai-ct/lib/js/CanvasTools/Core/Rect";
+import { SelectionMode } from "powerai-ct/lib/js/CanvasTools/Interface/ISelectorSettings";
 
 describe("Editor Canvas", () => {
     function createComponent(canvasProps?: ICanvasProps, assetPreviewProps?: IAssetPreviewProps)
@@ -46,6 +46,7 @@ describe("Editor Canvas", () => {
             selectedAsset: getAssetMetadata(),
             onAssetMetadataChanged: jest.fn(),
             onCanvasRendered: jest.fn(),
+            isDrawPolygon2MinBox: false,
             editorMode: EditorMode.Rectangle,
             selectionMode: SelectionMode.RECT,
             project: MockFactory.createTestProject(),

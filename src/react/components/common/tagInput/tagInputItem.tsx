@@ -1,5 +1,7 @@
 import React, { MouseEvent } from "react";
 import { ITag } from "../../../../models/applicationState";
+import { SketchPicker } from "react-color";
+import {Button, Popover} from "@material-ui/core";
 
 export enum TagEditMode {
     Color = "color",
@@ -41,6 +43,8 @@ export interface ITagInputItemState {
     isLocked: boolean;
     /** Mode of tag editing (text or color) */
     tagEditMode: TagEditMode;
+    showColorPicker: boolean;
+    anchorEl: Element;
 }
 
 export default class TagInputItem extends React.Component<ITagInputItemProps, ITagInputItemState> {
@@ -48,6 +52,8 @@ export default class TagInputItem extends React.Component<ITagInputItemProps, IT
         isBeingEdited: false,
         isLocked: false,
         tagEditMode: null,
+        showColorPicker: false,
+        anchorEl: null,
     };
 
     public render() {
@@ -59,9 +65,59 @@ export default class TagInputItem extends React.Component<ITagInputItemProps, IT
                 {
                     this.props.tag &&
                     <li className={this.getItemClassName()} style={style}>
-                        <div
-                            className={`tag-color`}
-                            onClick={this.onColorClick}>
+                        {/*<div*/}
+                        {/*    className={`tag-color`}*/}
+                        {/*    onClick={this.onColorClick}>*/}
+                        {/*</div>*/}
+                        <div>
+                            {/*<i className="fas fa-fill-drip"></i>*/}
+                            <a className="fas fa-quidditch" onClick={((event) => {
+                                this.setState({
+                                    ...this.state,
+                                    showColorPicker: true,
+                                    anchorEl: event.currentTarget,
+                                });
+                            })}></a>
+                            <Popover
+                                id={"colorrr"}
+                                open={this.state.showColorPicker}
+                                anchorEl={this.state.anchorEl}
+                                onClose={() => this.setState({
+                                    ...this.state,
+                                    showColorPicker: false,
+                                })}
+                                anchorOrigin={{
+                                    vertical: "bottom",
+                                    horizontal: "center",
+                                }}
+                                transformOrigin={{
+                                    vertical: "top",
+                                    horizontal: "center",
+                                }}
+                            >
+                                <SketchPicker
+                                    disableAlpha={true}
+                                    color={this.props.tag.color}
+                                    onChange={ (color, event) => {
+                                        console.log(`更改颜色: ${JSON.stringify(color)}`);
+                                        this.props.onChange(this.props.tag, {
+                                            ...this.props.tag,
+                                            color: color.hex,
+                                        });
+                                        // this.setState({
+                                        //     ...this.state,
+                                        //     showColorPicker: false,
+                                        // });
+                                    }} />
+                                <Button style={{width: "100%"}} onClick={(e) =>
+                                    this.setState({
+                                    ...this.state,
+                                    showColorPicker: false,
+                                    })
+                                } color="primary" >
+                                    关  闭
+                                </Button>
+                            </Popover>
                         </div>
                         <div
                             className={"tag-content"}
@@ -94,7 +150,6 @@ export default class TagInputItem extends React.Component<ITagInputItemProps, IT
 
     private onColorClick = (e: MouseEvent) => {
         e.stopPropagation();
-
         const ctrlKey = e.ctrlKey || e.metaKey;
         const altKey = e.altKey;
         this.setState({

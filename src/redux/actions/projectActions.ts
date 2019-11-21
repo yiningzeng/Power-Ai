@@ -15,7 +15,7 @@ import {
 import { createAction, createPayloadAction, IPayloadAction } from "./actionCreators";
 import {
     ExportAssetState,
-    IExportResults,
+    IExportResults, IStartTestResults,
     IStartTrainResults,
     ITrainConfigResults,
 } from "../../providers/export/exportProvider";
@@ -27,6 +27,7 @@ import {TrainProviderFactory} from "../../providers/trainSettings/trainProviderF
 import { decryptProviderOptions } from "../../common/utils";
 import {constants} from "../../common/constants";
 import _ from "lodash";
+import TestService from "../../services/testService";
 
 /**
  * Actions to be performed in relation to projects
@@ -44,6 +45,7 @@ export default interface IProjectActions {
     trainAddSql(project: IProject, source: IStartTrainResults): Promise<IStartTrainResults>;
     trainPackageProject(project: IProject): Promise<IStartTrainResults>;
     trainUploadProject(project: IProject, source: IStartTrainResults): Promise<IStartTrainResults>;
+    testImage(project: IProject): Promise<IStartTestResults>;
     loadAssets(project: IProject): Promise<IAsset[]>;
     loadAssetsWithFolder(project: IProject, folder: string): Promise<IAsset[]>;
     loadAssetMetadata(project: IProject, asset: IAsset): Promise<IAssetMetadata>;
@@ -51,6 +53,15 @@ export default interface IProjectActions {
     deleteAsset(project: IProject, selectAsset: IAsset): Promise<IProject>;
     updateProjectTag(project: IProject, oldTagName: string, newTagName: string): Promise<IAssetMetadata[]>;
     deleteProjectTag(project: IProject, tagName): Promise<IAssetMetadata[]>;
+    test(): void;
+}
+
+export function test(): (dispatch: Dispatch) => void {
+    return (dispatch: Dispatch): void => {
+        const trainService = new TrainService();
+        trainService.test();
+        // dispatch({ type: ActionTypes.CLOSE_PROJECT_SUCCESS });
+    };
 }
 
 /**
@@ -368,10 +379,12 @@ export function importTaggedAssets(project: IProject, folder: string):
             throw new AppError(ErrorCode.SecurityTokenNotFound, "Security Token Not Found");
         }
         const updatedProject = await projectService.importTaggedAssets(project, folder);
-        await saveProject(updatedProject)(dispatch, getState);
-        dispatch(saveProjectAction(updatedProject));
-        // Reload project after save actions
-        await loadProject(updatedProject)(dispatch, getState);
+        if (updatedProject !== null) {
+            await saveProject(updatedProject)(dispatch, getState);
+            dispatch(saveProjectAction(updatedProject));
+            // Reload project after save actions
+            await loadProject(updatedProject)(dispatch, getState);
+        }
         return updatedProject;
     };
 }
@@ -449,7 +462,13 @@ export function trainAddQueueProject(project: IProject, source: IStartTrainResul
         return await trainService.trainAddQueueProject(project, source);
     };
 }
-
+export function testImage(project: IProject):
+    (dispatch: Dispatch) => Promise<IStartTestResults> {
+    return async (dispatch: Dispatch) => {
+        const testService = new TestService();
+        return await testService.testGetModel(project);
+    };
+}
 export function trainAddSql(project: IProject, source: IStartTrainResults):
     (dispatch: Dispatch) => Promise<ITrainConfigResults> {
     return async (dispatch: Dispatch) => {

@@ -22,8 +22,9 @@ import { toast } from "react-toastify";
 import moment from "moment";
 import MessageBox from "../../common/messageBox/messageBox";
 import { isElectron } from "../../../../common/hostProcess";
-import {ILocalFileSystemProxyOptions} from "../../../../providers/storage/localFileSystemProxy";
+import {ILocalFileSystemProxyOptions, LocalFileSystemProxy} from "../../../../providers/storage/localFileSystemProxy";
 import * as connectionActions from "../../../../redux/actions/connectionActions";
+import trainService from "../../../../services/trainService";
 
 export interface IHomePageProps extends RouteComponentProps, React.Props<HomePage> {
     recentProjects: IProject[];
@@ -59,21 +60,31 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
     public state: IHomePageState = {
         cloudPickerOpen: false,
     };
+
     private filePicker: React.RefObject<FilePicker> = React.createRef();
     private deleteConfirm: React.RefObject<Confirm> = React.createRef();
     private cloudFilePicker: React.RefObject<CloudFilePicker> = React.createRef();
     private importConfirm: React.RefObject<Confirm> = React.createRef();
-    public render() {
-        if (this.props.appSettings.deadline === undefined || this.props.appSettings.deadline === null) {
-            const newAppSettings = {
-                ...this.props.appSettings,
-                deadline: moment().add(90, "days").format("YYYY-MM-DD"),
-            };
-            this.props.applicationActions.saveAppSettings(newAppSettings);
-        }
+
+    constructor(props, context) {
+        super(props, context);
         // 试用版本使用这个
         // if (this.props.appSettings.zengyining === undefined || this.props.appSettings.zengyining === null) {
         //     toast.warn("您当前处于试用权限，有些功能会受限制", { autoClose: false });
+        // } else {
+        //     const newAppSettings = {
+        //         ...this.props.appSettings,
+        //         zengyining: undefined,
+        //     };
+        //     this.props.applicationActions.saveAppSettings(newAppSettings);
+        //     toast.warn("您当前处于试用权限，有些功能会受限制", {autoClose: false});
+        // }
+        // if (this.props.appSettings.deadline === undefined || this.props.appSettings.deadline === null) {
+        //     const newAppSettings = {
+        //         ...this.props.appSettings,
+        //         deadline: moment().add(90, "days").format("YYYY-MM-DD"),
+        //     };
+        //     this.props.applicationActions.saveAppSettings(newAppSettings);
         // }
         // 试用版本使用这个
         // 正式版使用这个
@@ -85,6 +96,11 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
             this.props.applicationActions.saveAppSettings(newAppSettings);
         }
         // 正式版使用这个
+    }
+
+    public render() {
+
+        // this.props.actions.test();
         return (
             <div className="app-homepage">
                 <div className="app-homepage-main">
@@ -161,6 +177,10 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
     }
 
     private afterDeadLine = () => {
+        if (this.props.appSettings.zengyining) {
+            return false;
+        }
+
         if (moment(moment().format("YYYY-MM-DD")).isAfter(this.props.appSettings.deadline)) {
             toast.warn("程序到期了，为了不影响您的正常使用，请联系轻蜓视觉", { autoClose: false });
             return true;

@@ -9,6 +9,7 @@ export enum ToolbarItemName {
     SelectCanvas = "selectCanvas",
     DrawRectangle = "drawRectangle",
     DrawPolygon = "drawPolygon",
+    DrawPolygon2MinBox = "drawPolygon2MinBox",
     DrawWithPencil = "drawWithPencil",
     CopyRectangle = "copyRectangle",
     CopyRegions = "copyRegions",
@@ -28,6 +29,7 @@ export enum ToolbarItemName {
     TransferProject = "transferProject",
     ActiveLearning = "activeLearning",
     TrainAi = "trainAi",
+    OnlineTest = "onlineTest",
     RemoteTrainAi = "remoteTrainAi",
 }
 
@@ -78,7 +80,14 @@ export default function registerToolbar() {
         type: ToolbarItemType.State,
         accelerators: ["D", "d"],
     });
-
+    ToolbarItemFactory.register({
+        name: ToolbarItemName.DrawPolygon2MinBox,
+        tooltip: strings.editorPage.toolbar.drawPolygon2MinBox,
+        icon: "fa-border-none",
+        group: ToolbarItemGroup.Canvas,
+        type: ToolbarItemType.State,
+        accelerators: ["F", "f"],
+    });
     ToolbarItemFactory.register({
         name: ToolbarItemName.CopyRectangle,
         tooltip: strings.editorPage.toolbar.copyRectangle,
@@ -206,6 +215,15 @@ export default function registerToolbar() {
         accelerators: ["CmdOrCtrl+D", "CmdOrCtrl+d"],
     });
 
+    // ToolbarItemFactory.register({
+    //     name: ToolbarItemName.SaveProject,
+    //     tooltip: strings.editorPage.toolbar.saveProject,
+    //     icon: "fa-save",
+    //     group: ToolbarItemGroup.Project,
+    //     type: ToolbarItemType.Action,
+    //     accelerators: ["CmdOrCtrl+S", "CmdOrCtrl+s"],
+    // }, SaveProject);
+
     ToolbarItemFactory.register({
         name: ToolbarItemName.SaveProject,
         tooltip: strings.editorPage.toolbar.saveProject,
@@ -213,7 +231,7 @@ export default function registerToolbar() {
         group: ToolbarItemGroup.Project,
         type: ToolbarItemType.Action,
         accelerators: ["CmdOrCtrl+S", "CmdOrCtrl+s"],
-    }, SaveProject);
+    });
 
     ToolbarItemFactory.register({
         name: ToolbarItemName.ExportProject,
@@ -249,6 +267,16 @@ export default function registerToolbar() {
         type: ToolbarItemType.Action,
         accelerators: ["CmdOrCtrl+T", "CmdOrCtrl+t"],
     });
+
+    // ToolbarItemFactory.register({
+    //     name: ToolbarItemName.OnlineTest,
+    //     tooltip: strings.editorPage.toolbar.onlineTest,
+    //     icon: "fas fa-trophy",
+    //     // icon: "fas fa-caret-square-right",
+    //     group: ToolbarItemGroup.Ai,
+    //     type: ToolbarItemType.Action,
+    //     accelerators: ["CmdOrCtrl+K", "CmdOrCtrl+k"],
+    // });
 
     // ToolbarItemFactory.register({
     //     name: ToolbarItemName.RemoteTrainAi,
