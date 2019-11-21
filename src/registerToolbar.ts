@@ -268,15 +268,15 @@ export default function registerToolbar() {
         accelerators: ["CmdOrCtrl+T", "CmdOrCtrl+t"],
     });
 
-    ToolbarItemFactory.register({
-        name: ToolbarItemName.OnlineTest,
-        tooltip: strings.editorPage.toolbar.onlineTest,
-        icon: "fas fa-trophy",
-        // icon: "fas fa-caret-square-right",
-        group: ToolbarItemGroup.Ai,
-        type: ToolbarItemType.Action,
-        accelerators: ["CmdOrCtrl+K", "CmdOrCtrl+k"],
-    });
+    // ToolbarItemFactory.register({
+    //     name: ToolbarItemName.OnlineTest,
+    //     tooltip: strings.editorPage.toolbar.onlineTest,
+    //     icon: "fas fa-trophy",
+    //     // icon: "fas fa-caret-square-right",
+    //     group: ToolbarItemGroup.Ai,
+    //     type: ToolbarItemType.Action,
+    //     accelerators: ["CmdOrCtrl+K", "CmdOrCtrl+k"],
+    // });
 
     // ToolbarItemFactory.register({
     //     name: ToolbarItemName.RemoteTrainAi,

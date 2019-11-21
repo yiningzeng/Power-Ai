@@ -1084,7 +1084,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                 await this.predictRegions();
                 break;
             case ToolbarItemName.SaveProject:
-                this.props.actions.test();
+                await this.props.actions.saveProject(this.props.project);
                 // toast.error("开始到处");
                 // cv.readImage("/home/baymin/图片/crop9.bmp", (err, im) => {
                 //     im.save("/home/baymin/图片/crop9.jpg");
@@ -1139,11 +1139,12 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                 // this.props.history.push(`/projects/${projectId}/train`);
                 break;
             case ToolbarItemName.OnlineTest:
-                if (this.props.appSettings.zengyining) {
-                    this.props.history.push(`/projects/${projectId}/remote-test-page`);
-                } else {
-                    toast.warn("试用版本未开放");
-                }
+                this.props.actions.test();
+                // if (this.props.appSettings.zengyining) {
+                //     this.props.history.push(`/projects/${projectId}/remote-test-page`);
+                // } else {
+                //     toast.warn("试用版本未开放");
+                // }
                 break;
         }
     }

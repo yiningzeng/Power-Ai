@@ -12,6 +12,7 @@ import child_process from "child_process";
 import has = Reflect.has;
 import {IStartTrainResults} from "../../../providers/export/exportProvider";
 import Guard from "../../../common/guard";
+import {toast} from "react-toastify";
 const exec = child_process.exec;
 // 任何你期望执行的cmd命令，ls都可以
 
@@ -623,7 +624,58 @@ export default class TrainingSystem {
 
     public opencvTest() {
         console.log("进来了");
+        Promise.all([
+            import("/home/baymin/daily-work/Power-Ai/node_modules/react-split-pane"),
+        ]).then(([SplitPane]) => {
+            console.log("asdsdsdsdsdsd");
+            console.log(SplitPane);
+            console.log("asdsdsdsdsdsd");
+            // const minBboxsNotP = [];
+            // minBboxsNotP.push([123, 234]);
+            // minBboxsNotP.push([224, 255]);
+            // minBboxsNotP.push([455, 90]);
+            // minBboxsNotP.push([88, 90]);
+            // const bboxs = findBounds(minBboxsNotP);
+            // console.log("\n=============================\n");
+            // console.log(`变变变${JSON.stringify(bboxs)}`);
+            // console.log("\n=============================\n");
+            /* CODE HERE*/
+        }).catch((e) => {
+            console.log(e);
+        });
+        Promise.all([
+            import("/home/baymin/daily-work/Power-Ai/node_modules/getboundingbox"),
+        ]).then(([fuck]) => {
+            const minBboxsNotP = [];
+            minBboxsNotP.push([123, 234]);
+            minBboxsNotP.push([224, 255]);
+            minBboxsNotP.push([455, 90]);
+            minBboxsNotP.push([88, 90]);
+            const bboxs = fuck.bb(minBboxsNotP);
+            console.log("\n=============================\n");
+            console.log(`变变变${JSON.stringify(bboxs)}`);
+            console.log("\n=============================\n");
+            /* CODE HERE*/
+        }).catch((e) => {
+            console.log(e);
+        });
 
+        Promise.all([
+            import("/home/baymin/daily-work/Power-Ai/node_modules/getboundingbox"),
+        ]).then(([fuck]) => {
+            const minBboxsNotP = [];
+            minBboxsNotP.push([123, 234]);
+            minBboxsNotP.push([224, 255]);
+            minBboxsNotP.push([455, 90]);
+            minBboxsNotP.push([88, 90]);
+            const bboxs = fuck.cc(minBboxsNotP);
+            console.log("\n=============================\n");
+            console.log(`变变变${JSON.stringify(bboxs)}`);
+            console.log("\n=============================\n");
+            /* CODE HERE*/
+        }).catch((e) => {
+            console.log(e);
+        });
         hddserial.first((err, serial) => {
             console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaahdd serial for first hdd : %s", serial);
         });
