@@ -13,6 +13,7 @@ import has = Reflect.has;
 import {IStartTrainResults} from "../../../providers/export/exportProvider";
 import Guard from "../../../common/guard";
 import {toast} from "react-toastify";
+
 const exec = child_process.exec;
 // 任何你期望执行的cmd命令，ls都可以
 
@@ -623,6 +624,8 @@ export default class TrainingSystem {
     }
 
     public opencvTest() {
+
+
         console.log("进来了");
         Promise.all([
             import("/home/baymin/daily-work/Power-Ai/node_modules/react-split-pane"),
@@ -643,42 +646,45 @@ export default class TrainingSystem {
         }).catch((e) => {
             console.log(e);
         });
-        Promise.all([
-            import("/home/baymin/daily-work/Power-Ai/node_modules/getboundingbox"),
-        ]).then(([fuck]) => {
-            const minBboxsNotP = [];
-            minBboxsNotP.push([123, 234]);
-            minBboxsNotP.push([224, 255]);
-            minBboxsNotP.push([455, 90]);
-            minBboxsNotP.push([88, 90]);
-            const bboxs = fuck.bb(minBboxsNotP);
-            console.log("\n=============================\n");
-            console.log(`变变变${JSON.stringify(bboxs)}`);
-            console.log("\n=============================\n");
-            /* CODE HERE*/
-        }).catch((e) => {
-            console.log(e);
-        });
+        // region 插件库
+        // Promise.all([
+        //     import("/home/baymin/daily-work/Power-Ai/node_modules/getboundingbox"),
+        // ]).then(([fuck]) => {
+        //     const minBboxsNotP = [];
+        //     minBboxsNotP.push([123, 234]);
+        //     minBboxsNotP.push([224, 255]);
+        //     minBboxsNotP.push([455, 90]);
+        //     minBboxsNotP.push([88, 90]);
+        //     const bboxs = fuck.bb(minBboxsNotP);
+        //     console.log("\n=============================\n");
+        //     console.log(`变变变${JSON.stringify(bboxs)}`);
+        //     console.log("\n=============================\n");
+        //     /* CODE HERE*/
+        // }).catch((e) => {
+        //     console.log(e);
+        // });
+        //
+        // Promise.all([
+        //     import("/home/baymin/daily-work/Power-Ai/node_modules/getboundingbox"),
+        // ]).then(([fuck]) => {
+        //     const minBboxsNotP = [];
+        //     minBboxsNotP.push([123, 234]);
+        //     minBboxsNotP.push([224, 255]);
+        //     minBboxsNotP.push([455, 90]);
+        //     minBboxsNotP.push([88, 90]);
+        //     const bboxs = fuck.cc(minBboxsNotP);
+        //     console.log("\n=============================\n");
+        //     console.log(`变变变${JSON.stringify(bboxs)}`);
+        //     console.log("\n=============================\n");
+        //     /* CODE HERE*/
+        // }).catch((e) => {
+        //     console.log(e);
+        // });
+        // endregion 插件库
 
-        Promise.all([
-            import("/home/baymin/daily-work/Power-Ai/node_modules/getboundingbox"),
-        ]).then(([fuck]) => {
-            const minBboxsNotP = [];
-            minBboxsNotP.push([123, 234]);
-            minBboxsNotP.push([224, 255]);
-            minBboxsNotP.push([455, 90]);
-            minBboxsNotP.push([88, 90]);
-            const bboxs = fuck.cc(minBboxsNotP);
-            console.log("\n=============================\n");
-            console.log(`变变变${JSON.stringify(bboxs)}`);
-            console.log("\n=============================\n");
-            /* CODE HERE*/
-        }).catch((e) => {
-            console.log(e);
-        });
-        hddserial.first((err, serial) => {
-            console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaahdd serial for first hdd : %s", serial);
-        });
+        // hddserial.first((err, serial) => {
+        //     console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaahdd serial for first hdd : %s", serial);
+        // });
         // const mat = cv.imread("/home/baymin/图片/1964668478.jpg");
         // cv.imwrite("/home/baymin/图片/opencv4nodejs.jpg", mat);
         // cv.imshow("a window name", mat);
