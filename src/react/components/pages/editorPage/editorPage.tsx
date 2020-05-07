@@ -110,6 +110,8 @@ export interface IEditorPageState {
     treeList: IProviderOptions[] | ISecureString[];
     /** Array of assets in project */
     assets: IAsset[];
+    isFilter: boolean;
+    filterAssets?: IAsset[];
     /** The editor mode to set for canvas tools */
     editorMode: EditorMode;
     /** The selection mode to set for canvas tools */
@@ -182,6 +184,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         dialog: false,
         isDrawPolygon2MinBox: false,
         showProjectMetrics: false,
+        isFilter: false,
     };
     private localFileSystem: LocalFileSystemProxy;
 
@@ -406,13 +409,14 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                 onChange={this.onTagsChanged}
                                 onLockedTagsChange={this.onLockedTagsChanged}
                                 onTagClick={this.onTagClicked}
+                                onTagSearched={this.onTagSearched}
                                 onCtrlTagClick={this.onCtrlTagClicked}
                                 onTagRenamed={this.confirmTagRenamed}
                                 onTagDeleted={this.confirmTagDeleted}
                             />
                         </div>
                         <EditorSideBar
-                            assets={rootAssets}
+                            assets={this.state.isFilter ? this.state.filterAssets : this.state.assets}
                             selectedAsset={selectedAsset ? selectedAsset.asset : null}
                             // selectedAsset={null}
                             onBeforeAssetSelected={this.onBeforeAssetSelected}
@@ -742,6 +746,52 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         //             },
         //         },
         //     }, () => this.canvas.current.applyTag(tag.name));
+    }
+
+    /**
+     * Called when a tag from footer is clicked
+     * @param tag Tag clicked
+     */
+    private onTagSearched = async (tags: ITag[]): Promise<void>  => {
+        console.log("editorpage + onTagSearched + taginput" + JSON.stringify(tags));
+        if (tags.length) {
+
+            const filterAssets: IAsset[] = [];
+            await this.state.assets.filter(async (asset) => {
+                const assetMetadata = await this.props.actions.loadAssetMetadata(this.props.project, asset);
+                const regions = JSON.stringify(assetMetadata.regions);
+                const tagsTemp = tags.filter((val) => {
+                  return (regions.indexOf(val.name) > -1) ? true : false;
+                });
+                console.log("fuck filter" + JSON.stringify(tagsTemp));
+                if (tagsTemp.length) {
+                    console.log("fuck filter 我存在");
+                    filterAssets.push(asset);
+                    this.setState({
+                        ...this.state,
+                        isFilter: true,
+                        filterAssets,
+                    });
+                }
+                //
+                // if (rootAssetMetadata.asset.state !== AssetState.Tagged) {
+                //     rootAssetMetadata.asset.state = assetMetadata.asset.state;
+                //     await this.props.actions.saveAssetMetadata(this.props.project, rootAssetMetadata);
+                // }
+                //
+                // rootAsset.state = rootAssetMetadata.asset.state;
+
+            });
+        } else {
+            this.setState({
+                ...this.state,
+                isFilter: false,
+            });
+        }
+
+        // isFilter?: boolean;
+        // filterAsset?: IAssetMetadata;
+        // 在这里添加需要过滤的标签
     }
 
     /**
@@ -1184,6 +1234,9 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                 //     toast.warn("试用版本未开放");
                 // }
                 break;
+            case ToolbarItemName.FilterAssets:
+                toast.warn("过滤文件");
+                break;
         }
     }
 
@@ -1233,13 +1286,15 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                 height: "auto",
             },
         });
+
         const selectedRootAsset = this.state.selectedAsset.asset.parent || this.state.selectedAsset.asset;
-        const currentIndex = this.state.assets
+        const assets = this.state.isFilter ? this.state.filterAssets : this.state.assets;
+        const currentIndex = assets
             .findIndex((asset) => asset.id === selectedRootAsset.id);
         if (direction > 0) {
-            await this.selectAsset(this.state.assets[Math.min(this.state.assets.length - 1, currentIndex + 1)]);
+            await this.selectAsset(assets[Math.min(assets.length - 1, currentIndex + 1)]);
         } else {
-            await this.selectAsset(this.state.assets[Math.max(0, currentIndex - 1)]);
+            await this.selectAsset(assets[Math.max(0, currentIndex - 1)]);
         }
     }
 

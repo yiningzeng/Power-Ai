@@ -216,7 +216,7 @@ export function loadAssetMetadata(project: IProject, asset: IAsset): (dispatch: 
                 path: asset.path,
             },
         };
-        console.log(`loadAssetMetadata: ${JSON.stringify(assetMetadata)}`);
+        // console.log(`loadAssetMetadata: ${JSON.stringify(assetMetadata)}`);
         dispatch(loadAssetMetadataAction(assetMetadata));
 
         return { ...assetMetadata };

@@ -33,6 +33,7 @@ export enum ToolbarItemName {
     TrainAi = "trainAi",
     OnlineTest = "onlineTest",
     RemoteTrainAi = "remoteTrainAi",
+    FilterAssets = "filterAssets",
 }
 
 export enum ToolbarItemGroup {
@@ -43,6 +44,7 @@ export enum ToolbarItemGroup {
     Zoom = "Zoom",
     Ai = "ai",
     Start = "start",
+    Others = "others",
 }
 
 /**
@@ -288,6 +290,16 @@ export default function registerToolbar() {
         accelerators: ["CmdOrCtrl+K", "CmdOrCtrl+k"],
     });
 
+    ToolbarItemFactory.register({
+        name: ToolbarItemName.FilterAssets,
+        tooltip: strings.editorPage.toolbar.onlineTest,
+        icon: "fas fa-trophy",
+        isInput: true,
+        // icon: "fas fa-caret-square-right",
+        group: ToolbarItemGroup.Others,
+        type: ToolbarItemType.Action,
+        accelerators: ["CmdOrCtrl+F", "CmdOrCtrl+f"],
+    });
     // ToolbarItemFactory.register({
     //     name: ToolbarItemName.RemoteTrainAi,
     //     tooltip: strings.editorPage.toolbar.trainAi,
