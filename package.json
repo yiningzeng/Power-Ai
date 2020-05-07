@@ -1,6 +1,6 @@
 {
     "name": "Power-Ai",
-    "version": "3.6.1",
+    "version": "3.6.2",
     "author": {
         "name": "宁波轻蜓视觉科技有限公司",
         "url": "https://github.com/yiningzeng/Power-Ai.git"
@@ -48,6 +48,7 @@
         "node-fetch": "^2.3.0",
         "node-int64": "^0.4.0",
         "omnizoom": "^1.1.5",
+        "panzoom": "^9.2.1",
         "polygon-aabb": "^1.0.0",
         "powerai-ct": "^2.3.1",
         "rc-align": "^2.4.5",
@@ -74,12 +75,14 @@
         "react-toastify": "^4.5.2",
         "react-virtualized": "^9.21.0",
         "react-vis": "^1.11.6",
+        "react-zoomable-img": "^1.0.2",
         "reactstrap": "^6.5.0",
         "redux": "^4.0.1",
         "redux-thunk": "^2.3.0",
         "rimraf": "^2.6.2",
         "rotating-calipers": "0.0.0",
         "shortid": "^2.2.14",
+        "svg-pan-zoom": "^3.6.1",
         "tar": "^4.4.10",
         "typescript": "^3.7.1-rc",
         "update-electron-app": "^1.5.0",

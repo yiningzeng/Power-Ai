@@ -28,6 +28,7 @@ export interface ITagInputProps {
     placeHolder?: string;
     /** Function to call on clicking individual tag */
     onTagClick?: (tag: ITag) => void;
+    onTagSearched: (tags: ITag[]) => void;
     /** Function to call on clicking individual tag while holding CTRL key */
     onCtrlTagClick?: (tag: ITag) => void;
     /** Function to call when tag is renamed */
@@ -101,10 +102,10 @@ export class TagInput extends React.Component<ITagInputProps, ITagInputState> {
                                 type="text"
                                 onKeyDown={this.onSearchKeyDown}
                                 onChange={(e) => this.setState({ searchQuery: e.target.value })}
-                                placeholder="Search tags"
+                                placeholder="过滤标签"
                                 autoFocus={true}
                             />
-                            <i className="tag-row-icon fas fa-search" />
+                            <button className="tag-row-icon fas fa-search" onClick={this.doSearch} >查询</button>
                         </div>
                     }
                     {this.getColorPickerPortal()}
@@ -301,6 +302,16 @@ export class TagInput extends React.Component<ITagInputProps, ITagInputState> {
         return this.state.editingTagNode || document;
     }
 
+    private doSearch = () => {
+        let tags = this.state.tags;
+        const query = this.state.searchQuery;
+        if (query.length) {
+            tags = tags.filter((p) => p.name.toLowerCase().includes(query.toLowerCase()));
+        }
+        this.props.onTagSearched(tags);
+        // return tags;
+    }
+
     private renderTagItems = () => {
         let props = this.createTagItemProps();
         const query = this.state.searchQuery;
@@ -309,7 +320,8 @@ export class TagInput extends React.Component<ITagInputProps, ITagInputState> {
         if (query.length) {
             props = props.filter((prop) => prop.tag.name.toLowerCase().includes(query.toLowerCase()));
         }
-
+        // console.log("taginput");
+        // console.log("taginput" + JSON.stringify(props));
         return props.map((prop) => {
             return  <TagInputItem
                 key={prop.tag.name}

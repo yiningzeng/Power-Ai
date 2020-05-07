@@ -1,12 +1,12 @@
 import _ from "lodash";
 import React, {RefObject} from "react";
 import {connect} from "react-redux";
-import {Route, RouteComponentProps, Switch} from "react-router-dom";
+import {RouteComponentProps} from "react-router-dom";
 import SplitPane from "react-split-pane";
 import {bindActionCreators} from "redux";
 import {SelectionMode} from "powerai-ct/lib/js/CanvasTools/Interface/ISelectorSettings";
 import HtmlFileReader from "../../../../common/htmlFileReader";
-import {strings, interpolate} from "../../../../common/strings";
+import {interpolate, strings} from "../../../../common/strings";
 import {
     AppError,
     AssetState,
@@ -17,9 +17,12 @@ import {
     IApplicationState,
     IAppSettings,
     IAsset,
-    IAssetMetadata, IConnection,
-    IProject, IProviderOptions,
-    IRegion, ISecureString,
+    IAssetMetadata,
+    IConnection,
+    IProject,
+    IProviderOptions,
+    IRegion,
+    ISecureString,
     ISize,
     ITag,
     IZoomMode,
@@ -48,28 +51,22 @@ import SourceItem from "../../common/condensedList/sourceItem";
 import {Rnd} from "react-rnd";
 import Zoom from "../../common/zoom/zoom";
 import {ILocalFileSystemProxyOptions, LocalFileSystemProxy} from "../../../../providers/storage/localFileSystemProxy";
-import {async} from "q";
 import * as connectionActions from "../../../../redux/actions/connectionActions";
-import {IpcRendererProxy} from "../../../../common/ipcRendererProxy";
-
-// import "antd/lib/tree/style/css";
-
-import Button from "@material-ui/core/Button";
 import Dialog from "@material-ui/core/Dialog";
+import Drawer from "@material-ui/core/Drawer";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
-import Paper, { PaperProps } from "@material-ui/core/Paper";
+import Paper, {PaperProps} from "@material-ui/core/Paper";
 import Draggable from "react-draggable";
-import { makeStyles } from "@material-ui/styles";
 import LinearProgress from "@material-ui/core/LinearProgress";
-import {constants} from "../../../../common/constants";
 import DraggableDialog from "../../common/draggableDialog/draggableDialog";
-import {IStartTestResults} from "../../../../providers/export/exportProvider";
-import AiTestSettingsPage from "../aitest/testSettingsPage";
-import * as omnizoom from "omnizoom";
-import {Point2D} from "powerai-ct/lib/js/CanvasTools/Core/Point2D";
+import DraggableDialogProjectMetrics from "../../common/draggableDialog/draggableDialogProjectMetrics";
+import ProjectMetrics from "../projectSettings/projectMetrics";
+
+// import "antd/lib/tree/style/css";
+
 function PaperComponent(props: PaperProps) {
     return (
         <Draggable cancel={'[class*="MuiDialogContent-root"]'}>
@@ -77,7 +74,6 @@ function PaperComponent(props: PaperProps) {
         </Draggable>
     );
 }
-
 
 let projectId;
 
@@ -142,6 +138,7 @@ export interface IEditorPageState {
     zoomMode: IZoomMode;
     dialog: boolean;
     isDrawPolygon2MinBox: boolean;
+    showProjectMetrics: boolean;
 }
 
 function mapStateToProps(state: IApplicationState) {
@@ -165,6 +162,7 @@ function mapDispatchToProps(dispatch) {
  */
 @connect(mapStateToProps, mapDispatchToProps)
 export default class EditorPage extends React.Component<IEditorPageProps, IEditorPageState> {
+
     public state: IEditorPageState = {
         treeList: [],
         selectedTag: null,
@@ -183,6 +181,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         zoomMode: emptyZoomMode,
         dialog: false,
         isDrawPolygon2MinBox: false,
+        showProjectMetrics: false,
     };
     private localFileSystem: LocalFileSystemProxy;
 
@@ -195,6 +194,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
     private deleteSourceProviderConfirm: React.RefObject<Confirm> = React.createRef();
     private deleteConfirm: React.RefObject<Confirm> = React.createRef();
     private draggableDialog: React.RefObject<DraggableDialog> = React.createRef();
+    private draggableDialogProjectMetrics: React.RefObject<DraggableDialogProjectMetrics> = React.createRef();
     private myZoomDom: React.RefObject<Rnd> = React.createRef();
 
     constructor(props, context) {
@@ -258,8 +258,8 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         //         },
         //     });
         // }
-        const { project } = this.props;
-        const { treeList, assets, selectedAsset } = this.state;
+        const {project} = this.props;
+        const {treeList, assets, selectedAsset} = this.state;
         const rootAssets = assets.filter((asset) => !asset.parent);
         // console.log("editorPage: render project ", project);
         // console.log("editorPage: render rootAssets ", JSON.stringify(rootAssets));
@@ -272,8 +272,9 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         };
 
         const handleClose = () => {
-           this.setState({dialog: false});
+            this.setState({dialog: false});
         };
+
         // const folderPath = project.sourceConnection.providerOptions["folderPath"];
         // console.log("editorPage: render folderPath ", folderPath);
         // console.log("editorPage: render treeList ", treeList);
@@ -286,7 +287,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                         keyEventType={KeyEventType.KeyDown}
                         accelerators={[`${index}`]}
                         icon={"fa-tag"}
-                        handler={this.handleTagHotKey} />);
+                        handler={this.handleTagHotKey}/>);
                 })}
                 {[...Array(10).keys()].map((index) => {
                     return (<KeyboardBinding
@@ -295,15 +296,15 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                         keyEventType={KeyEventType.KeyDown}
                         accelerators={[`CmdOrCtrl+${index}`]}
                         icon={"fa-lock"}
-                        handler={this.handleCtrlTagHotKey} />);
+                        handler={this.handleCtrlTagHotKey}/>);
                 })}
                 <SplitPane split="vertical"
-                    defaultSize={this.state.thumbnailSize.width}
-                    minSize={350}
-                    maxSize={500}
-                    paneStyle={{ display: "flex" }}
-                    onChange={this.onSideBarResize}
-                    onDragFinished={this.onSideBarResizeComplete}>
+                           defaultSize={this.state.thumbnailSize.width}
+                           minSize={350}
+                           maxSize={500}
+                           paneStyle={{display: "flex"}}
+                           onChange={this.onSideBarResize}
+                           onDragFinished={this.onSideBarResizeComplete}>
                     <div className="editor-page-sidebar bg-lighter-1">
                         <div>
                             <Dialog
@@ -314,21 +315,21 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                 PaperComponent={PaperComponent}
                                 aria-labelledby="draggable-dialog-title"
                             >
-                                <DialogTitle style={{ cursor: "move" }} id="draggable-dialog-title">
-                                   请耐心等待...
+                                <DialogTitle style={{cursor: "move"}} id="draggable-dialog-title">
+                                    请耐心等待...
                                 </DialogTitle>
                                 <DialogContent>
-                                    <LinearProgress />
+                                    <LinearProgress/>
                                     <DialogContentText>
                                         正在努力打包上传...
                                     </DialogContentText>
                                 </DialogContent>
                                 <DialogActions>
                                     {/*<Button onClick={handleClose} color="primary">*/}
-                                       {/*取消 */}
+                                    {/*取消 */}
                                     {/*</Button>*/}
                                     {/*<Button onClick={handleClose} color="primary">*/}
-                                        {/*Subscribe*/}
+                                    {/*Subscribe*/}
                                     {/*</Button>*/}
                                 </DialogActions>
                             </Dialog>
@@ -342,7 +343,9 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                 onAddClick={async () => {
                                     console.log("新增文件夹");
                                     const filePath = await this.localFileSystem.selectContainer();
-                                    if (filePath === undefined) { return; }
+                                    if (filePath === undefined) {
+                                        return;
+                                    }
                                     const provider: ILocalFileSystemProxyOptions = {
                                         folderPath: filePath,
                                     };
@@ -370,7 +373,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                         treeList: newProject.sourceConnection.providerOptionsOthers,
                                     });
                                 }}
-                                onClick={ async (item) => {
+                                onClick={async (item) => {
                                     const newProject: IProject = {
                                         ...project,
                                         sourceConnection: {
@@ -387,7 +390,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                     this.loadProjectAssets();
                                 }}
                                 onDelete={async (item) => {
-                                   this.deleteSourceProviderConfirm.current.open(project, item);
+                                    this.deleteSourceProviderConfirm.current.open(project, item);
                                     // let aa: string[];
                                     // aa = project.sourceListConnection;
                                     // aa.splice(aa.indexOf(item), 1);
@@ -421,9 +424,9 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                         <div className="editor-page-content-main">
                             <div className="editor-page-content-main-header">
                                 <EditorToolbar project={this.props.project}
-                                    items={this.toolbarItems}
-                                    actions={this.props.actions}
-                                    onToolbarItemSelected={this.onToolbarItemSelected} />
+                                               items={this.toolbarItems}
+                                               actions={this.props.actions}
+                                               onToolbarItemSelected={this.onToolbarItemSelected}/>
                             </div>
                             <div className="editor-page-content-main-body">
                                 {selectedAsset &&
@@ -431,8 +434,8 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                     id="fuck"
                                     ref={this.myZoomDom}
                                     disableDragging={this.state.zoomMode.disableDrag}
-                                    size={{ width: this.state.zoomMode.width,  height: this.state.zoomMode.height }}
-                                    position={{ x: this.state.zoomMode.x, y: this.state.zoomMode.y }}
+                                    size={{width: this.state.zoomMode.width, height: this.state.zoomMode.height}}
+                                    position={{x: this.state.zoomMode.x, y: this.state.zoomMode.y}}
                                     onDragStop={(e, d) => {
                                         this.setState({
                                             zoomMode: {
@@ -481,31 +484,43 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                         //     },
                                         // });
                                     }}
-                                    onWheel={ (e) => Zoom(e, (deltaY) => {
-                                        const zone = document.getElementById("ct-zone");
-                                        console.log(`我是图像左上角点x: ${this.myZoomDom.current.getDraggablePosition().x} 我是图像左上角点y: ${this.myZoomDom.current.getDraggablePosition().y}`);
-                                        const w = zone.offsetWidth;
-                                        const h = zone.offsetHeight;
-                                        if ((h - deltaY) < this.state.zoomMode.miniHeight) { return; }
-                                        this.setState({
-                                            zoomMode: {
-                                                ...this.state.zoomMode,
-                                                width: ( w - deltaY * 2),
-                                                height: ( h - deltaY * 2),
-                                                x: this.state.zoomMode.x + deltaY,
-                                                y: this.state.zoomMode.x + deltaY,
-                                            },
-                                        });
-                                        if (this.state.zoomMode.height === "auto") {
+                                    onWheel={(e) => Zoom(e, (deltaY) => {
+                                        try {
+                                            const zone = document.getElementById("ct-zone");
+                                            console.log(`我是图像左上角点x: ${this.myZoomDom.current.getDraggablePosition().x} 我是图像左上角点y: ${this.myZoomDom.current.getDraggablePosition().y}`);
+                                            const w = zone.offsetWidth;
+                                            const h = zone.offsetHeight;
+                                            if ((h - deltaY) < this.state.zoomMode.miniHeight) {
+                                                return;
+                                            }
                                             this.setState({
                                                 zoomMode: {
                                                     ...this.state.zoomMode,
-                                                    height: document.getElementById("ct-zone").offsetHeight,
+                                                    width: (w - deltaY * 2),
+                                                    height: (h - deltaY * 2),
+                                                    x: this.state.zoomMode.x + deltaY,
+                                                    y: this.state.zoomMode.x + deltaY,
                                                 },
                                             });
+                                            if (this.state.zoomMode.height === "auto") {
+                                                this.setState({
+                                                    zoomMode: {
+                                                        ...this.state.zoomMode,
+                                                        height: document.getElementById("ct-zone").offsetHeight,
+                                                    },
+                                                });
+                                            }
+                                        } catch (e) {
+                                            console.error(e);
                                         }
                                     })}
                                 >
+
+                                    {/*<ZoomableImage*/}
+                                    {/*    src="https://i.picsum.photos/id/35/1440/900.jpg"*/}
+                                    {/*    alt="some alt text"*/}
+                                    {/*    zoomScale={3}*/}
+                                    {/*    transitionDuration={0.5}/>*/}
                                     <Canvas
                                         ref={this.canvas}
                                         selectedAsset={this.state.selectedAsset}
@@ -525,7 +540,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                             onBeforeAssetChanged={this.onBeforeAssetSelected}
                                             onChildAssetSelected={this.onChildAssetSelected}
                                             asset={this.state.selectedAsset.asset}
-                                            childAssets={this.state.childAssets} />
+                                            childAssets={this.state.childAssets}/>
                                     </Canvas>
                                 </Rnd>
                                 }
@@ -545,33 +560,34 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                         {/*    />*/}
                         {/*</div>*/}
                         <Confirm title={strings.editorPage.tags.rename.title}
-                            ref={this.renameTagConfirm}
-                            message={strings.editorPage.tags.rename.confirmation}
-                            confirmButtonColor="danger"
-                            onConfirm={this.onTagRenamed} />
+                                 ref={this.renameTagConfirm}
+                                 message={strings.editorPage.tags.rename.confirmation}
+                                 confirmButtonColor="danger"
+                                 onConfirm={this.onTagRenamed}/>
                         <Confirm title={strings.editorPage.tags.delete.title}
-                            ref={this.deleteTagConfirm}
-                            message={strings.editorPage.tags.delete.confirmation}
-                            confirmButtonColor="danger"
-                            onConfirm={this.onTagDeleted} />
+                                 ref={this.deleteTagConfirm}
+                                 message={strings.editorPage.tags.delete.confirmation}
+                                 confirmButtonColor="danger"
+                                 onConfirm={this.onTagDeleted}/>
                         <Confirm title={strings.projectSettings.sourceConnection.removeProvider.title}
                                  ref={this.deleteSourceProviderConfirm}
                                  message={strings.projectSettings.sourceConnection.removeProvider.confirmation}
                                  confirmButtonColor="danger"
-                                 onConfirm={this.onSourceProviderDeleted} />
+                                 onConfirm={this.onSourceProviderDeleted}/>
                         <Confirm title={strings.editorPage.canvas.deleteAsset.title}
                                  ref={this.deleteConfirm as any}
                                  message={strings.editorPage.canvas.deleteAsset.confirmation}
                                  confirmButtonColor="danger"
                                  onConfirm={this.onAssetDeleted}/>
                     </div>
+
                 </SplitPane>
                 <Alert show={this.state.showInvalidRegionWarning}
-                    title={strings.editorPage.messages.enforceTaggedRegions.title}
+                       title={strings.editorPage.messages.enforceTaggedRegions.title}
                     // tslint:disable-next-line:max-line-length
-                    message={strings.editorPage.messages.enforceTaggedRegions.description}
-                    closeButtonColor="info"
-                    onClose={() => this.setState({ showInvalidRegionWarning: false })} />
+                       message={strings.editorPage.messages.enforceTaggedRegions.description}
+                       closeButtonColor="info"
+                       onClose={() => this.setState({showInvalidRegionWarning: false})}/>
                 <DraggableDialog
                     title={strings.editorPage.assetsFolderBar.importTaggedAssets.progress.title}
                     ref={this.draggableDialog}
@@ -585,6 +601,17 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                     }}
                     onCancel={() => this.draggableDialog.current.close()}
                 />
+                <Drawer anchor="right" open={this.state.showProjectMetrics} onClose={() => {
+                    this.setState({
+                        ...this.state,
+                        showProjectMetrics: !this.state.showProjectMetrics,
+                    });
+                }}>
+                    <div className="project-settings-page-metrics bg-lighter-1" style={{background: "#454545"}}>
+                        <ProjectMetrics project={this.props.project}/>
+                    </div>
+                </Drawer>
+
             </div>
         );
     }
@@ -925,7 +952,6 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
             ...this.props.project,
             tags,
         };
-
         await this.props.actions.saveProject(project);
     }
 
@@ -1088,6 +1114,12 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                 break;
             case ToolbarItemName.ActiveLearning:
                 await this.predictRegions();
+                break;
+            case ToolbarItemName.ProjectMetrics:
+                this.setState({
+                    ...this.state,
+                    showProjectMetrics: !this.state.showProjectMetrics,
+                });
                 break;
             case ToolbarItemName.SaveProject:
                 await this.props.actions.saveProject(this.props.project);
