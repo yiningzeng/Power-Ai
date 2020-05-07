@@ -1009,7 +1009,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         this.setState({ lockedTags });
     }
 
-    private onToolbarItemSelected = async (toolbarItem: ToolbarItem): Promise<void> => {
+    private onToolbarItemSelected = async (toolbarItem: ToolbarItem, searchQuery?: string): Promise<void> => {
         let w;
         let zoomDelta;
         switch (toolbarItem.props.name) {
@@ -1235,7 +1235,19 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                 // }
                 break;
             case ToolbarItemName.FilterAssets:
-                toast.warn("过滤文件");
+                if (searchQuery) {
+                    const filterAssets: IAsset[] = [];
+                    await this.state.assets.filter(async (asset) => {
+                        if (asset.name.indexOf(encodeURI(searchQuery)) > -1) {
+                            filterAssets.push(asset);
+                            this.setState({
+                                ...this.state,
+                                isFilter: true,
+                                filterAssets,
+                            });
+                        }
+                    });
+                }
                 break;
         }
     }
