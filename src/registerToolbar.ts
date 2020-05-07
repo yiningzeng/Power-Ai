@@ -4,6 +4,7 @@ import { SaveProject } from "./react/components/toolbar/saveProject";
 import { ToolbarItemType } from "./react/components/toolbar/toolbarItem";
 import { strings } from "./common/strings";
 import {TrainAi} from "./react/components/toolbar/trainAi";
+import React from "react";
 
 export enum ToolbarItemName {
     SelectCanvas = "selectCanvas",
@@ -24,6 +25,7 @@ export enum ToolbarItemName {
     ZoomNormolAsset = "zoomNormolAsset",
     PreviousAsset = "navigatePreviousAsset",
     NextAsset = "navigateNextAsset",
+    ProjectMetrics = "projectMetrics",
     SaveProject = "saveProject",
     ExportProject = "exportProject",
     TransferProject = "transferProject",
@@ -31,6 +33,7 @@ export enum ToolbarItemName {
     TrainAi = "trainAi",
     OnlineTest = "onlineTest",
     RemoteTrainAi = "remoteTrainAi",
+    FilterAssets = "filterAssets",
 }
 
 export enum ToolbarItemGroup {
@@ -41,6 +44,7 @@ export enum ToolbarItemGroup {
     Zoom = "Zoom",
     Ai = "ai",
     Start = "start",
+    Others = "others",
 }
 
 /**
@@ -223,6 +227,14 @@ export default function registerToolbar() {
     //     type: ToolbarItemType.Action,
     //     accelerators: ["CmdOrCtrl+S", "CmdOrCtrl+s"],
     // }, SaveProject);
+    ToolbarItemFactory.register({
+        name: ToolbarItemName.ProjectMetrics,
+        tooltip: "分析",
+        icon: "fa-chart-bar",
+        group: ToolbarItemGroup.Project,
+        type: ToolbarItemType.Action,
+        accelerators: ["CmdOrCtrl+M", "CmdOrCtrl+m"],
+    });
 
     ToolbarItemFactory.register({
         name: ToolbarItemName.SaveProject,
@@ -268,16 +280,26 @@ export default function registerToolbar() {
         accelerators: ["CmdOrCtrl+T", "CmdOrCtrl+t"],
     });
 
-    // ToolbarItemFactory.register({
-    //     name: ToolbarItemName.OnlineTest,
-    //     tooltip: strings.editorPage.toolbar.onlineTest,
-    //     icon: "fas fa-trophy",
-    //     // icon: "fas fa-caret-square-right",
-    //     group: ToolbarItemGroup.Ai,
-    //     type: ToolbarItemType.Action,
-    //     accelerators: ["CmdOrCtrl+K", "CmdOrCtrl+k"],
-    // });
+    ToolbarItemFactory.register({
+        name: ToolbarItemName.OnlineTest,
+        tooltip: strings.editorPage.toolbar.onlineTest,
+        icon: "fas fa-trophy",
+        // icon: "fas fa-caret-square-right",
+        group: ToolbarItemGroup.Ai,
+        type: ToolbarItemType.Action,
+        accelerators: ["CmdOrCtrl+K", "CmdOrCtrl+k"],
+    });
 
+    ToolbarItemFactory.register({
+        name: ToolbarItemName.FilterAssets,
+        tooltip: strings.editorPage.toolbar.onlineTest,
+        icon: "fas fa-trophy",
+        isInput: true,
+        // icon: "fas fa-caret-square-right",
+        group: ToolbarItemGroup.Others,
+        type: ToolbarItemType.Action,
+        accelerators: ["CmdOrCtrl+F", "CmdOrCtrl+f"],
+    });
     // ToolbarItemFactory.register({
     //     name: ToolbarItemName.RemoteTrainAi,
     //     tooltip: strings.editorPage.toolbar.trainAi,

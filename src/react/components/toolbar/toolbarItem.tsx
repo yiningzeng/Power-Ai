@@ -21,6 +21,7 @@ export interface IToolbarItemMetadata {
     group: ToolbarItemGroup;
     type: ToolbarItemType;
     accelerators?: string[];
+    isInput?: boolean;
 }
 
 /**
@@ -82,12 +83,25 @@ export abstract class ToolbarItem extends React.Component<IToolbarItemProps> {
                         keyEventType={KeyEventType.KeyDown}
                     />
                 }
-                <button type="button"
-                    className={className.join(" ")}
-                    title={this.getTitle()}
-                    onClick={this.onClick}>
-                    <i className={"fas " + this.props.icon} />
-                </button>
+                {
+                    this.props.isInput && <div className="tag-input-text-input-row search-input">
+                        <input
+                            type="text"
+                            onChange={(e) => this.setState({searchQuery: e.target.value})}
+                            placeholder="过滤文件名"
+                            autoFocus={true}
+                        />
+                        <button type="button" className="tag-row-icon fas fa-search" onClick={this.onClick}>查询</button>
+                    </div>
+                }
+                {
+                    !this.props.isInput && <button type="button"
+                                                   className={className.join(" ")}
+                                                   title={this.getTitle()}
+                                                   onClick={this.onClick}>
+                        <i className={"fas " + this.props.icon}/>
+                    </button>
+                }
             </Fragment>
         );
     }

@@ -56,6 +56,7 @@ export default class TrainService implements ITrainService {
         //     // });
         //     im.save("/home/baymin/图片/out.jpg");
         // });
+        await IpcRendererProxy.send("FILE_WATCH");
         await IpcRendererProxy.send(`TrainingSystem:opencvTest`);
     }
 }

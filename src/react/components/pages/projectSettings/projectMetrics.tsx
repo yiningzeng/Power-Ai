@@ -223,7 +223,7 @@ export default class ProjectMetrics extends React.Component<IProjectMetricsProps
                         margin={{ bottom: 150 }}
                         xType="ordinal"
                         colorType="literal"
-                        width={300}
+                        width={600}
                         height={400}>
                         <HorizontalGridLines />
                         <XAxis tickLabelAngle={-45} />
@@ -278,6 +278,7 @@ export default class ProjectMetrics extends React.Component<IProjectMetricsProps
         }
 
         const tags = this.getAllTagReferences();
+        // console.log("每张平均标签数:tags.length=" + tags.length + ", taggedAssetCount=" + taggedAssetCount + ", (tags.length / taggedAssetCount).toFixed(2)=" + (tags.length / taggedAssetCount).toFixed(2));
         return (tags.length / taggedAssetCount).toFixed(2);
     }
 

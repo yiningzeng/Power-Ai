@@ -23,6 +23,7 @@ import {createContentBoundingBox} from "../../../../common/layout";
 import {Point2D} from "powerai-ct/lib/js/CanvasTools/Core/Point2D";
 import RotatingCalipers from "rotating-calipers";
 import getBounds from "bound-points";
+
 export interface ICanvasProps extends React.Props<Canvas> {
     selectedAsset: IAssetMetadata;
     editorMode: EditorMode;
