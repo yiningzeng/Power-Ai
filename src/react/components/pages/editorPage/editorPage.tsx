@@ -1240,12 +1240,17 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                     await this.state.assets.filter(async (asset) => {
                         if (asset.name.indexOf(encodeURI(searchQuery)) > -1) {
                             filterAssets.push(asset);
-                            this.setState({
-                                ...this.state,
-                                isFilter: true,
-                                filterAssets,
-                            });
                         }
+                    });
+                    this.setState({
+                        ...this.state,
+                        isFilter: true,
+                        filterAssets,
+                    });
+                } else {
+                    this.setState({
+                        ...this.state,
+                        isFilter: false,
                     });
                 }
                 break;
