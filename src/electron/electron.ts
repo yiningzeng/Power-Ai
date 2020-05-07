@@ -9,6 +9,7 @@ import TestingSystem from "./providers/testing/testingSystem";
 import log from "electron-log";
 import { updater } from "update-electron-app";
 import { autoUpdater } from "electron-updater";
+import chokidar from "chokidar";
 // import { remote } from "electron";
 //
 // Keep a global reference of the window object, if you don't, the window will
@@ -66,7 +67,7 @@ function createWindow() {
             // nodeIntegrationInWorker: true,
             nodeIntegration: true,
             plugins: true,
-            webSecurity: false,
+            webSecurity: true,
             webviewTag: true,
             // preload: __dirname + "/preload.js",
         },
@@ -106,6 +107,7 @@ function createWindow() {
 
     ipcMainProxy = new IpcMainProxy(ipcMain, mainWindow);
     ipcMainProxy.register("RELOAD_APP", onReloadApp);
+    ipcMainProxy.register("FILE_WATCH", onFileWatch);
     ipcMainProxy.register("TOGGLE_DEV_TOOLS", onToggleDevTools);
     ipcMainProxy.registerProxy("TrainingSystem", new TrainingSystem(mainWindow));
     ipcMainProxy.registerProxy("TestingSystem", new TestingSystem(mainWindow));
@@ -122,6 +124,17 @@ function createWindow() {
     } catch (e) {
         log.error(e);
     }
+}
+
+function onFileWatch() {
+    chokidar.watch("/home/baymin/daily-work/test/aa/", { ignored: /(^|[\/\\])\..txt/, persistent: true}).on("all", (event, path) => {
+        console.log(event, path);
+        if (event === "add") {
+            mainWindow.webContents.send("FILE_WATCH", path);
+        }
+
+    });
+    return true;
 }
 
 function onReloadApp() {

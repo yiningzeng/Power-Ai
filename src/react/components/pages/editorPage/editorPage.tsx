@@ -51,6 +51,7 @@ import {ILocalFileSystemProxyOptions, LocalFileSystemProxy} from "../../../../pr
 import {async} from "q";
 import * as connectionActions from "../../../../redux/actions/connectionActions";
 import {IpcRendererProxy} from "../../../../common/ipcRendererProxy";
+
 // import "antd/lib/tree/style/css";
 
 import Button from "@material-ui/core/Button";
@@ -76,6 +77,7 @@ function PaperComponent(props: PaperProps) {
         </Draggable>
     );
 }
+
 
 let projectId;
 
@@ -198,6 +200,10 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
     constructor(props, context) {
         super(props, context);
         this.localFileSystem = new LocalFileSystemProxy();
+        const ipcRenderer = (window as any & typeof globalThis).require("electron").ipcRenderer;
+        ipcRenderer.on("FILE_WATCH", (event, arg) => {
+            console.log(arg);
+        });
     }
 
     public async componentDidMount() {
