@@ -773,25 +773,16 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                         filterAssets,
                     });
                 }
-                //
-                // if (rootAssetMetadata.asset.state !== AssetState.Tagged) {
-                //     rootAssetMetadata.asset.state = assetMetadata.asset.state;
-                //     await this.props.actions.saveAssetMetadata(this.props.project, rootAssetMetadata);
-                // }
-                //
-                // rootAsset.state = rootAssetMetadata.asset.state;
-
             });
+            if (filterAssets.length) {
+                await this.selectAsset(filterAssets[0]);
+            }
         } else {
             this.setState({
                 ...this.state,
                 isFilter: false,
             });
         }
-
-        // isFilter?: boolean;
-        // filterAsset?: IAssetMetadata;
-        // 在这里添加需要过滤的标签
     }
 
     /**
@@ -1219,20 +1210,9 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                 break;
             case ToolbarItemName.RemoteTrainAi:
                 this.props.history.push(`/projects/${projectId}/remote-train-page`);
-                // toast.error("开始远程训练");
-                // IpcRendererProxy.send(`TrainingSystem:remoteTrain`, [this.props.project])
-                //     .then(() => {
-                //         toast.success(`配置成功`);
-                //     });
-                // this.props.history.push(`/projects/${projectId}/train`);
                 break;
             case ToolbarItemName.OnlineTest:
                 this.props.actions.test();
-                // if (this.props.appSettings.zengyining) {
-                //     this.props.history.push(`/projects/${projectId}/remote-test-page`);
-                // } else {
-                //     toast.warn("试用版本未开放");
-                // }
                 break;
             case ToolbarItemName.FilterAssets:
                 if (searchQuery) {
@@ -1247,6 +1227,9 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                         isFilter: true,
                         filterAssets,
                     });
+                    if (filterAssets.length) {
+                        await this.selectAsset(filterAssets[0]);
+                    }
                 } else {
                     this.setState({
                         ...this.state,
