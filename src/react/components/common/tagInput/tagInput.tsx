@@ -233,7 +233,7 @@ export class TagInput extends React.Component<ITagInputProps, ITagInputState> {
         }
         const nameChange = tag.name !== newTag.name;
         if (nameChange && this.state.tags.some((t) => t.name === newTag.name)) {
-            toast.warn(strings.tags.warnings.existingName);
+            this.props.onTagRenamed(tag.name, newTag.name);
             return;
         }
         if (nameChange && this.props.onTagRenamed) {

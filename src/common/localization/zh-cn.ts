@@ -300,7 +300,7 @@ export const chinese: IAppStrings = {
             },
             rename: {
                 title: "重命名标签",
-                confirmation: "确定要重命名标签么？这将会把所有的已打标的素材更改",
+                confirmation: "确定要重命名标签么？这将会把所有的已打标的素材更改！如果有重复的标签名，会合并",
             },
             delete: {
                 title: "删除标签",
