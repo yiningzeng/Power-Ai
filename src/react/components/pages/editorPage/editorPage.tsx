@@ -761,11 +761,9 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                 const assetMetadata = await this.props.actions.loadAssetMetadata(this.props.project, asset);
                 const regions = JSON.stringify(assetMetadata.regions);
                 const tagsTemp = tags.filter((val) => {
-                  return (regions.indexOf(val.name) > -1) ? true : false;
+                  return (regions.indexOf(`"${val.name}"`) > -1) ? true : false;
                 });
-                console.log("fuck filter" + JSON.stringify(tagsTemp));
                 if (tagsTemp.length) {
-                    console.log("fuck filter 我存在");
                     filterAssets.push(asset);
                     this.setState({
                         ...this.state,
