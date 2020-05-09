@@ -54,7 +54,8 @@ export class AssetService {
         const assetType = this.getAssetType(assetFormat);
 
         return {
-            id: md5Hash,
+            // id: md5Hash,
+            id: decodeURI(fileNameParts[0]),
             format: assetFormat,
             state: AssetState.NotVisited,
             type: assetType,
