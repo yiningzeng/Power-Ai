@@ -263,22 +263,36 @@ export class PascalVOCExportProvider extends ExportProvider<IPascalVOCExportProv
             }
 
             const assetList = [];
+            const positiveAssetList = [];
+            const negativeAssetsList = [];
             assetUsage.forEach((tags, assetName) => {
+                const indexOf = assetName.lastIndexOf(".");
+                let name = assetName;
+                if (indexOf !== -1) {
+                    name = assetName.substring(0, indexOf);
+                }
                 if (tags.has(tag.name)) {
-                    assetList.push(`${assetName} 1`);
+                    assetList.push(`${name} 1`);
+                    positiveAssetList.push(`${name} 1`);
                 } else {
-                    assetList.push(`${assetName} -1`);
+                    assetList.push(`${name} -1`);
+                    negativeAssetsList.push(`${name} -1`);
                 }
             });
 
             if (testSplit > 0 && testSplit <= 1) {
                 // Split in Test and Train sets
-                const totalAssets = assetUsage.size;
-                const testCount = Math.ceil(totalAssets * testSplit);
+                let totalAssets = positiveAssetList.length;
+                let testCount = Math.ceil(totalAssets * testSplit);
 
-                const testArray = assetList.slice(0, testCount);
-                const trainArray = assetList.slice(testCount, totalAssets);
+                let testArray = positiveAssetList.slice(0, testCount);
+                let trainArray = positiveAssetList.slice(testCount, totalAssets);
 
+                totalAssets = negativeAssetsList.length;
+                testCount = Math.ceil(totalAssets * testSplit);
+
+                testArray = testArray.concat(negativeAssetsList.slice(0, testCount));
+                trainArray = trainArray.concat(negativeAssetsList.slice(testCount, totalAssets));
                 const testImageSetFileName = `${imageSetsMainFolderName}/${tag.name}_val.txt`;
                 await this.storageProvider.writeText(testImageSetFileName, testArray.join(os.EOL));
 
