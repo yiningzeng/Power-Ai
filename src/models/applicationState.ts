@@ -349,6 +349,7 @@ export interface IAsset {
     parent?: IAsset;
     predicted?: boolean;
     tagType?: string;
+    tags?: string;
 }
 
 /**

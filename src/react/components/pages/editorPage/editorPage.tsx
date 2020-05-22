@@ -83,7 +83,7 @@ const emptyZoomMode: IZoomMode = {
     y: 0,
     miniWidth: 500,
     miniHeight: 500,
-    width: "auto",
+    width: 1000,
     height: "auto",
     zoomCenterX: 0,
     zoomCenterY: 0,
@@ -752,29 +752,35 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
      * Called when a tag from footer is clicked
      * @param tag Tag clicked
      */
-    private onTagSearched = async (tags: ITag[]): Promise<void>  => {
-        console.log("editorpage + onTagSearched + taginput" + JSON.stringify(tags));
-        if (tags.length) {
-
+    private onTagSearched = async (tags: ITag[], searchQuery: string): Promise<void>  => {
+        if (searchQuery) {
+            console.log("dosearch editorpage + onTagSearched + taginput" + JSON.stringify(tags));
+            const tagNames = [];
+            tags.forEach((v, i, a) => {
+                tagNames.push(v.name);
+            });
+            // const tagsStr = tagNames.sort().join(",");
+            // console.log("dosearch-editorpage + onTagSearched + taginput tagsstr: " + tagsStr);
             const filterAssets: IAsset[] = [];
             await this.state.assets.filter(async (asset) => {
-                const assetMetadata = await this.props.actions.loadAssetMetadata(this.props.project, asset);
-                const regions = JSON.stringify(assetMetadata.regions);
-                const tagsTemp = tags.filter((val) => {
-                  return (regions.indexOf(`"${val.name}"`) > -1) ? true : false;
-                });
-                if (tagsTemp.length) {
-                    filterAssets.push(asset);
-                    this.setState({
-                        ...this.state,
-                        isFilter: true,
-                        filterAssets,
+                if (asset.tags) {
+                    tags.forEach((v, i, a) => {
+                        if (asset.tags.indexOf(v.name) > -1) {
+                            filterAssets.push(asset);
+                        }
                     });
+                    console.log("dosearch-editorpage + filterAssets: " + JSON.stringify(filterAssets));
                 }
             });
-            if (filterAssets.length) {
-                await this.selectAsset(filterAssets[0]);
-            }
+            this.setState({
+                ...this.state,
+                isFilter: true,
+                filterAssets,
+            }, () => {
+                if (filterAssets.length) {
+                    this.selectAsset(filterAssets[0]);
+                }
+            });
         } else {
             this.setState({
                 ...this.state,
@@ -908,10 +914,17 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         }
 
         const initialState = assetMetadata.asset.state;
+        let tags = [];
+        assetMetadata.regions.forEach((val, idx, arry) => {
+            tags = tags.concat(val.tags);
+        });
+        tags = [...new Set(tags)].sort(); // 去重然后排序 用于标签搜索
+        const tagsStr = tags.join(",");
 
         // The root asset can either be the actual asset being edited (ex: VideoFrame) or the top level / root
         // asset selected from the side bar (image/video).
-        const rootAsset = { ...(assetMetadata.asset.parent || assetMetadata.asset) };
+        const rootAsset = { ...(assetMetadata.asset.parent || assetMetadata.asset), tags: tagsStr};
+        assetMetadata.asset.tags = tagsStr;
         // console.log("assetMetadata: " + JSON.stringify(assetMetadata));
         if (this.isTaggableAssetType(assetMetadata.asset)) {
             if (assetMetadata.asset.state === AssetState.OkTagged) {

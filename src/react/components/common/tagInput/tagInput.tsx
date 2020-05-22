@@ -28,7 +28,7 @@ export interface ITagInputProps {
     placeHolder?: string;
     /** Function to call on clicking individual tag */
     onTagClick?: (tag: ITag) => void;
-    onTagSearched: (tags: ITag[]) => void;
+    onTagSearched: (tags: ITag[], searchQuery: string) => void;
     /** Function to call on clicking individual tag while holding CTRL key */
     onCtrlTagClick?: (tag: ITag) => void;
     /** Function to call when tag is renamed */
@@ -101,11 +101,15 @@ export class TagInput extends React.Component<ITagInputProps, ITagInputState> {
                             <input
                                 type="text"
                                 onKeyDown={this.onSearchKeyDown}
-                                onChange={(e) => this.setState({ searchQuery: e.target.value })}
+                                onChange={(e) => this.setState({ searchQuery: e.target.value }, () => {
+                                    if (this.state.searchQuery === "") {
+                                        this.doSearch();
+                                    }
+                                })}
                                 placeholder="过滤标签"
                                 autoFocus={true}
                             />
-                            <button className="tag-row-icon fas fa-search" onClick={this.doSearch} >查询</button>
+                            {/*<button className="tag-row-icon fas fa-search" onClick={this.doSearch} >查询</button>*/}
                         </div>
                     }
                     {this.getColorPickerPortal()}
@@ -308,7 +312,8 @@ export class TagInput extends React.Component<ITagInputProps, ITagInputState> {
         if (query.length) {
             tags = tags.filter((p) => p.name.toLowerCase().includes(query.toLowerCase()));
         }
-        this.props.onTagSearched(tags);
+        console.log(`dosearch tagInput > tags: ${JSON.stringify(tags)}`);
+        this.props.onTagSearched(tags, query);
         // return tags;
     }
 
@@ -443,6 +448,8 @@ export class TagInput extends React.Component<ITagInputProps, ITagInputState> {
             this.setState({
                 searchTags: false,
             });
+        } else if (event.key === "Enter") {
+            this.doSearch();
         }
     }
 

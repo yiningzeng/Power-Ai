@@ -109,7 +109,7 @@ export class PascalVOCExportProvider extends ExportProvider<IPascalVOCExportProv
             }
         } catch (err) {
             // Ignore the error at the moment
-            // TODO: Refactor ExportProvider abstract class export() method
+            // TODO: Refactor TestProvider abstract class export() method
             //       to return Promise<object> with an object containing
             //       the number of files successfully exported out of total
             console.log(`Error downloading asset ${assetMetadata.asset.path} - ${err}`);
@@ -124,8 +124,8 @@ export class PascalVOCExportProvider extends ExportProvider<IPascalVOCExportProv
                     name: tagName,
                     xmin: region.boundingBox.left,
                     ymin: region.boundingBox.top,
-                    xmax: region.boundingBox.left + region.boundingBox.width,
-                    ymax: region.boundingBox.top + region.boundingBox.height,
+                    xmax: region.boundingBox.left + region.boundingBox.width - 1,
+                    ymax: region.boundingBox.top + region.boundingBox.height - 1,
                 };
 
                 tagObjects.push(objectInfo);
@@ -142,7 +142,7 @@ export class PascalVOCExportProvider extends ExportProvider<IPascalVOCExportProv
 
         if (image64.length < 10) {
             // Ignore the error at the moment
-            // TODO: Refactor ExportProvider abstract class export() method
+            // TODO: Refactor TestProvider abstract class export() method
             //       to return Promise<object> with an object containing
             //       the number of files successfully exported out of total
             console.log(`Image not valid ${imageFileName}`);
