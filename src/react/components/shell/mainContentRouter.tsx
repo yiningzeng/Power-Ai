@@ -33,7 +33,7 @@ export default function MainContentRouter() {
                 <Route path="/projects/:projectId/active-learning" component={ActiveLearningPage} />
                 {/*<Route path="/projects/:projectId/train-settings" component={TrainSettingsPage} />*/}
                 <Route path="/projects/:projectId/train" component={TrainPage} />
-                <Route path="/projects/:projectId/remote-train-page" component={RemoteTrainPage} />
+                {/*<Route path="/projects/:projectId/remote-train-page" component={RemoteTrainPage} />*/}
                 <Route path="/projects/:projectId/remote-test-page" component={AiTestSettingsPage} />
                 <Route component={HomePage} />
             </Switch>

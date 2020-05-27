@@ -126,7 +126,7 @@ export default class RemoteTrainPage extends React.Component<IProjectSettingsPag
     private onFormSubmit = async (project: IProject) => {
         await this.props.projectActions.saveProject(project);
         toast.error("开始远程训练");
-        IpcRendererProxy.send(`TrainingSystem:remoteTrain`, [this.props.project]);
+        await IpcRendererProxy.send(`TrainingSystem:remoteTrain`, [this.props.project]);
             // .then(() => {
             //     alert("asdsdsd");
             //     console.log("远程训练结束");                // toast.success(`配置成功`);

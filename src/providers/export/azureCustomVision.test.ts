@@ -78,7 +78,7 @@ describe("Azure Custom Vision Export Provider", () => {
         expect(AzureCustomVisionProvider).toBeDefined();
     });
 
-    it("Is Registered with the ExportProviderFactory", () => {
+    it("Is Registered with the TestProviderFactory", () => {
         registerProviders();
 
         const provider = ExportProviderFactory.createFromProject(testProject);
