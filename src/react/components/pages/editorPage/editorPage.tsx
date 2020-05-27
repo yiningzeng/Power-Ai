@@ -1128,24 +1128,10 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                 break;
             case ToolbarItemName.PreviousAsset:
                 await this.goToRootAsset(-1);
-                this.setState({
-                    ...this.state,
-                    zoomMode: {
-                        ...this.state.zoomMode,
-                        disableDrag: true,
-                    },
-                });
                 // this.canvas.current.enableCanvas(true);
                 break;
             case ToolbarItemName.NextAsset:
                 await this.goToRootAsset(1);
-                this.setState({
-                    ...this.state,
-                    zoomMode: {
-                        ...this.state.zoomMode,
-                        disableDrag: true,
-                    },
-                });
                 // this.canvas.current.enableCanvas(true);
                 break;
             case ToolbarItemName.DeleteAsset:
@@ -1176,29 +1162,6 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                 break;
             case ToolbarItemName.SaveProject:
                 await this.props.actions.saveProject(this.props.project);
-                // toast.error("开始到处");
-                // cv.readImage("/home/baymin/图片/crop9.bmp", (err, im) => {
-                //     im.save("/home/baymin/图片/crop9.jpg");
-                // });
-                // const mat = cv.imread("/home/baymin/图片/1964668478.jpg");
-                // toast.error("开始到处");
-                // load image from file
-                // imread ( filePath : string , flags : int = cv.IMREAD_COLOR ) : Result
-                // const mat =  imread("/home/baymin/图片/1964668478.jpg", cv.IMREAD_COLOR);
-                // cv.imreadAsync('./path/img.jpg', (err, mat) => {
-                // ...
-                // })
-
-// save image
-//                 cv.imwrite("/home/baymin/图片/1964668478sssss.jpg", mat);
-                // cv.imwriteAsync('./path/img.jpg', mat,(err) => {
-                // ...
-                // })
-
-// show image
-//                 cv.imshow("a window name", mat);
-//                 cv.waitKey();
-//                 this.props.history.push(`/projects/${projectId}/settings`);
                 break;
             case ToolbarItemName.ExportProject:
                 // toast.error("开始到处");
@@ -1218,7 +1181,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                 // } else {
                 //     toast.warn("试用版本未开放");
                 // }
-                break;
+                    break;
             // case ToolbarItemName.RemoteTrainAi:
             //     this.props.history.push(`/projects/${projectId}/remote-train-page`);
             //     break;
@@ -1345,15 +1308,15 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
      * @param direction Number specifying asset navigation
      */
     private goToRootAsset = async (direction: number) => {
-        this.setState({
-            ...this.state,
-            zoomMode: {
-                ...emptyZoomMode,
-                disableDrag: this.state.zoomMode.disableDrag,
-                width: "auto",
-                height: "auto",
-            },
-        });
+        // this.setState({
+        //     ...this.state,
+        //     zoomMode: {
+        //         ...emptyZoomMode,
+        //         disableDrag: this.state.zoomMode.disableDrag,
+        //         width: this.state.zoomMode.width,
+        //         height: this.state.zoomMode.height,
+        //     },
+        // });
 
         const selectedRootAsset = this.state.selectedAsset.asset.parent || this.state.selectedAsset.asset;
         const assets = this.state.isFilter ? this.state.filterAssets : this.state.assets;
