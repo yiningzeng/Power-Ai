@@ -1,9 +1,10 @@
 import React, { Fragment, SyntheticEvent } from "react";
-import { IProject } from "../../../models/applicationState";
+import {IProject, ITag} from "../../../models/applicationState";
 import IProjectActions from "../../../redux/actions/projectActions";
 import { IKeyboardContext, KeyboardContext, KeyEventType } from "../common/keyboardManager/keyboardManager";
 import { KeyboardBinding } from "../common/keyboardBinding/keyboardBinding";
 import { ToolbarItemName, ToolbarItemGroup } from "../../../registerToolbar";
+import {ITagInputState} from "../common/tagInput/tagInput";
 
 /**
  * Toolbar Item Metadata
@@ -45,16 +46,25 @@ export interface IToolbarItemProps extends IToolbarItemMetadata {
     actions: IProjectActions;
     project: IProject;
     active: boolean;
-    onClick: (item: ToolbarItem) => void;
+    onClick: (item: ToolbarItem, searchQuery: string) => void;
+}
+
+export interface IState {
+    searchQuery?: string;
 }
 
 /**
  * @name - Toolbar Item
  * @description - Controls for Editor Page Toolbar
  */
-export abstract class ToolbarItem extends React.Component<IToolbarItemProps> {
+export abstract class ToolbarItem extends React.Component<IToolbarItemProps, IState> {
     public static contextType = KeyboardContext;
     public context!: IKeyboardContext;
+
+    public state: IState = {
+        searchQuery: "",
+    };
+
     private unregisterKeyboardHandler: () => void;
 
     public componentWillUnmount() {
@@ -87,11 +97,12 @@ export abstract class ToolbarItem extends React.Component<IToolbarItemProps> {
                     this.props.isInput && <div className="tag-input-text-input-row search-input">
                         <input
                             type="text"
-                            onChange={(e) => this.setState({searchQuery: e.target.value})}
+                            onChange={(e) => this.setState({searchQuery: e.target.value}, () => {
+                                this.props.onClick(this, this.state.searchQuery);
+                            })}
                             placeholder="过滤文件名"
-                            autoFocus={true}
+                            autoFocus={false}
                         />
-                        <button type="button" className="tag-row-icon fas fa-search" onClick={this.onClick}>查询</button>
                     </div>
                 }
                 {
@@ -134,6 +145,6 @@ export abstract class ToolbarItem extends React.Component<IToolbarItemProps> {
         if (this.onItemClick) {
             this.onItemClick();
         }
-        this.props.onClick(this);
+        this.props.onClick(this, this.state.searchQuery);
     }
 }

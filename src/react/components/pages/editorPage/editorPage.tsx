@@ -64,6 +64,7 @@ import LinearProgress from "@material-ui/core/LinearProgress";
 import DraggableDialog from "../../common/draggableDialog/draggableDialog";
 import DraggableDialogProjectMetrics from "../../common/draggableDialog/draggableDialogProjectMetrics";
 import ProjectMetrics from "../projectSettings/projectMetrics";
+import {ExportAssetState} from "../../../../providers/export/exportProvider";
 
 // import "antd/lib/tree/style/css";
 
@@ -83,7 +84,7 @@ const emptyZoomMode: IZoomMode = {
     y: 0,
     miniWidth: 500,
     miniHeight: 500,
-    width: "auto",
+    width: 1000,
     height: "auto",
     zoomCenterX: 0,
     zoomCenterY: 0,
@@ -752,35 +753,34 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
      * Called when a tag from footer is clicked
      * @param tag Tag clicked
      */
-    private onTagSearched = async (tags: ITag[]): Promise<void>  => {
-        console.log("editorpage + onTagSearched + taginput" + JSON.stringify(tags));
-        if (tags.length) {
-
+    private onTagSearched = async (tags: ITag[], searchQuery: string): Promise<void>  => {
+        if (searchQuery) {
+            console.log("dosearch editorpage + onTagSearched + taginput" + JSON.stringify(tags));
+            const tagNames = [];
+            tags.forEach((v, i, a) => {
+                tagNames.push(v.name);
+            });
+            // const tagsStr = tagNames.sort().join(",");
+            // console.log("dosearch-editorpage + onTagSearched + taginput tagsstr: " + tagsStr);
             const filterAssets: IAsset[] = [];
             await this.state.assets.filter(async (asset) => {
-                const assetMetadata = await this.props.actions.loadAssetMetadata(this.props.project, asset);
-                const regions = JSON.stringify(assetMetadata.regions);
-                const tagsTemp = tags.filter((val) => {
-                  return (regions.indexOf(val.name) > -1) ? true : false;
-                });
-                console.log("fuck filter" + JSON.stringify(tagsTemp));
-                if (tagsTemp.length) {
-                    console.log("fuck filter 我存在");
-                    filterAssets.push(asset);
-                    this.setState({
-                        ...this.state,
-                        isFilter: true,
-                        filterAssets,
+                if (asset.tags) {
+                    tags.forEach((v, i, a) => {
+                        if (asset.tags.indexOf(v.name) > -1) {
+                            filterAssets.push(asset);
+                        }
                     });
+                    console.log("dosearch-editorpage + filterAssets: " + JSON.stringify(filterAssets));
                 }
-                //
-                // if (rootAssetMetadata.asset.state !== AssetState.Tagged) {
-                //     rootAssetMetadata.asset.state = assetMetadata.asset.state;
-                //     await this.props.actions.saveAssetMetadata(this.props.project, rootAssetMetadata);
-                // }
-                //
-                // rootAsset.state = rootAssetMetadata.asset.state;
-
+            });
+            this.setState({
+                ...this.state,
+                isFilter: true,
+                filterAssets,
+            }, () => {
+                if (filterAssets.length) {
+                    this.selectAsset(filterAssets[0]);
+                }
             });
         } else {
             this.setState({
@@ -788,10 +788,6 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                 isFilter: false,
             });
         }
-
-        // isFilter?: boolean;
-        // filterAsset?: IAssetMetadata;
-        // 在这里添加需要过滤的标签
     }
 
     /**
@@ -919,10 +915,17 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         }
 
         const initialState = assetMetadata.asset.state;
+        let tags = [];
+        assetMetadata.regions.forEach((val, idx, arry) => {
+            tags = tags.concat(val.tags);
+        });
+        tags = [...new Set(tags)].sort(); // 去重然后排序 用于标签搜索
+        const tagsStr = tags.join(",");
 
         // The root asset can either be the actual asset being edited (ex: VideoFrame) or the top level / root
         // asset selected from the side bar (image/video).
-        const rootAsset = { ...(assetMetadata.asset.parent || assetMetadata.asset) };
+        const rootAsset = { ...(assetMetadata.asset.parent || assetMetadata.asset), tags: tagsStr};
+        assetMetadata.asset.tags = tagsStr;
         // console.log("assetMetadata: " + JSON.stringify(assetMetadata));
         if (this.isTaggableAssetType(assetMetadata.asset)) {
             if (assetMetadata.asset.state === AssetState.OkTagged) {
@@ -1009,7 +1012,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         this.setState({ lockedTags });
     }
 
-    private onToolbarItemSelected = async (toolbarItem: ToolbarItem): Promise<void> => {
+    private onToolbarItemSelected = async (toolbarItem: ToolbarItem, searchQuery?: string): Promise<void> => {
         let w;
         let zoomDelta;
         switch (toolbarItem.props.name) {
@@ -1210,33 +1213,98 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                 // this.props.history.push(`/projects/${projectId}/export`);
                 break;
             case ToolbarItemName.TrainAi:
-                if (this.props.appSettings.zengyining) {
-                    this.props.history.push(`/projects/${projectId}/train`);
-                } else {
-                    toast.warn("试用版本未开放");
-                }
-                // toast.error("开始到处");
-                break;
-            case ToolbarItemName.RemoteTrainAi:
-                this.props.history.push(`/projects/${projectId}/remote-train-page`);
-                // toast.error("开始远程训练");
-                // IpcRendererProxy.send(`TrainingSystem:remoteTrain`, [this.props.project])
-                //     .then(() => {
-                //         toast.success(`配置成功`);
-                //     });
-                // this.props.history.push(`/projects/${projectId}/train`);
-                break;
-            case ToolbarItemName.OnlineTest:
-                this.props.actions.test();
                 // if (this.props.appSettings.zengyining) {
-                //     this.props.history.push(`/projects/${projectId}/remote-test-page`);
+                    this.props.history.push(`/projects/${projectId}/train`);
                 // } else {
                 //     toast.warn("试用版本未开放");
                 // }
                 break;
-            case ToolbarItemName.FilterAssets:
-                toast.warn("过滤文件");
+            // case ToolbarItemName.RemoteTrainAi:
+            //     this.props.history.push(`/projects/${projectId}/remote-train-page`);
+            //     break;
+            case ToolbarItemName.OnlineTest:
+                this.uploadTestAssets();
                 break;
+            case ToolbarItemName.FilterAssets:
+                if (searchQuery) {
+                    const filterAssets: IAsset[] = [];
+                    await this.state.assets.filter(async (asset) => {
+                        if (decodeURI(asset.name).indexOf(searchQuery) > -1) {
+                            filterAssets.push(asset);
+                        }
+                    });
+                    this.setState({
+                        ...this.state,
+                        isFilter: true,
+                        filterAssets,
+                    });
+                    if (filterAssets.length) {
+                        await this.selectAsset(filterAssets[0]);
+                    }
+                } else {
+                    this.setState({
+                        ...this.state,
+                        isFilter: false,
+                    });
+                }
+                break;
+        }
+    }
+
+    private uploadTestAssets = async () => {
+        this.draggableDialog.current.open();
+
+        const projectToUpdate: IProject = {
+            ...this.props.project,
+            exportFormat: {
+                providerOptions: {
+                    assetState: ExportAssetState.Tagged,
+                    testTrainSplit: 100,
+                    exportUnassigned: false,
+                },
+                providerType: "pascalVOC",
+            },
+        };
+        await this.props.actions.saveProject(projectToUpdate);
+        this.draggableDialog.current.change("导出数据集", "请耐心等待，去喝杯咖啡再来吧");
+        const results = await this.props.actions.exportProject(this.props.project);
+        // toast.dismiss(infoId);
+        if (!results || (results && results.errors.length === 0)) {
+            this.draggableDialog.current.change("导出完成", "导出成功");
+        } else if (results && results.errors.length > 0) {
+            this.draggableDialog.current.change("导出不全",
+                `成功的导出了 ${results.completed.length}/${results.count} 素材`);
+            // toast.warn(`成功的导出了 ${results.completed.length}/${results.count} 素材，但导出不全，请检查`);
+        }
+
+        this.draggableDialog.current.change("正在打包", "请耐心等待，去喝杯咖啡再来吧");
+        const packageRes = await this.props.actions.trainPackageProject(this.props.project);
+        if (packageRes.success) {
+            // const updateProject = {
+            //     ...this.props.project,
+            //     trainFormat: {
+            //         ...this.props.project.trainFormat,
+            //         tarBaseName: packageRes.tarBaseName,
+            //     },
+            // };
+            // await this.props.actions.saveProject(updateProject);
+            // this.draggableDialog.current.change(`正在上传`, "请耐心等待，去喝杯咖啡再来吧");
+            // const upload = await this.props.actions.trainUploadProject(this.props.project, packageRes);
+            // if (upload.success) {
+            //     this.draggableDialog.current.change(`正在加入训练队列`, "请耐心等待，去喝杯咖啡再来吧");
+            //     const res = await this.props.actions.trainAddQueueProject(this.props.project, packageRes);
+            //     if (res.success) {
+            //         await this.props.actions.trainAddSql(this.props.project, packageRes);
+            //         this.draggableDialog.current.change("已成功加入训练队列",
+            //             "项目等待训练中...在后台管理页面可以查看训练最新状态", true);
+            //     } else {
+            //         this.draggableDialog.current.change("加入队列失败", res.msg, true);
+            //     }
+            // } else {
+            //     this.draggableDialog.current.change("上传失败", upload.msg, true);
+            // }
+        } else {
+            this.draggableDialog.current.change("打包失败", packageRes.msg, true);
         }
     }
 

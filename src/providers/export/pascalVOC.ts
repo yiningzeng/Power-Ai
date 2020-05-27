@@ -109,7 +109,7 @@ export class PascalVOCExportProvider extends ExportProvider<IPascalVOCExportProv
             }
         } catch (err) {
             // Ignore the error at the moment
-            // TODO: Refactor ExportProvider abstract class export() method
+            // TODO: Refactor TestProvider abstract class export() method
             //       to return Promise<object> with an object containing
             //       the number of files successfully exported out of total
             console.log(`Error downloading asset ${assetMetadata.asset.path} - ${err}`);
@@ -124,8 +124,8 @@ export class PascalVOCExportProvider extends ExportProvider<IPascalVOCExportProv
                     name: tagName,
                     xmin: region.boundingBox.left,
                     ymin: region.boundingBox.top,
-                    xmax: region.boundingBox.left + region.boundingBox.width,
-                    ymax: region.boundingBox.top + region.boundingBox.height,
+                    xmax: region.boundingBox.left + region.boundingBox.width - 1,
+                    ymax: region.boundingBox.top + region.boundingBox.height - 1,
                 };
 
                 tagObjects.push(objectInfo);
@@ -142,7 +142,7 @@ export class PascalVOCExportProvider extends ExportProvider<IPascalVOCExportProv
 
         if (image64.length < 10) {
             // Ignore the error at the moment
-            // TODO: Refactor ExportProvider abstract class export() method
+            // TODO: Refactor TestProvider abstract class export() method
             //       to return Promise<object> with an object containing
             //       the number of files successfully exported out of total
             console.log(`Image not valid ${imageFileName}`);
@@ -263,22 +263,36 @@ export class PascalVOCExportProvider extends ExportProvider<IPascalVOCExportProv
             }
 
             const assetList = [];
+            const positiveAssetList = [];
+            const negativeAssetsList = [];
             assetUsage.forEach((tags, assetName) => {
+                const indexOf = assetName.lastIndexOf(".");
+                let name = assetName;
+                if (indexOf !== -1) {
+                    name = assetName.substring(0, indexOf);
+                }
                 if (tags.has(tag.name)) {
-                    assetList.push(`${assetName} 1`);
+                    assetList.push(`${name} 1`);
+                    positiveAssetList.push(`${name} 1`);
                 } else {
-                    assetList.push(`${assetName} -1`);
+                    assetList.push(`${name} -1`);
+                    negativeAssetsList.push(`${name} -1`);
                 }
             });
 
             if (testSplit > 0 && testSplit <= 1) {
                 // Split in Test and Train sets
-                const totalAssets = assetUsage.size;
-                const testCount = Math.ceil(totalAssets * testSplit);
+                let totalAssets = positiveAssetList.length;
+                let testCount = Math.ceil(totalAssets * testSplit);
 
-                const testArray = assetList.slice(0, testCount);
-                const trainArray = assetList.slice(testCount, totalAssets);
+                let testArray = positiveAssetList.slice(0, testCount);
+                let trainArray = positiveAssetList.slice(testCount, totalAssets);
 
+                totalAssets = negativeAssetsList.length;
+                testCount = Math.ceil(totalAssets * testSplit);
+
+                testArray = testArray.concat(negativeAssetsList.slice(0, testCount));
+                trainArray = trainArray.concat(negativeAssetsList.slice(testCount, totalAssets));
                 const testImageSetFileName = `${imageSetsMainFolderName}/${tag.name}_val.txt`;
                 await this.storageProvider.writeText(testImageSetFileName, testArray.join(os.EOL));
 

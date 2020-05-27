@@ -17,7 +17,7 @@ export interface IEditorToolbarProps {
     project: IProject;
     actions: IProjectActions;
     items: IToolbarItemRegistration[];
-    onToolbarItemSelected: (toolbarItem: ToolbarItem) => void;
+    onToolbarItemSelected: (toolbarItem: ToolbarItem, searchQuery: string) => void;
 }
 
 /**
@@ -66,11 +66,11 @@ export class EditorToolbar extends React.Component<IEditorToolbarProps, IEditorT
         );
     }
 
-    private onToolbarItemSelected = (toolbarItem: ToolbarItem) => {
+    private onToolbarItemSelected = (toolbarItem: ToolbarItem, searchQuery: string) => {
         this.setState({
             selectedItem: toolbarItem.props.name,
         }, () => {
-            this.props.onToolbarItemSelected(toolbarItem);
+            this.props.onToolbarItemSelected(toolbarItem, searchQuery);
         });
     }
 

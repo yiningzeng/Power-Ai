@@ -205,19 +205,30 @@ export default class ProjectService implements IProjectService {
                 try {
                     if (one.state !== AssetState.NotVisited) {
                         const md5Hash = new MD5().update(one.path).digest("hex");
+                        const fileName = one.name.substring(0, one.name.lastIndexOf("."));
+                        // alert(`文件名： ${fileName}`);
                         console.log(`导入计算 路径=${path.normalize(folder + "/")} one.path=${one.path}\n path.normalize(one.path)=${path.normalize(one.path)}\n md5: ${md5Hash}`);
-                        const oneTemp = {
+                        const oneTemp: IAsset = {
                             ...one,
-                            id: md5Hash,
+                            id: fileName,
                         };
                         tempAssets.push(oneTemp);
                         if (one.state === AssetState.Tagged) {
                             const itemJsonText = interpolate(
-                                await importStorageProvider.readText(`${one.id}-asset.json`), params);
+                                await importStorageProvider.readText(
+                                    `${one.id}${constants.assetMetadataFileExtension}`), params);
                             const json = JSON.parse(itemJsonText);
-                            json["asset"]["id"] = md5Hash;
-                            await projectStorageProvider.writeText(`${md5Hash}-asset.json`,
+                            json["asset"]["id"] = fileName;
+                            await projectStorageProvider.writeText(`${fileName}${constants.assetMetadataFileExtension}`,
                                 JSON.stringify(json, null, 4));
+                            if (!one.tags) {
+                                let tags = [];
+                                json["regions"].forEach((val, idx, arry) => {
+                                    tags = tags.concat(val.tags);
+                                });
+                                tags = [...new Set(tags)].sort(); // 去重然后排序 用于标签搜索
+                                oneTemp.tags = tags.join(",");
+                            }
                         }
                     }
                 } catch (e) {
@@ -281,8 +292,8 @@ export default class ProjectService implements IProjectService {
             };
             // await importStorageProvider.writeText(constants.importFileTransferExtension,
             //     JSON.stringify(jsonImportProject, null, 4));
-            await projectStorageProvider.writeText(`${project.name}+${constants.projectFileExtension}`,
-                JSON.stringify(updateProject, null, 4));
+            // await projectStorageProvider.writeText(`${project.name}+${constants.projectFileExtension}`,
+            //     JSON.stringify(updateProject, null, 4));
             return updateProject;
         } catch (e) {
             console.log(e);

@@ -272,7 +272,7 @@ export const chinese: IAppStrings = {
             transferProject: "迁移项目",
             activeLearning: "自动标注当前素材",
             trainAi: "开始训练",
-            onlineTest: "在线测试",
+            onlineTest: "上传标准测试集",
         },
         videoPlayer: {
             previousTaggedFrame: {
@@ -300,7 +300,7 @@ export const chinese: IAppStrings = {
             },
             rename: {
                 title: "重命名标签",
-                confirmation: "确定要重命名标签么？这将会把所有的已打标的素材更改",
+                confirmation: "确定要重命名标签么？这将会把所有的已打标的素材更改！如果有重复的标签名，会合并",
             },
             delete: {
                 title: "删除标签",

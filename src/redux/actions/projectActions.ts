@@ -290,11 +290,18 @@ export function updateProjectTag(project: IProject, oldTagName: string, newTagNa
         });
 
         const currentProject = getState().currentProject;
-        const updatedProject = {
-            ...currentProject,
-            tags: project.tags.map((t) => (t.name === oldTagName) ? { ...t, name: newTagName } : t),
-        };
-
+        let updatedProject;
+        if (currentProject.tags.filter((t) => t.name.indexOf(newTagName) > -1).length) { // 查找是否有相同的tag
+            updatedProject = {
+                ...currentProject,
+                tags: project.tags.filter((t) => t.name.indexOf(oldTagName) === -1),
+            };
+        } else { // 不存在相同的tag
+            updatedProject = {
+                ...currentProject,
+                tags: project.tags.map((t) => (t.name === oldTagName) ? { ...t, name: newTagName } : t),
+            };
+        }
         // Save updated project tags
         await saveProject(updatedProject)(dispatch, getState);
         dispatch(updateProjectTagAction(updatedProject));

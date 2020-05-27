@@ -109,7 +109,7 @@ export class PowerAiExportProvider extends ExportProvider<IPowerAiExportProvider
                             },
                         };
                         console.log(`导出Power-ai ${assetMetadata.asset.id}: ${JSON.stringify(changeTagAsset)}`);
-                        await this.storageProvider.writeText(`${exportFolderName}/${setTagType}${assetMetadata.asset.id}${constants.assetMetadataFileExtension}`,
+                        await this.storageProvider.writeText(`${exportFolderName}/${setTagType}${decodeURI(assetMetadata.asset.id)}${constants.assetMetadataFileExtension}`,
                             JSON.stringify(changeTagAsset, null, 4));
                         console.log(`导出Power-ai ${assetMetadata.asset.id}: 保存本地`);
                         assetFilePath = `${exportFolderName}/${setTagType}${assetMetadata.asset.name}`;
@@ -143,6 +143,7 @@ export class PowerAiExportProvider extends ExportProvider<IPowerAiExportProvider
                         ...assetMetadata,
                         asset: {
                             ...assetMetadata.asset,
+                            id: decodeURI(assetMetadata.asset.id),
                             path: "file:${path}" + assetMetadata.asset.name,
                             tagType: setTagType === "" ? undefined : setTagType.replace("/", ""),
                         },

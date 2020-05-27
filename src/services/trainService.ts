@@ -24,7 +24,6 @@ export default class TrainService implements ITrainService {
      * Save a connection
      * @param connection - Connection to save
      */
-
     public async trainPackageProject(project: IProject): Promise<IStartTrainResults> {
         Guard.null(project);
         return await IpcRendererProxy.send(`TrainingSystem:trainPackageProject`, [project]);
@@ -56,7 +55,7 @@ export default class TrainService implements ITrainService {
         //     // });
         //     im.save("/home/baymin/图片/out.jpg");
         // });
-        await IpcRendererProxy.send("FILE_WATCH");
-        await IpcRendererProxy.send(`TrainingSystem:opencvTest`);
+        // await IpcRendererProxy.send("FILE_WATCH");
+        // await IpcRendererProxy.send(`TrainingSystem:opencvTest`);
     }
 }

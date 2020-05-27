@@ -283,7 +283,7 @@ export default function registerToolbar() {
     ToolbarItemFactory.register({
         name: ToolbarItemName.OnlineTest,
         tooltip: strings.editorPage.toolbar.onlineTest,
-        icon: "fas fa-trophy",
+        icon: "fas fa-spider",
         // icon: "fas fa-caret-square-right",
         group: ToolbarItemGroup.Ai,
         type: ToolbarItemType.Action,

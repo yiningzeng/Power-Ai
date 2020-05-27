@@ -3,7 +3,8 @@
  */
 export const constants = {
     projectFileExtension: ".power-ai",
-    assetMetadataFileExtension: "-asset.json",
+    // assetMetadataFileExtension: "-asset.json",
+    assetMetadataFileExtension: ".json",
     exportFileExtension: "-export.power-ai",
     importFileExtension: "import.power-ai",
     importFileTransferExtension: "import-transfer.power-ai",

@@ -113,7 +113,7 @@ export class TFRecordsExportProvider extends ExportProvider {
                 resolve();
             } catch (error) {
                 // Ignore the error at the moment
-                // TODO: Refactor ExportProvider abstract class export() method
+                // TODO: Refactor TestProvider abstract class export() method
                 //       to return Promise<object> with an object containing
                 //       the number of files succesfully exported out of total
                 console.log(`Error downloading ${element.asset.path} - ${error}`);

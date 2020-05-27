@@ -17,6 +17,10 @@ export interface ITestService {
  * @description - Functions for dealing with project connections
  */
 export default class TestService implements ITestService {
+    public async testPackageProject(project: IProject): Promise<IStartTrainResults> {
+        Guard.null(project);
+        return await IpcRendererProxy.send(`TestingSystem:testPackageProject`, [project]);
+    }
     public async testGetModel(project: IProject): Promise<IStartTestResults> {
         Guard.null(project);
         return await IpcRendererProxy.send(`TestingSystem:testGetModel`, [project]);

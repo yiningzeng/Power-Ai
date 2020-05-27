@@ -70,12 +70,12 @@ export default function registerProviders() {
         displayName: strings.export.providers.powerAi.displayName,
         factory: (project, options) => new PowerAiExportProvider(project, options),
     });
-    // ExportProviderFactory.register({
+    // TestProviderFactory.register({
     //     name: "azureCustomVision",
     //     displayName: strings.export.providers.azureCV.displayName,
     //     factory: (project, options) => new AzureCustomVisionProvider(project, options),
     // });
-    // ExportProviderFactory.register({
+    // TestProviderFactory.register({
     //     name: "cntk",
     //     displayName: strings.export.providers.cntk.displayName,
     //     factory: (project, options) => new CntkExportProvider(project, options),
