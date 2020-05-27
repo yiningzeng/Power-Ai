@@ -203,6 +203,7 @@ export class PascalVOCExportProvider extends ExportProvider<IPascalVOCExportProv
 
                 const params = {
                     fileName: imageName,
+                    originalFileName: imageName,
                     filePath: imageFilePath,
                     width: imageInfo.width.toString(),
                     height: imageInfo.height.toString(),
