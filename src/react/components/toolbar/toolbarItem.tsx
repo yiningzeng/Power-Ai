@@ -97,12 +97,12 @@ export abstract class ToolbarItem extends React.Component<IToolbarItemProps, ISt
                     this.props.isInput && <div className="tag-input-text-input-row search-input">
                         <input
                             type="text"
-                            onChange={(e) => this.setState({searchQuery: e.target.value})}
-                            // onChange={(e) => console.log(e.target.value)}
+                            onChange={(e) => this.setState({searchQuery: e.target.value}, () => {
+                                this.props.onClick(this, this.state.searchQuery);
+                            })}
                             placeholder="过滤文件名"
-                            autoFocus={true}
+                            autoFocus={false}
                         />
-                        <button type="button" className="tag-row-icon fas fa-search" onClick={this.onClick}>查询</button>
                     </div>
                 }
                 {
