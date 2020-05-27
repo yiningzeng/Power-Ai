@@ -387,7 +387,7 @@ export default class TrainingSystem {
             // @ts-ignore
             day = (day < 10 ? "0" + day : day);
             const date = `${myDate.getFullYear()}${month.toString()}${day.toString()}`; // 获取当前时间比如 20190808
-            const tarBaseName = `${date}-auto-${project.name}-${project.trainFormat.providerType}`; // test fix组合tar的基本名
+            const tarBaseName = `${date}-auto-${project.name}-${project.trainFormat.providerType}`; // test close组合tar的基本名
             const tarName = `${tarBaseName}.tar`;
             // tar路径
             const tarPath = path.normalize(`${sourcePath}/${tarName}`);
