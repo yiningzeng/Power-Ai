@@ -268,9 +268,9 @@ export class PascalVOCExportProvider extends ExportProvider<IPascalVOCExportProv
             assetUsage.forEach((tags, assetName) => {
                 const indexOf = assetName.lastIndexOf(".");
                 let name = assetName;
-                if (indexOf !== -1) {
-                    name = assetName.substring(0, indexOf);
-                }
+                // if (indexOf !== -1) {
+                //     name = assetName.substring(0, indexOf);
+                // }
                 if (tags.has(tag.name)) {
                     assetList.push(`${name} 1`);
                     positiveAssetList.push(`${name} 1`);
