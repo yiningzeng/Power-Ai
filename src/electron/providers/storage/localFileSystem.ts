@@ -167,6 +167,14 @@ export default class LocalFileSystem implements IStorageProvider {
         });
     }
 
+    public async getAssetsFirst(folderPath?: string): Promise<IAsset[]> {
+        console.log("asdsds");
+        const assets = (await this.listFiles(path.normalize(folderPath)))
+            .map((filePath) => AssetService.createAssetFromFilePath(filePath))
+            .filter((asset) => asset.type !== AssetType.Unknown);
+        return assets;
+    }
+
     public async getAssets(folderPath?: string): Promise<IAsset[]> {
         return (await this.listFiles(path.normalize(folderPath)))
             .map((filePath) => AssetService.createAssetFromFilePath(filePath))

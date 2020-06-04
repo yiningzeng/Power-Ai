@@ -46,12 +46,12 @@ export class StatusBarMetrics extends React.Component<IStatusBarMetricsProps> {
                         nowAssets.length > 0 ? decodeURIComponent(nowAssets[0].name) : ""
                     }</span>
                 </li>
-                <li title={strings.projectMetrics.currentAsset.size}>
-                    <i className="fas fa-flushed"></i>
-                    <span className="metric-source-connection-name">{
-                        nowAssets.length > 0 ? `${nowAssets[0].size.width} x ${nowAssets[0].size.height}` : ""
-                    }</span>
-                </li>
+                {/*<li title={strings.projectMetrics.currentAsset.size}>*/}
+                {/*    <i className="fas fa-flushed"></i>*/}
+                {/*    <span className="metric-source-connection-name">{*/}
+                {/*        nowAssets.length > 0 ? `${nowAssets[0].size.width} x ${nowAssets[0].size.height}` : ""*/}
+                {/*    }</span>*/}
+                {/*</li>*/}
             </ul>
         );
     }

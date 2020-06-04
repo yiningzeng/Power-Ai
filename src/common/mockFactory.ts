@@ -570,6 +570,7 @@ export default class MockFactory {
             createContainer: jest.fn(),
             deleteContainer: jest.fn(),
             getAssets: jest.fn(),
+            getAssetsFirst: jest.fn(),
         };
     }
 
@@ -591,6 +592,9 @@ export default class MockFactory {
         return {
             initialize: jest.fn(() => Promise.resolve()),
             getAssets(containerName?: string): Promise<IAsset[]> {
+                throw new Error("Method not implemented.");
+            },
+            getAssetsFirst(containerName?: string): Promise<IAsset[]> {
                 throw new Error("Method not implemented.");
             },
         };
@@ -817,6 +821,7 @@ export default class MockFactory {
             closeProject: jest.fn(() => Promise.resolve()),
             loadAssets: jest.fn(() => Promise.resolve()),
             loadAssetsWithFolder: jest.fn(() => Promise.resolve()),
+            loadAssetsWithFolderAndTags: jest.fn(() => Promise.resolve()),
             exportProject: jest.fn(() => Promise.resolve()),
             importTaggedAssets: jest.fn(() => Promise.resolve()),
             transferProject: jest.fn(() => Promise.resolve()),

@@ -4,7 +4,9 @@ import shortid from "shortid";
 import { StorageProviderFactory } from "../providers/storage/storageProviderFactory";
 import {
     IProject, ISecurityToken, AppError,
-    ErrorCode, ModelPathType, IActiveLearningSettings, ITrainFormat, IProviderOptions, IConnection, IAsset, AssetState,
+    ErrorCode, DefaultActiveLearningSettings,
+    DefaultExportOptions, DefaultFastrcnn, DefaultTrainOptions,
+    DefaultYoloV3, DefaultYolov3Net, IConnection, IAsset, AssetState,
 } from "../models/applicationState";
 import Guard from "../common/guard";
 import { constants } from "../common/constants";
@@ -13,7 +15,7 @@ import {decryptProject, encodeFileURI, encryptProject} from "../common/utils";
 import packageJson from "../../package.json";
 import { ExportAssetState } from "../providers/export/exportProvider";
 import { IExportFormat } from "vott-react";
-import {IDetectron, NetModelType} from "../models/trainConfig";
+import {IDetectron, IYoloV3, IYoloV3Net, NetModelType} from "../models/trainConfig";
 import {toast} from "react-toastify";
 import {ILocalFileSystemProxyOptions} from "../providers/storage/localFileSystemProxy";
 import {interpolate} from "../common/strings";
@@ -31,38 +33,6 @@ export interface IProjectService {
     delete(project: IProject): Promise<void>;
     isDuplicate(project: IProject, projectList: IProject[]): boolean;
 }
-
-const defaultActiveLearningSettings: IActiveLearningSettings = {
-    autoDetect: false,
-    predictTag: true,
-    modelPathType: ModelPathType.Coco,
-};
-
-const defaultFastrcnn: IDetectron = {
-    detectron: {
-        netModelType: NetModelType.FasterRcnn,
-        layerNumbEnum: "50",
-        gpuNumb: 1,
-        fpn: true,
-        augument: true,
-        multiScale: true,
-        useFlipped: false,
-    },
-};
-
-const defaultTrainOptions: ITrainFormat = {
-    ip: "localhost",
-    providerType: "fasterRcnn",
-    providerOptions: defaultFastrcnn,
-};
-
-const defaultExportOptions: IExportFormat = {
-    providerType: "coco",
-    providerOptions: {
-        assetState: ExportAssetState.All,
-        includeImages: true,
-    },
-};
 
 /**
  * @name - Project Service
@@ -86,17 +56,17 @@ export default class ProjectService implements IProjectService {
 
             // Initialize active learning settings if they don't exist
             if (!loadedProject.activeLearningSettings) {
-                loadedProject.activeLearningSettings = defaultActiveLearningSettings;
+                loadedProject.activeLearningSettings = DefaultActiveLearningSettings;
             }
 
             // Initialize export settings if they don't exist
             if (!loadedProject.exportFormat) {
-                loadedProject.exportFormat = defaultExportOptions;
+                loadedProject.exportFormat = DefaultExportOptions;
             }
 
             // Initialize train settings if they don't exist
             if (!loadedProject.trainFormat) {
-                loadedProject.trainFormat = defaultTrainOptions;
+                loadedProject.trainFormat = DefaultTrainOptions;
             }
 
             return Promise.resolve({ ...loadedProject });
@@ -130,17 +100,17 @@ export default class ProjectService implements IProjectService {
 
         // Initialize active learning settings if they don't exist
         if (!project.activeLearningSettings) {
-            project.activeLearningSettings = defaultActiveLearningSettings;
+            project.activeLearningSettings = DefaultActiveLearningSettings;
         }
 
         // Initialize export settings if they don't exist
         if (!project.exportFormat) {
-            project.exportFormat = defaultExportOptions;
+            project.exportFormat = DefaultExportOptions;
         }
 
         // Initialize train settings if they don't exist
         if (!project.trainFormat) {
-            project.trainFormat = defaultTrainOptions;
+            project.trainFormat = DefaultTrainOptions;
         }
         // if (project.version.includes("删除")) {
         //     console.log(`删除保存: ${JSON.stringify(project)}`);
@@ -206,8 +176,6 @@ export default class ProjectService implements IProjectService {
                     if (one.state !== AssetState.NotVisited) {
                         const md5Hash = new MD5().update(one.path).digest("hex");
                         const fileName = one.name.substring(0, one.name.lastIndexOf("."));
-                        // alert(`文件名： ${fileName}`);
-                        console.log(`导入计算 路径=${path.normalize(folder + "/")} one.path=${one.path}\n path.normalize(one.path)=${path.normalize(one.path)}\n md5: ${md5Hash}`);
                         const oneTemp: IAsset = {
                             ...one,
                             id: fileName,
@@ -314,17 +282,17 @@ export default class ProjectService implements IProjectService {
 
         // Initialize active learning settings if they don't exist
         if (!project.activeLearningSettings) {
-            project.activeLearningSettings = defaultActiveLearningSettings;
+            project.activeLearningSettings = DefaultActiveLearningSettings;
         }
 
         // Initialize export settings if they don't exist
         if (!project.exportFormat) {
-            project.exportFormat = defaultExportOptions;
+            project.exportFormat = DefaultExportOptions;
         }
 
         // Initialize train settings if they don't exist
         if (!project.trainFormat) {
-            project.trainFormat = defaultTrainOptions;
+            project.trainFormat = DefaultTrainOptions;
         }
         // if (project.version.includes("删除")) {
         //     console.log(`删除保存: ${JSON.stringify(project)}`);

@@ -6,7 +6,7 @@ import { IAppStrings } from "../strings";
 export const chinese: IAppStrings = {
     appName: "Power Ai",
     common: {
-        displayName: "项目名称",
+        displayName: "名称",
         description: "描述",
         submit: "提交",
         cancel: "取消",
@@ -28,9 +28,9 @@ export const chinese: IAppStrings = {
         importAssets: "导入已经标注的素材文件夹",
     },
     homePage: {
-        newProject: "新建项目",
+        newProject: "打开标注的文件夹",
         openLocalProject: {
-            title: "打开本地项目",
+            title: "打开需要标注的文件夹",
         },
         openTransferProject: {
             title: "打开迁移的项目",
@@ -39,7 +39,7 @@ export const chinese: IAppStrings = {
             title: "打开线上项目",
             selectConnection: "选择连接",
         },
-        recentProjects: "最近项目",
+        recentProjects: "最近文件夹",
         deleteProject: {
             title: "删除项目",
             confirmation: "确定要删除该项目么",
@@ -86,12 +86,12 @@ export const chinese: IAppStrings = {
         },
     },
     projectSettings: {
-        title: "项目设置",
+        title: "属性设置",
         securityToken: {
             title: "安全令牌",
             description: "用于加密项目文件中的敏感数据",
         },
-        save: "保存项目",
+        save: "保存",
         sourceConnection: {
             title: "关联资源",
             description: "资源的路径",
@@ -101,8 +101,8 @@ export const chinese: IAppStrings = {
             },
         },
         targetConnection: {
-            title: "项目路径",
-            description: "初始项目素材路径，用于保存和导出数据",
+            title: "打开路径",
+            description: "加载的素材路径，用于保存和导出数据",
         },
         videoSettings: {
             title: "视频设置",
@@ -111,7 +111,7 @@ export const chinese: IAppStrings = {
         },
         addConnection: "新增",
         messages: {
-            saveSuccess: "保存 ${project.name} 项目设置成功",
+            saveSuccess: "保存 ${project.name} 设置成功",
         },
     },
     projectMetrics: {

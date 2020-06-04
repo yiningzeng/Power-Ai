@@ -4,7 +4,7 @@ import * as shortid from "shortid";
 import Guard from "../common/guard";
 import {
     IAsset, AssetType, IProject, IAssetMetadata, AssetState,
-    IRegion, RegionType, ITFRecordMetadata,
+    IRegion, RegionType, ITFRecordMetadata, ITag, IAssetsAndTags,
 } from "../models/applicationState";
 import { AssetProviderFactory, IAssetProvider } from "../providers/storage/assetProviderFactory";
 import { StorageProviderFactory, IStorageProvider } from "../providers/storage/storageProviderFactory";
@@ -13,15 +13,15 @@ import HtmlFileReader from "../common/htmlFileReader";
 import { TFRecordsReader } from "../providers/export/tensorFlowRecords/tensorFlowReader";
 import { FeatureType } from "../providers/export/tensorFlowRecords/tensorFlowBuilder";
 import { appInfo } from "../common/appInfo";
-import { encodeFileURI } from "../common/utils";
+import {encodeFileURI, randomIntInRange} from "../common/utils";
 import {LocalFileSystemProxy} from "../providers/storage/localFileSystemProxy";
-
+// tslint:disable-next-line:no-var-requires
+const tagColors = require("../react/components/common/tagColors.json");
 /**
  * @name - Asset Service
  * @description - Functions for dealing with project assets
  */
 export class AssetService {
-
     /**
      * Create IAsset from filePath
      * @param filePath - filepath of asset
@@ -53,9 +53,11 @@ export class AssetService {
 
         const assetType = this.getAssetType(assetFormat);
 
+        const idd = decodeURI(fileNameParts[0]);
+
         return {
             // id: md5Hash,
-            id: decodeURI(fileNameParts[0]),
+            id: idd,
             format: assetFormat,
             state: AssetState.NotVisited,
             type: assetType,
@@ -124,7 +126,6 @@ export class AssetService {
                 this.project.targetConnection.providerOptions,
             );
         }
-
         return this.storageProviderInstance;
     }
 
@@ -147,7 +148,85 @@ export class AssetService {
                 },
             );
         }
-        return await this.assetProviderInstance.getAssets();
+        const assets = await this.assetProviderInstance.getAssets();
+        const updates = await assets.mapAsync(async (asset) => {
+            const assetMetadata = await this.getAssetMetadata(asset);
+            if (assetMetadata.asset) {
+                return {
+                    ...asset,
+                    size: assetMetadata.asset.size,
+                    state: assetMetadata.asset.state,
+                    tags: assetMetadata.asset.tags,
+                };
+            } else {
+                return asset;
+            }
+        });
+        return updates;
+    }
+
+    public getNextColor = (tags) => {
+        if (tags.length > 0) {
+            const lastColor = tags[tags.length - 1].color;
+            const lastIndex = tagColors.findIndex((color) => color === lastColor);
+            let newIndex;
+            if (lastIndex > -1) {
+                newIndex = (lastIndex + 1) % tagColors.length;
+            } else {
+                newIndex = randomIntInRange(0, tagColors.length - 1);
+            }
+            return tagColors[newIndex];
+        } else {
+            return tagColors[0];
+        }
+    }
+
+    public async getAssetsWithFolderMain(folder): Promise<IAssetsAndTags> {
+        if (!this.assetProviderInstance) {
+            this.assetProviderInstance = AssetProviderFactory.create(
+                "localFileSystemProxy",
+                {
+                    folderPath: folder,
+                },
+            );
+        }
+        let res: IAssetsAndTags;
+        let taggs = [];
+        const assets = await this.assetProviderInstance.getAssets();
+        const updates = await assets.mapAsync(async (asset) => {
+            const assetMetadata = await this.getAssetMetadata(asset);
+            if (assetMetadata.asset) {
+                if (assetMetadata.asset.tags.indexOf(",") > 0) {
+                    taggs = taggs.concat(assetMetadata.asset.tags.split(","));
+                } else {
+                    taggs.push(assetMetadata.asset.tags);
+                }
+                console.log(`homePage: asset_name: ${asset.name} indexOf: ${assetMetadata.asset.tags.indexOf(",")}: ${assetMetadata.asset.tags.split(",")}\n${JSON.stringify(taggs)}`);
+                return {
+                    ...asset,
+                    size: assetMetadata.asset.size,
+                    state: assetMetadata.asset.state,
+                    tags: assetMetadata.asset.tags,
+                };
+            } else {
+                return asset;
+            }
+        });
+        taggs = [...new Set(taggs)].sort(); // 去重然后排序 用于标签搜索
+        const finalTags = [];
+        taggs.map((val) => {
+            const newTag: ITag = {
+                name: val,
+                color: this.getNextColor(finalTags),
+            };
+            finalTags.push(newTag);
+        });
+        res = {
+            assets: updates,
+            tags: finalTags,
+        };
+        console.log(`homePage: fucking tags: ${finalTags}`);
+        return res;
     }
 
     /**
@@ -215,6 +294,7 @@ export class AssetService {
         Guard.null(asset);
 
         const fileName = `${asset.id}${constants.assetMetadataFileExtension}`;
+        console.log(`assets_map: ${fileName}:`);
         try {
             const json = await this.storageProvider.readText(fileName);
             return JSON.parse(json) as IAssetMetadata;

@@ -9,7 +9,7 @@ import {
     ErrorCode,
     IApplicationState,
     IAsset,
-    IAssetMetadata,
+    IAssetMetadata, IAssetsAndTags,
     IProject,
 } from "../../models/applicationState";
 import { createAction, createPayloadAction, IPayloadAction } from "./actionCreators";
@@ -48,6 +48,7 @@ export default interface IProjectActions {
     testImage(project: IProject): Promise<IStartTestResults>;
     loadAssets(project: IProject): Promise<IAsset[]>;
     loadAssetsWithFolder(project: IProject, folder: string): Promise<IAsset[]>;
+    loadAssetsWithFolderAndTags(project: IProject, folder: string): Promise<IAssetsAndTags>;
     loadAssetMetadata(project: IProject, asset: IAsset): Promise<IAssetMetadata>;
     saveAssetMetadata(project: IProject, assetMetadata: IAssetMetadata): Promise<IAssetMetadata>;
     deleteAsset(project: IProject, selectAsset: IAsset): Promise<IProject>;
@@ -189,14 +190,27 @@ export function loadAssets(project: IProject): (dispatch: Dispatch) => Promise<I
  * Gets assets from project, dispatches load assets action and returns assets
  * @param project - Project from which to load assets
  */
-export function loadAssetsWithFolder(project: IProject, folder: string): (dispatch: Dispatch) => Promise<IAsset[]> {
+export function loadAssetsWithFolder(project: IProject, folder: string):
+    (dispatch: Dispatch) => Promise<IAsset[]> {
     return async (dispatch: Dispatch) => {
-        console.log("加载素材用文件夹 loadAssetsWithFolder: " + folder);
         const assetService = new AssetService(project);
         const assets = await assetService.getAssetsWithFolder(folder);
         dispatch(loadProjectAssetsAction(assets));
-
         return assets;
+    };
+}
+
+/**
+ * Gets assets from project, dispatches load assets action and returns assets
+ * @param project - Project from which to load assets
+ */
+export function loadAssetsWithFolderAndTags(project: IProject, folder: string):
+    (dispatch: Dispatch) => Promise<IAssetsAndTags> {
+    return async (dispatch: Dispatch) => {
+        const assetService = new AssetService(project);
+        const rest = await assetService.getAssetsWithFolderMain(folder);
+        dispatch(loadProjectAssetsAction(rest.assets));
+        return rest;
     };
 }
 
