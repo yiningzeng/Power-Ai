@@ -217,6 +217,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         } else if (projectId) {
             const project = this.props.recentProjects.find((project) => project.id === projectId);
             await this.props.actions.loadProject(project);
+            console.log(`fuck your son componentDidMount: ${JSON.stringify(project)}`);
         }
         this.setState({
             treeList: this.props.project.sourceConnection.providerOptionsOthers,
@@ -235,7 +236,6 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         // retrieved.
         // console.log("editorPage: componentDidUpdate prevProps: " + JSON.stringify(prevProps));
         if (this.props.project && !prevProps.project) {
-            console.log("componentDidUpdate: project");
             this.setState({
                 treeList: this.props.project.sourceConnection.providerOptionsOthers,
                 additionalSettings: {
@@ -442,6 +442,8 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                     size={{width: this.state.zoomMode.width, height: this.state.zoomMode.height}}
                                     position={{x: this.state.zoomMode.x, y: this.state.zoomMode.y}}
                                     onDragStop={(e, d) => {
+                                        console.log(`drag: ${d.x}, ${d.y} onDragStop`);
+                                        e.preventDefault();
                                         this.setState({
                                             zoomMode: {
                                                 ...this.state.zoomMode,
@@ -449,6 +451,9 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                                 y: d.y,
                                             },
                                         });
+                                    }}
+                                    onDragStart={(e) => {
+                                        e.preventDefault();
                                     }}
                                     onResize={(e, direction, ref, delta, position) => {
                                         this.setState({
@@ -463,6 +468,32 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                         });
                                     }}
                                     onMouseDown={(e) => {
+                                        // console.log(e.button);
+                                        // if (e.button === 0) {
+                                        //     this.setState({
+                                        //         selectionMode: SelectionMode.RECT,
+                                        //         editorMode: EditorMode.Rectangle,
+                                        //         zoomMode: {
+                                        //             ...this.state.zoomMode,
+                                        //             disableDrag: true,
+                                        //         },
+                                        //         isDrawPolygon2MinBox: false,
+                                        //     });
+                                        //     this.canvas.current.enableCanvas(true);
+                                        // } else if (e.button === 2) {
+                                        //     e.stopPropagation();
+                                        //     this.canvas.current.enableCanvas(false);
+                                        //     this.setState({
+                                        //         selectionMode: SelectionMode.NONE,
+                                        //         editorMode: EditorMode.Select,
+                                        //         zoomMode: {
+                                        //             ...this.state.zoomMode,
+                                        //             disableDrag: false,
+                                        //         },
+                                        //         isDrawPolygon2MinBox: false,
+                                        //     });
+                                        //
+                                        // }
                                         const zone = document.getElementById("ct-zone");
                                         console.log(this.myZoomDom.current.getOffsetFromParent().left);
                                         console.log(this.myZoomDom.current.getSelfElement().offsetLeft);
@@ -478,10 +509,25 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                             },
                                         });
                                     }}
-                                    onMouseMove={(e) => {
-                                        // console.log(e);
-                                        // console.log(`我是鼠标点x: ${e.} 我是鼠标点y: ${e.offsetY}`);
+                                    onMouseUp={(e) => {
+                                        console.log(e);
+                                        console.log(`我是鼠标点x: ${e.clientX} 我是鼠标点y: ${e.clientY}`);
                                         // this.setState({
+                                        //     ...this.state,
+                                        //     zoomMode: {
+                                        //         ...this.state.zoomMode,
+                                        //         zoomCenterX: e.clientX,
+                                        //         zoomCenterY: e.clientY,
+                                        //     },
+                                        // });
+                                    }}
+                                    onMouseMove={(e) => {
+                                        // if (e.stopPropagation) e.stopPropagation();
+                                        // if (e.preventDefault) e.preventDefault();
+                                        // console.log(e);
+                                        console.log(`drag: ${e.clientX}, ${e.clientY} onMouseMove`);
+                                        // this.setState({
+                                        //     ...this.state,
                                         //     zoomMode: {
                                         //         ...this.state.zoomMode,
                                         //         zoomCenterX: e.clientX,
@@ -1322,6 +1368,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         const assets = this.state.isFilter ? this.state.filterAssets : this.state.assets;
         const currentIndex = assets
             .findIndex((asset) => asset.id === selectedRootAsset.id);
+        console.log(`fuck your son:currentIndex ${currentIndex}`);
         if (direction > 0) {
             await this.selectAsset(assets[Math.min(assets.length - 1, currentIndex + 1)]);
         } else {
@@ -1338,7 +1385,6 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
     }
 
     private selectAsset = async (asset: IAsset): Promise<void> => {
-
         // Nothing to do if we are already on the same asset.
         if (this.state.selectedAsset && this.state.selectedAsset.asset.id === asset.id) {
             return;
@@ -1385,7 +1431,6 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
             .uniqBy((asset) => asset.id)
             .value();
         const lastVisited = rootAssets.find((asset) => asset.id === this.props.project.lastVisitedAssetId);
-
         this.setState({
             assets: rootAssets,
         }, async () => {
@@ -1426,7 +1471,6 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
             .uniqBy((asset) => asset.id)
             .value();
         const lastVisited = rootAssets.find((asset) => asset.id === this.props.project.lastVisitedAssetId);
-
         this.setState({
             assets: rootAssets,
         }, async () => {

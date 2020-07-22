@@ -14,7 +14,6 @@ export class StatusBarMetrics extends React.Component<IStatusBarMetricsProps> {
         if (!project) {
             return null;
         }
-
         const projectAssets = _.values(project.assets);
         const visitedAssets = projectAssets
             .filter((asset) => asset.state === AssetState.Visited || asset.state === AssetState.Tagged);

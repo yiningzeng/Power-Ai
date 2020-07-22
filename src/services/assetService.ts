@@ -193,23 +193,40 @@ export class AssetService {
         let res: IAssetsAndTags;
         let taggs = [];
         const assets = await this.assetProviderInstance.getAssets();
+
         const updates = await assets.mapAsync(async (asset) => {
             const assetMetadata = await this.getAssetMetadata(asset);
+            console.log(`fuck your son: assetService22 ${JSON.stringify(assetMetadata.asset)}`);
             if (assetMetadata.asset) {
-                if (assetMetadata.asset.tags.indexOf(",") > 0) {
-                    taggs = taggs.concat(assetMetadata.asset.tags.split(","));
-                } else {
-                    taggs.push(assetMetadata.asset.tags);
+                if (assetMetadata.asset.tags) {
+                    if (assetMetadata.asset.tags.indexOf(",") > 0) {
+                        taggs = taggs.concat(assetMetadata.asset.tags.split(","));
+                    } else {
+                        taggs.push(assetMetadata.asset.tags);
+                    }
                 }
-                console.log(`homePage: asset_name: ${asset.name} indexOf: ${assetMetadata.asset.tags.indexOf(",")}: ${assetMetadata.asset.tags.split(",")}\n${JSON.stringify(taggs)}`);
-                return {
+                const newAsset = {
                     ...asset,
+                    path: `file:${folder}/${asset.name}`,
                     size: assetMetadata.asset.size,
                     state: assetMetadata.asset.state,
                     tags: assetMetadata.asset.tags,
                 };
+                this.save({
+                    ...assetMetadata,
+                    asset: newAsset,
+                });
+                return newAsset;
             } else {
-                return asset;
+                const newAsset = {
+                    ...asset,
+                    path: `file:${folder}/${asset.name}`,
+                };
+                this.save({
+                    ...assetMetadata,
+                    asset: newAsset,
+                });
+                return newAsset;
             }
         });
         taggs = [...new Set(taggs)].sort(); // 去重然后排序 用于标签搜索
@@ -225,7 +242,6 @@ export class AssetService {
             assets: updates,
             tags: finalTags,
         };
-        console.log(`homePage: fucking tags: ${finalTags}`);
         return res;
     }
 
@@ -267,7 +283,7 @@ export class AssetService {
      */
     public async save(metadata: IAssetMetadata): Promise<IAssetMetadata> {
         Guard.null(metadata);
-
+        console.log(`assetsService-test: ${JSON.stringify(metadata)}`);
         const fileName = `${metadata.asset.id}${constants.assetMetadataFileExtension}`;
 
         // Only save asset metadata if asset is in a tagged state

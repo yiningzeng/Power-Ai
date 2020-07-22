@@ -1,6 +1,6 @@
 {
     "name": "Power-Ai",
-    "version": "3.7.2",
+    "version": "3.8.1",
     "author": {
         "name": "宁波轻蜓视觉科技有限公司",
         "url": "https://github.com/yiningzeng/Power-Ai.git"
@@ -92,6 +92,7 @@
     "scripts": {
         "start": "nf start -p 3000",
         "build-first": "npm run build && npm run webpack:prod",
+        "build-win64": "electron-builder --win --x64",
         "build-win32-nsis": "electron-builder --win --ia32 nsis",
         "build-win64-nsis": "electron-builder --win --x64 nsis",
         "build-mac-dmg": "electron-builder --mac zip",

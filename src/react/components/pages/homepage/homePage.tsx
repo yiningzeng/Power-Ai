@@ -142,18 +142,17 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                                         onError={this.onProjectFileUploadError}/>
                         </li>
                         }
-                        {isElectron() &&
-                        <li>
-                            <a href="#" className="p-5 file-upload"
-                               onClick={() => this.filePicker.current.upload()}>
-                                <i className="fas fa-folder-open fa-9x"></i>
-                                <h6 style={{marginTop: "10px"}}>{strings.homePage.openLocalProject.title}</h6>
-                            </a>
-                            <FilePicker ref={this.filePicker}
-                                        onChange={this.onProjectFileUpload}
-                                        onError={this.onProjectFileUploadError}/>
-                        </li>
-                        }
+                        {/*{isElectron() &&*/}
+                        {/*<li>*/}
+                        {/*    <a href="#" className="p-5 file-upload"*/}
+                        {/*       onClick={() => this.filePicker.current.upload()}>*/}
+                        {/*        <i className="fas fa-folder-open fa-9x"></i>*/}
+                        {/*        <h6 style={{marginTop: "10px"}}>{strings.homePage.openLocalProject.title}</h6>*/}
+                        {/*    </a>*/}
+                        {/*    <FilePicker ref={this.filePicker}*/}
+                        {/*                onChange={this.onProjectFileUpload}*/}
+                        {/*                onError={this.onProjectFileUploadError}/>*/}
+                        {/*</li>*/}
                         {/*{isElectron() &&*/}
                         {/*<li>*/}
                             {/*<a href="#" className="p-5 file-upload"*/}
@@ -236,9 +235,14 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
         // this.filePicker.current.upload()
         const fileFolder = await this.localFileSystem.importTaggedContainer();
         // alert(JSON.stringify(this.props.project));
-        const idd = (fileFolder[0] + "").replace("\\", "/").lastIndexOf("/")
+        console.log(`homePage>openDir: fileFolder ${fileFolder}`);
+        if (!fileFolder) return;
+        const idd = normalizeSlashes(fileFolder[0]).lastIndexOf("/");
         // const randId = shortid.generate();
-        const folderName = (fileFolder[0] + "").substring(idd + 1);
+        console.log(`homePage>openDir: idd ${idd}`);
+        const folderName = normalizeSlashes(fileFolder[0]).substring(idd + 1);
+        console.log(`homePage>openDir: folderName ${folderName}`);
+        console.log(`homePage>openDir: normalizeSlashes(fileFolder[0]) ${normalizeSlashes(fileFolder[0])}`);
         const connection: IConnection = {
             id: folderName,
             name: folderName,

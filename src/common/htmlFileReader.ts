@@ -75,7 +75,6 @@ export default class HtmlFileReader {
      */
     public static async getAssetBlob(asset: IAsset): Promise<Blob> {
         Guard.null(asset);
-
         const config: AxiosRequestConfig = {
             responseType: "blob",
         };
