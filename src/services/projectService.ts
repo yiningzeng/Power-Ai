@@ -239,10 +239,10 @@ export default class ProjectService implements IProjectService {
             console.log(`导入素材->合并后项目的素材文件:${JSON.stringify(newAssets)}`);
             // 那么这里只能是做遍历了 增加素材了 可以看 MockFactory.createTestAsset
 
-            await importStorageProvider.writeText("aaaaa.json",
-                JSON.stringify(_.keyBy(newAssets, (asset) => asset.id), null, 4));
-            await importStorageProvider.writeText("aaaaa2.json",
-                JSON.stringify(_.keyBy(tempAssets, (asset) => asset.id), null, 4));
+            // await importStorageProvider.writeText("aaaaa.json",
+            //     JSON.stringify(_.keyBy(newAssets, (asset) => asset.id), null, 4));
+            // await importStorageProvider.writeText("aaaaa2.json",
+            //     JSON.stringify(_.keyBy(tempAssets, (asset) => asset.id), null, 4));
             // await storageProvider.writeText("bibibibibibibibibibibi.json",
             //     JSON.stringify(_.values(jsonImportProject.assets), null, 4));
             const updateProject: IProject = {
