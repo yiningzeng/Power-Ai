@@ -222,83 +222,86 @@ export default class TrainingSystem {
                 };
                 const c = new ftp();
                 c.on("ready", () => {
-                    c.put(tarPath, tarName, (err) => {
-                        if (err) {
-                            throw err;
-                        }
-                        c.end();
-                        console.log("上传成功");
-                        const packageInfo = {
-                            projectId: project.id,
-                            projectName: project.name,
-                            packageDir: tarBaseName,
-                            packageName: tarName,
-                        };
-                        const trainInfo = {
-                            projectId: project.id,
-                            projectName: project.name,
-                            assetsDir: tarBaseName,
-                            assetsType: project.exportFormat.providerType,
-                            ...project.trainFormat,
-                        };
-                        // http://www.squaremobius.net/amqp.node/channel_api.html api文档
-                        // rabbitmq
-                        const trainExchange = "ai.train.topic";
-                        const packageExchange = "ai.package.topic";
-                        const amqplib = require("amqplib")
-                            .connect(`amqp://baymin:baymin1024@${project.trainFormat.ip}:5672`);
-                        // Publisher
-                        amqplib.then((conn) => {
-                            return conn.createChannel();
-                        }).then((ch) => {
-                            ch.publish(packageExchange,
-                                `package.upload-done.${project.name}.${project.trainFormat.providerType}`,
-                                Buffer.from(JSON.stringify(packageInfo)));
-                            ch.publish(trainExchange,
-                                `train.start.${project.name}.${project.trainFormat.providerType}`,
-                                Buffer.from(JSON.stringify(trainInfo)));
-                            // ch.assertExchange(exchange, "topic").then(() => {
-                            //     console.log("creat Exchange success");
-                            // }).catch((err) => {
-                            //     console.log("creat Exchange failed");
-                            //     console.log(err);
+                    c.cwd("data", (er, curDir) => {
+                        console.log(`fucking cwd: ${curDir}`);
+                        c.put(tarPath, `${tarName}`, (err) => {
+                            if (err) {
+                                throw err;
+                            }
+                            c.end();
+                            console.log("上传成功");
+                            const packageInfo = {
+                                projectId: project.id,
+                                projectName: project.name,
+                                packageDir: tarBaseName,
+                                packageName: tarName,
+                            };
+                            const trainInfo = {
+                                projectId: project.id,
+                                projectName: project.name,
+                                assetsDir: tarBaseName,
+                                assetsType: project.exportFormat.providerType,
+                                ...project.trainFormat,
+                            };
+                            // http://www.squaremobius.net/amqp.node/channel_api.html api文档
+                            // rabbitmq
+                            const trainExchange = "ai.train.topic";
+                            const packageExchange = "ai.package.topic";
+                            const amqplib = require("amqplib")
+                                .connect(`amqp://baymin:baymin1024@${project.trainFormat.ip}:5672`);
+                            // Publisher
+                            amqplib.then((conn) => {
+                                return conn.createChannel();
+                            }).then((ch) => {
+                                ch.publish(packageExchange,
+                                    `package.upload-done.${project.name}.${project.trainFormat.providerType}`,
+                                    Buffer.from(JSON.stringify(packageInfo)));
+                                ch.publish(trainExchange,
+                                    `train.start.${project.name}.${project.trainFormat.providerType}`,
+                                    Buffer.from(JSON.stringify(trainInfo)));
+                                // ch.assertExchange(exchange, "topic").then(() => {
+                                //     console.log("creat Exchange success");
+                                // }).catch((err) => {
+                                //     console.log("creat Exchange failed");
+                                //     console.log(err);
+                                // });
+                                // return ch.assertQueue(q).then((ok) => {
+                                //     console.log(ok);
+                                //     ch.bindQueue(q, exchange, "train.start.#");
+                                //     // return ch.sendToQueue(q, Buffer.from("something to do"));
+                                // });
+                            }).catch(console.warn);
+
+                            // Consumer
+                            // amqplib.then((conn) => {
+                            //     return conn.createChannel();
+                            // }).then((ch) => {
+                            //     return ch.assertQueue(q).then((ok) => {
+                            //         return ch.consume(q, (msg) => {
+                            //             if (msg !== null) {
+                            //                 console.log(`get masg ${msg.content.toString()}`);
+                            //                 ch.ack(msg);
+                            //             }
+                            //         });
+                            //     });
+                            // }).catch(console.warn);
+
+                            // const form = new FormData();
+                            // form.append("username", "baymin");
+                            // form.append("password", "e10adc3949ba59abbe56e057f20f883e");
+                            // got("http://rest.yining.site:8080/api/v1/u2", {
+                            //     body: form,
+                            //     method: "POST",
+                            // }).then((response) => {
+                            //     console.log("进来了大爷");
+                            //     console.log(response.body);
+                            // }).catch((error) => {
+                            //     console.log("错误了");
+                            //     console.log(error.response.body);
                             // });
-                            // return ch.assertQueue(q).then((ok) => {
-                            //     console.log(ok);
-                            //     ch.bindQueue(q, exchange, "train.start.#");
-                            //     // return ch.sendToQueue(q, Buffer.from("something to do"));
-                            // });
-                        }).catch(console.warn);
 
-                        // Consumer
-                        // amqplib.then((conn) => {
-                        //     return conn.createChannel();
-                        // }).then((ch) => {
-                        //     return ch.assertQueue(q).then((ok) => {
-                        //         return ch.consume(q, (msg) => {
-                        //             if (msg !== null) {
-                        //                 console.log(`get masg ${msg.content.toString()}`);
-                        //                 ch.ack(msg);
-                        //             }
-                        //         });
-                        //     });
-                        // }).catch(console.warn);
-
-                        // const form = new FormData();
-                        // form.append("username", "baymin");
-                        // form.append("password", "e10adc3949ba59abbe56e057f20f883e");
-                        // got("http://rest.yining.site:8080/api/v1/u2", {
-                        //     body: form,
-                        //     method: "POST",
-                        // }).then((response) => {
-                        //     console.log("进来了大爷");
-                        //     console.log(response.body);
-                        // }).catch((error) => {
-                        //     console.log("错误了");
-                        //     console.log(error.response.body);
-                        // });
-
-                    });
+                        });
+                        });
                 });
                 // connect to localhost:21 as anonymous
                 c.connect(config);
@@ -387,7 +390,7 @@ export default class TrainingSystem {
             // @ts-ignore
             day = (day < 10 ? "0" + day : day);
             const date = `${myDate.getFullYear()}${month.toString()}${day.toString()}`; // 获取当前时间比如 20190808
-            const tarBaseName = `train-assets-${project.name}-${project.trainFormat.providerType}-${date}`; // 组合tar的基本名
+            const tarBaseName = `${date}-auto-${project.name}-${project.trainFormat.providerType}`;
             const tarName = `${tarBaseName}.tar`;
             // tar路径
             const tarPath = path.normalize(`${sourcePath}/${tarName}`);
@@ -623,76 +626,76 @@ export default class TrainingSystem {
         });
     }
 
-    public opencvTest() {
-
-
-        console.log("进来了");
-        Promise.all([
-            import("/home/baymin/daily-work/Power-Ai/node_modules/react-split-pane"),
-        ]).then(([SplitPane]) => {
-            console.log("asdsdsdsdsdsd");
-            console.log(SplitPane);
-            console.log("asdsdsdsdsdsd");
-            // const minBboxsNotP = [];
-            // minBboxsNotP.push([123, 234]);
-            // minBboxsNotP.push([224, 255]);
-            // minBboxsNotP.push([455, 90]);
-            // minBboxsNotP.push([88, 90]);
-            // const bboxs = findBounds(minBboxsNotP);
-            // console.log("\n=============================\n");
-            // console.log(`变变变${JSON.stringify(bboxs)}`);
-            // console.log("\n=============================\n");
-            /* CODE HERE*/
-        }).catch((e) => {
-            console.log(e);
-        });
-        // region 插件库
-        // Promise.all([
-        //     import("/home/baymin/daily-work/Power-Ai/node_modules/getboundingbox"),
-        // ]).then(([fuck]) => {
-        //     const minBboxsNotP = [];
-        //     minBboxsNotP.push([123, 234]);
-        //     minBboxsNotP.push([224, 255]);
-        //     minBboxsNotP.push([455, 90]);
-        //     minBboxsNotP.push([88, 90]);
-        //     const bboxs = fuck.bb(minBboxsNotP);
-        //     console.log("\n=============================\n");
-        //     console.log(`变变变${JSON.stringify(bboxs)}`);
-        //     console.log("\n=============================\n");
-        //     /* CODE HERE*/
-        // }).catch((e) => {
-        //     console.log(e);
-        // });
-        //
-        // Promise.all([
-        //     import("/home/baymin/daily-work/Power-Ai/node_modules/getboundingbox"),
-        // ]).then(([fuck]) => {
-        //     const minBboxsNotP = [];
-        //     minBboxsNotP.push([123, 234]);
-        //     minBboxsNotP.push([224, 255]);
-        //     minBboxsNotP.push([455, 90]);
-        //     minBboxsNotP.push([88, 90]);
-        //     const bboxs = fuck.cc(minBboxsNotP);
-        //     console.log("\n=============================\n");
-        //     console.log(`变变变${JSON.stringify(bboxs)}`);
-        //     console.log("\n=============================\n");
-        //     /* CODE HERE*/
-        // }).catch((e) => {
-        //     console.log(e);
-        // });
-        // endregion 插件库
-
-        // hddserial.first((err, serial) => {
-        //     console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaahdd serial for first hdd : %s", serial);
-        // });
-        // const mat = cv.imread("/home/baymin/图片/1964668478.jpg");
-        // cv.imwrite("/home/baymin/图片/opencv4nodejs.jpg", mat);
-        // cv.imshow("a window name", mat);
-        // cv.waitKey();
-        // const mat = cv.imread("/home/baymin/图片/1964668478.jpg");
-        // cv.imshow("a window name", mat);
-        // cv.waitKey();
-    }
+    // public opencvTest() {
+    //
+    //
+    //     console.log("进来了");
+    //     Promise.all([
+    //         import("/home/baymin/daily-work/Power-Ai/node_modules/react-split-pane"),
+    //     ]).then(([SplitPane]) => {
+    //         console.log("asdsdsdsdsdsd");
+    //         console.log(SplitPane);
+    //         console.log("asdsdsdsdsdsd");
+    //         // const minBboxsNotP = [];
+    //         // minBboxsNotP.push([123, 234]);
+    //         // minBboxsNotP.push([224, 255]);
+    //         // minBboxsNotP.push([455, 90]);
+    //         // minBboxsNotP.push([88, 90]);
+    //         // const bboxs = findBounds(minBboxsNotP);
+    //         // console.log("\n=============================\n");
+    //         // console.log(`变变变${JSON.stringify(bboxs)}`);
+    //         // console.log("\n=============================\n");
+    //         /* CODE HERE*/
+    //     }).catch((e) => {
+    //         console.log(e);
+    //     });
+    //     // region 插件库
+    //     // Promise.all([
+    //     //     import("/home/baymin/daily-work/Power-Ai/node_modules/getboundingbox"),
+    //     // ]).then(([fuck]) => {
+    //     //     const minBboxsNotP = [];
+    //     //     minBboxsNotP.push([123, 234]);
+    //     //     minBboxsNotP.push([224, 255]);
+    //     //     minBboxsNotP.push([455, 90]);
+    //     //     minBboxsNotP.push([88, 90]);
+    //     //     const bboxs = fuck.bb(minBboxsNotP);
+    //     //     console.log("\n=============================\n");
+    //     //     console.log(`变变变${JSON.stringify(bboxs)}`);
+    //     //     console.log("\n=============================\n");
+    //     //     /* CODE HERE*/
+    //     // }).catch((e) => {
+    //     //     console.log(e);
+    //     // });
+    //     //
+    //     // Promise.all([
+    //     //     import("/home/baymin/daily-work/Power-Ai/node_modules/getboundingbox"),
+    //     // ]).then(([fuck]) => {
+    //     //     const minBboxsNotP = [];
+    //     //     minBboxsNotP.push([123, 234]);
+    //     //     minBboxsNotP.push([224, 255]);
+    //     //     minBboxsNotP.push([455, 90]);
+    //     //     minBboxsNotP.push([88, 90]);
+    //     //     const bboxs = fuck.cc(minBboxsNotP);
+    //     //     console.log("\n=============================\n");
+    //     //     console.log(`变变变${JSON.stringify(bboxs)}`);
+    //     //     console.log("\n=============================\n");
+    //     //     /* CODE HERE*/
+    //     // }).catch((e) => {
+    //     //     console.log(e);
+    //     // });
+    //     // endregion 插件库
+    //
+    //     // hddserial.first((err, serial) => {
+    //     //     console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaahdd serial for first hdd : %s", serial);
+    //     // });
+    //     // const mat = cv.imread("/home/baymin/图片/1964668478.jpg");
+    //     // cv.imwrite("/home/baymin/图片/opencv4nodejs.jpg", mat);
+    //     // cv.imshow("a window name", mat);
+    //     // cv.waitKey();
+    //     // const mat = cv.imread("/home/baymin/图片/1964668478.jpg");
+    //     // cv.imshow("a window name", mat);
+    //     // cv.waitKey();
+    // }
     /**
      * Gets the node file system stats for the specified path
      * @param  {string} path

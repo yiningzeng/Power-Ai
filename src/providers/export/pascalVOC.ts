@@ -17,6 +17,7 @@ interface IObjectInfo {
 }
 
 interface IImageInfo {
+    idFileName: string;
     width: number;
     height: number;
     objects: IObjectInfo[];
@@ -38,6 +39,7 @@ export interface IPascalVOCExportProviderOptions extends IExportProviderOptions 
  */
 export class PascalVOCExportProvider extends ExportProvider<IPascalVOCExportProviderOptions> {
     private imagesInfo = new Map<string, IImageInfo>();
+    private idd: number = 0;
 
     constructor(project: IProject, options: IPascalVOCExportProviderOptions) {
         super(project, options);
@@ -86,19 +88,17 @@ export class PascalVOCExportProvider extends ExportProvider<IPascalVOCExportProv
         try {
             const arrayBuffer = await HtmlFileReader.getAssetArray(assetMetadata.asset);
             const buffer = Buffer.from(arrayBuffer);
-            const imageFileName = `${jpegImagesFolderName}/${assetMetadata.asset.name}`;
-
-            // Write Binary
-            await this.storageProvider.writeBinary(imageFileName, buffer);
-
             // Get Array of all Box shaped tag for the Asset
             const tagObjects = this.getAssetTagArray(assetMetadata);
-
             const imageInfo: IImageInfo = {
+                idFileName: `${(this.idd++).toString()}.${assetMetadata.asset.format}`,
                 width: assetMetadata.asset.size ? assetMetadata.asset.size.width : 0,
                 height: assetMetadata.asset.size ? assetMetadata.asset.size.height : 0,
                 objects: tagObjects,
             };
+            const imageFileName = `${jpegImagesFolderName}/${imageInfo.idFileName}`;
+            // Write Binary
+            await this.storageProvider.writeBinary(imageFileName, buffer);
 
             this.imagesInfo.set(assetMetadata.asset.name, imageInfo);
 
@@ -185,7 +185,7 @@ export class PascalVOCExportProvider extends ExportProvider<IPascalVOCExportProv
         try {
             // Save Annotations
             await this.imagesInfo.forEachAsync(async (imageInfo, imageName) => {
-                const imageFilePath = `${annotationsFolderName}/${imageName}`;
+                const imageFilePath = `${annotationsFolderName}/${imageInfo.idFileName}`;
                 const assetFilePath = `${imageFilePath.substr(0, imageFilePath.lastIndexOf("."))
                     || imageFilePath}.xml`;
 
@@ -202,7 +202,8 @@ export class PascalVOCExportProvider extends ExportProvider<IPascalVOCExportProv
                 });
 
                 const params = {
-                    fileName: imageName,
+                    fileName: imageInfo.idFileName,
+                    originalFileName: imageName,
                     filePath: imageFilePath,
                     width: imageInfo.width.toString(),
                     height: imageInfo.height.toString(),
@@ -266,10 +267,11 @@ export class PascalVOCExportProvider extends ExportProvider<IPascalVOCExportProv
             const positiveAssetList = [];
             const negativeAssetsList = [];
             assetUsage.forEach((tags, assetName) => {
-                const indexOf = assetName.lastIndexOf(".");
-                let name = assetName;
+                const imageInfo = this.imagesInfo.get(assetName);
+                const indexOf = imageInfo.idFileName.lastIndexOf(".");
+                let name = imageInfo.idFileName;
                 if (indexOf !== -1) {
-                    name = assetName.substring(0, indexOf);
+                    name = imageInfo.idFileName.substring(0, indexOf);
                 }
                 if (tags.has(tag.name)) {
                     assetList.push(`${name} 1`);

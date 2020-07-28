@@ -97,13 +97,13 @@
 
     &:hover {
       position: relative;
-      background-color: $lighter-3;
+      background-color: $lighter-5;
       cursor: pointer;
     }
 
     &.selected {
       color: #fff;
-      background-color: $lighter-4;
+      background-color: $color-yellow2;
       font-weight: 600;
     }
 

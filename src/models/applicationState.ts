@@ -1,6 +1,79 @@
 import { ExportAssetState } from "../providers/export/exportProvider";
-import {IYoloV3, IDetectron} from "./trainConfig";
+import {IYoloV3, IDetectron, IYoloV3Net, NetModelType} from "./trainConfig";
 import { IAssetPreviewSettings } from "../react/components/common/assetPreview/assetPreview";
+
+/**
+ * @name - Model Path Type
+ * @description - Defines the mechanism to load the TF.js model for Active Learning
+ * @member Coco - Specifies the default/generic pre-trained Coco-SSD model
+ * @member File - Specifies to load a custom model from filesystem
+ * @member Url - Specifies to load a custom model from a web server
+ */
+export enum ModelPathType {
+    Coco = "coco",
+    File = "file",
+    Url = "url",
+}
+
+export const DefaultActiveLearningSettings: IActiveLearningSettings = {
+    modelPath: "",
+    modelUrl: "",
+    autoDetect: false,
+    predictTag: false,
+    modelPathType: ModelPathType.Coco,
+};
+
+export const DefaultYolov3Net: IYoloV3Net = {
+    batch: 64,
+    subdivisions: 32,
+    width: 608,
+    height: 608,
+    channels: 3,
+    momentum: 1,
+    decay: 0.0005,
+    angle: 360,
+    saturation: 1.5,
+    exposure: 1.5,
+    hue: 0.1,
+    learning_rate: 0.00025,
+    burn_in: 4000,
+    max_batches: 100000,
+    policy: "steps",
+    steps: "80000,90000",
+    scales: ".1,.1",
+};
+
+export const DefaultYoloV3: IYoloV3 = {
+    gpu_numb: 4,
+    yolov3net: DefaultYolov3Net,
+};
+
+export const DefaultFastrcnn: IDetectron = {
+    detectron: {
+        netModelType: NetModelType.FasterRcnn,
+        layerNumbEnum: "50",
+        gpuNumb: 1,
+        fpn: true,
+        augument: true,
+        multiScale: true,
+        useFlipped: false,
+    },
+};
+
+export const DefaultTrainOptions: ITrainFormat = {
+    ip: "localhost",
+    providerType: "yolov3", // 这里需要改掉
+    providerOptions: DefaultYoloV3,
+};
+
+export const DefaultExportOptions: IExportFormat = {
+    providerType: "pascalVOC",
+    providerOptions: {
+        assetState: ExportAssetState.Tagged,
+        testTrainSplit: 100,
+        exportUnassigned: false,
+    },
+};
 
 /**
  * @name - Application State
@@ -269,19 +342,6 @@ export interface IProjectVideoSettings {
 }
 
 /**
- * @name - Model Path Type
- * @description - Defines the mechanism to load the TF.js model for Active Learning
- * @member Coco - Specifies the default/generic pre-trained Coco-SSD model
- * @member File - Specifies to load a custom model from filesystem
- * @member Url - Specifies to load a custom model from a web server
- */
-export enum ModelPathType {
-    Coco = "coco",
-    File = "file",
-    Url = "url",
-}
-
-/**
  * Properties for additional project settings
  * @member activeLearningSettings - Active Learning settings
  */
@@ -324,6 +384,11 @@ export interface IAssetVideoSettings {
     shouldAutoPlayVideo: boolean;
     posterSource: string;
     shouldShowPlayControls: boolean;
+}
+
+export interface IAssetsAndTags {
+    assets: IAsset[];
+    tags: ITag[];
 }
 
 /**

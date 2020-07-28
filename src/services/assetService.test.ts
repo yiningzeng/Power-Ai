@@ -101,6 +101,7 @@ describe("Asset Service", () => {
         beforeEach(() => {
             assetProviderMock = {
                 getAssets: () => Promise.resolve(testAssets),
+                getAssetsFirst: () => Promise.resolve(testAssets),
             };
 
             storageProviderMock = {
@@ -224,6 +225,7 @@ describe("Asset Service", () => {
         beforeEach(() => {
             assetProviderMock = {
                 getAssets: () => Promise.resolve(testAssets),
+                getAssetsFirst: () => Promise.resolve(testAssets),
             };
 
             storageProviderMock = {
@@ -268,6 +270,7 @@ describe("Asset Service", () => {
         beforeEach(() => {
             assetProviderMock = {
                 getAssets: () => Promise.resolve([testAsset]),
+                getAssetsFirst: () => Promise.resolve([testAsset]),
             };
 
             storageProviderMock = {

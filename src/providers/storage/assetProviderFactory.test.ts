@@ -28,4 +28,7 @@ class TestAssetProvider implements IAssetProvider {
     public getAssets(containerName?: string): Promise<IAsset[]> {
         throw new Error("Method not implemented.");
     }
+    public getAssetsFirst(containerName?: string): Promise<IAsset[]> {
+        throw new Error("Method not implemented.");
+    }
 }

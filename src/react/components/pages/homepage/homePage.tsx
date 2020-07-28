@@ -1,3 +1,4 @@
+import _ from "lodash";
 import React, { SyntheticEvent } from "react";
 import { connect } from "react-redux";
 import { RouteComponentProps } from "react-router-dom";
@@ -13,8 +14,19 @@ import "./homePage.scss";
 import RecentProjectItem from "./recentProjectItem";
 import { constants } from "../../../../common/constants";
 import {
-    IApplicationState, IConnection, IProject, IFileInfo,
-    ErrorCode, AppError, IAppError, IAppSettings, IAsset, IProviderOptions,
+    IApplicationState,
+    IConnection,
+    IProject,
+    IFileInfo,
+    ErrorCode,
+    AppError,
+    IAppError,
+    IAppSettings,
+    IAsset,
+    IProviderOptions,
+    IExportFormat,
+    IExportProviderOptions,
+    ISecureString, DefaultActiveLearningSettings, DefaultExportOptions, DefaultTrainOptions, ModelPathType,
 } from "../../../../models/applicationState";
 import ImportService from "../../../../services/importService";
 import { IAssetMetadata } from "../../../../models/applicationState";
@@ -25,6 +37,12 @@ import { isElectron } from "../../../../common/hostProcess";
 import {ILocalFileSystemProxyOptions, LocalFileSystemProxy} from "../../../../providers/storage/localFileSystemProxy";
 import * as connectionActions from "../../../../redux/actions/connectionActions";
 import trainService from "../../../../services/trainService";
+import {normalizeSlashes, randomIntInRange} from "../../../../common/utils";
+import shortid from "shortid";
+import {ExportAssetState} from "../../../../providers/export/exportProvider";
+import {appInfo} from "../../../../common/appInfo";
+// tslint:disable-next-line:no-var-requires
+const tagColors = require("../../common/tagColors.json");
 
 export interface IHomePageProps extends RouteComponentProps, React.Props<HomePage> {
     recentProjects: IProject[];
@@ -60,7 +78,7 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
     public state: IHomePageState = {
         cloudPickerOpen: false,
     };
-
+    private localFileSystem: LocalFileSystemProxy;
     private filePicker: React.RefObject<FilePicker> = React.createRef();
     private deleteConfirm: React.RefObject<Confirm> = React.createRef();
     private cloudFilePicker: React.RefObject<CloudFilePicker> = React.createRef();
@@ -68,6 +86,7 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
 
     constructor(props, context) {
         super(props, context);
+        this.localFileSystem = new LocalFileSystemProxy();
         // 试用版本使用这个
         // if (this.props.appSettings.zengyining === undefined || this.props.appSettings.zengyining === null) {
         //     toast.warn("您当前处于试用权限，有些功能会受限制", { autoClose: false });
@@ -105,24 +124,36 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
             <div className="app-homepage">
                 <div className="app-homepage-main">
                     <ul>
-                        <li>
-                            <a href="#" onClick={this.createNewProject} className="p-5 new-project">
-                                <i className="fas fa-plus-circle fa-9x"></i>
-                                <h6 style={{marginTop: "10px"}}>{strings.homePage.newProject}</h6>
-                            </a>
-                        </li>
-                        {isElectron() &&
-                        <li>
-                            <a href="#" className="p-5 file-upload"
-                               onClick={() => this.filePicker.current.upload()}>
-                                <i className="fas fa-folder-open fa-9x"></i>
-                                <h6 style={{marginTop: "10px"}}>{strings.homePage.openLocalProject.title}</h6>
-                            </a>
-                            <FilePicker ref={this.filePicker}
-                                        onChange={this.onProjectFileUpload}
-                                        onError={this.onProjectFileUploadError}/>
-                        </li>
+                        {/*<li>*/}
+                        {/*    <a href="#" onClick={this.createNewProject} className="p-5 new-project">*/}
+                        {/*        <i className="fas fa-plus-circle fa-9x"></i>*/}
+                        {/*        <h6 style={{marginTop: "10px"}}>{strings.homePage.newProject}</h6>*/}
+                        {/*    </a>*/}
+                        {/*</li>*/}
+                        {
+                            isElectron() &&
+                            <li>
+                                <a href="#" className="p-5 file-upload"
+                                   onClick={this.onOpenDirectory}>
+                                    <i className="fas fa-folder-open fa-9x"></i>
+                                    <h6 style={{marginTop: "10px"}}>{strings.homePage.openLocalProject.title}</h6>
+                                </a>
+                                <FilePicker ref={this.filePicker}
+                                            onChange={this.onProjectFileUpload}
+                                            onError={this.onProjectFileUploadError}/>
+                            </li>
                         }
+                        {/*{isElectron() &&*/}
+                        {/*<li>*/}
+                        {/*    <a href="#" className="p-5 file-upload"*/}
+                        {/*       onClick={() => this.filePicker.current.upload()}>*/}
+                        {/*        <i className="fas fa-folder-open fa-9x"></i>*/}
+                        {/*        <h6 style={{marginTop: "10px"}}>{strings.homePage.openLocalProject.title}</h6>*/}
+                        {/*    </a>*/}
+                        {/*    <FilePicker ref={this.filePicker}*/}
+                        {/*                onChange={this.onProjectFileUpload}*/}
+                        {/*                onError={this.onProjectFileUploadError}/>*/}
+                        {/*</li>*/}
                         {/*{isElectron() &&*/}
                         {/*<li>*/}
                             {/*<a href="#" className="p-5 file-upload"*/}
@@ -201,11 +232,68 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
         this.cloudFilePicker.current.open();
     }
 
+    private  onOpenDirectory = async () => {
+        // this.filePicker.current.upload()
+        const fileFolder = await this.localFileSystem.importTaggedContainer();
+        // alert(JSON.stringify(this.props.project));
+        console.log(`homePage>openDir: fileFolder ${fileFolder}`);
+        if (!fileFolder) return;
+        const idd = normalizeSlashes(fileFolder[0]).lastIndexOf("/");
+        // const randId = shortid.generate();
+        console.log(`homePage>openDir: idd ${idd}`);
+        const folderName = normalizeSlashes(fileFolder[0]).substring(idd + 1);
+        console.log(`homePage>openDir: folderName ${folderName}`);
+        console.log(`homePage>openDir: normalizeSlashes(fileFolder[0]) ${normalizeSlashes(fileFolder[0])}`);
+        const connection: IConnection = {
+            id: folderName,
+            name: folderName,
+            providerType: "localFileSystemProxy",
+            providerOptions: {
+                folderPath: normalizeSlashes(fileFolder[0]),
+            },
+            providerOptionsOthers: [{
+                folderPath: normalizeSlashes(fileFolder[0]),
+            }],
+        };
+        let projectJson: IProject = {
+            id: folderName,
+            name: folderName,
+            version: "3.0.0",
+            activeLearningSettings: DefaultActiveLearningSettings,
+            autoSave: true,
+            exportFormat: DefaultExportOptions,
+            securityToken: folderName,
+            sourceConnection: connection,
+            sourceListConnection: [],
+            tags: [],
+            targetConnection: connection,
+            trainFormat: DefaultTrainOptions,
+            videoSettings: { frameExtractionRate: 15 },
+            assets: {},
+        };
+        const dataTemp = await this.props.actions.loadAssetsWithFolderAndTags(projectJson, fileFolder[0]);
+        const rootProjectAssets = _.values(projectJson.assets)
+            .filter((asset) => !asset.parent);
+        const rootAssets = _(rootProjectAssets)
+            .concat(dataTemp.assets)
+            .uniqBy((asset) => asset.id)
+            .value();
+        projectJson = {
+            ...projectJson,
+            assets: _.keyBy(rootAssets, (asset) => asset.id),
+            tags: dataTemp.tags,
+        };
+        console.log(`homePage: ${JSON.stringify(projectJson)}`);
+        connectionActions.saveConnection(connection);
+        await this.loadSelectedProject(projectJson);
+    }
+
     private onProjectFileUpload = async (e, project) => {
         if (this.afterDeadLine()) {return; }
         let projectJson: IProject;
         try {
             projectJson = JSON.parse(project.content);
+            // alert(JSON.stringify(project.content));
         } catch (error) {
             throw new AppError(ErrorCode.ProjectInvalidJson, "Error parsing JSON");
         }

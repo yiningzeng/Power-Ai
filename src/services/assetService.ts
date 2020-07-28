@@ -3,25 +3,33 @@ import _ from "lodash";
 import * as shortid from "shortid";
 import Guard from "../common/guard";
 import {
-    IAsset, AssetType, IProject, IAssetMetadata, AssetState,
-    IRegion, RegionType, ITFRecordMetadata,
+    AssetState,
+    AssetType,
+    IAsset,
+    IAssetMetadata,
+    IAssetsAndTags,
+    IProject,
+    IRegion,
+    ITag,
+    ITFRecordMetadata,
+    RegionType,
 } from "../models/applicationState";
-import { AssetProviderFactory, IAssetProvider } from "../providers/storage/assetProviderFactory";
-import { StorageProviderFactory, IStorageProvider } from "../providers/storage/storageProviderFactory";
-import { constants } from "../common/constants";
+import {AssetProviderFactory, IAssetProvider} from "../providers/storage/assetProviderFactory";
+import {IStorageProvider, StorageProviderFactory} from "../providers/storage/storageProviderFactory";
+import {constants} from "../common/constants";
 import HtmlFileReader from "../common/htmlFileReader";
-import { TFRecordsReader } from "../providers/export/tensorFlowRecords/tensorFlowReader";
-import { FeatureType } from "../providers/export/tensorFlowRecords/tensorFlowBuilder";
-import { appInfo } from "../common/appInfo";
-import { encodeFileURI } from "../common/utils";
+import {TFRecordsReader} from "../providers/export/tensorFlowRecords/tensorFlowReader";
+import {FeatureType} from "../providers/export/tensorFlowRecords/tensorFlowBuilder";
+import {appInfo} from "../common/appInfo";
+import {encodeFileURI, randomIntInRange} from "../common/utils";
 import {LocalFileSystemProxy} from "../providers/storage/localFileSystemProxy";
-
+// tslint:disable-next-line:no-var-requires
+const tagColors = require("../react/components/common/tagColors.json");
 /**
  * @name - Asset Service
  * @description - Functions for dealing with project assets
  */
 export class AssetService {
-
     /**
      * Create IAsset from filePath
      * @param filePath - filepath of asset
@@ -47,16 +55,13 @@ export class AssetService {
         // fileNameParts[1] = "mp4"
         // fileNameParts[2] = "t=5"
         fileName = fileName || pathParts[pathParts.length - 1];
-        const fileNameParts = fileName.split(".");
-        const extensionParts = fileNameParts[fileNameParts.length - 1].split(/[\?#]/);
-        const assetFormat = extensionParts[0];
-
-        const assetType = this.getAssetType(assetFormat);
-
+        const fileNameParts = fileName.substring(0, fileName.lastIndexOf("."));
+        const extensionParts = fileName.substr(fileName.lastIndexOf(".") + 1);
+        const assetType = this.getAssetType(extensionParts);
         return {
             // id: md5Hash,
-            id: decodeURI(fileNameParts[0]),
-            format: assetFormat,
+            id: decodeURI(fileNameParts),
+            format: extensionParts,
             state: AssetState.NotVisited,
             type: assetType,
             name: fileName,
@@ -124,7 +129,6 @@ export class AssetService {
                 this.project.targetConnection.providerOptions,
             );
         }
-
         return this.storageProviderInstance;
     }
 
@@ -147,7 +151,102 @@ export class AssetService {
                 },
             );
         }
-        return await this.assetProviderInstance.getAssets();
+        const assets = await this.assetProviderInstance.getAssets();
+        const updates = await assets.mapAsync(async (asset) => {
+            const assetMetadata = await this.getAssetMetadata(asset);
+            if (assetMetadata.asset) {
+                return {
+                    ...asset,
+                    size: assetMetadata.asset.size,
+                    state: assetMetadata.asset.state,
+                    tags: assetMetadata.asset.tags,
+                };
+            } else {
+                return asset;
+            }
+        });
+        return updates;
+    }
+
+    public getNextColor = (tags) => {
+        if (tags.length > 0) {
+            const lastColor = tags[tags.length - 1].color;
+            const lastIndex = tagColors.findIndex((color) => color === lastColor);
+            let newIndex;
+            if (lastIndex > -1) {
+                newIndex = (lastIndex + 1) % tagColors.length;
+            } else {
+                newIndex = randomIntInRange(0, tagColors.length - 1);
+            }
+            return tagColors[newIndex];
+        } else {
+            return tagColors[0];
+        }
+    }
+
+    public async getAssetsWithFolderMain(folder): Promise<IAssetsAndTags> {
+        if (!this.assetProviderInstance) {
+            this.assetProviderInstance = AssetProviderFactory.create(
+                "localFileSystemProxy",
+                {
+                    folderPath: folder,
+                },
+            );
+        }
+        let res: IAssetsAndTags;
+        let taggs = [];
+        const assets = await this.assetProviderInstance.getAssets();
+
+        const updates = await assets.mapAsync(async (asset) => {
+            const assetMetadata = await this.getAssetMetadata(asset);
+            console.log(`fuck your son: assetService22 ${JSON.stringify(assetMetadata.asset)}`);
+            if (assetMetadata.asset) {
+                if (assetMetadata.asset.tags) {
+                    if (assetMetadata.asset.tags.indexOf(",") > 0) {
+                        taggs = taggs.concat(assetMetadata.asset.tags.split(","));
+                    } else {
+                        taggs.push(assetMetadata.asset.tags);
+                    }
+                }
+                const newAsset = {
+                    ...asset,
+                    path: `file:${folder}/${asset.name}`,
+                    size: assetMetadata.asset.size,
+                    state: assetMetadata.asset.state,
+                    tags: assetMetadata.asset.tags,
+                };
+                this.save({
+                    ...assetMetadata,
+                    asset: newAsset,
+                });
+                return newAsset;
+            } else {
+                const newAsset = {
+                    ...asset,
+                    path: `file:${folder}/${asset.name}`,
+                };
+                this.save({
+                    ...assetMetadata,
+                    asset: newAsset,
+                });
+                return newAsset;
+            }
+        });
+        const finalAssets = updates.sort((a1, a2) => a1.state > a2.state ? -1 : 1);
+        taggs = [...new Set(taggs)].sort(); // 去重然后排序 用于标签搜索
+        const finalTags = [];
+        taggs.map((val) => {
+            const newTag: ITag = {
+                name: val,
+                color: this.getNextColor(finalTags),
+            };
+            finalTags.push(newTag);
+        });
+        res = {
+            assets: finalAssets,
+            tags: finalTags,
+        };
+        return res;
     }
 
     /**
@@ -188,12 +287,14 @@ export class AssetService {
      */
     public async save(metadata: IAssetMetadata): Promise<IAssetMetadata> {
         Guard.null(metadata);
-
+        console.log(`assetsService-test: ${JSON.stringify(metadata)}`);
         const fileName = `${metadata.asset.id}${constants.assetMetadataFileExtension}`;
 
         // Only save asset metadata if asset is in a tagged state
         // Otherwise primary asset information is already persisted in the project file.
-        if (metadata.asset.state === AssetState.Tagged) {
+        if (metadata.asset.state === AssetState.Tagged ||
+            metadata.asset.state === AssetState.OkTagged ||
+            metadata.asset.state === AssetState.Visited) {
             await this.storageProvider.writeText(fileName, JSON.stringify(metadata, null, 4));
         } else {
             // If the asset is no longer tagged, then it doesn't contain any regions
@@ -215,6 +316,7 @@ export class AssetService {
         Guard.null(asset);
 
         const fileName = `${asset.id}${constants.assetMetadataFileExtension}`;
+        console.log(`assets_map: ${fileName}:`);
         try {
             const json = await this.storageProvider.readText(fileName);
             return JSON.parse(json) as IAssetMetadata;

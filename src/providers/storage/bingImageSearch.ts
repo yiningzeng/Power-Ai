@@ -61,4 +61,26 @@ export class BingImageSearch implements IAssetProvider {
             .map((filePath) => AssetService.createAssetFromFilePath(filePath))
             .filter((asset) => asset.type !== AssetType.Unknown);
     }
+
+    public async getAssetsFirst(): Promise<IAsset[]> {
+        const query = {
+            q: this.options.query,
+            aspect: this.options.aspectRatio,
+        };
+
+        const url = `${BingImageSearch.SEARCH_URL}?${createQueryString(query)}`;
+
+        const response = await axios.get(url, {
+            headers: {
+                "Ocp-Apim-Subscription-Key": this.options.apiKey,
+                "Accept": "application/json",
+            },
+        });
+
+        const items = response.data.value.map((item) => item.contentUrl);
+
+        return items
+            .map((filePath) => AssetService.createAssetFromFilePath(filePath))
+            .filter((asset) => asset.type !== AssetType.Unknown);
+    }
 }

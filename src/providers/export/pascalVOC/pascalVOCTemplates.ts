@@ -8,6 +8,7 @@ export const annotationTemplate = "\
 <annotation verified=\"yes\">\n\
     <folder>Annotation</folder>\n\
     <filename>${fileName}</filename>\n\
+    <original>${originalFileName}</original>\n\
     <path>${filePath}</path>\n\
     <source>\n\
         <database>Unknown</database>\n\
