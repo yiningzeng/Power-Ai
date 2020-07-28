@@ -130,17 +130,18 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                         {/*        <h6 style={{marginTop: "10px"}}>{strings.homePage.newProject}</h6>*/}
                         {/*    </a>*/}
                         {/*</li>*/}
-                        {isElectron() &&
-                        <li>
-                            <a href="#" className="p-5 file-upload"
-                               onClick={this.onOpenDirectory}>
-                                <i className="fas fa-folder-open fa-9x"></i>
-                                <h6 style={{marginTop: "10px"}}>{strings.homePage.openLocalProject.title}</h6>
-                            </a>
-                            <FilePicker ref={this.filePicker}
-                                        onChange={this.onProjectFileUpload}
-                                        onError={this.onProjectFileUploadError}/>
-                        </li>
+                        {
+                            isElectron() &&
+                            <li>
+                                <a href="#" className="p-5 file-upload"
+                                   onClick={this.onOpenDirectory}>
+                                    <i className="fas fa-folder-open fa-9x"></i>
+                                    <h6 style={{marginTop: "10px"}}>{strings.homePage.openLocalProject.title}</h6>
+                                </a>
+                                <FilePicker ref={this.filePicker}
+                                            onChange={this.onProjectFileUpload}
+                                            onError={this.onProjectFileUploadError}/>
+                            </li>
                         }
                         {/*{isElectron() &&*/}
                         {/*<li>*/}
@@ -292,7 +293,7 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
         let projectJson: IProject;
         try {
             projectJson = JSON.parse(project.content);
-            alert(JSON.stringify(project.content));
+            // alert(JSON.stringify(project.content));
         } catch (error) {
             throw new AppError(ErrorCode.ProjectInvalidJson, "Error parsing JSON");
         }
