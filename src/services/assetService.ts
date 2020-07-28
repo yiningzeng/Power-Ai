@@ -232,6 +232,7 @@ export class AssetService {
                 return newAsset;
             }
         });
+        const finalAssets = updates.sort((a1, a2) => a1.state > a2.state ? -1 : 1);
         taggs = [...new Set(taggs)].sort(); // 去重然后排序 用于标签搜索
         const finalTags = [];
         taggs.map((val) => {
@@ -242,7 +243,7 @@ export class AssetService {
             finalTags.push(newTag);
         });
         res = {
-            assets: updates,
+            assets: finalAssets,
             tags: finalTags,
         };
         return res;
