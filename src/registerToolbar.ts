@@ -57,7 +57,7 @@ export default function registerToolbar() {
         icon: "fas fa-hand-rock",
         group: ToolbarItemGroup.Canvas,
         type: ToolbarItemType.State,
-        accelerators: ["V", "v"],
+        accelerators: ["Z", "z"],
     });
 
     ToolbarItemFactory.register({
@@ -66,7 +66,7 @@ export default function registerToolbar() {
         icon: "fa-vector-square",
         group: ToolbarItemGroup.Canvas,
         type: ToolbarItemType.State,
-        accelerators: ["R", "r"],
+        accelerators: ["X", "x"],
     });
     // ToolbarItemFactory.register({
     //     name: ToolbarItemName.DrawWithPencil,
@@ -189,7 +189,7 @@ export default function registerToolbar() {
         icon: "fa-expand",
         group: ToolbarItemGroup.Zoom,
         type: ToolbarItemType.Action,
-        accelerators: ["U", "u"],
+        accelerators: ["C", "c"],
     });
 
     ToolbarItemFactory.register({
@@ -216,7 +216,7 @@ export default function registerToolbar() {
         icon: "fa-trash-alt",
         group: ToolbarItemGroup.Navigation,
         type: ToolbarItemType.Action,
-        accelerators: ["CmdOrCtrl+D", "CmdOrCtrl+d"],
+        accelerators: ["V", "v"],
     });
 
     // ToolbarItemFactory.register({
