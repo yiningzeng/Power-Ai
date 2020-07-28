@@ -3,16 +3,24 @@ import _ from "lodash";
 import * as shortid from "shortid";
 import Guard from "../common/guard";
 import {
-    IAsset, AssetType, IProject, IAssetMetadata, AssetState,
-    IRegion, RegionType, ITFRecordMetadata, ITag, IAssetsAndTags,
+    AssetState,
+    AssetType,
+    IAsset,
+    IAssetMetadata,
+    IAssetsAndTags,
+    IProject,
+    IRegion,
+    ITag,
+    ITFRecordMetadata,
+    RegionType,
 } from "../models/applicationState";
-import { AssetProviderFactory, IAssetProvider } from "../providers/storage/assetProviderFactory";
-import { StorageProviderFactory, IStorageProvider } from "../providers/storage/storageProviderFactory";
-import { constants } from "../common/constants";
+import {AssetProviderFactory, IAssetProvider} from "../providers/storage/assetProviderFactory";
+import {IStorageProvider, StorageProviderFactory} from "../providers/storage/storageProviderFactory";
+import {constants} from "../common/constants";
 import HtmlFileReader from "../common/htmlFileReader";
-import { TFRecordsReader } from "../providers/export/tensorFlowRecords/tensorFlowReader";
-import { FeatureType } from "../providers/export/tensorFlowRecords/tensorFlowBuilder";
-import { appInfo } from "../common/appInfo";
+import {TFRecordsReader} from "../providers/export/tensorFlowRecords/tensorFlowReader";
+import {FeatureType} from "../providers/export/tensorFlowRecords/tensorFlowBuilder";
+import {appInfo} from "../common/appInfo";
 import {encodeFileURI, randomIntInRange} from "../common/utils";
 import {LocalFileSystemProxy} from "../providers/storage/localFileSystemProxy";
 // tslint:disable-next-line:no-var-requires
@@ -47,18 +55,13 @@ export class AssetService {
         // fileNameParts[1] = "mp4"
         // fileNameParts[2] = "t=5"
         fileName = fileName || pathParts[pathParts.length - 1];
-        const fileNameParts = fileName.split(".");
-        const extensionParts = fileNameParts[fileNameParts.length - 1].split(/[\?#]/);
-        const assetFormat = extensionParts[0];
-
-        const assetType = this.getAssetType(assetFormat);
-
-        const idd = decodeURI(fileNameParts[0]);
-
+        const fileNameParts = fileName.substring(0, fileName.lastIndexOf("."));
+        const extensionParts = fileName.substr(fileName.lastIndexOf(".") + 1);
+        const assetType = this.getAssetType(extensionParts);
         return {
             // id: md5Hash,
-            id: idd,
-            format: assetFormat,
+            id: decodeURI(fileNameParts),
+            format: extensionParts,
             state: AssetState.NotVisited,
             type: assetType,
             name: fileName,
