@@ -10,7 +10,7 @@ import {interpolate, strings} from "../../../../common/strings";
 import {
     AppError,
     AssetState,
-    AssetType,
+    AssetType, DefaultActiveLearningSettings, DefaultExportOptions, DefaultTrainOptions,
     EditorMode,
     ErrorCode,
     IAdditionalPageSettings,
@@ -65,6 +65,9 @@ import DraggableDialog from "../../common/draggableDialog/draggableDialog";
 import DraggableDialogProjectMetrics from "../../common/draggableDialog/draggableDialogProjectMetrics";
 import ProjectMetrics from "../projectSettings/projectMetrics";
 import {ExportAssetState} from "../../../../providers/export/exportProvider";
+import {normalizeSlashes, randomIntInRange} from "../../../../common/utils";
+// tslint:disable-next-line:no-var-requires
+import tagColors from "../../common/tagColors.json";
 
 // import "antd/lib/tree/style/css";
 
@@ -378,20 +381,95 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                     });
                                 }}
                                 onClick={async (item) => {
-                                    const newProject: IProject = {
-                                        ...project,
-                                        sourceConnection: {
-                                            ...project.sourceConnection,
-                                            providerOptions: item,
+                                    // this.props.actions.closeProject();
+                                    const fileFolder = item.folderPath;
+                                    // alert(JSON.stringify(this.props.project));
+                                    console.log(`homePage>openDir: fileFolder ${fileFolder}`);
+                                    if (!fileFolder) { return; }
+                                    const idd = normalizeSlashes(fileFolder).lastIndexOf("/");
+                                    // const randId = shortid.generate();
+                                    console.log(`homePage>openDir: idd ${idd}`);
+                                    const folderName = normalizeSlashes(fileFolder).substring(idd + 1);
+                                    console.log(`homePage>openDir: folderName ${folderName}`);
+                                    console.log(`homePage>openDir: normalizeSlashes(fileFolder[0]) ${normalizeSlashes(fileFolder)}`);
+                                    const connection: IConnection = {
+                                        id: folderName,
+                                        name: folderName,
+                                        providerType: "localFileSystemProxy",
+                                        providerOptions: {
+                                            folderPath: normalizeSlashes(fileFolder),
                                         },
+                                        providerOptionsOthers: [{
+                                            folderPath: normalizeSlashes(fileFolder),
+                                        }],
                                     };
-                                    await this.props.applicationActions.ensureSecurityToken(newProject);
-                                    await this.props.actions.saveProject(newProject);
+                                    let projectJson: IProject = {
+                                        id: folderName,
+                                        name: folderName,
+                                        version: "3.0.0",
+                                        activeLearningSettings: DefaultActiveLearningSettings,
+                                        autoSave: true,
+                                        exportFormat: DefaultExportOptions,
+                                        securityToken: folderName,
+                                        sourceConnection: connection,
+                                        sourceListConnection: [],
+                                        tags: [],
+                                        targetConnection: connection,
+                                        trainFormat: DefaultTrainOptions,
+                                        videoSettings: { frameExtractionRate: 15 },
+                                        assets: {},
+                                    };
+                                    const dataTemp = await this.props.actions.loadAssetsWithFolderAndTags(projectJson,
+                                        fileFolder);
+                                    const rootProjectAssets = _.values(projectJson.assets)
+                                        .filter((asset) => !asset.parent);
+                                    const rootAssets = _(rootProjectAssets)
+                                        .concat(dataTemp.assets)
+                                        .uniqBy((asset) => asset.id)
+                                        .value();
+                                    // region 查询重复的标签
+                                    const finalTags = this.props.project.tags;
+                                    dataTemp.tags.map((val) => {
+                                        if (!finalTags.some((v) => v.name === val.name)) {
+                                            const newTag: ITag = {
+                                                name: val.name,
+                                                color: this.getNextColor(finalTags),
+                                            };
+                                            finalTags.push(newTag);
+                                        }
+                                    });
+                                    // endregion
+
+                                    projectJson = {
+                                        ...projectJson,
+                                        assets: _.keyBy(rootAssets, (asset) => asset.id),
+                                        tags: finalTags.sort(),
+                                    };
+                                    console.log(`merge tags: ${JSON.stringify(finalTags)}`);
+                                    console.log(`homePage:merge tags: ${JSON.stringify(projectJson)}`);
+                                    connectionActions.saveConnection(connection);
+
+                                    await this.props.actions.loadProject(projectJson);
+                                    this.props.history.push(`/projects/${projectJson.id}/edit`);
                                     this.loadingProjectAssets = false;
                                     this.setState({
                                         assets: [],
                                     });
                                     this.loadProjectAssets();
+                                    // const newProject: IProject = {
+                                    //     ...project,
+                                    //     sourceConnection: {
+                                    //         ...project.sourceConnection,
+                                    //         providerOptions: item,
+                                    //     },
+                                    // };
+                                    // await this.props.applicationActions.ensureSecurityToken(newProject);
+                                    // await this.props.actions.saveProject(newProject);
+                                    // this.loadingProjectAssets = false;
+                                    // this.setState({
+                                    //     assets: [],
+                                    // });
+                                    // this.loadProjectAssets();
                                 }}
                                 onDelete={async (item) => {
                                     this.deleteSourceProviderConfirm.current.open(project, item);
@@ -402,7 +480,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                     // await this.props.applicationActions.ensureSecurityToken(project);
                                     // await this.props.actions.saveProject(project);
                                 }}
-                                showToolbar={true}/>
+                                showToolbar={false}/>
                             <TagInput
                                 tags={this.props.project.tags}
                                 lockedTags={this.state.lockedTags}
@@ -438,7 +516,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                 <Rnd
                                     id="fuck"
                                     ref={this.myZoomDom}
-                                    disableDragging={this.state.zoomMode.disableDrag}
+                                    // disableDragging={this.state.zoomMode.disableDrag}
                                     size={{width: this.state.zoomMode.width, height: this.state.zoomMode.height}}
                                     position={{x: this.state.zoomMode.x, y: this.state.zoomMode.y}}
                                     onDragStop={(e, d) => {
@@ -470,6 +548,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                     onMouseDown={(e) => {
                                         // console.log(e.button);
                                         // if (e.button === 0) {
+                                        //     this.canvas.current.enableCanvas(true);
                                         //     this.setState({
                                         //         selectionMode: SelectionMode.RECT,
                                         //         editorMode: EditorMode.Rectangle,
@@ -494,22 +573,26 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                         //     });
                                         //
                                         // }
-                                        const zone = document.getElementById("ct-zone");
-                                        console.log(this.myZoomDom.current.getOffsetFromParent().left);
-                                        console.log(this.myZoomDom.current.getSelfElement().offsetLeft);
-                                        console.log(this.myZoomDom.current.getSelfElement().style.marginLeft);
-                                        console.log(this.myZoomDom.current.getSelfElement().style.left);
-                                        console.log(this.myZoomDom.current.getSelfElement().style.paddingLeft);
-                                        console.log(`zone.offsetLeft : ${e.pageX} ${e.screenX}我是鼠标点击x: ${e.clientX} 我是鼠标点击Y: ${e.pageY}`);
-                                        this.setState({
-                                            zoomMode: {
-                                                ...this.state.zoomMode,
-                                                zoomCenterX: e.clientX,
-                                                zoomCenterY: e.clientY,
-                                            },
-                                        });
+                                        // const zone = document.getElementById("ct-zone");
+                                        // console.log(this.myZoomDom.current.getOffsetFromParent().left);
+                                        // console.log(this.myZoomDom.current.getSelfElement().offsetLeft);
+                                        // console.log(this.myZoomDom.current.getSelfElement().style.marginLeft);
+                                        // console.log(this.myZoomDom.current.getSelfElement().style.left);
+                                        // console.log(this.myZoomDom.current.getSelfElement().style.paddingLeft);
+                                        // console.log(`zone.offsetLeft : ${e.pageX} ${e.screenX}我是鼠标点击x: ${e.clientX} 我是鼠标点击Y: ${e.pageY}`);
+                                            this.setState({
+                                                ...this.state,
+                                                zoomMode: {
+                                                    ...this.state.zoomMode,
+                                                    zoomCenterX: e.clientX,
+                                                    zoomCenterY: e.clientY,
+                                                },
+                                            });
                                     }}
                                     onMouseUp={(e) => {
+                                        // if (e.button === 2) {
+                                        //     this.canvas.current.enableCanvas(true);
+                                        // }
                                         console.log(e);
                                         console.log(`我是鼠标点x: ${e.clientX} 我是鼠标点y: ${e.clientY}`);
                                         // this.setState({
@@ -1494,5 +1577,21 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         });
 
         this.setState({ assets: updatedAssets });
+    }
+
+    private getNextColor = (tags) => {
+        if (tags.length > 0) {
+            const lastColor = tags[tags.length - 1].color;
+            const lastIndex = tagColors.findIndex((color) => color === lastColor);
+            let newIndex;
+            if (lastIndex > -1) {
+                newIndex = (lastIndex + 1) % tagColors.length;
+            } else {
+                newIndex = randomIntInRange(0, tagColors.length - 1);
+            }
+            return tagColors[newIndex];
+        } else {
+            return tagColors[0];
+        }
     }
 }

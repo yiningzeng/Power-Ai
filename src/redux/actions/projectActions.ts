@@ -10,7 +10,7 @@ import {
     IApplicationState,
     IAsset,
     IAssetMetadata, IAssetsAndTags,
-    IProject,
+    IProject, ITag,
 } from "../../models/applicationState";
 import { createAction, createPayloadAction, IPayloadAction } from "./actionCreators";
 import {
@@ -46,6 +46,7 @@ export default interface IProjectActions {
     trainPackageProject(project: IProject): Promise<IStartTrainResults>;
     trainUploadProject(project: IProject, source: IStartTrainResults): Promise<IStartTrainResults>;
     testImage(project: IProject): Promise<IStartTestResults>;
+    getNextColor(tags: ITag[]): string;
     loadAssets(project: IProject): Promise<IAsset[]>;
     loadAssetsWithFolder(project: IProject, folder: string): Promise<IAsset[]>;
     loadAssetsWithFolderAndTags(project: IProject, folder: string): Promise<IAssetsAndTags>;
@@ -483,6 +484,15 @@ export function trainAddQueueProject(project: IProject, source: IStartTrainResul
         return await trainService.trainAddQueueProject(project, source);
     };
 }
+
+export function getNextColor(tags: []):
+    (dispatch: Dispatch) => string {
+    return (dispatch: Dispatch) => {
+        const assetService = new AssetService(null);
+        return assetService.getNextColor(tags);
+    };
+}
+
 export function testImage(project: IProject):
     (dispatch: Dispatch) => Promise<IStartTestResults> {
     return async (dispatch: Dispatch) => {
