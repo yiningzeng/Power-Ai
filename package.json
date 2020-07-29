@@ -1,6 +1,6 @@
 {
     "name": "Power-Ai",
-    "version": "3.8.1",
+    "version": "3.8.7",
     "author": {
         "name": "宁波轻蜓视觉科技有限公司",
         "url": "https://github.com/yiningzeng/Power-Ai.git"
@@ -67,7 +67,7 @@
         "react-localization": "^1.0.13",
         "react-modal": "^3.8.1",
         "react-redux": "^5.1.1",
-        "react-rnd": "^9.1.2",
+        "react-rnd": "10.2.0",
         "react-router-dom": "^4.3.1",
         "react-scripts": "2.1.1",
         "react-split-pane": "^0.1.87",
@@ -221,6 +221,9 @@
             "vendor": "宁波轻蜓科技技术有限公司",
             "category": "Development",
             "desktop": "Power Ai"
+        },
+        "electronDownload": {
+            "mirror": "https://npm.taobao.org/mirrors/electron/"
         }
     }
 }

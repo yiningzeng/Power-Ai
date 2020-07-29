@@ -237,7 +237,7 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
         const fileFolder = await this.localFileSystem.importTaggedContainer();
         // alert(JSON.stringify(this.props.project));
         console.log(`homePage>openDir: fileFolder ${fileFolder}`);
-        if (!fileFolder) return;
+        if (!fileFolder) { return; }
         const idd = normalizeSlashes(fileFolder[0]).lastIndexOf("/");
         // const randId = shortid.generate();
         console.log(`homePage>openDir: idd ${idd}`);

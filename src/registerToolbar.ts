@@ -51,14 +51,14 @@ export enum ToolbarItemGroup {
  * Registers items for toolbar
  */
 export default function registerToolbar() {
-    ToolbarItemFactory.register({
-        name: ToolbarItemName.SelectCanvas,
-        tooltip: strings.editorPage.toolbar.select,
-        icon: "fas fa-hand-rock",
-        group: ToolbarItemGroup.Canvas,
-        type: ToolbarItemType.State,
-        accelerators: ["Z", "z"],
-    });
+    // ToolbarItemFactory.register({
+    //     name: ToolbarItemName.SelectCanvas,
+    //     tooltip: strings.editorPage.toolbar.select,
+    //     icon: "fas fa-hand-rock",
+    //     group: ToolbarItemGroup.Canvas,
+    //     type: ToolbarItemType.State,
+    //     accelerators: ["Z", "z"],
+    // });
 
     ToolbarItemFactory.register({
         name: ToolbarItemName.DrawRectangle,
