@@ -126,10 +126,11 @@ export default class ProjectService implements IProjectService {
         //         JSON.stringify(project, null, "\t"),
         //     );
         // }
-        await storageProvider.writeText(
-            `${project.name}${constants.projectFileExtension}`,
-            JSON.stringify(project, null, "\t"),
-        );
+
+        // await storageProvider.writeText(
+        //     `${project.name}${constants.projectFileExtension}`,
+        //     JSON.stringify(project, null, "\t"),
+        // );
 
         return project;
     }
