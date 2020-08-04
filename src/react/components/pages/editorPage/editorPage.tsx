@@ -921,7 +921,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
             await this.state.assets.filter(async (asset) => {
                 if (asset.tags) {
                     tags.forEach((v, i, a) => {
-                        if (asset.tags === v.name) {
+                        if (asset.tags.indexOf(v.name) > -1) {
                             filterAssets.push(asset);
                         }
                     });
