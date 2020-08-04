@@ -168,6 +168,17 @@ function mapDispatchToProps(dispatch) {
  */
 @connect(mapStateToProps, mapDispatchToProps)
 export default class EditorPage extends React.Component<IEditorPageProps, IEditorPageState> {
+    /**
+     * 等待指定的时间
+     * @param ms
+     */
+    private async sleep(ms: number) {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                resolve("");
+            }, ms);
+        });
+    }
 
     public state: IEditorPageState = {
         treeList: [],
@@ -201,6 +212,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
     private deleteSourceProviderConfirm: React.RefObject<Confirm> = React.createRef();
     private deleteConfirm: React.RefObject<Confirm> = React.createRef();
     private draggableDialog: React.RefObject<DraggableDialog> = React.createRef();
+    private loadingDialog: React.RefObject<DraggableDialog> = React.createRef();
     private draggableDialogProjectMetrics: React.RefObject<DraggableDialogProjectMetrics> = React.createRef();
     private myZoomDom: React.RefObject<Rnd> = React.createRef();
 
@@ -735,6 +747,16 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                     }}
                     onCancel={() => this.draggableDialog.current.close()}
                 />
+                <DraggableDialog
+                    ref={this.loadingDialog}
+                    disableBackdropClick={true}
+                    disableEscapeKeyDown={true}
+                    fullWidth={true}
+                    onDone={() => {
+                        this.loadingDialog.current.close();
+                    }}
+                    onCancel={() => this.loadingDialog.current.close()}
+                />
                 <Drawer anchor="right" open={this.state.showProjectMetrics} onClose={() => {
                     this.setState({
                         ...this.state,
@@ -884,6 +906,8 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
      */
     private onTagSearched = async (tags: ITag[], searchQuery: string): Promise<void>  => {
         if (searchQuery) {
+            this.loadingDialog.current.open();
+            this.loadingDialog.current.change("正在搜索标签...", "请耐心等待");
             console.log("dosearch editorpage + onTagSearched + taginput" + JSON.stringify(tags));
             const tagNames = [];
             tags.forEach((v, i, a) => {
@@ -895,7 +919,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
             await this.state.assets.filter(async (asset) => {
                 if (asset.tags) {
                     tags.forEach((v, i, a) => {
-                        if (asset.tags.indexOf(v.name) > -1) {
+                        if (asset.tags === v.name) {
                             filterAssets.push(asset);
                         }
                     });
@@ -911,6 +935,9 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                     this.selectAsset(filterAssets[0]);
                 }
             });
+            // 等待500毫秒后再执行同步
+            await this.sleep(500);
+            this.loadingDialog.current.close();
         } else {
             this.setState({
                 ...this.state,
@@ -932,14 +959,18 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
      * @param newTagName New name of tag
      */
     private onTagRenamed = async (tagName: string, newTagName: string): Promise<void> => {
+        this.loadingDialog.current.open();
+        this.loadingDialog.current.change("正在重命名标签...", "请耐心等待");
         const assetUpdates = await this.props.actions.updateProjectTag(this.props.project, tagName, newTagName);
         const selectedAsset = assetUpdates.find((am) => am.asset.id === this.state.selectedAsset.asset.id);
-
         if (selectedAsset) {
             if (selectedAsset) {
                 this.setState({ selectedAsset });
             }
         }
+        this.loadingDialog.current.close();
+        this.canvas.current.enableCanvas(false);
+        this.canvas.current.enableCanvas(true);
     }
 
     /**

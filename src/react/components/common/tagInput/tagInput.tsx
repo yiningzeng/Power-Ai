@@ -310,9 +310,8 @@ export class TagInput extends React.Component<ITagInputProps, ITagInputState> {
         let tags = this.state.tags;
         const query = this.state.searchQuery;
         if (query.length) {
-            tags = tags.filter((p) => p.name.toLowerCase().includes(query.toLowerCase()));
+            tags = tags.filter((p) => p.name.toLowerCase() === query.toLowerCase());
         }
-        console.log(`dosearch tagInput > tags: ${JSON.stringify(tags)}`);
         this.props.onTagSearched(tags, query);
         // return tags;
     }
@@ -323,7 +322,7 @@ export class TagInput extends React.Component<ITagInputProps, ITagInputState> {
         this.tagItemRefs.clear();
 
         if (query.length) {
-            props = props.filter((prop) => prop.tag.name.toLowerCase().includes(query.toLowerCase()));
+            props = props.filter((prop) => prop.tag.name.toLowerCase() === query.toLowerCase());
         }
         // console.log("taginput");
         // console.log("taginput" + JSON.stringify(props));
