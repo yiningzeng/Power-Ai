@@ -199,6 +199,9 @@ export class AssetService {
 
         const updates = await assets.mapAsync(async (asset) => {
             const assetMetadata = await this.getAssetMetadata(asset);
+            if (assetMetadata.version === "3.6.2") {
+                console.log("老版本的数据，最好是读取所有的regions组装tags");
+            }
             console.log(`fuck your son: assetService22 ${JSON.stringify(assetMetadata.asset)}`);
             if (assetMetadata.asset) {
                 if (assetMetadata.asset.tags) {
@@ -386,13 +389,21 @@ export class AssetService {
         transformer: (tags: string[]) => string[]): boolean {
         let foundTag = false;
 
+        let finalTags = [];
         for (const region of assetMetadata.regions) {
             if (region.tags.find((t) => t === tagName)) {
                 foundTag = true;
                 region.tags = transformer(region.tags);
             }
+            region.tags.map((val) => {
+                finalTags.push(val);
+            });
         }
+
+        finalTags = [...new Set(finalTags)].sort(); // 去重然后排序 用于标签搜索
         if (foundTag) {
+            assetMetadata.asset.tags = finalTags.toString();
+            console.log(`更改的标签: ${finalTags.toString()}`);
             assetMetadata.regions = assetMetadata.regions.filter((region) => region.tags.length > 0);
             assetMetadata.asset.state = (assetMetadata.regions.length) ? AssetState.Tagged : AssetState.Visited;
             return true;
