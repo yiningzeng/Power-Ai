@@ -802,13 +802,15 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
      * @param tagName Name of tag to be deleted
      */
     private onAssetDeleted = async (): Promise<void> => {
+        this.loadingDialog.current.open();
+        this.loadingDialog.current.change("正在删除相关素材...", "请耐心等待");
         const { selectedAsset } = this.state;
         // await this.localFileSystem.deleteDirectory(decodeURI(selectedAsset.asset.path.replace("file:", "")));
         // this.props.project.assets[selectedAsset.asset.id].
-        this.canvas.current.removeAllRegions();
         const finalProject = await this.props.actions.deleteAsset(this.props.project, selectedAsset.asset);
         await this.props.actions.saveProject(finalProject);
         // console.log(`删除素材fuck：${JSON.stringify(this.props.project)}`);
+        this.loadingDialog.current.close();
         toast.success(`成功删除`);
         this.goToRootAsset(1);
         await this.deleteAssetsAndRefreshProjectAssets(finalProject);
@@ -1557,12 +1559,24 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
     }
 
     private deleteAssetsAndRefreshProjectAssets = async (finalProject): Promise<void> => {
-        const newAssets = _.values(this.state.assets)
-            .filter((asset) => asset.id !== this.state.selectedAsset.asset.id)
-            .sort((a, b) => a.timestamp - b.timestamp);
-        this.setState({
-            assets: newAssets,
-        });
+        if (this.state.isFilter) { // 判断是否是过滤的数据
+            const newAssets = _.values(this.state.filterAssets)
+                .filter((asset) => asset.id !== this.state.selectedAsset.asset.id)
+                .sort((a, b) => a.timestamp - b.timestamp);
+            this.setState({
+                ...this.state,
+                isFilter: true,
+                filterAssets: newAssets,
+            });
+        } else {
+            const newAssets = _.values(this.state.assets)
+                .filter((asset) => asset.id !== this.state.selectedAsset.asset.id)
+                .sort((a, b) => a.timestamp - b.timestamp);
+            this.setState({
+                assets: newAssets,
+            });
+        }
+
         // await this.props.actions.saveProject(finalProject);
     }
 

@@ -262,6 +262,9 @@ export class AssetService {
         console.log(`删除素材deleteAsset->删除中文:${JSON.stringify(selectAsset)}`);
         await new LocalFileSystemProxy().deleteFileOnlyPath(path);
         await this.storageProvider.deleteFile(decodeURI(selectAsset.name)); // 根据文件名删除，可能存在多文件夹有问题
+        await this.storageProvider.deleteFile(
+            decodeURI(selectAsset.name.substring(0, selectAsset.name.lastIndexOf(".")))
+            + constants.assetMetadataFileExtension); // 根据文件名删除，可能存在多文件夹有问题
         return _
             .values(this.project.assets)
             .filter((asset) => asset.id !== selectAsset.id)
