@@ -404,12 +404,12 @@ export class TagInput extends React.Component<ITagInputProps, ITagInputState> {
             });
 
             // Only fire click event if a region is selected
-            if (this.props.selectedRegions &&
-                this.props.selectedRegions.length > 0 &&
-                this.props.onTagClick &&
-                !inEditMode) {
-                this.props.onTagClick(tag);
-            }
+            // if (this.props.selectedRegions &&
+            //     this.props.selectedRegions.length > 0 &&
+            //     this.props.onTagClick &&
+            //     !inEditMode) {
+            //     this.props.onTagClick(tag);
+            // }
         }
         // alert(`啦啦${JSON.stringify(this.state.searchTags)}`);
     }
