@@ -127,6 +127,7 @@ export default class ProjectService implements IProjectService {
         //     );
         // }
 
+        // 暂时去掉保存的零时项目文件
         // await storageProvider.writeText(
         //     `${project.name}${constants.projectFileExtension}`,
         //     JSON.stringify(project, null, "\t"),
