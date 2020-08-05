@@ -41,6 +41,7 @@ import {normalizeSlashes, randomIntInRange} from "../../../../common/utils";
 import shortid from "shortid";
 import {ExportAssetState} from "../../../../providers/export/exportProvider";
 import {appInfo} from "../../../../common/appInfo";
+import DraggableDialog from "../../common/draggableDialog/draggableDialog";
 // tslint:disable-next-line:no-var-requires
 const tagColors = require("../../common/tagColors.json");
 
@@ -83,7 +84,7 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
     private deleteConfirm: React.RefObject<Confirm> = React.createRef();
     private cloudFilePicker: React.RefObject<CloudFilePicker> = React.createRef();
     private importConfirm: React.RefObject<Confirm> = React.createRef();
-
+    private draggableDialog: React.RefObject<DraggableDialog> = React.createRef();
     constructor(props, context) {
         super(props, context);
         this.localFileSystem = new LocalFileSystemProxy();
@@ -203,6 +204,18 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                              interpolate(strings.homePage.importProject.confirmation, {project})}
                          confirmButtonColor="danger"
                          onConfirm={this.convertProject}/>
+                <DraggableDialog
+                    title={"正在加载..."}
+                    ref={this.draggableDialog}
+                    content={"请耐心等待"}
+                    disableBackdropClick={true}
+                    disableEscapeKeyDown={true}
+                    fullWidth={true}
+                    onDone={() => {
+                        this.draggableDialog.current.close();
+                    }}
+                    onCancel={() => this.draggableDialog.current.close()}
+                />
             </div>
         );
     }
@@ -236,14 +249,11 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
         // this.filePicker.current.upload()
         const fileFolder = await this.localFileSystem.importTaggedContainer();
         // alert(JSON.stringify(this.props.project));
-        console.log(`homePage>openDir: fileFolder ${fileFolder}`);
         if (!fileFolder) { return; }
+        this.draggableDialog.current.open();
         const idd = normalizeSlashes(fileFolder[0]).lastIndexOf("/");
         // const randId = shortid.generate();
-        console.log(`homePage>openDir: idd ${idd}`);
         const folderName = normalizeSlashes(fileFolder[0]).substring(idd + 1);
-        console.log(`homePage>openDir: folderName ${folderName}`);
-        console.log(`homePage>openDir: normalizeSlashes(fileFolder[0]) ${normalizeSlashes(fileFolder[0])}`);
         const connection: IConnection = {
             id: folderName,
             name: folderName,
@@ -283,8 +293,8 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
             assets: _.keyBy(rootAssets, (asset) => asset.id),
             tags: dataTemp.tags,
         };
-        console.log(`homePage: ${JSON.stringify(projectJson)}`);
         connectionActions.saveConnection(connection);
+        this.draggableDialog.current.close();
         await this.loadSelectedProject(projectJson);
     }
 
