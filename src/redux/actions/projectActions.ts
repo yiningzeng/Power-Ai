@@ -298,25 +298,33 @@ export function updateProjectTag(project: IProject, oldTagName: string, newTagNa
         // Find tags to rename
         const assetService = new AssetService(project);
         const assetUpdates = await assetService.renameTag(oldTagName, newTagName);
-
         // Save updated assets
         await assetUpdates.forEachAsync(async (assetMetadata) => {
             await saveAssetMetadata(project, assetMetadata)(dispatch);
         });
-
         const currentProject = getState().currentProject;
         let updatedProject;
-        if (currentProject.tags.filter((t) => t.name.indexOf(newTagName) > -1).length) { // 查找是否有相同的tag
-            updatedProject = {
-                ...currentProject,
-                tags: project.tags.filter((t) => t.name.indexOf(oldTagName) === -1),
-            };
-        } else { // 不存在相同的tag
-            updatedProject = {
-                ...currentProject,
-                tags: project.tags.map((t) => (t.name === oldTagName) ? { ...t, name: newTagName } : t),
-            };
-        }
+        // region 更新新的标签颜色和老的一致
+        const oldTag = currentProject.tags.filter((t) => t.name === oldTagName)[0];
+        updatedProject = {
+            ...currentProject,
+            tags: currentProject.tags.filter((t) => t.name !== oldTagName && t.name !== newTagName)
+                .concat({name: newTagName, color: oldTag.color}),
+        };
+        // region
+        // if (currentProject.tags.filter((t) => t.name === newTagName).length > 0) { // 查找是否有相同的tag
+        //     console.log(`updateProjectTag 相同`);
+        //     updatedProject = {
+        //         ...currentProject,
+        //         tags: currentProject.tags.filter((t) => t.name !== oldTagName),
+        //     };
+        // } else { // 不存在相同的tag
+        //     console.log(`updateProjectTag 不相同`);
+        //     updatedProject = {
+        //         ...currentProject,
+        //         tags: currentProject.tags.map((t) => (t.name === oldTagName) ? { ...t, name: newTagName } : t),
+        //     };
+        // }
         // Save updated project tags
         await saveProject(updatedProject)(dispatch, getState);
         dispatch(updateProjectTagAction(updatedProject));
