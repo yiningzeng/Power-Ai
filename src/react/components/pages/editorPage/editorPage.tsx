@@ -802,20 +802,14 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
      * @param tagName Name of tag to be deleted
      */
     private onAssetDeleted = async (): Promise<void> => {
-        this.loadingDialog.current.open();
-        this.loadingDialog.current.change("正在删除相关素材...", "请耐心等待");
         const { selectedAsset } = this.state;
         // await this.localFileSystem.deleteDirectory(decodeURI(selectedAsset.asset.path.replace("file:", "")));
         // this.props.project.assets[selectedAsset.asset.id].
         const finalProject = await this.props.actions.deleteAsset(this.props.project, selectedAsset.asset);
         await this.props.actions.saveProject(finalProject);
-        // console.log(`删除素材fuck：${JSON.stringify(this.props.project)}`);
-        this.loadingDialog.current.close();
-        toast.success(`成功删除`);
         this.goToRootAsset(1);
         await this.deleteAssetsAndRefreshProjectAssets(finalProject);
-        // console.log(`删除素材fuck 222：${JSON.stringify(this.props.project)}`);
-        // this.updateRootAssets();
+        toast.success(`成功删除`);
     }
 
     /**
@@ -1297,7 +1291,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                 // this.canvas.current.enableCanvas(true);
                 break;
             case ToolbarItemName.DeleteAsset:
-                this.deleteConfirm.current.open();
+                this.onAssetDeleted();
                 break;
             case ToolbarItemName.CopyRegions:
                 this.canvas.current.enableCanvas(true);
@@ -1567,6 +1561,9 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                 ...this.state,
                 isFilter: true,
                 filterAssets: newAssets,
+                assets: _.values(this.state.assets)
+                    .filter((asset) => asset.id !== this.state.selectedAsset.asset.id)
+                    .sort((a, b) => a.timestamp - b.timestamp),
             });
         } else {
             const newAssets = _.values(this.state.assets)

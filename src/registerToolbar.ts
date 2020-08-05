@@ -216,7 +216,7 @@ export default function registerToolbar() {
         icon: "fa-trash-alt",
         group: ToolbarItemGroup.Navigation,
         type: ToolbarItemType.Action,
-        accelerators: ["V", "v"],
+        accelerators: ["CmdOrCtrl+D", "CmdOrCtrl+d"],
     });
 
     // ToolbarItemFactory.register({
