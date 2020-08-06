@@ -303,6 +303,7 @@ export function updateProjectTag(project: IProject, oldTagName: string, newTagNa
             await saveAssetMetadata(project, assetMetadata)(dispatch);
         });
         const currentProject = getState().currentProject;
+        console.log(`fff-update tags: 2`);
         let updatedProject;
         // region 更新新的标签颜色和老的一致
         const oldTag = currentProject.tags.filter((t) => t.name === oldTagName)[0];

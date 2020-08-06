@@ -358,7 +358,7 @@ export class AssetService {
      */
     public async renameTag(tagName: string, newTagName: string): Promise<IAssetMetadata[]> {
         const transformer = (tags) => tags.map((t) => (t === tagName) ? newTagName : t);
-        return await this.getUpdatedAssets(tagName, transformer);
+        return await this.getUpdatedAssets(tagName, transformer, newTagName);
     }
 
     /**
@@ -366,12 +366,12 @@ export class AssetService {
      * @param tagName Name of tag to update within project
      * @param transformer Function that accepts array of tags from a region and returns a modified array of tags
      */
-    private async getUpdatedAssets(tagName: string, transformer: (tags: string[]) => string[])
+    private async getUpdatedAssets(tagName: string, transformer: (tags: string[]) => string[], newTagname?: string)
         : Promise<IAssetMetadata[]> {
         // Loop over assets and update if necessary
         const updates = await _.values(this.project.assets).mapAsync(async (asset) => {
             const assetMetadata = await this.getAssetMetadata(asset);
-            const isUpdated = this.updateTagInAssetMetadata(assetMetadata, tagName, transformer);
+            const isUpdated = this.updateTagInAssetMetadata(assetMetadata, tagName, transformer, newTagname);
 
             return isUpdated ? assetMetadata : null;
         });
@@ -389,7 +389,7 @@ export class AssetService {
     private updateTagInAssetMetadata(
         assetMetadata: IAssetMetadata,
         tagName: string,
-        transformer: (tags: string[]) => string[]): boolean {
+        transformer: (tags: string[]) => string[], newTagname?: string): boolean {
         let foundTag = false;
 
         let finalTags = [];
