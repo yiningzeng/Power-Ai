@@ -168,18 +168,6 @@ function mapDispatchToProps(dispatch) {
  */
 @connect(mapStateToProps, mapDispatchToProps)
 export default class EditorPage extends React.Component<IEditorPageProps, IEditorPageState> {
-    /**
-     * 等待指定的时间
-     * @param ms
-     */
-    private async sleep(ms: number) {
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                resolve("");
-            }, ms);
-        });
-    }
-
     public state: IEditorPageState = {
         treeList: [],
         selectedTag: null,
@@ -222,6 +210,18 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         const ipcRenderer = (window as any & typeof globalThis).require("electron").ipcRenderer;
         ipcRenderer.on("FILE_WATCH", (event, arg) => {
             console.log(arg);
+        });
+    }
+
+    /**
+     * 等待指定的时间
+     * @param ms
+     */
+    public async sleep(ms: number) {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                resolve("");
+            }, ms);
         });
     }
 
@@ -542,9 +542,9 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                             },
                                         });
                                     }}
-                                    onDragStart={(e) => {
-                                        e.preventDefault();
-                                    }}
+                                    // onDragStart={(e) => {
+                                    //     e.preventDefault();
+                                    // }}
                                     onResize={(e, direction, ref, delta, position) => {
                                         this.setState({
                                             zoomMode: {
@@ -591,9 +591,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                         // console.log(this.myZoomDom.current.getSelfElement().style.marginLeft);
                                         // console.log(this.myZoomDom.current.getSelfElement().style.left);
                                         // console.log(this.myZoomDom.current.getSelfElement().style.paddingLeft);
-                                        // console.log(`zone.offsetLeft : ${e.pageX} ${e.screenX}我是鼠标点击x: ${e.clientX} 我是鼠标点击Y: ${e.pageY}`);
                                             this.setState({
-                                                ...this.state,
                                                 zoomMode: {
                                                     ...this.state.zoomMode,
                                                     zoomCenterX: e.clientX,
@@ -902,8 +900,8 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
      */
     private onTagSearched = async (tags: ITag[], searchQuery: string): Promise<void>  => {
         if (searchQuery) {
-            this.loadingDialog.current.open();
-            this.loadingDialog.current.change("正在搜索标签...", "请耐心等待");
+            // this.loadingDialog.current.open();
+            // this.loadingDialog.current.change("正在搜索标签...", "请耐心等待");
             console.log("dosearch editorpage + onTagSearched + taginput" + JSON.stringify(tags));
             const tagNames = [];
             tags.forEach((v, i, a) => {
@@ -932,8 +930,8 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                 }
             });
             // 等待500毫秒后再执行同步
-            await this.sleep(500);
-            this.loadingDialog.current.close();
+            // await this.sleep(500);
+            // this.loadingDialog.current.close();
         } else {
             this.setState({
                 ...this.state,
