@@ -10,6 +10,7 @@ import TagInputItem, { ITagInputItemProps, ITagClickProps } from "./tagInputItem
 import TagInputToolbar from "./tagInputToolbar";
 import { toast } from "react-toastify";
 import { strings } from "../../../../common/strings";
+import DraggableDialog from "../draggableDialog/draggableDialog";
 // tslint:disable-next-line:no-var-requires
 const tagColors = require("../../common/tagColors.json");
 
@@ -72,7 +73,7 @@ export class TagInput extends React.Component<ITagInputProps, ITagInputState> {
         editingTagNode: null,
         portalElement: defaultDOMNode(),
     };
-
+    private loadingDialog: React.RefObject<DraggableDialog> = React.createRef();
     private tagItemRefs: Map<string, RefObject<TagInputItem>> = new Map<string, RefObject<TagInputItem>>();
     private portalDiv = document.createElement("div");
 
@@ -130,6 +131,16 @@ export class TagInput extends React.Component<ITagInputProps, ITagInputState> {
                         </div>
                     }
                 </div>
+                <DraggableDialog
+                    ref={this.loadingDialog}
+                    disableBackdropClick={true}
+                    disableEscapeKeyDown={true}
+                    fullWidth={true}
+                    onDone={() => {
+                        this.loadingDialog.current.close();
+                    }}
+                    onCancel={() => this.loadingDialog.current.close()}
+                />
             </div>
         );
     }
@@ -307,12 +318,15 @@ export class TagInput extends React.Component<ITagInputProps, ITagInputState> {
     }
 
     private doSearch = () => {
+        this.loadingDialog.current.open();
+        this.loadingDialog.current.change("正在搜索标签...", "请耐心等待");
         let tags = this.state.tags;
         const query = this.state.searchQuery;
         if (query.length) {
             tags = tags.filter((p) => p.name.toLowerCase() === query.toLowerCase());
         }
         this.props.onTagSearched(tags, query);
+        this.loadingDialog.current.close();
         // return tags;
     }
 
