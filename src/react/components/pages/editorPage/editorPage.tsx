@@ -1035,6 +1035,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         this.loadingDialog.current.change("正在重命名标签...", "请耐心等待");
         const assetUpdates = await this.props.actions.updateProjectTag(this.props.project, tagName, newTagName);
         const selectedAsset = assetUpdates.find((am) => am.asset.id === this.state.selectedAsset.asset.id);
+        await this.reloadProject();
         if (selectedAsset) {
             if (selectedAsset) {
                 this.setState({ selectedAsset });
