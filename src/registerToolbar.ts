@@ -101,14 +101,14 @@ export default function registerToolbar() {
         accelerators: ["CmdOrCtrl+W", "CmdOrCtrl+w"],
     });
 
-    ToolbarItemFactory.register({
-        name: ToolbarItemName.CopyRegions,
-        tooltip: strings.editorPage.toolbar.copy,
-        icon: "fa-copy",
-        group: ToolbarItemGroup.Regions,
-        type: ToolbarItemType.Action,
-        accelerators: ["CmdOrCtrl+C", "CmdOrCtrl+c"],
-    });
+    // ToolbarItemFactory.register({
+    //     name: ToolbarItemName.CopyRegions,
+    //     tooltip: strings.editorPage.toolbar.copy,
+    //     icon: "fa-copy",
+    //     group: ToolbarItemGroup.Regions,
+    //     type: ToolbarItemType.Action,
+    //     accelerators: ["CmdOrCtrl+C", "CmdOrCtrl+c"],
+    // });
 
     // ToolbarItemFactory.register({
     //     name: ToolbarItemName.CutRegions,
