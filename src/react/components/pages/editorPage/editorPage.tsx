@@ -981,7 +981,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
             });
             // const tagsStr = tagNames.sort().join(",");
             // console.log("dosearch-editorpage + onTagSearched + taginput tagsstr: " + tagsStr);
-            const filterAssets: IAsset[] = [];
+            let filterAssets: IAsset[] = [];
             await this.state.assets.filter(async (asset) => {
                 if (asset.tags) {
                     tags.forEach((v, i, a) => {
@@ -992,6 +992,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                     console.log("dosearch-editorpage + filterAssets: " + JSON.stringify(filterAssets));
                 }
             });
+            filterAssets = [...new Set(filterAssets)].sort(); // 去重然后排序
             this.setState({
                 ...this.state,
                 isFilter: true,
