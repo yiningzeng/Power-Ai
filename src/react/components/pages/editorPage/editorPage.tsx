@@ -145,6 +145,11 @@ export interface IEditorPageState {
     dialog: boolean;
     isDrawPolygon2MinBox: boolean;
     showProjectMetrics: boolean;
+    multipleSelectAssets: {
+        multipleSelect: boolean;
+        startIndex: number;
+        endIndex: number;
+    };
 }
 
 function mapStateToProps(state: IApplicationState) {
@@ -188,6 +193,11 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         isDrawPolygon2MinBox: false,
         showProjectMetrics: false,
         isFilter: false,
+        multipleSelectAssets: {
+            multipleSelect: false,
+            startIndex: 0,
+            endIndex: 0,
+        },
     };
     private localFileSystem: LocalFileSystemProxy;
 
@@ -800,14 +810,76 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
      * @param tagName Name of tag to be deleted
      */
     private onAssetDeleted = async (): Promise<void> => {
-        const { selectedAsset } = this.state;
-        // await this.localFileSystem.deleteDirectory(decodeURI(selectedAsset.asset.path.replace("file:", "")));
-        // this.props.project.assets[selectedAsset.asset.id].
-        const finalProject = await this.props.actions.deleteAsset(this.props.project, selectedAsset.asset);
-        await this.props.actions.saveProject(finalProject);
-        this.goToRootAsset(1);
-        await this.deleteAssetsAndRefreshProjectAssets(finalProject);
-        toast.success(`成功删除`);
+        if (this.state.multipleSelectAssets.multipleSelect) {
+            this.loadingDialog.current.open();
+            this.loadingDialog.current.change("正在批量删除...", "请耐心等待");
+            // 这里还要区分是否是搜索的列表
+            if (this.state.isFilter) { // 这里有个隐患！！！就是只是删除了搜索后的列表！
+                for (let i = this.state.multipleSelectAssets.startIndex;
+                     i <= this.state.multipleSelectAssets.endIndex; i++) {
+                    const asset = this.state.filterAssets[i];
+                    await this.props.actions.deleteAsset(this.props.project, asset);
+                }
+                this.state.filterAssets.splice(
+                    this.state.multipleSelectAssets.startIndex,
+                    this.state.multipleSelectAssets.endIndex - this.state.multipleSelectAssets.startIndex + 1);
+                const newAssets = _.values(this.state.filterAssets)
+                    .sort((a, b) => a.timestamp - b.timestamp);
+                this.setState({
+                    ...this.state,
+                    isFilter: true,
+                    filterAssets: newAssets,
+                    // assets: _.values(this.state.assets)
+                    //     .filter((asset) => asset.id !== this.state.selectedAsset.asset.id)
+                    //     .sort((a, b) => a.timestamp - b.timestamp),
+                }, () => {
+                    if (newAssets.length) {
+                        const index = this.state.multipleSelectAssets.startIndex >= newAssets.length ?
+                            newAssets.length - 1 : this.state.multipleSelectAssets.startIndex;
+                        this.selectAsset(newAssets[index]);
+                    }
+                });
+                this.loadingDialog.current.close();
+            } else { // 这里是非搜索的批量删除
+                console.log("test");
+
+                for (let i = this.state.multipleSelectAssets.startIndex;
+                     i <= this.state.multipleSelectAssets.endIndex; i++) {
+                    const asset = this.state.assets[i];
+                    await this.props.actions.deleteAsset(this.props.project, asset);
+                }
+
+                await this.reloadProject();
+                if (this.state.assets.length) {
+                    const index = this.state.multipleSelectAssets.startIndex >= this.state.assets.length ?
+                        this.state.assets.length - 1 : this.state.multipleSelectAssets.startIndex;
+                    this.selectAsset(this.state.assets[index]);
+                }
+            }
+
+            // if (this.state.isFilter) { // 判断是否是过滤的数据
+            //
+            // } else {
+            //     const newAssets = _.values(this.state.assets)
+            //         .filter((asset) => asset.id !== this.state.selectedAsset.asset.id)
+            //         .sort((a, b) => a.timestamp - b.timestamp);
+            //     this.setState({
+            //         assets: newAssets,
+            //     });
+            // }
+            // await this.props.actions.saveProject(finalProject);
+
+        } else {
+            const { selectedAsset } = this.state;
+            // await this.localFileSystem.deleteDirectory(decodeURI(selectedAsset.asset.path.replace("file:", "")));
+            // this.props.project.assets[selectedAsset.asset.id].
+            const finalProject = await this.props.actions.deleteAsset(this.props.project, selectedAsset.asset);
+            await this.props.actions.saveProject(finalProject);
+            this.goToRootAsset(1);
+            await this.deleteAssetsAndRefreshProjectAssets(finalProject);
+            toast.success(`成功删除`);
+        }
+
     }
 
     /**
@@ -936,7 +1008,13 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
             this.setState({
                 ...this.state,
                 isFilter: false,
+                multipleSelectAssets: {
+                    multipleSelect: false,
+                    startIndex: 0,
+                    endIndex: 0,
+                },
             });
+            await this.reloadProject();
         }
     }
 
@@ -1368,6 +1446,87 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         }
     }
 
+    private reloadProject = async () => {
+        this.loadingDialog.current.open();
+        this.loadingDialog.current.change("正在重新加载数据集", "请耐心等待");
+        const par: IProviderOptions = this.props.project.sourceConnection.providerOptions;
+        console.log(`fucking ${par["folderPath"]}`);
+        const fileFolder = par["folderPath"];
+        // alert(JSON.stringify(this.props.project));
+        if (!fileFolder) { return; }
+        const idd = normalizeSlashes(fileFolder).lastIndexOf("/");
+        // const randId = shortid.generate();
+        console.log(`homePage>openDir: idd ${idd}`);
+        const folderName = normalizeSlashes(fileFolder).substring(idd + 1);
+        console.log(`homePage>openDir: folderName ${folderName}`);
+        console.log(`homePage>openDir: normalizeSlashes(fileFolder[0]) ${normalizeSlashes(fileFolder)}`);
+        const connection: IConnection = {
+            id: folderName,
+            name: folderName,
+            providerType: "localFileSystemProxy",
+            providerOptions: {
+                folderPath: normalizeSlashes(fileFolder),
+            },
+            providerOptionsOthers: [{
+                folderPath: normalizeSlashes(fileFolder),
+            }],
+        };
+        let projectJson: IProject = {
+            id: folderName,
+            name: folderName,
+            version: "3.0.0",
+            activeLearningSettings: DefaultActiveLearningSettings,
+            autoSave: true,
+            exportFormat: DefaultExportOptions,
+            securityToken: folderName,
+            sourceConnection: connection,
+            sourceListConnection: [],
+            tags: [],
+            targetConnection: connection,
+            trainFormat: DefaultTrainOptions,
+            videoSettings: { frameExtractionRate: 15 },
+            assets: {},
+        };
+        const dataTemp = await this.props.actions.loadAssetsWithFolderAndTags(projectJson,
+            fileFolder);
+        const rootProjectAssets = _.values(projectJson.assets)
+            .filter((asset) => !asset.parent);
+        const rootAssets = _(rootProjectAssets)
+            .concat(dataTemp.assets)
+            .uniqBy((asset) => asset.id)
+            .value();
+        // region 查询重复的标签
+        const finalTags = this.props.project.tags;
+        dataTemp.tags.map((val) => {
+            if (!finalTags.some((v) => v.name === val.name)) {
+                const newTag: ITag = {
+                    name: val.name,
+                    color: this.getNextColor(finalTags),
+                };
+                finalTags.push(newTag);
+            }
+        });
+        // endregion
+
+        projectJson = {
+            ...projectJson,
+            assets: _.keyBy(rootAssets, (asset) => asset.id),
+            tags: finalTags.sort(),
+        };
+        console.log(`merge tags: ${JSON.stringify(finalTags)}`);
+        console.log(`homePage:merge tags: ${JSON.stringify(projectJson)}`);
+        connectionActions.saveConnection(connection);
+
+        await this.props.actions.loadProject(projectJson);
+        this.loadingDialog.current.close();
+        this.props.history.push(`/projects/${projectJson.id}/edit`);
+        this.loadingProjectAssets = false;
+        this.setState({
+            assets: [],
+        });
+        this.loadProjectAssets();
+    }
+
     private uploadTestAssets = async () => {
         this.draggableDialog.current.open();
 
@@ -1571,8 +1730,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                 assets: newAssets,
             });
         }
-
-        // await this.props.actions.saveProject(finalProject);
+        await this.props.actions.saveProject(finalProject);
     }
 
     private loadProjectAssetsWithFolder = async (folder): Promise<void> => {

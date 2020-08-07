@@ -23,7 +23,7 @@ export class KeyboardManager extends React.Component<any, IKeyboardContext> {
         keyboard: new KeyboardRegistrationManager(),
     };
 
-    private nonSupportedKeys = new Set(["Meta", "Ctrl", " Control", "Alt"]);
+    private nonSupportedKeys = new Set(["Meta", "Ctrl", " Control", "Alt", "Shift"]);
     private inputElementTypes = new Set(["input", "select", "textarea"]);
 
     public componentDidMount() {
@@ -50,6 +50,9 @@ export class KeyboardManager extends React.Component<any, IKeyboardContext> {
         const keyParts = [];
         if (evt.ctrlKey || evt.metaKey) {
             keyParts.push("CmdOrCtrl+");
+        }
+        if (evt.shiftKey || evt.metaKey) {
+            keyParts.push("Shift+");
         }
         if (evt.altKey) {
             keyParts.push("Alt+");

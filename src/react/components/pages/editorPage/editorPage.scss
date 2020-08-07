@@ -107,6 +107,13 @@
       font-weight: 600;
     }
 
+    &.selected-list {
+      color: #fff;
+      background-color: $color-red2;
+      font-weight: 600;
+    }
+
+
     &-image {
       flex-grow: 1;
       overflow: hidden;
