@@ -1651,7 +1651,16 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         return this.state.isValid;
     }
 
-    private selectAsset = async (asset: IAsset): Promise<void> => {
+    private selectAsset = async (asset: IAsset, multipleSelect?: boolean, startIndex?: number, endIndex?: number):
+        Promise<void> => {
+        this.setState({
+            ...this.state,
+            multipleSelectAssets: {
+                multipleSelect,
+                startIndex,
+                endIndex,
+            },
+        });
         // Nothing to do if we are already on the same asset.
         if (this.state.selectedAsset && this.state.selectedAsset.asset.id === asset.id) {
             return;
