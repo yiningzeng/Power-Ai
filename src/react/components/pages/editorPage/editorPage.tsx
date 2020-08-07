@@ -1396,6 +1396,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                 await this.props.actions.saveProject(this.props.project);
                 break;
             case ToolbarItemName.ExportProject:
+                await this.reloadProject();
                 // toast.error("开始到处");
                 this.props.history.push(`/projects/${projectId}/export`);
                 break;
