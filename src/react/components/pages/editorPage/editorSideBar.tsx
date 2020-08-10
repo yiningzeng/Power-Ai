@@ -84,6 +84,13 @@ export default class EditorSideBar extends React.Component<IEditorSideBarProps, 
         }
     }
 
+    public removeStatus = () => {
+        this.setState({
+            ...this.state,
+            multipleSelect: false,
+        });
+    }
+
     private onItemClick = (e: MouseEvent, asset: IAsset) => {
         // e.stopPropagation();
 
@@ -131,7 +138,6 @@ export default class EditorSideBar extends React.Component<IEditorSideBarProps, 
                 return;
             }
         }
-
         this.selectAsset(asset);
     }
 

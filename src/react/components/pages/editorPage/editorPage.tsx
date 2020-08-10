@@ -213,6 +213,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
     private loadingDialog: React.RefObject<DraggableDialog> = React.createRef();
     private draggableDialogProjectMetrics: React.RefObject<DraggableDialogProjectMetrics> = React.createRef();
     private myZoomDom: React.RefObject<Rnd> = React.createRef();
+    private editorSideBar: React.RefObject<EditorSideBar> = React.createRef();
 
     constructor(props, context) {
         super(props, context);
@@ -517,6 +518,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                             />
                         </div>
                         <EditorSideBar
+                            ref={this.editorSideBar}
                             assets={this.state.isFilter ? this.state.filterAssets : this.state.assets}
                             selectedAsset={selectedAsset ? selectedAsset.asset : null}
                             // selectedAsset={null}
@@ -856,6 +858,8 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                     this.selectAsset(this.state.assets[index]);
                 }
             }
+
+            this.editorSideBar.current.removeStatus();
 
             // if (this.state.isFilter) { // 判断是否是过滤的数据
             //
