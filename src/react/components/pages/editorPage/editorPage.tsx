@@ -545,6 +545,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                     position={{x: this.state.zoomMode.x, y: this.state.zoomMode.y}}
                                     onDragStop={(e, d) => {
                                         console.log(`drag: ${d.x}, ${d.y} onDragStop`);
+                                        console.log(`drag: this.state.zoomMode.x ${this.state.zoomMode.x}, this.state.zoomMode.y ${this.state.zoomMode.y}`);
                                         e.preventDefault();
                                         this.setState({
                                             zoomMode: {
@@ -554,9 +555,9 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                             },
                                         });
                                     }}
-                                    // onDragStart={(e) => {
-                                    //     e.preventDefault();
-                                    // }}
+                                    onDragStart={(e) => {
+                                        e.preventDefault();
+                                    }}
                                     onResize={(e, direction, ref, delta, position) => {
                                         this.setState({
                                             zoomMode: {
@@ -564,57 +565,57 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                                 ...position,
                                                 width: ref.offsetWidth,
                                                 height: ref.offsetHeight,
-                                                zoomCenterX: ref.offsetWidth / 2,
-                                                zoomCenterY: ref.offsetHeight / 2,
+                                                // zoomCenterX: ref.offsetWidth / 2,
+                                                // zoomCenterY: ref.offsetHeight / 2,
                                             },
                                         });
                                     }}
                                     onMouseDown={(e) => {
-                                        // console.log(e.button);
-                                        // if (e.button === 0) {
-                                        //     this.canvas.current.enableCanvas(true);
-                                        //     this.setState({
-                                        //         selectionMode: SelectionMode.RECT,
-                                        //         editorMode: EditorMode.Rectangle,
-                                        //         zoomMode: {
-                                        //             ...this.state.zoomMode,
-                                        //             disableDrag: true,
-                                        //         },
-                                        //         isDrawPolygon2MinBox: false,
-                                        //     });
-                                        //     this.canvas.current.enableCanvas(true);
-                                        // } else if (e.button === 2) {
-                                        //     e.stopPropagation();
-                                        //     this.canvas.current.enableCanvas(false);
-                                        //     this.setState({
-                                        //         selectionMode: SelectionMode.NONE,
-                                        //         editorMode: EditorMode.Select,
-                                        //         zoomMode: {
-                                        //             ...this.state.zoomMode,
-                                        //             disableDrag: false,
-                                        //         },
-                                        //         isDrawPolygon2MinBox: false,
-                                        //     });
-                                        //
-                                        // }
+                                        console.log(e.button);
+                                        if (e.button === 0) {
+                                            this.canvas.current.enableCanvas(true);
+                                            this.setState({
+                                                selectionMode: SelectionMode.RECT,
+                                                editorMode: EditorMode.Rectangle,
+                                                zoomMode: {
+                                                    ...this.state.zoomMode,
+                                                    disableDrag: true,
+                                                },
+                                                isDrawPolygon2MinBox: false,
+                                            });
+                                            this.canvas.current.enableCanvas(true);
+                                        } else if (e.button === 2) {
+                                            e.stopPropagation();
+                                            this.canvas.current.enableCanvas(false);
+                                            this.setState({
+                                                selectionMode: SelectionMode.NONE,
+                                                editorMode: EditorMode.Select,
+                                                zoomMode: {
+                                                    ...this.state.zoomMode,
+                                                    disableDrag: false,
+                                                },
+                                                isDrawPolygon2MinBox: false,
+                                            });
+
+                                        }
                                         // const zone = document.getElementById("ct-zone");
                                         // console.log(this.myZoomDom.current.getOffsetFromParent().left);
                                         // console.log(this.myZoomDom.current.getSelfElement().offsetLeft);
                                         // console.log(this.myZoomDom.current.getSelfElement().style.marginLeft);
                                         // console.log(this.myZoomDom.current.getSelfElement().style.left);
                                         // console.log(this.myZoomDom.current.getSelfElement().style.paddingLeft);
-                                            this.setState({
-                                                zoomMode: {
-                                                    ...this.state.zoomMode,
-                                                    zoomCenterX: e.clientX,
-                                                    zoomCenterY: e.clientY,
-                                                },
-                                            });
+                                        // this.setState({
+                                        //     zoomMode: {
+                                        //         ...this.state.zoomMode,
+                                        //         zoomCenterX: e.clientX,
+                                        //         zoomCenterY: e.clientY,
+                                        //     },
+                                        // });
                                     }}
                                     onMouseUp={(e) => {
-                                        // if (e.button === 2) {
-                                        //     this.canvas.current.enableCanvas(true);
-                                        // }
+                                        if (e.button === 2) {
+                                            this.canvas.current.enableCanvas(true);
+                                        }
                                         console.log(e);
                                         console.log(`我是鼠标点x: ${e.clientX} 我是鼠标点y: ${e.clientY}`);
                                         // this.setState({
@@ -655,7 +656,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                                     width: (w - deltaY * 2),
                                                     height: (h - deltaY * 2),
                                                     x: this.state.zoomMode.x + deltaY,
-                                                    y: this.state.zoomMode.x + deltaY,
+                                                    y: this.state.zoomMode.y + deltaY,
                                                 },
                                             });
                                             if (this.state.zoomMode.height === "auto") {
