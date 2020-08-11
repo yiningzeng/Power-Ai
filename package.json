@@ -1,6 +1,6 @@
 {
     "name": "Power-Ai",
-    "version": "3.8.7",
+    "version": "3.9.14-beta",
     "author": {
         "name": "宁波轻蜓视觉科技有限公司",
         "url": "https://github.com/yiningzeng/Power-Ai.git"
@@ -51,6 +51,8 @@
         "panzoom": "^9.2.1",
         "polygon-aabb": "^1.0.0",
         "powerai-ct": "^2.3.1",
+        "powerai-react-rnd": "^10.2.4",
+        "powerai-react-draggable-v2": "^4.4.5",
         "rc-align": "^2.4.5",
         "rc-checkbox": "^2.1.6",
         "rc-menu": "^7.4.21",
@@ -67,7 +69,6 @@
         "react-localization": "^1.0.13",
         "react-modal": "^3.8.1",
         "react-redux": "^5.1.1",
-        "react-rnd": "10.2.0",
         "react-router-dom": "^4.3.1",
         "react-scripts": "2.1.1",
         "react-split-pane": "^0.1.87",

@@ -48,7 +48,6 @@ import {ActiveLearningService} from "../../../../services/activeLearningService"
 import {toast} from "react-toastify";
 import CondensedList from "../../common/condensedList/condensedList";
 import SourceItem from "../../common/condensedList/sourceItem";
-import {Rnd} from "react-rnd";
 import Zoom from "../../common/zoom/zoom";
 import {ILocalFileSystemProxyOptions, LocalFileSystemProxy} from "../../../../providers/storage/localFileSystemProxy";
 import * as connectionActions from "../../../../redux/actions/connectionActions";
@@ -59,7 +58,8 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import Paper, {PaperProps} from "@material-ui/core/Paper";
-import Draggable from "react-draggable";
+// import Draggable from "react-draggable-power-ai";
+import Draggable from "powerai-react-draggable-v2";
 import LinearProgress from "@material-ui/core/LinearProgress";
 import DraggableDialog from "../../common/draggableDialog/draggableDialog";
 import DraggableDialogProjectMetrics from "../../common/draggableDialog/draggableDialogProjectMetrics";
@@ -68,6 +68,7 @@ import {ExportAssetState} from "../../../../providers/export/exportProvider";
 import {normalizeSlashes, randomIntInRange} from "../../../../common/utils";
 // tslint:disable-next-line:no-var-requires
 import tagColors from "../../common/tagColors.json";
+import {Rnd} from "powerai-react-rnd";
 
 // import "antd/lib/tree/style/css";
 
@@ -631,13 +632,11 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                         // if (e.stopPropagation) e.stopPropagation();
                                         // if (e.preventDefault) e.preventDefault();
                                         // console.log(e);
-                                        console.log(`drag: ${e.clientX}, ${e.clientY} onMouseMove`);
+                                        // console.log(`drag: ${e.clientX}, ${e.clientY} onMouseMove`);
                                         // this.setState({
                                         //     ...this.state,
                                         //     zoomMode: {
                                         //         ...this.state.zoomMode,
-                                        //         zoomCenterX: e.clientX,
-                                        //         zoomCenterY: e.clientY,
                                         //     },
                                         // });
                                     }}
