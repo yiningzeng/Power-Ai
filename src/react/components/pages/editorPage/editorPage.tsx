@@ -573,31 +573,31 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                     }}
                                     onMouseDown={(e) => {
                                         console.log(e.button);
-                                        if (e.button === 0) {
-                                            this.canvas.current.enableCanvas(true);
-                                            this.setState({
-                                                selectionMode: SelectionMode.RECT,
-                                                editorMode: EditorMode.Rectangle,
-                                                zoomMode: {
-                                                    ...this.state.zoomMode,
-                                                    disableDrag: true,
-                                                },
-                                                isDrawPolygon2MinBox: false,
-                                            });
-                                            this.canvas.current.enableCanvas(true);
-                                        } else if (e.button === 2) {
+                                        // if (e.button === 0) {
+                                        //     // this.canvas.current.enableCanvas(true);
+                                        //     this.setState({
+                                        //         selectionMode: SelectionMode.RECT,
+                                        //         editorMode: EditorMode.Rectangle,
+                                        //         zoomMode: {
+                                        //             ...this.state.zoomMode,
+                                        //             disableDrag: true,
+                                        //         },
+                                        //         isDrawPolygon2MinBox: false,
+                                        //     });
+                                        //     // this.canvas.current.enableCanvas(true);
+                                        // } else
+                                        if (e.button === 2) {
                                             e.stopPropagation();
-                                            this.canvas.current.enableCanvas(false);
-                                            this.setState({
-                                                selectionMode: SelectionMode.NONE,
-                                                editorMode: EditorMode.Select,
-                                                zoomMode: {
-                                                    ...this.state.zoomMode,
-                                                    disableDrag: false,
-                                                },
-                                                isDrawPolygon2MinBox: false,
-                                            });
-
+                                            // this.canvas.current.enableCanvas(false);
+                                            // this.setState({
+                                            //     selectionMode: SelectionMode.NONE,
+                                            //     editorMode: EditorMode.Select,
+                                            //     zoomMode: {
+                                            //         ...this.state.zoomMode,
+                                            //         disableDrag: false,
+                                            //     },
+                                            //     isDrawPolygon2MinBox: false,
+                                            // });
                                         }
                                         // const zone = document.getElementById("ct-zone");
                                         // console.log(this.myZoomDom.current.getOffsetFromParent().left);
@@ -783,9 +783,9 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
     }
 
     private onPageClick = () => {
-        this.setState({
-            selectedRegions: [],
-        });
+        // this.setState({
+        //     selectedRegions: [],
+        // });
     }
 
     private onSourceProviderDeleted = async (project: IProject, item: IProviderOptions|ISecureString):
