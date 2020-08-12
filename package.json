@@ -1,6 +1,6 @@
 {
     "name": "Power-Ai",
-    "version": "3.9.14-beta",
+    "version": "4.0.0-beta",
     "author": {
         "name": "宁波轻蜓视觉科技有限公司",
         "url": "https://github.com/yiningzeng/Power-Ai.git"
@@ -50,7 +50,7 @@
         "omnizoom": "^1.1.5",
         "panzoom": "^9.2.1",
         "polygon-aabb": "^1.0.0",
-        "powerai-ct": "^2.3.1",
+        "powerai-ct": "^2.3.6",
         "powerai-react-rnd": "^10.2.4",
         "powerai-react-draggable-v2": "^4.4.5",
         "rc-align": "^2.4.5",
