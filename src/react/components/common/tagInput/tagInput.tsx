@@ -412,7 +412,7 @@ export class TagInput extends React.Component<ITagInputProps, ITagInputState> {
             this.setState({
                 editingTag: newEditingTag,
                 editingTagNode: this.getTagNode(newEditingTag),
-                selectedTag: (alreadySelected && !inEditMode) ? null : tag,
+                selectedTag: (alreadySelected && !inEditMode) ? tag : tag,
                 clickedColor: props.clickedColor,
                 showColorPicker: false,
             });
