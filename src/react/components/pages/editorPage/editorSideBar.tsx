@@ -58,7 +58,7 @@ export default class EditorSideBar extends React.Component<IEditorSideBarProps, 
                             height={height}
                             width={width}
                             rowCount={this.props.assets.length}
-                            rowHeight={() => this.getRowHeight(width)}
+                            rowHeight={width / (4 / 3) + 16}
                             rowRenderer={this.rowRenderer}
                             overscanRowCount={2}
                             scrollToIndex={this.state.scrollToIndex}
