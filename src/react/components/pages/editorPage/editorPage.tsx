@@ -629,6 +629,8 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                         // });
                                     }}
                                     onMouseMove={(e) => {
+                                        console.log(`我是图像左上角点x: ${this.myZoomDom.current.getDraggablePosition().x} 我是图像左上角点y: ${this.myZoomDom.current.getDraggablePosition().y}`);
+                                        console.log(`我是图像鼠标x: ${e.clientX} 我是图像鼠标Y: ${e.clientY}`);
                                         // if (e.stopPropagation) e.stopPropagation();
                                         // if (e.preventDefault) e.preventDefault();
                                         // console.log(e);
@@ -640,22 +642,31 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                         //     },
                                         // });
                                     }}
-                                    onWheel={(e) => Zoom(e, (deltaY) => {
+                                    onWheel={(e) => {
                                         try {
                                             const zone = document.getElementById("ct-zone");
-                                            console.log(`我是图像左上角点x: ${this.myZoomDom.current.getDraggablePosition().x} 我是图像左上角点y: ${this.myZoomDom.current.getDraggablePosition().y}`);
-                                            const w = zone.offsetWidth;
-                                            const h = zone.offsetHeight;
-                                            if ((h - deltaY) < this.state.zoomMode.miniHeight) {
+                                            let w = zone.offsetWidth;
+                                            let h = zone.offsetHeight;
+                                            if ((h - e.deltaY) < this.state.zoomMode.miniHeight) {
                                                 return;
                                             }
+                                            const leftTopX = this.myZoomDom.current.getDraggablePosition().x;
+                                            const leftTopY = this.myZoomDom.current.getDraggablePosition().y;
+
+                                            const ratioL = (e.clientX - leftTopX) / w;
+                                            const ratioT = (e.clientY - leftTopY) / h;
+                                            const ratioDelta = e.deltaY < 0 ? 1 + 0.07 : 1 - 0.07;
+
+                                            // console.log(`我是图像鼠标滚轮ratioDelta: ${ratioDelta} `);
+                                            w = w * ratioDelta;
+                                            h = h * ratioDelta;
                                             this.setState({
                                                 zoomMode: {
                                                     ...this.state.zoomMode,
-                                                    width: (w - deltaY * 2),
-                                                    height: (h - deltaY * 2),
-                                                    x: this.state.zoomMode.x + deltaY,
-                                                    y: this.state.zoomMode.y + deltaY,
+                                                    width: w,
+                                                    height: h,
+                                                    x: Math.round(e.clientX - (w * ratioL)) - (e.deltaY / 4),
+                                                    y: Math.round(e.clientY - (h * ratioT)),
                                                 },
                                             });
                                             if (this.state.zoomMode.height === "auto") {
@@ -669,14 +680,9 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                         } catch (e) {
                                             console.error(e);
                                         }
-                                    })}
+                                        e.stopPropagation();
+                                    }}
                                 >
-
-                                    {/*<ZoomableImage*/}
-                                    {/*    src="https://i.picsum.photos/id/35/1440/900.jpg"*/}
-                                    {/*    alt="some alt text"*/}
-                                    {/*    zoomScale={3}*/}
-                                    {/*    transitionDuration={0.5}/>*/}
                                     <Canvas
                                         ref={this.canvas}
                                         selectedAsset={this.state.selectedAsset}
