@@ -199,10 +199,15 @@ export class AssetService {
 
         const updates = await assets.mapAsync(async (asset) => {
             const assetMetadata = await this.getAssetMetadata(asset);
-            if (assetMetadata.version === "3.6.2") {
-                console.log("老版本的数据，最好是读取所有的regions组装tags");
+            const comVersionRes = this.compareVersion(assetMetadata.version, appInfo.version);
+            if (comVersionRes === 0) {
+                console.log(assetMetadata.asset.name + "版本一致");
+            } else if (comVersionRes > 0) {
+                console.log(assetMetadata.asset.name + "更新的版本");
+            } else if (comVersionRes < 0) {
+                console.log(assetMetadata.asset.name + "老版本的数据");
+                this.upgradeAssetMetadata(assetMetadata);
             }
-            console.log(`fuck your son: assetService22 ${JSON.stringify(assetMetadata.asset)}`);
             if (assetMetadata.asset) {
                 if (assetMetadata.asset.tags) {
                     if (assetMetadata.asset.tags.indexOf(",") > 0) {
@@ -250,6 +255,19 @@ export class AssetService {
             tags: finalTags,
         };
         return res;
+    }
+
+    /**
+     * 用于升级老版本数据使用
+     * @param metadata - Asset for which to retrieve metadata
+     */
+    public async upgradeAssetMetadata(metadata: IAssetMetadata): Promise<boolean> {
+        Guard.null(metadata);
+        if (this.compareVersion(metadata.version, "4.1.4") < 0) {
+            metadata.version = appInfo.version;
+            this.save(metadata);
+        }
+        return true;
     }
 
     /**
@@ -341,6 +359,36 @@ export class AssetService {
                 };
             }
         }
+    }
+
+    /**
+     * 比对素材json版本和当前版本
+     * @param version 素材的版本
+     * return 0：版本一致 -1：老版本 1：更新的版本
+     */
+    public compareVersion(assetsVersion: string, compareVersion: string): number {
+        Guard.null(assetsVersion);
+        if (assetsVersion === compareVersion) { return 0; }
+        if (compareVersion.indexOf("-") > 0) {
+            compareVersion = compareVersion.substring(0, compareVersion.indexOf("-"));
+        }
+        if (assetsVersion.indexOf("-") > 0) {
+            assetsVersion = assetsVersion.substring(0, assetsVersion.indexOf("-"));
+        }
+        const versions = assetsVersion.split(".");
+        const currentVersions = compareVersion.split(".");
+        console.log("版本 素材版本" + JSON.stringify(versions));
+        console.log(`版本 比较的版本 ${compareVersion} ${JSON.stringify(currentVersions)}`);
+        if (Number(versions[0]) > Number(currentVersions[0])) {
+            return 1;
+        } else if (Number(versions[0]) === Number(currentVersions[0]) &&
+            Number(versions[1]) > Number(currentVersions[1])) {
+            return 1;
+        } else if (Number(versions[0]) === Number(currentVersions[0]) &&
+            Number(versions[1]) === Number(currentVersions[1]) &&
+            Number(versions[2]) > Number(currentVersions[2])) {
+            return 1;
+        } else { return -1; }
     }
 
     /**
