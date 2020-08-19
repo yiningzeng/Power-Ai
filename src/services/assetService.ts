@@ -185,6 +185,14 @@ export class AssetService {
     }
 
     public async getAssetsWithFolderMain(folder): Promise<IAssetsAndTags> {
+        if (!this.storageProviderInstance) {
+            this.storageProviderInstance = StorageProviderFactory.create(
+                "localFileSystemProxy",
+                {
+                    folderPath: folder,
+                },
+            );
+        }
         if (!this.assetProviderInstance) {
             this.assetProviderInstance = AssetProviderFactory.create(
                 "localFileSystemProxy",
@@ -195,8 +203,10 @@ export class AssetService {
         }
         let res: IAssetsAndTags;
         let taggs = [];
+        let finalTags: ITag[] = [];
         const assets = await this.assetProviderInstance.getAssets();
-
+        finalTags = await this.getColors();
+        console.log(`获取到的颜色 ${JSON.stringify(finalTags)}`);
         const updates = await assets.mapAsync(async (asset) => {
             const assetMetadata = await this.getAssetMetadata(asset);
             const comVersionRes = this.compareVersion(assetMetadata.version, appInfo.version);
@@ -242,13 +252,15 @@ export class AssetService {
         });
         const finalAssets = updates.sort((a1, a2) => a1.state > a2.state ? -1 : 1);
         taggs = [...new Set(taggs)].sort(); // 去重然后排序 用于标签搜索
-        const finalTags = [];
         taggs.map((val) => {
-            const newTag: ITag = {
-                name: val,
-                color: this.getNextColor(finalTags),
-            };
-            finalTags.push(newTag);
+            const index = finalTags.findIndex((item) => item.name === val);
+            if (index === -1) {
+                const newTag: ITag = {
+                    name: val,
+                    color: this.getNextColor(finalTags),
+                };
+                finalTags.push(newTag);
+            }
         });
         res = {
             assets: finalAssets,
@@ -358,6 +370,20 @@ export class AssetService {
                     version: appInfo.version,
                 };
             }
+        }
+    }
+
+    /**
+     * Get metadata for asset
+     * @param asset - Asset for which to retrieve metadata
+     */
+    public async getColors(): Promise<ITag[]> {
+        try {
+            const json = await this.storageProviderInstance.readText(constants.colorFileExtension);
+            return JSON.parse(json) as ITag[];
+        } catch (err) {
+            const taggs: ITag[] = [];
+            return taggs;
         }
     }
 

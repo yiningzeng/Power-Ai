@@ -133,6 +133,10 @@ export default class ProjectService implements IProjectService {
         //     JSON.stringify(project, null, "\t"),
         // );
 
+        await storageProvider.writeText(
+            constants.colorFileExtension,
+            JSON.stringify(project.tags, null, "\t"),
+        );
         return project;
     }
 
