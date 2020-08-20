@@ -300,6 +300,20 @@ export class AssetService {
             .filter((asset) => asset.id !== selectAsset.id)
             .sort((a, b) => a.timestamp - b.timestamp);
     }
+
+    /**
+     * 删除素材
+     * @param selectAsset
+     */
+    public async onlyDeleteAsset(selectAsset: IAsset): Promise<boolean> {
+        const path = decodeURI(selectAsset.path.replace("file:", ""));
+        await new LocalFileSystemProxy().deleteFileOnlyPath(path);
+        await this.storageProvider.deleteFile(decodeURI(selectAsset.name)); // 根据文件名删除，可能存在多文件夹有问题
+        await this.storageProvider.deleteFile(
+            decodeURI(selectAsset.name.substring(0, selectAsset.name.lastIndexOf(".")))
+            + constants.assetMetadataFileExtension); // 根据文件名删除，可能存在多文件夹有问题
+        return true;
+    }
     /**
      * Get a list of child assets associated with the current asset
      * @param rootAsset The parent asset to search

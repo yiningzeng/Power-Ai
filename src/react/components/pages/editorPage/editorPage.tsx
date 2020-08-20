@@ -821,12 +821,14 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         if (this.state.multipleSelectAssets.multipleSelect) {
             this.loadingDialog.current.open();
             this.loadingDialog.current.change("正在批量删除...", "请耐心等待");
+            const assetService = new AssetService(this.props.project);
             // 这里还要区分是否是搜索的列表
             if (this.state.isFilter) { // 这里有个隐患！！！就是只是删除了搜索后的列表！
                 for (let i = this.state.multipleSelectAssets.startIndex;
                      i <= this.state.multipleSelectAssets.endIndex; i++) {
                     const asset = this.state.filterAssets[i];
-                    await this.props.actions.deleteAsset(this.props.project, asset);
+                    // await this.props.actions.deleteAsset(this.props.project, asset);
+                    await this.props.actions.deleteAssetBatch(assetService, asset);
                 }
                 this.state.filterAssets.splice(
                     this.state.multipleSelectAssets.startIndex,
@@ -854,7 +856,8 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                 for (let i = this.state.multipleSelectAssets.startIndex;
                      i <= this.state.multipleSelectAssets.endIndex; i++) {
                     const asset = this.state.assets[i];
-                    await this.props.actions.deleteAsset(this.props.project, asset);
+                    // await this.props.actions.deleteAsset(this.props.project, asset);
+                    await this.props.actions.deleteAssetBatch(assetService, asset);
                 }
 
                 await this.reloadProject();

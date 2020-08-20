@@ -53,6 +53,7 @@ export default interface IProjectActions {
     loadAssetMetadata(project: IProject, asset: IAsset): Promise<IAssetMetadata>;
     saveAssetMetadata(project: IProject, assetMetadata: IAssetMetadata): Promise<IAssetMetadata>;
     deleteAsset(project: IProject, selectAsset: IAsset): Promise<IProject>;
+    deleteAssetBatch(assetService: AssetService, selectAsset: IAsset): Promise<void>;
     updateProjectTag(project: IProject, oldTagName: string, newTagName: string): Promise<IAssetMetadata[]>;
     deleteProjectTag(project: IProject, tagName): Promise<IAssetMetadata[]>;
     test(): void;
@@ -283,6 +284,18 @@ export function deleteAsset(project: IProject, selectAsset: IAsset)
         // Reload project after save actions
         await loadProject(updatedProject)(dispatch, getState);
         return updatedProject;
+    };
+}
+
+/**
+ * Dispatches Delete Project action and resolves with project
+ * @param project - Project to delete
+ * @param selectAsset
+ */
+export function deleteAssetBatch(assetService: AssetService, selectAsset: IAsset)
+    : (dispatch: Dispatch, getState: () => IApplicationState) => Promise<void> {
+    return async (dispatch: Dispatch, getState: () => IApplicationState) => {
+        assetService.onlyDeleteAsset(selectAsset);
     };
 }
 
