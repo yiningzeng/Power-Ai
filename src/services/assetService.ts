@@ -185,6 +185,14 @@ export class AssetService {
     }
 
     public async getAssetsWithFolderMain(folder): Promise<IAssetsAndTags> {
+        if (!this.storageProviderInstance) {
+            this.storageProviderInstance = StorageProviderFactory.create(
+                "localFileSystemProxy",
+                {
+                    folderPath: folder,
+                },
+            );
+        }
         if (!this.assetProviderInstance) {
             this.assetProviderInstance = AssetProviderFactory.create(
                 "localFileSystemProxy",
@@ -195,11 +203,21 @@ export class AssetService {
         }
         let res: IAssetsAndTags;
         let taggs = [];
+        let finalTags: ITag[] = [];
         const assets = await this.assetProviderInstance.getAssets();
-
+        finalTags = await this.getColors();
+        console.log(`获取到的颜色 ${JSON.stringify(finalTags)}`);
         const updates = await assets.mapAsync(async (asset) => {
             const assetMetadata = await this.getAssetMetadata(asset);
-            console.log(`fuck your son: assetService22 ${JSON.stringify(assetMetadata.asset)}`);
+            const comVersionRes = this.compareVersion(assetMetadata.version, appInfo.version);
+            if (comVersionRes === 0) {
+                console.log(assetMetadata.asset.name + "版本一致");
+            } else if (comVersionRes > 0) {
+                console.log(assetMetadata.asset.name + "更新的版本");
+            } else if (comVersionRes < 0) {
+                console.log(assetMetadata.asset.name + "老版本的数据");
+                this.upgradeAssetMetadata(assetMetadata);
+            }
             if (assetMetadata.asset) {
                 if (assetMetadata.asset.tags) {
                     if (assetMetadata.asset.tags.indexOf(",") > 0) {
@@ -234,19 +252,34 @@ export class AssetService {
         });
         const finalAssets = updates.sort((a1, a2) => a1.state > a2.state ? -1 : 1);
         taggs = [...new Set(taggs)].sort(); // 去重然后排序 用于标签搜索
-        const finalTags = [];
         taggs.map((val) => {
-            const newTag: ITag = {
-                name: val,
-                color: this.getNextColor(finalTags),
-            };
-            finalTags.push(newTag);
+            const index = finalTags.findIndex((item) => item.name === val);
+            if (index === -1) {
+                const newTag: ITag = {
+                    name: val,
+                    color: this.getNextColor(finalTags),
+                };
+                finalTags.push(newTag);
+            }
         });
         res = {
             assets: finalAssets,
             tags: finalTags,
         };
         return res;
+    }
+
+    /**
+     * 用于升级老版本数据使用
+     * @param metadata - Asset for which to retrieve metadata
+     */
+    public async upgradeAssetMetadata(metadata: IAssetMetadata): Promise<boolean> {
+        Guard.null(metadata);
+        if (this.compareVersion(metadata.version, "4.1.4") < 0) {
+            metadata.version = appInfo.version;
+            this.save(metadata);
+        }
+        return true;
     }
 
     /**
@@ -259,10 +292,27 @@ export class AssetService {
         console.log(`删除素材deleteAsset->删除中文:${JSON.stringify(selectAsset)}`);
         await new LocalFileSystemProxy().deleteFileOnlyPath(path);
         await this.storageProvider.deleteFile(decodeURI(selectAsset.name)); // 根据文件名删除，可能存在多文件夹有问题
+        await this.storageProvider.deleteFile(
+            decodeURI(selectAsset.name.substring(0, selectAsset.name.lastIndexOf(".")))
+            + constants.assetMetadataFileExtension); // 根据文件名删除，可能存在多文件夹有问题
         return _
             .values(this.project.assets)
             .filter((asset) => asset.id !== selectAsset.id)
             .sort((a, b) => a.timestamp - b.timestamp);
+    }
+
+    /**
+     * 删除素材
+     * @param selectAsset
+     */
+    public async onlyDeleteAsset(selectAsset: IAsset): Promise<boolean> {
+        const path = decodeURI(selectAsset.path.replace("file:", ""));
+        await new LocalFileSystemProxy().deleteFileOnlyPath(path);
+        await this.storageProvider.deleteFile(decodeURI(selectAsset.name)); // 根据文件名删除，可能存在多文件夹有问题
+        await this.storageProvider.deleteFile(
+            decodeURI(selectAsset.name.substring(0, selectAsset.name.lastIndexOf(".")))
+            + constants.assetMetadataFileExtension); // 根据文件名删除，可能存在多文件夹有问题
+        return true;
     }
     /**
      * Get a list of child assets associated with the current asset
@@ -338,6 +388,50 @@ export class AssetService {
     }
 
     /**
+     * Get metadata for asset
+     * @param asset - Asset for which to retrieve metadata
+     */
+    public async getColors(): Promise<ITag[]> {
+        try {
+            const json = await this.storageProviderInstance.readText(constants.colorFileExtension);
+            return JSON.parse(json) as ITag[];
+        } catch (err) {
+            const taggs: ITag[] = [];
+            return taggs;
+        }
+    }
+
+    /**
+     * 比对素材json版本和当前版本
+     * @param version 素材的版本
+     * return 0：版本一致 -1：老版本 1：更新的版本
+     */
+    public compareVersion(assetsVersion: string, compareVersion: string): number {
+        Guard.null(assetsVersion);
+        if (assetsVersion === compareVersion) { return 0; }
+        if (compareVersion.indexOf("-") > 0) {
+            compareVersion = compareVersion.substring(0, compareVersion.indexOf("-"));
+        }
+        if (assetsVersion.indexOf("-") > 0) {
+            assetsVersion = assetsVersion.substring(0, assetsVersion.indexOf("-"));
+        }
+        const versions = assetsVersion.split(".");
+        const currentVersions = compareVersion.split(".");
+        console.log("版本 素材版本" + JSON.stringify(versions));
+        console.log(`版本 比较的版本 ${compareVersion} ${JSON.stringify(currentVersions)}`);
+        if (Number(versions[0]) > Number(currentVersions[0])) {
+            return 1;
+        } else if (Number(versions[0]) === Number(currentVersions[0]) &&
+            Number(versions[1]) > Number(currentVersions[1])) {
+            return 1;
+        } else if (Number(versions[0]) === Number(currentVersions[0]) &&
+            Number(versions[1]) === Number(currentVersions[1]) &&
+            Number(versions[2]) > Number(currentVersions[2])) {
+            return 1;
+        } else { return -1; }
+    }
+
+    /**
      * Delete a tag from asset metadata files
      * @param tagName Name of tag to delete
      */
@@ -352,7 +446,7 @@ export class AssetService {
      */
     public async renameTag(tagName: string, newTagName: string): Promise<IAssetMetadata[]> {
         const transformer = (tags) => tags.map((t) => (t === tagName) ? newTagName : t);
-        return await this.getUpdatedAssets(tagName, transformer);
+        return await this.getUpdatedAssets(tagName, transformer, newTagName);
     }
 
     /**
@@ -360,12 +454,12 @@ export class AssetService {
      * @param tagName Name of tag to update within project
      * @param transformer Function that accepts array of tags from a region and returns a modified array of tags
      */
-    private async getUpdatedAssets(tagName: string, transformer: (tags: string[]) => string[])
+    private async getUpdatedAssets(tagName: string, transformer: (tags: string[]) => string[], newTagname?: string)
         : Promise<IAssetMetadata[]> {
         // Loop over assets and update if necessary
         const updates = await _.values(this.project.assets).mapAsync(async (asset) => {
             const assetMetadata = await this.getAssetMetadata(asset);
-            const isUpdated = this.updateTagInAssetMetadata(assetMetadata, tagName, transformer);
+            const isUpdated = this.updateTagInAssetMetadata(assetMetadata, tagName, transformer, newTagname);
 
             return isUpdated ? assetMetadata : null;
         });
@@ -383,16 +477,24 @@ export class AssetService {
     private updateTagInAssetMetadata(
         assetMetadata: IAssetMetadata,
         tagName: string,
-        transformer: (tags: string[]) => string[]): boolean {
+        transformer: (tags: string[]) => string[], newTagname?: string): boolean {
         let foundTag = false;
 
+        let finalTags = [];
         for (const region of assetMetadata.regions) {
             if (region.tags.find((t) => t === tagName)) {
                 foundTag = true;
                 region.tags = transformer(region.tags);
             }
+            region.tags.map((val) => {
+                finalTags.push(val);
+            });
         }
+
+        finalTags = [...new Set(finalTags)].sort(); // 去重然后排序 用于标签搜索
         if (foundTag) {
+            assetMetadata.asset.tags = finalTags.toString();
+            console.log(`更改的标签: ${finalTags.toString()}`);
             assetMetadata.regions = assetMetadata.regions.filter((region) => region.tags.length > 0);
             assetMetadata.asset.state = (assetMetadata.regions.length) ? AssetState.Tagged : AssetState.Visited;
             return true;

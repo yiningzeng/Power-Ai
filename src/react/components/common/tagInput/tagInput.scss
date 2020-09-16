@@ -59,16 +59,17 @@ $tagInputWidth: 250px;
 
         &-selected {
             .tag-content {
-                color: white;
-                margin: 1px 1px 1px 0;
+                color: #778899;
+                margin: 1px 8px 1px 8px;
+                font-weight: 900;
                 background: $darker-10 !important;
             }
         }
 
         &-applied {
             .tag-content {
-                color: #fff;
-                font-weight: 600;
+                //color: #fff;
+                //font-weight: 600;
                 background: $darker-10 !important;
             }
         }

@@ -1,8 +1,11 @@
-import React from "react";
+import React, {MouseEvent} from "react";
 import { AutoSizer, List } from "react-virtualized";
 import { IAsset, AssetState, ISize } from "../../../../models/applicationState";
 import { AssetPreview } from "../../common/assetPreview/assetPreview";
 import { strings } from "../../../../common/strings";
+import {KeyboardBinding} from "../../common/keyboardBinding/keyboardBinding";
+import {KeyEventType} from "../../common/keyboardManager/keyboardManager";
+import {TagEditMode} from "../../common/tagInput/tagInputItem";
 
 /**
  * Properties for Editor Side Bar
@@ -13,7 +16,7 @@ import { strings } from "../../../../common/strings";
  */
 export interface IEditorSideBarProps {
     assets: IAsset[];
-    onAssetSelected: (asset: IAsset) => void;
+    onAssetSelected: (asset: IAsset, multipleSelect?: boolean, startIndex?: number, endIndex?: number) => void;
     onBeforeAssetSelected?: () => boolean;
     selectedAsset?: IAsset;
     thumbnailSize?: ISize;
@@ -25,6 +28,8 @@ export interface IEditorSideBarProps {
  */
 export interface IEditorSideBarState {
     scrollToIndex: number;
+    multipleSelect: boolean;
+    originalIndex: number;
 }
 
 /**
@@ -36,6 +41,8 @@ export default class EditorSideBar extends React.Component<IEditorSideBarProps, 
         scrollToIndex: this.props.selectedAsset
             ? this.props.assets.findIndex((asset) => asset.id === this.props.selectedAsset.id)
             : 0,
+        originalIndex: 0,
+        multipleSelect: false,
     };
 
     private listRef: React.RefObject<List> = React.createRef();
@@ -51,7 +58,7 @@ export default class EditorSideBar extends React.Component<IEditorSideBarProps, 
                             height={height}
                             width={width}
                             rowCount={this.props.assets.length}
-                            rowHeight={() => this.getRowHeight(width)}
+                            rowHeight={width / (4 / 3) + 16}
                             rowRenderer={this.rowRenderer}
                             overscanRowCount={2}
                             scrollToIndex={this.state.scrollToIndex}
@@ -77,17 +84,51 @@ export default class EditorSideBar extends React.Component<IEditorSideBarProps, 
         }
     }
 
+    public removeStatus = () => {
+        this.setState({
+            ...this.state,
+            multipleSelect: false,
+        });
+    }
+
+    private onItemClick = (e: MouseEvent, asset: IAsset) => {
+        // e.stopPropagation();
+
+        const shiftKey = e.shiftKey || e.metaKey;
+        let originalIndex = 0;
+        let multipleSelect = false;
+        if (shiftKey) {
+            originalIndex = this.props.assets.findIndex((asset) => asset.id === this.props.selectedAsset.id);
+            multipleSelect = true;
+        }
+        this.setState({
+            ...this.state,
+            multipleSelect,
+            originalIndex,
+        }, () => {
+            console.log(`sidebar: this.state: ${JSON.stringify(this.state)}`);
+            console.log(`sidebar: originalIndex: ${originalIndex}`);
+            console.log(`sidebar: multipleSelect: ${multipleSelect}`);
+            this.onAssetClicked(asset);
+        });
+    }
+
     private getRowHeight = (width: number) => {
         return width / (4 / 3) + 16;
     }
 
     private selectAsset = (selectedAsset: IAsset): void => {
         const scrollToIndex = this.props.assets.findIndex((asset) => asset.id === selectedAsset.id);
-
         this.setState({
             scrollToIndex,
         }, () => {
             this.listRef.current.forceUpdateGrid();
+            const startIndex = this.state.originalIndex < this.state.scrollToIndex ?
+                this.state.originalIndex : this.state.scrollToIndex;
+            const endIndex = this.state.originalIndex < this.state.scrollToIndex ?
+                this.state.scrollToIndex : this.state.originalIndex;
+            console.log(`sidebar: this.state: ${JSON.stringify(this.state)}`);
+            this.props.onAssetSelected(selectedAsset, this.state.multipleSelect, startIndex, endIndex);
         });
     }
 
@@ -97,9 +138,7 @@ export default class EditorSideBar extends React.Component<IEditorSideBarProps, 
                 return;
             }
         }
-
         this.selectAsset(asset);
-        this.props.onAssetSelected(asset);
     }
 
     private rowRenderer = ({ key, index, style }): JSX.Element => {
@@ -109,8 +148,11 @@ export default class EditorSideBar extends React.Component<IEditorSideBarProps, 
         // console.log("EditorSideBar asset: " + JSON.stringify(this.props.assets));
         return (
             <div key={key} style={style}
-                className={this.getAssetCssClassNames(asset, selectedAsset)}
-                onClick={() => this.onAssetClicked(asset)}>
+                className={this.getAssetCssClassNames(asset, selectedAsset, index)}
+                onClick={(e) => {
+                    this.onItemClick(e, asset);
+                }}
+            >
                 <div className="asset-item-image">
                     {this.renderBadges(asset)}
                     <AssetPreview asset={asset} />
@@ -155,10 +197,19 @@ export default class EditorSideBar extends React.Component<IEditorSideBarProps, 
         }
     }
 
-    private getAssetCssClassNames = (asset: IAsset, selectedAsset: IAsset = null): string => {
+    private getAssetCssClassNames = (asset: IAsset, selectedAsset: IAsset = null, index: number): string => {
         const cssClasses = ["asset-item"];
         if (selectedAsset && selectedAsset.id === asset.id) {
             cssClasses.push("selected");
+        }
+        if (this.state.multipleSelect) {
+            const startIndex = this.state.originalIndex < this.state.scrollToIndex ?
+                this.state.originalIndex : this.state.scrollToIndex;
+            const endIndex = this.state.originalIndex < this.state.scrollToIndex ?
+                this.state.scrollToIndex : this.state.originalIndex;
+            if (startIndex <= index && index <= endIndex) {
+                cssClasses.push("selected-list");
+            }
         }
 
         return cssClasses.join(" ");

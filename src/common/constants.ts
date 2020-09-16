@@ -3,6 +3,7 @@
  */
 export const constants = {
     projectFileExtension: ".power-ai",
+    colorFileExtension: "colors.color",
     // assetMetadataFileExtension: "-asset.json",
     assetMetadataFileExtension: ".json",
     exportFileExtension: "-export.power-ai",

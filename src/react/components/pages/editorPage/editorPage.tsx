@@ -48,7 +48,6 @@ import {ActiveLearningService} from "../../../../services/activeLearningService"
 import {toast} from "react-toastify";
 import CondensedList from "../../common/condensedList/condensedList";
 import SourceItem from "../../common/condensedList/sourceItem";
-import {Rnd} from "react-rnd";
 import Zoom from "../../common/zoom/zoom";
 import {ILocalFileSystemProxyOptions, LocalFileSystemProxy} from "../../../../providers/storage/localFileSystemProxy";
 import * as connectionActions from "../../../../redux/actions/connectionActions";
@@ -59,7 +58,8 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import Paper, {PaperProps} from "@material-ui/core/Paper";
-import Draggable from "react-draggable";
+// import Draggable from "react-draggable-power-ai";
+import Draggable from "powerai-react-draggable-v2";
 import LinearProgress from "@material-ui/core/LinearProgress";
 import DraggableDialog from "../../common/draggableDialog/draggableDialog";
 import DraggableDialogProjectMetrics from "../../common/draggableDialog/draggableDialogProjectMetrics";
@@ -68,6 +68,7 @@ import {ExportAssetState} from "../../../../providers/export/exportProvider";
 import {normalizeSlashes, randomIntInRange} from "../../../../common/utils";
 // tslint:disable-next-line:no-var-requires
 import tagColors from "../../common/tagColors.json";
+import {Rnd} from "powerai-react-rnd";
 
 // import "antd/lib/tree/style/css";
 
@@ -145,6 +146,11 @@ export interface IEditorPageState {
     dialog: boolean;
     isDrawPolygon2MinBox: boolean;
     showProjectMetrics: boolean;
+    multipleSelectAssets: {
+        multipleSelect: boolean;
+        startIndex: number;
+        endIndex: number;
+    };
 }
 
 function mapStateToProps(state: IApplicationState) {
@@ -168,7 +174,6 @@ function mapDispatchToProps(dispatch) {
  */
 @connect(mapStateToProps, mapDispatchToProps)
 export default class EditorPage extends React.Component<IEditorPageProps, IEditorPageState> {
-
     public state: IEditorPageState = {
         treeList: [],
         selectedTag: null,
@@ -189,6 +194,11 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         isDrawPolygon2MinBox: false,
         showProjectMetrics: false,
         isFilter: false,
+        multipleSelectAssets: {
+            multipleSelect: false,
+            startIndex: 0,
+            endIndex: 0,
+        },
     };
     private localFileSystem: LocalFileSystemProxy;
 
@@ -201,8 +211,10 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
     private deleteSourceProviderConfirm: React.RefObject<Confirm> = React.createRef();
     private deleteConfirm: React.RefObject<Confirm> = React.createRef();
     private draggableDialog: React.RefObject<DraggableDialog> = React.createRef();
+    private loadingDialog: React.RefObject<DraggableDialog> = React.createRef();
     private draggableDialogProjectMetrics: React.RefObject<DraggableDialogProjectMetrics> = React.createRef();
     private myZoomDom: React.RefObject<Rnd> = React.createRef();
+    private editorSideBar: React.RefObject<EditorSideBar> = React.createRef();
 
     constructor(props, context) {
         super(props, context);
@@ -210,6 +222,18 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         const ipcRenderer = (window as any & typeof globalThis).require("electron").ipcRenderer;
         ipcRenderer.on("FILE_WATCH", (event, arg) => {
             console.log(arg);
+        });
+    }
+
+    /**
+     * 等待指定的时间
+     * @param ms
+     */
+    public async sleep(ms: number) {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                resolve("");
+            }, ms);
         });
     }
 
@@ -495,6 +519,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                             />
                         </div>
                         <EditorSideBar
+                            ref={this.editorSideBar}
                             assets={this.state.isFilter ? this.state.filterAssets : this.state.assets}
                             selectedAsset={selectedAsset ? selectedAsset.asset : null}
                             // selectedAsset={null}
@@ -521,6 +546,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                     position={{x: this.state.zoomMode.x, y: this.state.zoomMode.y}}
                                     onDragStop={(e, d) => {
                                         console.log(`drag: ${d.x}, ${d.y} onDragStop`);
+                                        console.log(`drag: this.state.zoomMode.x ${this.state.zoomMode.x}, this.state.zoomMode.y ${this.state.zoomMode.y}`);
                                         e.preventDefault();
                                         this.setState({
                                             zoomMode: {
@@ -540,15 +566,15 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                                 ...position,
                                                 width: ref.offsetWidth,
                                                 height: ref.offsetHeight,
-                                                zoomCenterX: ref.offsetWidth / 2,
-                                                zoomCenterY: ref.offsetHeight / 2,
+                                                // zoomCenterX: ref.offsetWidth / 2,
+                                                // zoomCenterY: ref.offsetHeight / 2,
                                             },
                                         });
                                     }}
                                     onMouseDown={(e) => {
-                                        // console.log(e.button);
+                                        console.log(e.button);
                                         // if (e.button === 0) {
-                                        //     this.canvas.current.enableCanvas(true);
+                                        //     // this.canvas.current.enableCanvas(true);
                                         //     this.setState({
                                         //         selectionMode: SelectionMode.RECT,
                                         //         editorMode: EditorMode.Rectangle,
@@ -558,41 +584,39 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                         //         },
                                         //         isDrawPolygon2MinBox: false,
                                         //     });
-                                        //     this.canvas.current.enableCanvas(true);
-                                        // } else if (e.button === 2) {
-                                        //     e.stopPropagation();
-                                        //     this.canvas.current.enableCanvas(false);
-                                        //     this.setState({
-                                        //         selectionMode: SelectionMode.NONE,
-                                        //         editorMode: EditorMode.Select,
-                                        //         zoomMode: {
-                                        //             ...this.state.zoomMode,
-                                        //             disableDrag: false,
-                                        //         },
-                                        //         isDrawPolygon2MinBox: false,
-                                        //     });
-                                        //
-                                        // }
+                                        //     // this.canvas.current.enableCanvas(true);
+                                        // } else
+                                        if (e.button === 2) {
+                                            e.stopPropagation();
+                                            // this.canvas.current.enableCanvas(false);
+                                            // this.setState({
+                                            //     selectionMode: SelectionMode.NONE,
+                                            //     editorMode: EditorMode.Select,
+                                            //     zoomMode: {
+                                            //         ...this.state.zoomMode,
+                                            //         disableDrag: false,
+                                            //     },
+                                            //     isDrawPolygon2MinBox: false,
+                                            // });
+                                        }
                                         // const zone = document.getElementById("ct-zone");
                                         // console.log(this.myZoomDom.current.getOffsetFromParent().left);
                                         // console.log(this.myZoomDom.current.getSelfElement().offsetLeft);
                                         // console.log(this.myZoomDom.current.getSelfElement().style.marginLeft);
                                         // console.log(this.myZoomDom.current.getSelfElement().style.left);
                                         // console.log(this.myZoomDom.current.getSelfElement().style.paddingLeft);
-                                        // console.log(`zone.offsetLeft : ${e.pageX} ${e.screenX}我是鼠标点击x: ${e.clientX} 我是鼠标点击Y: ${e.pageY}`);
-                                            this.setState({
-                                                ...this.state,
-                                                zoomMode: {
-                                                    ...this.state.zoomMode,
-                                                    zoomCenterX: e.clientX,
-                                                    zoomCenterY: e.clientY,
-                                                },
-                                            });
+                                        // this.setState({
+                                        //     zoomMode: {
+                                        //         ...this.state.zoomMode,
+                                        //         zoomCenterX: e.clientX,
+                                        //         zoomCenterY: e.clientY,
+                                        //     },
+                                        // });
                                     }}
                                     onMouseUp={(e) => {
-                                        // if (e.button === 2) {
-                                        //     this.canvas.current.enableCanvas(true);
-                                        // }
+                                        if (e.button === 2) {
+                                            this.canvas.current.enableCanvas(true);
+                                        }
                                         console.log(e);
                                         console.log(`我是鼠标点x: ${e.clientX} 我是鼠标点y: ${e.clientY}`);
                                         // this.setState({
@@ -605,35 +629,44 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                         // });
                                     }}
                                     onMouseMove={(e) => {
+                                        console.log(`我是图像左上角点x: ${this.myZoomDom.current.getDraggablePosition().x} 我是图像左上角点y: ${this.myZoomDom.current.getDraggablePosition().y}`);
+                                        console.log(`我是图像鼠标x: ${e.clientX} 我是图像鼠标Y: ${e.clientY}`);
                                         // if (e.stopPropagation) e.stopPropagation();
                                         // if (e.preventDefault) e.preventDefault();
                                         // console.log(e);
-                                        console.log(`drag: ${e.clientX}, ${e.clientY} onMouseMove`);
+                                        // console.log(`drag: ${e.clientX}, ${e.clientY} onMouseMove`);
                                         // this.setState({
                                         //     ...this.state,
                                         //     zoomMode: {
                                         //         ...this.state.zoomMode,
-                                        //         zoomCenterX: e.clientX,
-                                        //         zoomCenterY: e.clientY,
                                         //     },
                                         // });
                                     }}
-                                    onWheel={(e) => Zoom(e, (deltaY) => {
+                                    onWheel={(e) => {
                                         try {
                                             const zone = document.getElementById("ct-zone");
-                                            console.log(`我是图像左上角点x: ${this.myZoomDom.current.getDraggablePosition().x} 我是图像左上角点y: ${this.myZoomDom.current.getDraggablePosition().y}`);
-                                            const w = zone.offsetWidth;
-                                            const h = zone.offsetHeight;
-                                            if ((h - deltaY) < this.state.zoomMode.miniHeight) {
+                                            let w = zone.offsetWidth;
+                                            let h = zone.offsetHeight;
+                                            if ((h - e.deltaY) < this.state.zoomMode.miniHeight) {
                                                 return;
                                             }
+                                            const leftTopX = this.myZoomDom.current.getDraggablePosition().x;
+                                            const leftTopY = this.myZoomDom.current.getDraggablePosition().y;
+
+                                            const ratioL = (e.clientX - leftTopX) / w;
+                                            const ratioT = (e.clientY - leftTopY) / h;
+                                            const ratioDelta = e.deltaY < 0 ? 1 + 0.07 : 1 - 0.07;
+
+                                            // console.log(`我是图像鼠标滚轮ratioDelta: ${ratioDelta} `);
+                                            w = w * ratioDelta;
+                                            h = h * ratioDelta;
                                             this.setState({
                                                 zoomMode: {
                                                     ...this.state.zoomMode,
-                                                    width: (w - deltaY * 2),
-                                                    height: (h - deltaY * 2),
-                                                    x: this.state.zoomMode.x + deltaY,
-                                                    y: this.state.zoomMode.x + deltaY,
+                                                    width: w,
+                                                    height: h,
+                                                    x: Math.round(e.clientX - (w * ratioL)) - (e.deltaY / 4),
+                                                    y: Math.round(e.clientY - (h * ratioT)),
                                                 },
                                             });
                                             if (this.state.zoomMode.height === "auto") {
@@ -647,14 +680,9 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                         } catch (e) {
                                             console.error(e);
                                         }
-                                    })}
+                                        e.stopPropagation();
+                                    }}
                                 >
-
-                                    {/*<ZoomableImage*/}
-                                    {/*    src="https://i.picsum.photos/id/35/1440/900.jpg"*/}
-                                    {/*    alt="some alt text"*/}
-                                    {/*    zoomScale={3}*/}
-                                    {/*    transitionDuration={0.5}/>*/}
                                     <Canvas
                                         ref={this.canvas}
                                         selectedAsset={this.state.selectedAsset}
@@ -735,6 +763,16 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                     }}
                     onCancel={() => this.draggableDialog.current.close()}
                 />
+                <DraggableDialog
+                    ref={this.loadingDialog}
+                    disableBackdropClick={true}
+                    disableEscapeKeyDown={true}
+                    fullWidth={true}
+                    onDone={() => {
+                        this.loadingDialog.current.close();
+                    }}
+                    onCancel={() => this.loadingDialog.current.close()}
+                />
                 <Drawer anchor="right" open={this.state.showProjectMetrics} onClose={() => {
                     this.setState({
                         ...this.state,
@@ -751,9 +789,9 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
     }
 
     private onPageClick = () => {
-        this.setState({
-            selectedRegions: [],
-        });
+        // this.setState({
+        //     selectedRegions: [],
+        // });
     }
 
     private onSourceProviderDeleted = async (project: IProject, item: IProviderOptions|ISecureString):
@@ -780,18 +818,81 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
      * @param tagName Name of tag to be deleted
      */
     private onAssetDeleted = async (): Promise<void> => {
-        const { selectedAsset } = this.state;
-        // await this.localFileSystem.deleteDirectory(decodeURI(selectedAsset.asset.path.replace("file:", "")));
-        // this.props.project.assets[selectedAsset.asset.id].
-        this.canvas.current.removeAllRegions();
-        const finalProject = await this.props.actions.deleteAsset(this.props.project, selectedAsset.asset);
-        await this.props.actions.saveProject(finalProject);
-        // console.log(`删除素材fuck：${JSON.stringify(this.props.project)}`);
-        toast.success(`成功删除`);
-        this.goToRootAsset(1);
-        await this.deleteAssetsAndRefreshProjectAssets(finalProject);
-        // console.log(`删除素材fuck 222：${JSON.stringify(this.props.project)}`);
-        // this.updateRootAssets();
+        if (this.state.multipleSelectAssets.multipleSelect) {
+            this.loadingDialog.current.open();
+            this.loadingDialog.current.change("正在批量删除...", "请耐心等待");
+            const assetService = new AssetService(this.props.project);
+            // 这里还要区分是否是搜索的列表
+            if (this.state.isFilter) { // 这里有个隐患！！！就是只是删除了搜索后的列表！
+                for (let i = this.state.multipleSelectAssets.startIndex;
+                     i <= this.state.multipleSelectAssets.endIndex; i++) {
+                    const asset = this.state.filterAssets[i];
+                    // await this.props.actions.deleteAsset(this.props.project, asset);
+                    await this.props.actions.deleteAssetBatch(assetService, asset);
+                }
+                this.state.filterAssets.splice(
+                    this.state.multipleSelectAssets.startIndex,
+                    this.state.multipleSelectAssets.endIndex - this.state.multipleSelectAssets.startIndex + 1);
+                const newAssets = _.values(this.state.filterAssets)
+                    .sort((a, b) => a.timestamp - b.timestamp);
+                this.setState({
+                    ...this.state,
+                    isFilter: true,
+                    filterAssets: newAssets,
+                    // assets: _.values(this.state.assets)
+                    //     .filter((asset) => asset.id !== this.state.selectedAsset.asset.id)
+                    //     .sort((a, b) => a.timestamp - b.timestamp),
+                }, () => {
+                    if (newAssets.length) {
+                        const index = this.state.multipleSelectAssets.startIndex >= newAssets.length ?
+                            newAssets.length - 1 : this.state.multipleSelectAssets.startIndex;
+                        this.selectAsset(newAssets[index]);
+                    }
+                });
+                this.loadingDialog.current.close();
+            } else { // 这里是非搜索的批量删除
+                console.log("test");
+
+                for (let i = this.state.multipleSelectAssets.startIndex;
+                     i <= this.state.multipleSelectAssets.endIndex; i++) {
+                    const asset = this.state.assets[i];
+                    // await this.props.actions.deleteAsset(this.props.project, asset);
+                    await this.props.actions.deleteAssetBatch(assetService, asset);
+                }
+
+                await this.reloadProject();
+                if (this.state.assets.length) {
+                    const index = this.state.multipleSelectAssets.startIndex >= this.state.assets.length ?
+                        this.state.assets.length - 1 : this.state.multipleSelectAssets.startIndex;
+                    this.selectAsset(this.state.assets[index]);
+                }
+            }
+
+            this.editorSideBar.current.removeStatus();
+
+            // if (this.state.isFilter) { // 判断是否是过滤的数据
+            //
+            // } else {
+            //     const newAssets = _.values(this.state.assets)
+            //         .filter((asset) => asset.id !== this.state.selectedAsset.asset.id)
+            //         .sort((a, b) => a.timestamp - b.timestamp);
+            //     this.setState({
+            //         assets: newAssets,
+            //     });
+            // }
+            // await this.props.actions.saveProject(finalProject);
+
+        } else {
+            const { selectedAsset } = this.state;
+            // await this.localFileSystem.deleteDirectory(decodeURI(selectedAsset.asset.path.replace("file:", "")));
+            // this.props.project.assets[selectedAsset.asset.id].
+            const finalProject = await this.props.actions.deleteAsset(this.props.project, selectedAsset.asset);
+            await this.props.actions.saveProject(finalProject);
+            this.goToRootAsset(1);
+            await this.deleteAssetsAndRefreshProjectAssets(finalProject);
+            toast.success(`成功删除`);
+        }
+
     }
 
     /**
@@ -884,6 +985,8 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
      */
     private onTagSearched = async (tags: ITag[], searchQuery: string): Promise<void>  => {
         if (searchQuery) {
+            // this.loadingDialog.current.open();
+            // this.loadingDialog.current.change("正在搜索标签...", "请耐心等待");
             console.log("dosearch editorpage + onTagSearched + taginput" + JSON.stringify(tags));
             const tagNames = [];
             tags.forEach((v, i, a) => {
@@ -891,7 +994,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
             });
             // const tagsStr = tagNames.sort().join(",");
             // console.log("dosearch-editorpage + onTagSearched + taginput tagsstr: " + tagsStr);
-            const filterAssets: IAsset[] = [];
+            let filterAssets: IAsset[] = [];
             await this.state.assets.filter(async (asset) => {
                 if (asset.tags) {
                     tags.forEach((v, i, a) => {
@@ -902,6 +1005,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                     console.log("dosearch-editorpage + filterAssets: " + JSON.stringify(filterAssets));
                 }
             });
+            filterAssets = [...new Set(filterAssets)].sort(); // 去重然后排序
             this.setState({
                 ...this.state,
                 isFilter: true,
@@ -911,11 +1015,20 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                     this.selectAsset(filterAssets[0]);
                 }
             });
+            // 等待500毫秒后再执行同步
+            // await this.sleep(500);
+            // this.loadingDialog.current.close();
         } else {
             this.setState({
                 ...this.state,
                 isFilter: false,
+                multipleSelectAssets: {
+                    multipleSelect: false,
+                    startIndex: 0,
+                    endIndex: 0,
+                },
             });
+            await this.reloadProject();
         }
     }
 
@@ -932,14 +1045,19 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
      * @param newTagName New name of tag
      */
     private onTagRenamed = async (tagName: string, newTagName: string): Promise<void> => {
+        this.loadingDialog.current.open();
+        this.loadingDialog.current.change("正在重命名标签...", "请耐心等待");
         const assetUpdates = await this.props.actions.updateProjectTag(this.props.project, tagName, newTagName);
         const selectedAsset = assetUpdates.find((am) => am.asset.id === this.state.selectedAsset.asset.id);
-
+        await this.reloadProject();
         if (selectedAsset) {
             if (selectedAsset) {
                 this.setState({ selectedAsset });
             }
         }
+        this.loadingDialog.current.close();
+        this.canvas.current.enableCanvas(false);
+        this.canvas.current.enableCanvas(true);
     }
 
     /**
@@ -1264,7 +1382,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                 // this.canvas.current.enableCanvas(true);
                 break;
             case ToolbarItemName.DeleteAsset:
-                this.deleteConfirm.current.open();
+                this.onAssetDeleted();
                 break;
             case ToolbarItemName.CopyRegions:
                 this.canvas.current.enableCanvas(true);
@@ -1293,6 +1411,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                 await this.props.actions.saveProject(this.props.project);
                 break;
             case ToolbarItemName.ExportProject:
+                await this.reloadProject();
                 // toast.error("开始到处");
                 this.props.history.push(`/projects/${projectId}/export`);
                 break;
@@ -1341,6 +1460,87 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                 }
                 break;
         }
+    }
+
+    private reloadProject = async () => {
+        this.loadingDialog.current.open();
+        this.loadingDialog.current.change("正在重新加载数据集", "请耐心等待");
+        const par: IProviderOptions = this.props.project.sourceConnection.providerOptions;
+        console.log(`fucking ${par["folderPath"]}`);
+        const fileFolder = par["folderPath"];
+        // alert(JSON.stringify(this.props.project));
+        if (!fileFolder) { return; }
+        const idd = normalizeSlashes(fileFolder).lastIndexOf("/");
+        // const randId = shortid.generate();
+        console.log(`homePage>openDir: idd ${idd}`);
+        const folderName = normalizeSlashes(fileFolder).substring(idd + 1);
+        console.log(`homePage>openDir: folderName ${folderName}`);
+        console.log(`homePage>openDir: normalizeSlashes(fileFolder[0]) ${normalizeSlashes(fileFolder)}`);
+        const connection: IConnection = {
+            id: folderName,
+            name: folderName,
+            providerType: "localFileSystemProxy",
+            providerOptions: {
+                folderPath: normalizeSlashes(fileFolder),
+            },
+            providerOptionsOthers: [{
+                folderPath: normalizeSlashes(fileFolder),
+            }],
+        };
+        let projectJson: IProject = {
+            id: folderName,
+            name: folderName,
+            version: "3.0.0",
+            activeLearningSettings: DefaultActiveLearningSettings,
+            autoSave: true,
+            exportFormat: DefaultExportOptions,
+            securityToken: folderName,
+            sourceConnection: connection,
+            sourceListConnection: [],
+            tags: [],
+            targetConnection: connection,
+            trainFormat: DefaultTrainOptions,
+            videoSettings: { frameExtractionRate: 15 },
+            assets: {},
+        };
+        const dataTemp = await this.props.actions.loadAssetsWithFolderAndTags(projectJson,
+            fileFolder);
+        const rootProjectAssets = _.values(projectJson.assets)
+            .filter((asset) => !asset.parent);
+        const rootAssets = _(rootProjectAssets)
+            .concat(dataTemp.assets)
+            .uniqBy((asset) => asset.id)
+            .value();
+        // region 查询重复的标签
+        const finalTags = this.props.project.tags;
+        dataTemp.tags.map((val) => {
+            if (!finalTags.some((v) => v.name === val.name)) {
+                const newTag: ITag = {
+                    name: val.name,
+                    color: this.getNextColor(finalTags),
+                };
+                finalTags.push(newTag);
+            }
+        });
+        // endregion
+
+        projectJson = {
+            ...projectJson,
+            assets: _.keyBy(rootAssets, (asset) => asset.id),
+            tags: finalTags.sort(),
+        };
+        console.log(`merge tags: ${JSON.stringify(finalTags)}`);
+        console.log(`homePage:merge tags: ${JSON.stringify(projectJson)}`);
+        connectionActions.saveConnection(connection);
+
+        await this.props.actions.loadProject(projectJson);
+        this.loadingDialog.current.close();
+        this.props.history.push(`/projects/${projectJson.id}/edit`);
+        this.loadingProjectAssets = false;
+        this.setState({
+            assets: [],
+        });
+        this.loadProjectAssets();
     }
 
     private uploadTestAssets = async () => {
@@ -1467,7 +1667,16 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         return this.state.isValid;
     }
 
-    private selectAsset = async (asset: IAsset): Promise<void> => {
+    private selectAsset = async (asset: IAsset, multipleSelect?: boolean, startIndex?: number, endIndex?: number):
+        Promise<void> => {
+        this.setState({
+            ...this.state,
+            multipleSelectAssets: {
+                multipleSelect,
+                startIndex,
+                endIndex,
+            },
+        });
         // Nothing to do if we are already on the same asset.
         if (this.state.selectedAsset && this.state.selectedAsset.asset.id === asset.id) {
             return;
@@ -1526,13 +1735,27 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
     }
 
     private deleteAssetsAndRefreshProjectAssets = async (finalProject): Promise<void> => {
-        const newAssets = _.values(this.state.assets)
-            .filter((asset) => asset.id !== this.state.selectedAsset.asset.id)
-            .sort((a, b) => a.timestamp - b.timestamp);
-        this.setState({
-            assets: newAssets,
-        });
-        // await this.props.actions.saveProject(finalProject);
+        if (this.state.isFilter) { // 判断是否是过滤的数据
+            const newAssets = _.values(this.state.filterAssets)
+                .filter((asset) => asset.id !== this.state.selectedAsset.asset.id)
+                .sort((a, b) => a.timestamp - b.timestamp);
+            this.setState({
+                ...this.state,
+                isFilter: true,
+                filterAssets: newAssets,
+                assets: _.values(this.state.assets)
+                    .filter((asset) => asset.id !== this.state.selectedAsset.asset.id)
+                    .sort((a, b) => a.timestamp - b.timestamp),
+            });
+        } else {
+            const newAssets = _.values(this.state.assets)
+                .filter((asset) => asset.id !== this.state.selectedAsset.asset.id)
+                .sort((a, b) => a.timestamp - b.timestamp);
+            this.setState({
+                assets: newAssets,
+            });
+        }
+        await this.props.actions.saveProject(finalProject);
     }
 
     private loadProjectAssetsWithFolder = async (folder): Promise<void> => {

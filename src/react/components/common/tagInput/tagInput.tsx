@@ -10,6 +10,7 @@ import TagInputItem, { ITagInputItemProps, ITagClickProps } from "./tagInputItem
 import TagInputToolbar from "./tagInputToolbar";
 import { toast } from "react-toastify";
 import { strings } from "../../../../common/strings";
+import DraggableDialog from "../draggableDialog/draggableDialog";
 // tslint:disable-next-line:no-var-requires
 const tagColors = require("../../common/tagColors.json");
 
@@ -72,7 +73,7 @@ export class TagInput extends React.Component<ITagInputProps, ITagInputState> {
         editingTagNode: null,
         portalElement: defaultDOMNode(),
     };
-
+    private loadingDialog: React.RefObject<DraggableDialog> = React.createRef();
     private tagItemRefs: Map<string, RefObject<TagInputItem>> = new Map<string, RefObject<TagInputItem>>();
     private portalDiv = document.createElement("div");
 
@@ -130,6 +131,16 @@ export class TagInput extends React.Component<ITagInputProps, ITagInputState> {
                         </div>
                     }
                 </div>
+                <DraggableDialog
+                    ref={this.loadingDialog}
+                    disableBackdropClick={true}
+                    disableEscapeKeyDown={true}
+                    fullWidth={true}
+                    onDone={() => {
+                        this.loadingDialog.current.close();
+                    }}
+                    onCancel={() => this.loadingDialog.current.close()}
+                />
             </div>
         );
     }
@@ -307,13 +318,15 @@ export class TagInput extends React.Component<ITagInputProps, ITagInputState> {
     }
 
     private doSearch = () => {
+        this.loadingDialog.current.open();
+        this.loadingDialog.current.change("正在搜索标签...", "请耐心等待");
         let tags = this.state.tags;
         const query = this.state.searchQuery;
         if (query.length) {
-            tags = tags.filter((p) => p.name.toLowerCase().includes(query.toLowerCase()));
+            tags = tags.filter((p) => p.name.toLowerCase().startsWith(query.toLowerCase()));
         }
-        console.log(`dosearch tagInput > tags: ${JSON.stringify(tags)}`);
         this.props.onTagSearched(tags, query);
+        this.loadingDialog.current.close();
         // return tags;
     }
 
@@ -323,7 +336,7 @@ export class TagInput extends React.Component<ITagInputProps, ITagInputState> {
         this.tagItemRefs.clear();
 
         if (query.length) {
-            props = props.filter((prop) => prop.tag.name.toLowerCase().includes(query.toLowerCase()));
+            props = props.filter((prop) => prop.tag.name.toLowerCase().startsWith(query.toLowerCase()));
         }
         // console.log("taginput");
         // console.log("taginput" + JSON.stringify(props));
@@ -399,18 +412,18 @@ export class TagInput extends React.Component<ITagInputProps, ITagInputState> {
             this.setState({
                 editingTag: newEditingTag,
                 editingTagNode: this.getTagNode(newEditingTag),
-                selectedTag: (alreadySelected && !inEditMode) ? null : tag,
+                selectedTag: (alreadySelected && !inEditMode) ? tag : tag,
                 clickedColor: props.clickedColor,
                 showColorPicker: false,
             });
 
             // Only fire click event if a region is selected
-            if (this.props.selectedRegions &&
-                this.props.selectedRegions.length > 0 &&
-                this.props.onTagClick &&
-                !inEditMode) {
-                this.props.onTagClick(tag);
-            }
+            // if (this.props.selectedRegions &&
+            //     this.props.selectedRegions.length > 0 &&
+            //     this.props.onTagClick &&
+            //     !inEditMode) {
+            //     this.props.onTagClick(tag);
+            // }
         }
         // alert(`啦啦${JSON.stringify(this.state.searchTags)}`);
     }

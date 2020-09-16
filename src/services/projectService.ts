@@ -126,11 +126,17 @@ export default class ProjectService implements IProjectService {
         //         JSON.stringify(project, null, "\t"),
         //     );
         // }
-        await storageProvider.writeText(
-            `${project.name}${constants.projectFileExtension}`,
-            JSON.stringify(project, null, "\t"),
-        );
 
+        // 暂时去掉保存的零时项目文件
+        // await storageProvider.writeText(
+        //     `${project.name}${constants.projectFileExtension}`,
+        //     JSON.stringify(project, null, "\t"),
+        // );
+
+        await storageProvider.writeText(
+            constants.colorFileExtension,
+            JSON.stringify(project.tags, null, "\t"),
+        );
         return project;
     }
 

@@ -101,14 +101,14 @@ export default function registerToolbar() {
         accelerators: ["CmdOrCtrl+W", "CmdOrCtrl+w"],
     });
 
-    ToolbarItemFactory.register({
-        name: ToolbarItemName.CopyRegions,
-        tooltip: strings.editorPage.toolbar.copy,
-        icon: "fa-copy",
-        group: ToolbarItemGroup.Regions,
-        type: ToolbarItemType.Action,
-        accelerators: ["CmdOrCtrl+C", "CmdOrCtrl+c"],
-    });
+    // ToolbarItemFactory.register({
+    //     name: ToolbarItemName.CopyRegions,
+    //     tooltip: strings.editorPage.toolbar.copy,
+    //     icon: "fa-copy",
+    //     group: ToolbarItemGroup.Regions,
+    //     type: ToolbarItemType.Action,
+    //     accelerators: ["CmdOrCtrl+C", "CmdOrCtrl+c"],
+    // });
 
     // ToolbarItemFactory.register({
     //     name: ToolbarItemName.CutRegions,
@@ -216,7 +216,7 @@ export default function registerToolbar() {
         icon: "fa-trash-alt",
         group: ToolbarItemGroup.Navigation,
         type: ToolbarItemType.Action,
-        accelerators: ["V", "v"],
+        accelerators: ["CmdOrCtrl+D", "CmdOrCtrl+d"],
     });
 
     // ToolbarItemFactory.register({
@@ -236,14 +236,14 @@ export default function registerToolbar() {
         accelerators: ["CmdOrCtrl+M", "CmdOrCtrl+m"],
     });
 
-    ToolbarItemFactory.register({
-        name: ToolbarItemName.SaveProject,
-        tooltip: strings.editorPage.toolbar.saveProject,
-        icon: "fa-save",
-        group: ToolbarItemGroup.Project,
-        type: ToolbarItemType.Action,
-        accelerators: ["CmdOrCtrl+S", "CmdOrCtrl+s"],
-    });
+    // ToolbarItemFactory.register({
+    //     name: ToolbarItemName.SaveProject,
+    //     tooltip: strings.editorPage.toolbar.saveProject,
+    //     icon: "fa-save",
+    //     group: ToolbarItemGroup.Project,
+    //     type: ToolbarItemType.Action,
+    //     accelerators: ["CmdOrCtrl+S", "CmdOrCtrl+s"],
+    // });
 
     ToolbarItemFactory.register({
         name: ToolbarItemName.ExportProject,
@@ -270,26 +270,26 @@ export default function registerToolbar() {
     //     type: ToolbarItemType.Action,
     //     accelerators: ["CmdOrCtrl+E", "CmdOrCtrl+e"],
     // }, ExportProject);
-    ToolbarItemFactory.register({
-        name: ToolbarItemName.TrainAi,
-        tooltip: strings.editorPage.toolbar.trainAi,
-        icon: "fa fa-fighter-jet",
-        // icon: "fas fa-caret-square-right",
-        group: ToolbarItemGroup.Ai,
-        type: ToolbarItemType.Action,
-        accelerators: ["CmdOrCtrl+T", "CmdOrCtrl+t"],
-    });
+    // ToolbarItemFactory.register({
+    //     name: ToolbarItemName.TrainAi,
+    //     tooltip: strings.editorPage.toolbar.trainAi,
+    //     icon: "fa fa-fighter-jet",
+    //     // icon: "fas fa-caret-square-right",
+    //     group: ToolbarItemGroup.Ai,
+    //     type: ToolbarItemType.Action,
+    //     accelerators: ["CmdOrCtrl+T", "CmdOrCtrl+t"],
+    // });
 
-    ToolbarItemFactory.register({
-        name: ToolbarItemName.OnlineTest,
-        tooltip: strings.editorPage.toolbar.onlineTest,
-        icon: "fas fa-spider",
-        // icon: "fas fa-caret-square-right",
-        group: ToolbarItemGroup.Ai,
-        type: ToolbarItemType.Action,
-        accelerators: ["CmdOrCtrl+K", "CmdOrCtrl+k"],
-    });
-
+    // ToolbarItemFactory.register({
+    //     name: ToolbarItemName.OnlineTest,
+    //     tooltip: strings.editorPage.toolbar.onlineTest,
+    //     icon: "fas fa-spider",
+    //     // icon: "fas fa-caret-square-right",
+    //     group: ToolbarItemGroup.Ai,
+    //     type: ToolbarItemType.Action,
+    //     accelerators: ["CmdOrCtrl+K", "CmdOrCtrl+k"],
+    // });
+    //
     ToolbarItemFactory.register({
         name: ToolbarItemName.FilterAssets,
         tooltip: strings.editorPage.toolbar.onlineTest,

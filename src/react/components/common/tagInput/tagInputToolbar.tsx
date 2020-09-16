@@ -64,12 +64,12 @@ export default class TagInputToolbar extends React.Component<ITagInputToolbarPro
                 icon: "fa-search",
                 handler: this.handleSearch,
             },
-            {
-                displayName: strings.tags.toolbar.lock,
-                className: "lock",
-                icon: "fa-lock",
-                handler: this.handleLock,
-            },
+            // {
+            //     displayName: strings.tags.toolbar.lock,
+            //     className: "lock",
+            //     icon: "fa-lock",
+            //     handler: this.handleLock,
+            // },
             {
                 displayName: strings.tags.toolbar.edit,
                 className: "edit",
