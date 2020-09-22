@@ -1,10 +1,18 @@
 import React from "react";
-import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from "reactstrap";
+import { Button, Modal, ModalBody, ModalFooter, ModalHeader,
+    Input, Label, InputGroup, InputGroupAddon, InputGroupText} from "reactstrap";
 import { strings } from "../../../../common/strings";
 import { IConnection, StorageType } from "../../../../models/applicationState";
 import { StorageProviderFactory } from "../../../../providers/storage/storageProviderFactory";
 import CondensedList, { ListItem } from "../condensedList/condensedList";
-
+import {normalizeSlashes} from "../../../../common/utils";
+import {toast} from "react-toastify";
+import DraggableDialog from "../draggableDialog/draggableDialog";
+import pTimeout from "p-timeout";
+import delay from "delay";
+import {IpcRendererProxy} from "../../../../common/ipcRendererProxy";
+// const delay = require('delay');
+// const pTimeout = require('p-timeout');
 /**
  * Properties for Cloud File Picker
  * @member connections - Array of connections to choose from
@@ -33,11 +41,11 @@ export interface ICloudFilePickerProps {
 export interface ICloudFilePickerState {
     isOpen: boolean;
     modalHeader: string;
-    condensedList: any;
-    selectedConnection: IConnection;
-    selectedFile: string;
-    okDisabled: boolean;
-    backDisabled: boolean;
+    platform: string;
+    ip: string;
+    cloudPath: string;
+    username: string;
+    password: string;
 }
 
 /**
@@ -46,6 +54,7 @@ export interface ICloudFilePickerState {
  */
 export class CloudFilePicker extends React.Component<ICloudFilePickerProps, ICloudFilePickerState> {
 
+    private draggableDialog: React.RefObject<DraggableDialog> = React.createRef();
     constructor(props) {
         super(props);
 
@@ -55,10 +64,6 @@ export class CloudFilePicker extends React.Component<ICloudFilePickerProps, IClo
         this.getInitialState = this.getInitialState.bind(this);
         this.ok = this.ok.bind(this);
         this.back = this.back.bind(this);
-        this.connectionList = this.connectionList.bind(this);
-        this.onClickConnection = this.onClickConnection.bind(this);
-        this.fileList = this.fileList.bind(this);
-        this.onClickFile = this.onClickFile.bind(this);
 
         this.state = this.getInitialState();
     }
@@ -72,22 +77,78 @@ export class CloudFilePicker extends React.Component<ICloudFilePickerProps, IClo
                     {this.state.modalHeader}
                 </ModalHeader>
                 <ModalBody>
-                    {this.state.condensedList}
+                    <div>
+                        <Label for="exampleSelect">目标平台</Label>
+                        <Input type="select" name="select" id="exampleSelect" onChange={(v) => {
+                            // this.setState({
+                            //     ...this.state,
+                            //     platform: v.target.value,
+                            // });
+                        }}>
+                            <option>Windows</option>
+                            <option>Linux</option>
+                        </Input>
+                        <Label for="path">目标共享地址</Label>
+                        <InputGroup>
+                            <InputGroupAddon addonType="prepend">
+                                <InputGroupText>//</InputGroupText>
+                            </InputGroupAddon>
+                            <Input name="ip" id="ip" placeholder="输入目标IP" onChange={(v) => {
+                                this.setState({
+                                    ...this.state,
+                                    ip: v.target.value,
+                                });
+                            }}/>
+                            <InputGroupAddon addonType="append">
+                                <InputGroupText>/</InputGroupText>
+                            </InputGroupAddon>
+                            <Input name="path" id="path" defaultValue="NG" placeholder="共享的目录" onChange={(v) => {
+                                this.setState({
+                                    ...this.state,
+                                    cloudPath: v.target.value,
+                                });
+                            }}/>
+                        </InputGroup>
+                        {/*<Input name="path" id="path" onChange={(v) => toast.info(v.target.value)}/>*/}
+                        <Label for="username">登录用户名</Label>
+                        <Input id="username" defaultValue="Everyone" placeholder="默认是Everyone" onChange={(v) => {
+                            this.setState({
+                                ...this.state,
+                                username: v.target.value,
+                            });
+                        }}/>
+                        <Label for="password">登录密码</Label>
+                        <Input name="password" id="password" placeholder="默认密码是空" onChange={(v) => {
+                            this.setState({
+                                ...this.state,
+                                password: v.target.value,
+                            });
+                        }}/>
+                    </div>
                 </ModalBody>
                 <ModalFooter>
-                    {this.state.selectedFile || ""}
                     <Button
                         className="btn btn-success mr-1"
-                        onClick={this.ok}
-                        disabled={this.state.okDisabled}>
-                        Ok
+                        onClick={this.ok}>
+                        连接
                     </Button>
                     <Button
-                        onClick={this.back}
-                        disabled={this.state.backDisabled}>
-                        Go Back
+                        onClick={this.close}>
+                        取消
                     </Button>
                 </ModalFooter>
+                <DraggableDialog
+                    title={"正在连接远程数据..."}
+                    ref={this.draggableDialog}
+                    content={"请耐心等待"}
+                    disableBackdropClick={true}
+                    disableEscapeKeyDown={true}
+                    fullWidth={true}
+                    onDone={() => {
+                        this.draggableDialog.current.close();
+                    }}
+                    onCancel={() => this.draggableDialog.current.close()}
+                />
             </Modal>
         );
     }
@@ -116,94 +177,61 @@ export class CloudFilePicker extends React.Component<ICloudFilePickerProps, IClo
         return {
             isOpen: false,
             modalHeader: strings.homePage.openCloudProject.selectConnection,
-            condensedList: this.connectionList(),
-            selectedConnection: null,
-            selectedFile: null,
-            okDisabled: true,
-            backDisabled: true,
+            platform: "Windows",
+            ip: "",
+            cloudPath: "NG",
+            username: "Everyone",
+            password: "",
         };
     }
 
     private async ok() {
-        if (this.state.selectedConnection && this.state.selectedFile) {
-            const storageProvider = StorageProviderFactory.createFromConnection(this.state.selectedConnection);
-            const content = await storageProvider.readText(this.state.selectedFile);
-            this.props.onSubmit(content);
+        this.draggableDialog.current.open();
+        if (this.state.ip === "" || this.state.ip === null) {
+            this.draggableDialog.current.change("连接远程数据失败...",
+                `远程地址: \\\\${this.state.ip}\\${this.state.cloudPath}`, true);
+            return;
         }
+        this.draggableDialog.current.change("正在连接远程数据...",
+            `远程地址: \\\\${this.state.ip}\\${this.state.cloudPath}`, false, true);
+        const aa = new Promise(async (resolve, reject) => {
+            await IpcRendererProxy.send(`TrainingSystem:CloseRemoteAssets`, [this.state.ip, this.state.cloudPath])
+                .then(() => {
+                    console.log("关闭成功");
+                })
+                .catch(() => {
+                    console.log("关闭失败");
+                });
+            await IpcRendererProxy.send(`TrainingSystem:LoadRemoteAssets`,
+                [this.state.ip, this.state.cloudPath, this.state.username, this.state.password])
+                .then((v) => {
+                    toast.success("已经成功连接了远程数据");
+                    this.draggableDialog.current.close();
+                    this.close();
+                    this.props.onSubmit(v.toString());
+                    resolve("success"); // 成功
+                })
+                .catch(() => {
+                    this.draggableDialog.current.change("连接远程数据失败...",
+                        // tslint:disable-next-line:max-line-length
+                        `远程地址: \\\\${this.state.ip}\\${this.state.cloudPath.replace(new RegExp("/", "g"), "\\")}`, true);
+                    // this.props.onSubmit("连接失败");
+                    reject("fail");        // 失败
+                });
+        }).catch(() => console.log("加载失败lala"));
+        pTimeout(aa, 10000, () => {
+            this.draggableDialog.current.change("连接远程数据超时！",
+                `连接超时，请检查配置信息是否正确\n远程地址: \\\\${this.state.ip}\\${this.state.cloudPath.replace(new RegExp("/", "g"), "\\")}`, true);
+        }).then(() => {
+            // 执行结束了,这里做善后工作
+            // toast.success("执行结束了");
+        });
     }
 
     private back() {
         this.setState({
             ...this.getInitialState(),
             isOpen: true,
-        });
-    }
-
-    private getCondensedList(title: string, items: any[], onClick) {
-        return <CondensedList
-            title={title}
-            items={items}
-            Component={ListItem}
-            onClick={onClick}
-         showToolbar={false}/>;
-    }
-
-    private isCloudConnection(connection: IConnection): boolean {
-        try {
-            const storageProvider = StorageProviderFactory.createFromConnection(connection);
-            return storageProvider.storageType === StorageType.Cloud;
-        } catch (e) {
-            // Catches connections that are not registered as StorageProviders (e.g. Bing Image search)
-            return false;
-        }
-    }
-
-    private getCloudConnections(connections: IConnection[]): IConnection[] {
-        return connections.filter(this.isCloudConnection);
-    }
-
-    private connectionList() {
-        const connections = this.getCloudConnections(this.props.connections);
-        return this.getCondensedList("Cloud Connections", connections, (args) => this.onClickConnection(args));
-    }
-
-    private async onClickConnection(args) {
-        const connection: IConnection = {
-            ...args,
-        };
-        const fileList = await this.fileList(connection);
-        this.setState({
-            selectedConnection: connection,
-            modalHeader: `Select a file from "${connection.name}"`,
-            condensedList: fileList,
-            backDisabled: false,
-        });
-    }
-
-    private async fileList(connection: IConnection) {
-        const storageProvider = StorageProviderFactory.createFromConnection(connection);
-        const files = await storageProvider.listFiles(
-            connection.providerOptions["containerName"],
-            this.props.fileExtension);
-        const fileItems = [];
-        for (let i = 0; i < files.length; i++) {
-            fileItems.push({
-                id: `file-${i + 1}`,
-                name: files[i],
-            });
-        }
-        return this.getCondensedList(
-            `${this.props.fileExtension || "All"} Files in "${connection.name}"`,
-            fileItems,
-            this.onClickFile,
-        );
-    }
-
-    private onClickFile(args) {
-        const fileName = args.name;
-        this.setState({
-            selectedFile: fileName,
-            okDisabled: false,
         });
     }
 }

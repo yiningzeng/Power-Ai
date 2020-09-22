@@ -30,13 +30,13 @@ export const chinese: IAppStrings = {
     homePage: {
         newProject: "打开标注的文件夹",
         openLocalProject: {
-            title: "打开需要标注的文件夹",
+            title: "打开本地文件夹",
         },
         openTransferProject: {
             title: "打开迁移的项目",
         },
         openCloudProject: {
-            title: "打开线上项目",
+            title: "打开远程文件夹",
             selectConnection: "选择连接",
         },
         recentProjects: "最近文件夹",

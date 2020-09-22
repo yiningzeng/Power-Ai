@@ -33,7 +33,7 @@ import { IAssetMetadata } from "../../../../models/applicationState";
 import { toast } from "react-toastify";
 import moment from "moment";
 import MessageBox from "../../common/messageBox/messageBox";
-import { isElectron } from "../../../../common/hostProcess";
+import { isElectron, PlatformType } from "../../../../common/hostProcess";
 import {ILocalFileSystemProxyOptions, LocalFileSystemProxy} from "../../../../providers/storage/localFileSystemProxy";
 import * as connectionActions from "../../../../redux/actions/connectionActions";
 import trainService from "../../../../services/trainService";
@@ -119,7 +119,6 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
     }
 
     public render() {
-
         // this.props.actions.test();
         return (
             <div className="app-homepage">
@@ -155,31 +154,35 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                         {/*                onChange={this.onProjectFileUpload}*/}
                         {/*                onError={this.onProjectFileUploadError}/>*/}
                         {/*</li>*/}
+                        {/*}*/}
                         {/*{isElectron() &&*/}
                         {/*<li>*/}
-                            {/*<a href="#" className="p-5 file-upload"*/}
-                               {/*onClick={() => this.filePicker.current.upload()}>*/}
-                                {/*<i className="fas fa-file-import fa-9x"></i>*/}
-                                {/*<h6 style={{marginTop: "10px", marginLeft: "10px"}}>*/}
-                                    {/*{strings.homePage.openTransferProject.title}</h6>*/}
-                            {/*</a>*/}
-                            {/*<FilePicker ref={this.filePicker}*/}
-                                        {/*onChange={this.onProjectFileUpload}*/}
-                                        {/*onError={this.onProjectFileUploadError}/>*/}
+                        {/*    <a href="#" className="p-5 file-upload"*/}
+                        {/*       onClick={() => this.filePicker.current.upload()}>*/}
+                        {/*        <i className="fas fa-file-import fa-9x"></i>*/}
+                        {/*        <h6 style={{marginTop: "10px", marginLeft: "10px"}}>*/}
+                        {/*            {strings.homePage.openTransferProject.title}</h6>*/}
+                        {/*    </a>*/}
+                        {/*    <FilePicker ref={this.filePicker}*/}
+                        {/*                onChange={this.onProjectFileUpload}*/}
+                        {/*                onError={this.onProjectFileUploadError}/>*/}
                         {/*</li>*/}
                         {/*}*/}
-                        {/*<li>*/}
-                        {/*<a href="#" onClick={this.handleOpenCloudProjectClick} className="p-5 cloud-open-project">*/}
-                        {/*<i className="fas fa-cloud fa-9x"></i>*/}
-                        {/*<h6>{strings.homePage.openCloudProject.title}</h6>*/}
-                        {/*</a>*/}
-                        {/*<CloudFilePicker*/}
-                        {/*ref={this.cloudFilePicker}*/}
-                        {/*connections={this.props.connections}*/}
-                        {/*onSubmit={(content) => this.loadSelectedProject(JSON.parse(content))}*/}
-                        {/*fileExtension={constants.projectFileExtension}*/}
-                        {/*/>*/}
-                        {/*</li>*/}
+
+                        <li>
+                            <a href="#" onClick={this.handleOpenCloudProjectClick} className="p-5 cloud-open-project">
+                                <i className="fas fa-cloud fa-9x"></i>
+                                <h6>{strings.homePage.openCloudProject.title}</h6>
+                            </a>
+                            <CloudFilePicker
+                                ref={this.cloudFilePicker}
+                                connections={this.props.connections}
+                                onSubmit={(content) => {
+                                    this.loadProject(content, true);
+                                }}
+                                fileExtension={constants.projectFileExtension}
+                            />
+                        </li>
                     </ul>
                 </div>
                 {(this.props.recentProjects && this.props.recentProjects.length > 0) &&
@@ -242,32 +245,35 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
     }
 
     private handleOpenCloudProjectClick = () => {
+        const platform = global && global.process ? global.process.platform : "web";
+        if (platform !== PlatformType.Linux) {
+            toast.error("远程标注暂时不支持非linux系统");
+            return;
+        }
         this.cloudFilePicker.current.open();
     }
 
-    private  onOpenDirectory = async () => {
-        // this.filePicker.current.upload()
-        const fileFolder = await this.localFileSystem.importTaggedContainer();
-        // alert(JSON.stringify(this.props.project));
-        if (!fileFolder) { return; }
+    private loadProject = async (fileFolder: string, remoteTag: boolean) => {
         this.draggableDialog.current.open();
-        const idd = normalizeSlashes(fileFolder[0]).lastIndexOf("/");
+        const idd = normalizeSlashes(fileFolder).lastIndexOf("/");
         // const randId = shortid.generate();
-        const folderName = normalizeSlashes(fileFolder[0]).substring(idd + 1);
+        const folderName = normalizeSlashes(fileFolder).substring(idd + 1);
         const connection: IConnection = {
             id: folderName,
             name: folderName,
             providerType: "localFileSystemProxy",
             providerOptions: {
-                folderPath: normalizeSlashes(fileFolder[0]),
+                folderPath: normalizeSlashes(fileFolder),
             },
             providerOptionsOthers: [{
-                folderPath: normalizeSlashes(fileFolder[0]),
+                folderPath: normalizeSlashes(fileFolder),
             }],
         };
         let projectJson: IProject = {
             id: folderName,
             name: folderName,
+            remoteTag,
+            remoteSaveFolder: fileFolder,
             version: "3.0.0",
             activeLearningSettings: DefaultActiveLearningSettings,
             autoSave: true,
@@ -278,10 +284,10 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
             tags: [],
             targetConnection: connection,
             trainFormat: DefaultTrainOptions,
-            videoSettings: { frameExtractionRate: 15 },
+            videoSettings: {frameExtractionRate: 15},
             assets: {},
         };
-        const dataTemp = await this.props.actions.loadAssetsWithFolderAndTags(projectJson, fileFolder[0]);
+        const dataTemp = await this.props.actions.loadAssetsWithFolderAndTags(projectJson, fileFolder);
         const rootProjectAssets = _.values(projectJson.assets)
             .filter((asset) => !asset.parent);
         const rootAssets = _(rootProjectAssets)
@@ -296,6 +302,14 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
         connectionActions.saveConnection(connection);
         this.draggableDialog.current.close();
         await this.loadSelectedProject(projectJson);
+    }
+
+    private  onOpenDirectory = async () => {
+        // this.filePicker.current.upload()
+        const fileFolder = await this.localFileSystem.importTaggedContainer();
+        // alert(JSON.stringify(this.props.project));
+        if (!fileFolder) { return; }
+        this.loadProject(fileFolder[0], false);
     }
 
     private onProjectFileUpload = async (e, project) => {

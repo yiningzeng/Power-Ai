@@ -189,6 +189,87 @@ export default class TrainingSystem {
     }
     // endregion
 
+    // 加载远程图片集
+    public LoadRemoteAssets(ip: string, remotePath: string, username: string, password: string): Promise<string> {
+        return new Promise<string>((resolve, reject) => {
+            const passwordFile = process.cwd() + "/sudo.txt";
+            const localPath = `/Remote_Assets/${ip}-${this.replaceAll("/", "-", remotePath)}`;
+            const cmdStr = `echo \`cat "${passwordFile}"\` | sudo -S mkdir -p ${localPath} && sudo mount -t cifs -o user=${username},password=${password},dir_mode=0777,file_mode=0777 //${ip}/${remotePath} ${localPath}`;
+            console.log(cmdStr);
+            workerProcess = exec(cmdStr);
+            // 不受child_process默认的缓冲区大小的使用方法，没参数也要写上{}：workerProcess = exec(cmdStr, {})
+            // 打印正常的后台可执行程序输出
+            workerProcess.stdout.on("data", (data) => {
+                console.log("stdout: " + data);
+            });
+            // 打印错误的后台可执行程序输出
+            workerProcess.stderr.on("data", (data) => {
+                console.log("stderr: " + data);
+            });
+            // 退出之后的输出
+            workerProcess.on("close", (code) => {
+                console.log("out code：" + code);
+                if (code === 0) {
+                    console.log("执行成功");
+                    resolve(localPath);
+                } else {
+                    console.log("执行失败");
+                    reject("执行失败");
+                    workerProcess = exec(`echo \`cat "${passwordFile}"\` | sudo -S rm -r ${localPath}`);
+                }
+            });
+        });
+    }
+
+    // 关闭远程图片集
+    public CloseRemoteAssets(ip: string, remotePath: string): Promise<string> {
+        return new Promise<string>((resolve, reject) => {
+            const passwordFile = process.cwd() + "/sudo.txt";
+            const localPath = `/Remote_Assets/${ip}-${this.replaceAll("/", "-", remotePath)}`;
+            const cmdStr = `echo \`cat "${passwordFile}"\` | sudo -S umount ${localPath}`;
+            console.log(cmdStr);
+            workerProcess = exec(cmdStr);
+            // 不受child_process默认的缓冲区大小的使用方法，没参数也要写上{}：workerProcess = exec(cmdStr, {})
+            // 打印正常的后台可执行程序输出
+            workerProcess.stdout.on("data", (data) => {
+                console.log("stdout: " + data);
+            });
+            // 打印错误的后台可执行程序输出
+            workerProcess.stderr.on("data", (data) => {
+                console.log("stderr: " + data);
+            });
+            // 退出之后的输出
+            workerProcess.on("close", (code) => {
+                console.log("out code：" + code);
+            });
+            resolve(localPath);
+        });
+    }
+
+    // 复制远程图片到本机
+    public CopyRemoteAssets(remoteSaveFolder: string): Promise<string> {
+        return new Promise<string>((resolve, reject) => {
+            const passwordFile = process.cwd() + "/sudo.txt";
+            const cmdStr = `echo \`cat "${passwordFile}"\` | sudo -S mkdir -p /PowerAi_Assets && sudo cp -r ${remoteSaveFolder} /PowerAi_Assets && sudo chmod -R 777 /PowerAi_Assets`;
+            console.log(cmdStr);
+            workerProcess = exec(cmdStr);
+            // 不受child_process默认的缓冲区大小的使用方法，没参数也要写上{}：workerProcess = exec(cmdStr, {})
+            // 打印正常的后台可执行程序输出
+            workerProcess.stdout.on("data", (data) => {
+                console.log("stdout: " + data);
+            });
+            // 打印错误的后台可执行程序输出
+            workerProcess.stderr.on("data", (data) => {
+                console.log("stderr: " + data);
+            });
+            // 退出之后的输出
+            workerProcess.on("close", (code) => {
+                console.log("out code：" + code);
+            });
+            resolve(remoteSaveFolder.replace("Remote_Assets", "PowerAi_Assets"));
+        });
+    }
+
     public remoteTrain(project: IProject): Promise<string> {
         return new Promise<string>((resolve, reject) => {
             console.log(`开始打包`);
@@ -714,5 +795,9 @@ export default class TrainingSystem {
                 });
             });
         });
+    }
+
+    private replaceAll(find, replace, str): string {
+        return str.replace(new RegExp(find, "g"), replace);
     }
 }

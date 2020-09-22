@@ -1463,6 +1463,8 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
     }
 
     private reloadProject = async () => {
+
+        console.log(`exportPage: homepage: ${JSON.stringify(this.props.project)}`);
         this.loadingDialog.current.open();
         this.loadingDialog.current.change("正在重新加载数据集", "请耐心等待");
         const par: IProviderOptions = this.props.project.sourceConnection.providerOptions;
@@ -1491,6 +1493,8 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
             id: folderName,
             name: folderName,
             version: "3.0.0",
+            remoteTag: this.props.project.remoteTag,
+            remoteSaveFolder: this.props.project.remoteSaveFolder,
             activeLearningSettings: DefaultActiveLearningSettings,
             autoSave: true,
             exportFormat: DefaultExportOptions,
@@ -1534,6 +1538,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         connectionActions.saveConnection(connection);
 
         await this.props.actions.loadProject(projectJson);
+        console.log(`exportPage: homepage2222: ${JSON.stringify(this.props.project)}`);
         this.loadingDialog.current.close();
         this.props.history.push(`/projects/${projectJson.id}/edit`);
         this.loadingProjectAssets = false;

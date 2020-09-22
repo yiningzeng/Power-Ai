@@ -10,6 +10,7 @@ import DraggableDialog from "../../common/draggableDialog/draggableDialog";
 import { ExportAssetState } from "../../../../providers/export/exportProvider";
 import { toast } from "react-toastify";
 import Confirm from "../../common/confirm/confirm";
+import {IpcRendererProxy} from "../../../../common/ipcRendererProxy";
 
 /**
  * Properties for Export Page
@@ -115,12 +116,24 @@ export default class ExportPage extends React.Component<IExportPageProps> {
         // const res = await this.props.actions.packageProject(projectToUpdate);
         // this.draggableDialog.current.change("导出", JSON.stringify(res));
         const results = await this.props.actions.exportProject(this.props.project);
+        console.log(`exportPage: ${JSON.stringify(this.props.project)}`);
+        let remoteSaveFolder = "";
+        if (this.props.project.remoteTag !== undefined && this.props.project.remoteTag === true) {
+            await IpcRendererProxy.send(`TrainingSystem:CopyRemoteAssets`, [this.props.project.remoteSaveFolder])
+                .then((v) => {
+                    remoteSaveFolder = `\n已经把远程素材保存到本机${v.toString()}目录`;
+                    console.log("复制成功");
+                })
+                .catch(() => {
+                    console.log("复制失败");
+                });
+        }
         // toast.dismiss(infoId);
         if (!results || (results && results.errors.length === 0)) {
-            this.draggableDialog.current.change("导出完成", "导出成功，确定返回上一页", true, true);
+            this.draggableDialog.current.change("导出完成", "导出成功，" + remoteSaveFolder + "确定返回上一页", true, true);
         } else if (results && results.errors.length > 0) {
             this.draggableDialog.current.change("导出不全",
-                `成功的导出了 ${results.completed.length}/${results.count} 素材，但导出不全，请检查`, true, true);
+                `成功的导出了${results.completed.length}/${results.count} 素材，但导出不全，请检查 ${remoteSaveFolder} `, true, true);
             // toast.warn(`成功的导出了 ${results.completed.length}/${results.count} 素材，但导出不全，请检查`);
         }
         // endregion

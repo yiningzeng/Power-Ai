@@ -183,6 +183,8 @@ export interface IAppSettings {
 export interface IProject {
     id: string;
     name: string;
+    remoteTag?: boolean;
+    remoteSaveFolder?: string;
     version: string;
     securityToken: string;
     description?: string;

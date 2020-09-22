@@ -112,7 +112,6 @@ export default class LocalFileSystem implements IStorageProvider {
             if (!exists) {
                 resolve();
             }
-
             fs.unlink(filePath, (err) => {
                 if (err) {
                     return reject(err);
