@@ -92,12 +92,12 @@ export class TitleBar extends React.Component<ITitleBarProps, ITitleBarState> {
                                 </ConditionalNavLink>
                             </div>
                         </MenuItem>
-                        <MenuItem key={"管理页面"} disabled={false} selectable={false}>
+                        <MenuItem key={"训练中心"} disabled={false} selectable={false}>
                             <div className="menu-item-container">
                                 <ConditionalNavLink disabled={!this.props.projectId}
                                                     title={"manage"}
                                                     to={`/web-manage`}>
-                                    管理页面
+                                    训练中心
                                 </ConditionalNavLink>
                             </div>
                         </MenuItem>
