@@ -204,8 +204,8 @@ export class AssetService {
         let res: IAssetsAndTags;
         let taggs = [];
         let finalTags: ITag[] = [];
+        const exitsColor = await this.getColors();
         const assets = await this.assetProviderInstance.getAssets();
-        finalTags = await this.getColors();
         console.log(`获取到的颜色 ${JSON.stringify(finalTags)}`);
         const updates = await assets.mapAsync(async (asset) => {
             const assetMetadata = await this.getAssetMetadata(asset);
@@ -253,13 +253,15 @@ export class AssetService {
         const finalAssets = updates.sort((a1, a2) => a1.state > a2.state ? -1 : 1);
         taggs = [...new Set(taggs)].sort(); // 去重然后排序 用于标签搜索
         taggs.map((val) => {
-            const index = finalTags.findIndex((item) => item.name === val);
+            const index = exitsColor.findIndex((item) => item.name === val);
             if (index === -1) {
                 const newTag: ITag = {
                     name: val,
-                    color: this.getNextColor(finalTags),
+                    color: this.getNextColor(exitsColor),
                 };
                 finalTags.push(newTag);
+            } else {
+                finalTags.push(exitsColor[index]);
             }
         });
         res = {
@@ -337,7 +339,7 @@ export class AssetService {
      */
     public async save(metadata: IAssetMetadata): Promise<IAssetMetadata> {
         Guard.null(metadata);
-        console.log(`assetsService-test: ${JSON.stringify(metadata)}`);
+        // console.log(`assetsService-test: ${JSON.stringify(metadata)}`);
         const fileName = `${metadata.asset.id}${constants.assetMetadataFileExtension}`;
 
         // Only save asset metadata if asset is in a tagged state
@@ -366,7 +368,7 @@ export class AssetService {
         Guard.null(asset);
 
         const fileName = `${asset.id}${constants.assetMetadataFileExtension}`;
-        console.log(`assets_map: ${fileName}:`);
+        // console.log(`assets_map: ${fileName}:`);
         try {
             const json = await this.storageProvider.readText(fileName);
             return JSON.parse(json) as IAssetMetadata;
@@ -435,9 +437,8 @@ export class AssetService {
      * Delete a tag from asset metadata files
      * @param tagName Name of tag to delete
      */
-    public async deleteTag(tagName: string): Promise<IAssetMetadata[]> {
-        const transformer = (tags) => tags.filter((t) => t !== tagName);
-        return await this.getUpdatedAssets(tagName, transformer);
+    public async deleteTag(tagName: string): Promise<void> {
+        await this.onlyDeleteTagAssets(tagName);
     }
 
     /**
@@ -447,6 +448,20 @@ export class AssetService {
     public async renameTag(tagName: string, newTagName: string): Promise<IAssetMetadata[]> {
         const transformer = (tags) => tags.map((t) => (t === tagName) ? newTagName : t);
         return await this.getUpdatedAssets(tagName, transformer, newTagName);
+    }
+
+    /**
+     * Update tags within asset metadata files
+     * @param tagName Name of tag to update within project
+     * @param transformer Function that accepts array of tags from a region and returns a modified array of tags
+     */
+    private async onlyDeleteTagAssets(tagName: string)
+        : Promise<void> {
+        // Loop over assets and update if necessary
+        const updates = await _.values(this.project.assets).mapAsync(async (asset) => {
+            const assetMetadata = await this.getAssetMetadata(asset);
+            await this.deltetTagInAssetMetadata(assetMetadata, tagName);
+        });
     }
 
     /**
@@ -465,6 +480,41 @@ export class AssetService {
         });
 
         return updates.filter((assetMetadata) => !!assetMetadata);
+    }
+
+    /**
+     * Update tag within asset metadata object
+     * @param assetMetadata Asset metadata to update
+     * @param tagName Name of tag being updated
+     * @param transformer Function that accepts array of tags from a region and returns a modified array of tags
+     * @returns Modified asset metadata object or null if object does not need to be modified
+     */
+    private async deltetTagInAssetMetadata(
+        assetMetadata: IAssetMetadata,
+        tagName: string): Promise<boolean> {
+        let foundTag = false;
+        let finalTags = [];
+        for (const region of assetMetadata.regions) {
+            if (region.tags.find((t) => t === tagName)) {
+                foundTag = true;
+                region.tags = region.tags.filter((t) => t !== tagName);
+            }
+            region.tags.map((val) => {
+                finalTags.push(val);
+            });
+        }
+
+        if (foundTag) {
+            finalTags = [...new Set(finalTags)].sort(); // 去重然后排序 用于标签搜索
+            assetMetadata.asset.tags = finalTags.toString();
+            // console.log(`更改的标签: ${finalTags.toString()}`);
+            assetMetadata.regions = assetMetadata.regions.filter((region) => region.tags.length > 0);
+            assetMetadata.asset.state = (assetMetadata.regions.length) ? AssetState.Tagged : AssetState.Visited;
+            await this.save(assetMetadata);
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -494,7 +544,7 @@ export class AssetService {
         finalTags = [...new Set(finalTags)].sort(); // 去重然后排序 用于标签搜索
         if (foundTag) {
             assetMetadata.asset.tags = finalTags.toString();
-            console.log(`更改的标签: ${finalTags.toString()}`);
+            // console.log(`更改的标签: ${finalTags.toString()}`);
             assetMetadata.regions = assetMetadata.regions.filter((region) => region.tags.length > 0);
             assetMetadata.asset.state = (assetMetadata.regions.length) ? AssetState.Tagged : AssetState.Visited;
             return true;

@@ -69,6 +69,7 @@ import {normalizeSlashes, randomIntInRange} from "../../../../common/utils";
 // tslint:disable-next-line:no-var-requires
 import tagColors from "../../common/tagColors.json";
 import {Rnd} from "powerai-react-rnd";
+import {constants} from "../../../../common/constants";
 
 // import "antd/lib/tree/style/css";
 
@@ -1072,12 +1073,17 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
      * @param tagName Name of tag to be deleted
      */
     private onTagDeleted = async (tagName: string): Promise<void> => {
-        const assetUpdates = await this.props.actions.deleteProjectTag(this.props.project, tagName);
-        const selectedAsset = assetUpdates.find((am) => am.asset.id === this.state.selectedAsset.asset.id);
-
-        if (selectedAsset) {
-            this.setState({ selectedAsset });
-        }
+        this.loadingDialog.current.open();
+        this.loadingDialog.current.change("正在删除标签", "请耐心等待...");
+        await this.props.actions.deleteProjectTag(this.props.project, tagName);
+        // await this.goToRootAsset(1);
+        // const selectedAsset = assetUpdates.find((am) => am.asset.id === this.state.selectedAsset.asset.id);
+        //
+        // if (selectedAsset) {
+        //     this.setState({ selectedAsset });
+        // }
+        this.loadingDialog.current.change("删除完成", "抱歉！该版本删除后需要手动到首页重新打开文件夹!", true);
+        // this.reloadProject(this.state.selectedAsset.asset.id, tagName);
     }
 
     private onCtrlTagClicked = (tag: ITag): void => {
@@ -1384,6 +1390,14 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
             case ToolbarItemName.DeleteAsset:
                 this.onAssetDeleted();
                 break;
+            case ToolbarItemName.GlobalPositioningAsset:
+                await this.setState({
+                    ...this.state,
+                    isFilter: false,
+                }, () => {
+                    this.reloadProject(this.state.selectedAsset.asset.id);
+                });
+                break;
             case ToolbarItemName.CopyRegions:
                 this.canvas.current.enableCanvas(true);
                 this.canvas.current.copyRegions();
@@ -1396,7 +1410,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
             //     this.canvas.current.pasteRegions();
             //     break;
             case ToolbarItemName.RemoveAllRegions:
-                this.canvas.current.confirmRemoveAllRegions();
+                this.canvas.current.removeAllRegions();
                 break;
             case ToolbarItemName.ActiveLearning:
                 await this.predictRegions();
@@ -1462,22 +1476,22 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         }
     }
 
-    private reloadProject = async () => {
+    private reloadProject = async (selectAssetId?: string, deltetTag?: string) => {
 
-        console.log(`exportPage: homepage: ${JSON.stringify(this.props.project)}`);
+        // console.log(`exportPage: homepage: ${JSON.stringify(this.props.project)}`);
         this.loadingDialog.current.open();
         this.loadingDialog.current.change("正在重新加载数据集", "请耐心等待");
         const par: IProviderOptions = this.props.project.sourceConnection.providerOptions;
-        console.log(`fucking ${par["folderPath"]}`);
+        // console.log(`fucking ${par["folderPath"]}`);
         const fileFolder = par["folderPath"];
         // alert(JSON.stringify(this.props.project));
         if (!fileFolder) { return; }
         const idd = normalizeSlashes(fileFolder).lastIndexOf("/");
         // const randId = shortid.generate();
-        console.log(`homePage>openDir: idd ${idd}`);
+        // console.log(`homePage>openDir: idd ${idd}`);
         const folderName = normalizeSlashes(fileFolder).substring(idd + 1);
-        console.log(`homePage>openDir: folderName ${folderName}`);
-        console.log(`homePage>openDir: normalizeSlashes(fileFolder[0]) ${normalizeSlashes(fileFolder)}`);
+        // console.log(`homePage>openDir: folderName ${folderName}`);
+        // console.log(`homePage>openDir: normalizeSlashes(fileFolder[0]) ${normalizeSlashes(fileFolder)}`);
         const connection: IConnection = {
             id: folderName,
             name: folderName,
@@ -1506,6 +1520,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
             trainFormat: DefaultTrainOptions,
             videoSettings: { frameExtractionRate: 15 },
             assets: {},
+            lastVisitedAssetId: selectAssetId,
         };
         const dataTemp = await this.props.actions.loadAssetsWithFolderAndTags(projectJson,
             fileFolder);
@@ -1516,7 +1531,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
             .uniqBy((asset) => asset.id)
             .value();
         // region 查询重复的标签
-        const finalTags = this.props.project.tags;
+        const finalTags = this.props.project.tags.filter((v) => v.name !== deltetTag);
         dataTemp.tags.map((val) => {
             if (!finalTags.some((v) => v.name === val.name)) {
                 const newTag: ITag = {
@@ -1533,12 +1548,13 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
             assets: _.keyBy(rootAssets, (asset) => asset.id),
             tags: finalTags.sort(),
         };
-        console.log(`merge tags: ${JSON.stringify(finalTags)}`);
-        console.log(`homePage:merge tags: ${JSON.stringify(projectJson)}`);
+        // console.log(`merge tags: ${JSON.stringify(finalTags)}`);
+        // console.log(`homePage:merge tags: ${JSON.stringify(projectJson)}`);
         connectionActions.saveConnection(connection);
 
         await this.props.actions.loadProject(projectJson);
-        console.log(`exportPage: homepage2222: ${JSON.stringify(this.props.project)}`);
+        // console.log(`homePage:merge tags: fufufufufufufufufufuufuf`);
+        // console.log(`exportPage: homepage2222: ${JSON.stringify(this.props.project)}`);
         this.loadingDialog.current.close();
         this.props.history.push(`/projects/${projectJson.id}/edit`);
         this.loadingProjectAssets = false;

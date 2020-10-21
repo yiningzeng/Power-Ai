@@ -357,24 +357,23 @@ export function deleteProjectTag(project: IProject, tagName)
     return async (dispatch: Dispatch, getState: () => IApplicationState) => {
         // Find tags to rename
         const assetService = new AssetService(project);
-        const assetUpdates = await assetService.deleteTag(tagName);
+        await assetService.deleteTag(tagName);
 
         // Save updated assets
-        await assetUpdates.forEachAsync(async (assetMetadata) => {
-            await saveAssetMetadata(project, assetMetadata)(dispatch);
-        });
+        // await assetUpdates.forEachAsync(async (assetMetadata) => {
+        //     await saveAssetMetadata(project, assetMetadata)(dispatch);
+        // });
 
-        const currentProject = getState().currentProject;
-        const updatedProject = {
-            ...currentProject,
-            tags: project.tags.filter((t) => t.name !== tagName),
-        };
-
-        // Save updated project tags
-        await saveProject(updatedProject)(dispatch, getState);
-        dispatch(deleteProjectTagAction(updatedProject));
-
-        return assetUpdates;
+        // const currentProject = getState().currentProject;
+        // const updatedProject = {
+        //     ...currentProject,
+        //     tags: project.tags.filter((t) => t.name !== tagName),
+        // };
+        //
+        // // Save updated project tags
+        // await saveProject(updatedProject)(dispatch, getState);
+        // dispatch(deleteProjectTagAction(updatedProject));
+        return null;
     };
 }
 

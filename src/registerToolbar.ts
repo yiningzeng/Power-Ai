@@ -19,6 +19,7 @@ export enum ToolbarItemName {
     HideAllRegions = "hideAllRegions",
     ShowAllRegions = "showAllRegions",
     RemoveAllRegions = "removeAllRegions",
+    GlobalPositioningAsset = "globalPositioningAsset",
     DeleteAsset = "deleteAsset",
     ZoomInAsset = "zoomInAsset",
     ZoomOutAsset = "zoomOutAsset",
@@ -66,7 +67,7 @@ export default function registerToolbar() {
         icon: "fa-vector-square",
         group: ToolbarItemGroup.Canvas,
         type: ToolbarItemType.State,
-        accelerators: ["X", "x"],
+        accelerators: ["Q", "q"],
     });
     // ToolbarItemFactory.register({
     //     name: ToolbarItemName.DrawWithPencil,
@@ -82,7 +83,7 @@ export default function registerToolbar() {
         icon: "fa-draw-polygon",
         group: ToolbarItemGroup.Canvas,
         type: ToolbarItemType.State,
-        accelerators: ["D", "d"],
+        accelerators: ["E", "e"],
     });
     ToolbarItemFactory.register({
         name: ToolbarItemName.DrawPolygon2MinBox,
@@ -90,7 +91,7 @@ export default function registerToolbar() {
         icon: "fa-border-none",
         group: ToolbarItemGroup.Canvas,
         type: ToolbarItemType.State,
-        accelerators: ["F", "f"],
+        accelerators: ["R", "r"],
     });
     ToolbarItemFactory.register({
         name: ToolbarItemName.CopyRectangle,
@@ -152,7 +153,7 @@ export default function registerToolbar() {
         icon: "fa-ban",
         group: ToolbarItemGroup.Regions,
         type: ToolbarItemType.Action,
-        accelerators: ["CmdOrCtrl+Delete", "CmdOrCtrl+Backspace"],
+        accelerators: ["X", "x"],
     });
 
     // ToolbarItemFactory.register({
@@ -216,9 +217,16 @@ export default function registerToolbar() {
         icon: "fa-trash-alt",
         group: ToolbarItemGroup.Navigation,
         type: ToolbarItemType.Action,
-        accelerators: ["CmdOrCtrl+D", "CmdOrCtrl+d"],
+        accelerators: ["D", "d"],
     });
-
+    ToolbarItemFactory.register({
+        name: ToolbarItemName.GlobalPositioningAsset,
+        tooltip: "全局定位该图片",
+        icon: "fa fa-map-pin",
+        group: ToolbarItemGroup.Navigation,
+        type: ToolbarItemType.Action,
+        accelerators: ["CmdOrCtrl+F", "CmdOrCtrl+f"],
+    });
     // ToolbarItemFactory.register({
     //     name: ToolbarItemName.SaveProject,
     //     tooltip: strings.editorPage.toolbar.saveProject,
@@ -298,7 +306,7 @@ export default function registerToolbar() {
         // icon: "fas fa-caret-square-right",
         group: ToolbarItemGroup.Others,
         type: ToolbarItemType.Action,
-        accelerators: ["CmdOrCtrl+F", "CmdOrCtrl+f"],
+        accelerators: ["CmdOrCtrl+R", "CmdOrCtrl+r"],
     });
     // ToolbarItemFactory.register({
     //     name: ToolbarItemName.RemoteTrainAi,
