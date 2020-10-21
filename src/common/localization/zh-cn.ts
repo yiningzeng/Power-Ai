@@ -432,10 +432,10 @@ export const chinese: IAppStrings = {
                 displayName: "CoCo",
             },
             powerAi: {
-                displayName: "PowerAi(可导入到其他项目)",
+                displayName: "原始数据",
                 subdirectories: {
                     title: "根据标签名分文件夹",
-                    description: "如果一个素材包含多个标签名会被分到multi-tag文件夹",
+                    description: "如果一个素材包含多个标签名会被分到multilabel文件夹",
                 },
             },
         },
