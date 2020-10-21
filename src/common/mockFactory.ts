@@ -865,6 +865,7 @@ export default class MockFactory {
                 MockFactory.createSecurityToken("TestProject"),
                 MockFactory.createSecurityToken("test"),
             ],
+            remoteHostList: [],
             deadline: "2019-11-16",
         };
     }

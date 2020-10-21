@@ -164,6 +164,13 @@ export interface IAppSettings {
     thumbnailSize?: ISize;
     deadline: string;
     zengyining?: boolean;
+    remoteHostList: IRemoteHost[];
+}
+
+export interface IRemoteHost {
+    ip: string;
+    name: string;
+    platform: string;
 }
 
 /**

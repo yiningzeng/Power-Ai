@@ -31,6 +31,22 @@
                 cursor: pointer;
             }
         }
+
+        &-home-toolbar {
+            //width: 100%;
+            //float: right;
+            margin-left: 166px;
+            display: flex;
+            flex-direction: row;
+            &-item {
+                color: #ccc;
+                padding: 1px;
+            }
+            &-item:hover {
+                color: white;
+                cursor: pointer;
+            }
+        }
     }
 
     &-body {

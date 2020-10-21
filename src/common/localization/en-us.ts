@@ -29,6 +29,9 @@ export const english: IAppStrings = {
     },
     homePage: {
         newProject: "New Project",
+        remoteHost: {
+            title: "远程主机",
+        },
         openLocalProject: {
             title: "Open Local Project",
         },

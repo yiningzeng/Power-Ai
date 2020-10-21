@@ -2,7 +2,7 @@ import React from "react";
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader,
     Input, Label, InputGroup, InputGroupAddon, InputGroupText} from "reactstrap";
 import { strings } from "../../../../common/strings";
-import { IConnection, StorageType } from "../../../../models/applicationState";
+import {IConnection, IRemoteHost, StorageType} from "../../../../models/applicationState";
 import { StorageProviderFactory } from "../../../../providers/storage/storageProviderFactory";
 import CondensedList, { ListItem } from "../condensedList/condensedList";
 import {normalizeSlashes} from "../../../../common/utils";
@@ -21,9 +21,10 @@ import {IpcRendererProxy} from "../../../../common/ipcRendererProxy";
  * @member fileExtension - Filter on files with extension
  */
 export interface ICloudFilePickerProps {
+    modalHeader: string;
     connections: IConnection[];
     onSubmit: (content: string) => void;
-
+    remoteHostList?: IRemoteHost[];
     onCancel?: () => void;
     fileExtension?: string;
 }
@@ -69,6 +70,7 @@ export class CloudFilePicker extends React.Component<ICloudFilePickerProps, IClo
     }
 
     public render() {
+        const { remoteHostList } = this.props;
         const closeBtn = <button className="close" onClick={this.close}>&times;</button>;
 
         return(
@@ -78,27 +80,22 @@ export class CloudFilePicker extends React.Component<ICloudFilePickerProps, IClo
                 </ModalHeader>
                 <ModalBody>
                     <div>
-                        <Label for="exampleSelect">目标平台</Label>
+                        <Label for="exampleSelect">目标主机</Label>
                         <Input type="select" name="select" id="exampleSelect" onChange={(v) => {
-                            // this.setState({
-                            //     ...this.state,
-                            //     platform: v.target.value,
-                            // });
+                            this.setState({
+                                ...this.state,
+                                ip: v.target.value,
+                            });
                         }}>
-                            <option>Windows</option>
-                            <option>Linux</option>
+                            {remoteHostList && remoteHostList.length > 0 && remoteHostList.map((item) =>
+                                <option value={item.ip}>{`${item.name}(${item.platform}) - ${item.ip}`}</option>)}
                         </Input>
-                        <Label for="path">目标共享地址</Label>
+                        <Label for="path">主机共享的文件夹路径</Label>
                         <InputGroup>
                             <InputGroupAddon addonType="prepend">
                                 <InputGroupText>//</InputGroupText>
                             </InputGroupAddon>
-                            <Input name="ip" id="ip" placeholder="输入目标IP" onChange={(v) => {
-                                this.setState({
-                                    ...this.state,
-                                    ip: v.target.value,
-                                });
-                            }}/>
+                            <Input name="ip" id="ip" value={this.state.ip} readOnly/>
                             <InputGroupAddon addonType="append">
                                 <InputGroupText>/</InputGroupText>
                             </InputGroupAddon>
@@ -176,9 +173,10 @@ export class CloudFilePicker extends React.Component<ICloudFilePickerProps, IClo
     private getInitialState(): ICloudFilePickerState {
         return {
             isOpen: false,
-            modalHeader: strings.homePage.openCloudProject.selectConnection,
+            modalHeader: this.props.modalHeader,
             platform: "Windows",
-            ip: "",
+            ip: this.props.remoteHostList !== undefined && this.props.remoteHostList.length > 0 ?
+                this.props.remoteHostList[0].ip : "",
             cloudPath: "NG",
             username: "Everyone",
             password: "",

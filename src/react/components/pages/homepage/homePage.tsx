@@ -7,6 +7,7 @@ import { strings, interpolate } from "../../../../common/strings";
 import IProjectActions, * as projectActions from "../../../../redux/actions/projectActions";
 import IApplicationActions, * as applicationActions from "../../../../redux/actions/applicationActions";
 import { CloudFilePicker } from "../../common/cloudFilePicker/cloudFilePicker";
+import { RemoteHostAddModal } from "../../common/RemoteHostAddModal/remoteHostAddModal";
 import CondensedList from "../../common/condensedList/condensedList";
 import Confirm from "../../common/confirm/confirm";
 import FilePicker from "../../common/filePicker/filePicker";
@@ -42,6 +43,7 @@ import shortid from "shortid";
 import {ExportAssetState} from "../../../../providers/export/exportProvider";
 import {appInfo} from "../../../../common/appInfo";
 import DraggableDialog from "../../common/draggableDialog/draggableDialog";
+import RemoteHostItem from "./RemoteHostItem";
 // tslint:disable-next-line:no-var-requires
 const tagColors = require("../../common/tagColors.json");
 
@@ -83,6 +85,7 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
     private filePicker: React.RefObject<FilePicker> = React.createRef();
     private deleteConfirm: React.RefObject<Confirm> = React.createRef();
     private cloudFilePicker: React.RefObject<CloudFilePicker> = React.createRef();
+    private remoteHostAddModal: React.RefObject<RemoteHostAddModal> = React.createRef();
     private importConfirm: React.RefObject<Confirm> = React.createRef();
     private draggableDialog: React.RefObject<DraggableDialog> = React.createRef();
     constructor(props, context) {
@@ -122,6 +125,36 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
         // this.props.actions.test();
         return (
             <div className="app-homepage">
+                <div className="app-homepage-remoteHost bg-lighter-1">
+                    <CondensedList
+                        title={strings.homePage.remoteHost.title}
+                        Component={RemoteHostItem}
+                        items={this.props.appSettings.remoteHostList}
+                        // onClick={(item) => toast.info(`主机名: ${item.name} 主机IP: ${item.ip}`)}
+                        onAddClick={() => this.remoteHostAddModal.current.open()}
+                        onDelete={(item) => this.deleteRemoteHostConfirm.current.open(item)}
+                        showToolbar={true}
+                        home={true}/>
+                    <RemoteHostAddModal
+                        ref={this.remoteHostAddModal}
+                        onSubmit={(platform, name, ip) => {
+                            const newAppSettings = {
+                                ...this.props.appSettings,
+                                remoteHostList: [
+                                    ...this.props.appSettings.remoteHostList,
+                                    {
+                                        name,
+                                        ip,
+                                        platform,
+                                    }],
+                            };
+                            this.props.applicationActions.saveAppSettings(newAppSettings);
+                            this.remoteHostAddModal.current.close();
+                            toast.success("新增主机成功");
+                            console.log(JSON.stringify(this.props.appSettings));
+                        }}
+                    />
+                </div>
                 <div className="app-homepage-main">
                     <ul>
                         {/*<li>*/}
@@ -195,6 +228,19 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                         onDelete={(project) => this.deleteConfirm.current.open(project)} showToolbar={false}/>
                 </div>
                 }
+                <Confirm title="删除主机"
+                         ref={this.deleteRemoteHostConfirm as any}
+                         message={(item) =>
+                             `确定要删除主机[${item.name}]么?`}
+                         confirmButtonColor="danger"
+                         onConfirm={(item) => {
+                             const newAppSettings = {
+                                 ...this.props.appSettings,
+                                 remoteHostList: this.props.appSettings.remoteHostList.filter((v) => v.ip !== item.ip),
+                             };
+                             this.props.applicationActions.saveAppSettings(newAppSettings);
+                             toast.success("已成功删除");
+                         }}/>
                 <Confirm title="Delete Project"
                          ref={this.deleteConfirm as any}
                          message={(project: IProject) =>
@@ -244,13 +290,13 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
         e.preventDefault();
     }
 
-    private handleOpenCloudProjectClick = () => {
+    private handleOpenCloudProjectClick = (modal: CloudFilePicker) => {
         const platform = global && global.process ? global.process.platform : "web";
         if (platform !== PlatformType.Linux) {
             toast.error("远程标注暂时不支持非linux系统");
             return;
         }
-        this.cloudFilePicker.current.open();
+        modal.open();
     }
 
     private loadProject = async (fileFolder: string, remoteTag: boolean) => {

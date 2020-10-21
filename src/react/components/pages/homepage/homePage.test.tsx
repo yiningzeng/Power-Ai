@@ -276,6 +276,7 @@ describe("Homepage Component", () => {
                 devToolsEnabled: false,
                 securityTokens: [],
                 deadline: null,
+                remoteHostList: [],
             },
             match: {
                 params: {},

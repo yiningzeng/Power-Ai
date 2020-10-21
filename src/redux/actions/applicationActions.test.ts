@@ -57,6 +57,7 @@ describe("Application Redux Actions", () => {
                 { name: "C", key: "3" },
             ],
             deadline: null,
+            remoteHostList: [],
         };
 
         const result = await applicationActions.saveAppSettings(appSettings)(store.dispatch);
@@ -80,6 +81,7 @@ describe("Application Redux Actions", () => {
                 { name: "C", key: "3" },
             ],
             deadline: null,
+            remoteHostList: [],
         };
         const middleware = [thunk];
         const mockState: IApplicationState = {

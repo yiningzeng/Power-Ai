@@ -12,6 +12,7 @@ const initialState: IApplicationState = {
         devToolsEnabled: false,
         securityTokens: [],
         deadline: null,
+        remoteHostList: [],
     },
     connections: [],
     recentProjects: [],
