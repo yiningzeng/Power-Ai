@@ -84,7 +84,10 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
     private localFileSystem: LocalFileSystemProxy;
     private filePicker: React.RefObject<FilePicker> = React.createRef();
     private deleteConfirm: React.RefObject<Confirm> = React.createRef();
-    private cloudFilePicker: React.RefObject<CloudFilePicker> = React.createRef();
+    private deleteRemoteHostConfirm: React.RefObject<Confirm> = React.createRef();
+    private cloudFilePickerModal: React.RefObject<CloudFilePicker> = React.createRef();
+    private copyRemoteAssetsModal: React.RefObject<CloudFilePicker> = React.createRef();
+    private inputCodeTagAssetsModal: React.RefObject<CloudFilePicker> = React.createRef();
     private remoteHostAddModal: React.RefObject<RemoteHostAddModal> = React.createRef();
     private importConfirm: React.RefObject<Confirm> = React.createRef();
     private draggableDialog: React.RefObject<DraggableDialog> = React.createRef();
@@ -203,13 +206,50 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                         {/*}*/}
 
                         <li>
-                            <a href="#" onClick={this.handleOpenCloudProjectClick} className="p-5 cloud-open-project">
+                            <a href="#"  className="p-5 cloud-open-project"
+                               onClick={() => this.handleOpenCloudProjectClick(this.cloudFilePickerModal.current)}>
                                 <i className="fas fa-cloud fa-9x"></i>
-                                <h6>{strings.homePage.openCloudProject.title}</h6>
+                                <h6 style={{marginTop: "10px"}}>{strings.homePage.openCloudProject.title}</h6>
                             </a>
                             <CloudFilePicker
-                                ref={this.cloudFilePicker}
+                                ref={this.cloudFilePickerModal}
+                                modalHeader={strings.homePage.openCloudProject.title}
                                 connections={this.props.connections}
+                                remoteHostList={this.props.appSettings.remoteHostList}
+                                onSubmit={(content) => {
+                                    this.loadProject(content, true);
+                                }}
+                                fileExtension={constants.projectFileExtension}
+                            />
+                        </li>
+                        <li>
+                            <a href="#"  className="p-5 cloud-open-project"
+                               onClick={() => this.handleOpenCloudProjectClick(this.copyRemoteAssetsModal.current)}>
+                                <i className="fas fa-copy fa-9x"></i>
+                                <h6 style={{marginTop: "10px"}}>{strings.homePage.copyRemoteAssets.title}</h6>
+                            </a>
+                            <CloudFilePicker
+                                ref={this.copyRemoteAssetsModal}
+                                modalHeader={strings.homePage.copyRemoteAssets.title}
+                                connections={this.props.connections}
+                                remoteHostList={this.props.appSettings.remoteHostList}
+                                onSubmit={(content) => {
+                                    this.loadProject(content, true);
+                                }}
+                                fileExtension={constants.projectFileExtension}
+                            />
+                        </li>
+                        <li>
+                            <a href="#"  className="p-5 cloud-open-project"
+                               onClick={() => this.handleOpenCloudProjectClick(this.inputCodeTagAssetsModal.current)}>
+                                <i className="fas fa-search fa-9x"></i>
+                                <h6 style={{marginTop: "10px"}}>{strings.homePage.inputCodeTagAssets.title}</h6>
+                            </a>
+                            <CloudFilePicker
+                                ref={this.inputCodeTagAssetsModal}
+                                modalHeader={strings.homePage.inputCodeTagAssets.title}
+                                connections={this.props.connections}
+                                remoteHostList={this.props.appSettings.remoteHostList}
                                 onSubmit={(content) => {
                                     this.loadProject(content, true);
                                 }}

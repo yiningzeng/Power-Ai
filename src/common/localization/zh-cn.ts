@@ -42,6 +42,12 @@ export const chinese: IAppStrings = {
             title: "打开远程文件夹",
             selectConnection: "选择连接",
         },
+        copyRemoteAssets: {
+            title: "远程拷图",
+        },
+        inputCodeTagAssets: {
+            title: "查找条码标图",
+        },
         recentProjects: "最近文件夹",
         deleteProject: {
             title: "删除项目",

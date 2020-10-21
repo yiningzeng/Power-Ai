@@ -45,6 +45,12 @@ export interface IAppStrings {
             title: string;
             selectConnection: string;
         },
+        copyRemoteAssets: {
+            title: string;
+        },
+        inputCodeTagAssets: {
+            title: string;
+        },
         deleteProject: {
             title: string;
             confirmation: string;

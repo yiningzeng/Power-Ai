@@ -42,6 +42,12 @@ export const english: IAppStrings = {
             title: "Open Cloud Project",
             selectConnection: "Select a Connection",
         },
+        copyRemoteAssets: {
+            title: "远程拷图",
+        },
+        inputCodeTagAssets: {
+            title: "查找条码标图",
+        },
         recentProjects: "Recent Projects",
         deleteProject: {
             title: "Delete Project",
