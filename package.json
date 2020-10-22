@@ -1,6 +1,6 @@
 {
     "name": "Power-Ai",
-    "version": "4.1.4-release",
+    "version": "4.2.20-beta",
     "author": {
         "name": "宁波轻蜓视觉科技有限公司",
         "url": "https://github.com/yiningzeng/Power-Ai.git"
@@ -14,6 +14,47 @@
     "license": "MIT",
     "private": true,
     "main": "build/electron.js",
+    "scripts": {
+        "start": "nf start -p 3000",
+        "build-first": "npm run build && npm run webpack:prod",
+        "build-win64": "electron-builder --win --x64",
+        "build-win32-nsis": "electron-builder --win --ia32 nsis",
+        "build-win64-nsis": "electron-builder --win --x64 nsis",
+        "build-mac-dmg": "electron-builder --mac zip",
+        "build-linux-deb-snap-tar": "electron-builder --linux snap deb tar.xz",
+        "compile": "tsc",
+        "build": "react-scripts build",
+        "webpack:dev": "webpack --config ./config/webpack.dev.js",
+        "webpack:prod": "webpack -p --config ./config/webpack.prod.js",
+        "react-start": "react-scripts start",
+        "electron:run:dev": "npm run webpack:dev && electron . --remote-debugging-port=9223",
+        "electron:run:prod": "npm run webpack:prod && electron . --remote-debugging-port=9223",
+        "electron:start:dev": "npm run webpack:dev && npm run electron-start",
+        "electron:start:prod": "npm run webpack:prod && npm run electron-start",
+        "electron-start": "node src/electron/start",
+        "eject": "react-scripts eject",
+        "release-pr": "./scripts/release-pr.sh",
+        "release-web": "npm run build && npm run webpack:prod",
+        "release-ci": "bash ./scripts/build.sh",
+        "release": "npm run build && npm run webpack:prod && electron-builder",
+        "pretest": "./node_modules/.bin/tslint 'src/**/*.ts*'",
+        "lintfix": "./node_modules/.bin/tslint 'src/**/*.ts*' --fix",
+        "test": "react-scripts test --env=jsdom --silent",
+        "test:ci": "cross-env CI=true npm run test",
+        "test:coverage": "npm run test -- --coverage",
+        "plato": "scripts/generate-report.sh -o report -v $(node -pe \"require('./package.json').version\") -c $(git rev-parse --short HEAD)",
+        "postinstall": "electron-builder install-app-deps",
+        "predebug": "npm run build && npm run webpack:dev"
+    },
+    "eslintConfig": {
+        "extends": "react-app"
+    },
+    "browserslist": [
+        ">0.2%",
+        "not dead",
+        "not ie <= 11",
+        "not op_mini all"
+    ],
     "dependencies": {
         "@azure/storage-blob": "^10.3.0",
         "@material-ui/core": "^4.5.1",
@@ -92,47 +133,6 @@
         "video-react": "^0.14.1",
         "vott-react": "^0.2.10"
     },
-    "scripts": {
-        "start": "nf start -p 3000",
-        "build-first": "npm run build && npm run webpack:prod",
-        "build-win64": "electron-builder --win --x64",
-        "build-win32-nsis": "electron-builder --win --ia32 nsis",
-        "build-win64-nsis": "electron-builder --win --x64 nsis",
-        "build-mac-dmg": "electron-builder --mac zip",
-        "build-linux-deb-snap-tar": "electron-builder --linux snap deb tar.xz",
-        "compile": "tsc",
-        "build": "react-scripts build",
-        "webpack:dev": "webpack --config ./config/webpack.dev.js",
-        "webpack:prod": "webpack -p --config ./config/webpack.prod.js",
-        "react-start": "react-scripts start",
-        "electron:run:dev": "npm run webpack:dev && electron . --remote-debugging-port=9223",
-        "electron:run:prod": "npm run webpack:prod && electron . --remote-debugging-port=9223",
-        "electron:start:dev": "npm run webpack:dev && npm run electron-start",
-        "electron:start:prod": "npm run webpack:prod && npm run electron-start",
-        "electron-start": "node src/electron/start",
-        "eject": "react-scripts eject",
-        "release-pr": "./scripts/release-pr.sh",
-        "release-web": "npm run build && npm run webpack:prod",
-        "release-ci": "bash ./scripts/build.sh",
-        "release": "npm run build && npm run webpack:prod && electron-builder",
-        "pretest": "./node_modules/.bin/tslint 'src/**/*.ts*'",
-        "lintfix": "./node_modules/.bin/tslint 'src/**/*.ts*' --fix",
-        "test": "react-scripts test --env=jsdom --silent",
-        "test:ci": "cross-env CI=true npm run test",
-        "test:coverage": "npm run test -- --coverage",
-        "plato": "scripts/generate-report.sh -o report -v $(node -pe \"require('./package.json').version\") -c $(git rev-parse --short HEAD)",
-        "postinstall": "electron-builder install-app-deps",
-        "predebug": "npm run build && npm run webpack:dev"
-    },
-    "eslintConfig": {
-        "extends": "react-app"
-    },
-    "browserslist": [
-        ">0.2%",
-        "not dead",
-        "not ie <= 11",
-        "not op_mini all"
-    ],
     "devDependencies": {
         "@fortawesome/fontawesome-free": "^5.11.2",
         "@types/axios": "^0.14.0",
