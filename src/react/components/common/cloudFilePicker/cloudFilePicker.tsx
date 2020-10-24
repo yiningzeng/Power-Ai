@@ -11,6 +11,7 @@ import DraggableDialog from "../draggableDialog/draggableDialog";
 import pTimeout from "p-timeout";
 import delay from "delay";
 import {IpcRendererProxy} from "../../../../common/ipcRendererProxy";
+import {LocalFileSystemProxy} from "../../../../providers/storage/localFileSystemProxy";
 // const delay = require('delay');
 // const pTimeout = require('p-timeout');
 /**
@@ -23,10 +24,11 @@ import {IpcRendererProxy} from "../../../../common/ipcRendererProxy";
 export interface ICloudFilePickerProps {
     modalHeader: string;
     connections: IConnection[];
-    onSubmit: (content: string) => void;
+    onSubmit: (content: string, copyList?: string[], savePath?: string) => void;
     remoteHostList?: IRemoteHost[];
     onCancel?: () => void;
     fileExtension?: string;
+    copy?: boolean;
 }
 
 /**
@@ -47,6 +49,9 @@ export interface ICloudFilePickerState {
     cloudPath: string;
     username: string;
     password: string;
+
+    savePath?: string;
+    copyList?: string[];
 }
 
 /**
@@ -54,11 +59,11 @@ export interface ICloudFilePickerState {
  * @description - Modal to choose and read file from cloud connections
  */
 export class CloudFilePicker extends React.Component<ICloudFilePickerProps, ICloudFilePickerState> {
-
+    private localFileSystem: LocalFileSystemProxy;
     private draggableDialog: React.RefObject<DraggableDialog> = React.createRef();
     constructor(props) {
         super(props);
-
+        this.localFileSystem = new LocalFileSystemProxy();
         this.open = this.open.bind(this);
         this.close = this.close.bind(this);
 
@@ -121,13 +126,43 @@ export class CloudFilePicker extends React.Component<ICloudFilePickerProps, IClo
                                 password: v.target.value,
                             });
                         }}/>
+                        {
+                            this.props.copy && <div>
+                                <Label for="password">文件选项</Label>
+                                <InputGroup>
+                                    <InputGroupAddon addonType="prepend">
+                                        <Button onClick={async () => {
+                                            const fileFolder = await this.localFileSystem.copyRemoteContainer();
+                                            // alert(JSON.stringify(this.props.project));
+                                            if (!fileFolder) { return; }
+                                            this.setState({
+                                                ...this.state,
+                                                copyList: fileFolder as string[],
+                                            });
+                                        }
+                                        }>点击选择复制的文件</Button>
+                                    </InputGroupAddon>
+                                    {/*<InputGroupAddon addonType="append">*/}
+                                    {/*    <InputGroupText>保存的目录</InputGroupText>*/}
+                                    {/*</InputGroupAddon>*/}
+                                    <Input name="savePath" id="savePath" value={this.state.savePath} placeholder="输入复制保存的目录" onClick={async () => {
+                                        const fileFolder = await this.localFileSystem.saveEditContainer();
+                                        if (!fileFolder) { return; }
+                                        this.setState({
+                                            ...this.state,
+                                            savePath: fileFolder[0],
+                                        });
+                                    }}/>
+                                </InputGroup>
+                                </div>
+                        }
                     </div>
                 </ModalBody>
                 <ModalFooter>
                     <Button
                         className="btn btn-success mr-1"
                         onClick={this.ok}>
-                        连接
+                        确定
                     </Button>
                     <Button
                         onClick={this.close}>
@@ -185,6 +220,7 @@ export class CloudFilePicker extends React.Component<ICloudFilePickerProps, IClo
 
     private async ok() {
         this.draggableDialog.current.open();
+        this.props.onSubmit("测试返回", this.state.copyList, this.state.savePath);
         if (this.state.ip === "" || this.state.ip === null) {
             this.draggableDialog.current.change("连接远程数据失败...",
                 `远程地址: \\\\${this.state.ip}\\${this.state.cloudPath}`, true);
@@ -206,7 +242,7 @@ export class CloudFilePicker extends React.Component<ICloudFilePickerProps, IClo
                     toast.success("已经成功连接了远程数据");
                     this.draggableDialog.current.close();
                     this.close();
-                    this.props.onSubmit(v.toString());
+                    this.props.onSubmit(v.toString(), this.state.copyList, this.state.savePath);
                     resolve("success"); // 成功
                 })
                 .catch(() => {

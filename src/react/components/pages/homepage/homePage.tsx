@@ -44,6 +44,7 @@ import {ExportAssetState} from "../../../../providers/export/exportProvider";
 import {appInfo} from "../../../../common/appInfo";
 import DraggableDialog from "../../common/draggableDialog/draggableDialog";
 import RemoteHostItem from "./RemoteHostItem";
+import {SearchPcb} from "../../common/searchPcb/searchPcb";
 // tslint:disable-next-line:no-var-requires
 const tagColors = require("../../common/tagColors.json");
 
@@ -87,7 +88,7 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
     private deleteRemoteHostConfirm: React.RefObject<Confirm> = React.createRef();
     private cloudFilePickerModal: React.RefObject<CloudFilePicker> = React.createRef();
     private copyRemoteAssetsModal: React.RefObject<CloudFilePicker> = React.createRef();
-    private inputCodeTagAssetsModal: React.RefObject<CloudFilePicker> = React.createRef();
+    private inputCodeTagAssetsModal: React.RefObject<SearchPcb> = React.createRef();
     private remoteHostAddModal: React.RefObject<RemoteHostAddModal> = React.createRef();
     private importConfirm: React.RefObject<Confirm> = React.createRef();
     private draggableDialog: React.RefObject<DraggableDialog> = React.createRef();
@@ -141,15 +142,26 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                     <RemoteHostAddModal
                         ref={this.remoteHostAddModal}
                         onSubmit={(platform, name, ip) => {
-                            const newAppSettings = {
-                                ...this.props.appSettings,
-                                remoteHostList: [
+                            let hostList = [];
+                            if (this.props.appSettings.remoteHostList !== undefined) {
+                                hostList = [
                                     ...this.props.appSettings.remoteHostList,
                                     {
                                         name,
                                         ip,
                                         platform,
-                                    }],
+                                    }];
+                            } else {
+                                hostList =  [
+                                    {
+                                        name,
+                                        ip,
+                                        platform,
+                                    }];
+                            }
+                            const newAppSettings = {
+                                ...this.props.appSettings,
+                                remoteHostList: hostList,
                             };
                             this.props.applicationActions.saveAppSettings(newAppSettings);
                             this.remoteHostAddModal.current.close();
@@ -233,19 +245,20 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                                 modalHeader={strings.homePage.copyRemoteAssets.title}
                                 connections={this.props.connections}
                                 remoteHostList={this.props.appSettings.remoteHostList}
-                                onSubmit={(content) => {
-                                    this.loadProject(content, true);
+                                onSubmit={(content, copyList, savePath) => {
+                                    console.log(`结果: ${copyList}\n ${savePath}`);
                                 }}
                                 fileExtension={constants.projectFileExtension}
+                                copy
                             />
                         </li>
                         <li>
                             <a href="#"  className="p-5 cloud-open-project"
-                               onClick={() => this.handleOpenCloudProjectClick(this.inputCodeTagAssetsModal.current)}>
+                               onClick={() => this.inputCodeTagAssetsModal.current.open()}>
                                 <i className="fas fa-search fa-9x"></i>
                                 <h6 style={{marginTop: "10px"}}>{strings.homePage.inputCodeTagAssets.title}</h6>
                             </a>
-                            <CloudFilePicker
+                            <SearchPcb
                                 ref={this.inputCodeTagAssetsModal}
                                 modalHeader={strings.homePage.inputCodeTagAssets.title}
                                 connections={this.props.connections}
