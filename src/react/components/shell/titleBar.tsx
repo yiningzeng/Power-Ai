@@ -83,12 +83,12 @@ export class TitleBar extends React.Component<ITitleBarProps, ITitleBarState> {
                                 </NavLink>
                             </div>
                         </MenuItem>
-                        <MenuItem key={"工作台"} disabled={false}>
+                        <MenuItem key={"标注中心"} disabled={false}>
                             <div className="menu-item-container">
                                 <ConditionalNavLink disabled={!this.props.projectId}
                                                     title={"workspace"}
                                                     to={`/projects/${this.props.projectId}/edit`}>
-                                    工作台
+                                    标注中心
                                 </ConditionalNavLink>
                             </div>
                         </MenuItem>
