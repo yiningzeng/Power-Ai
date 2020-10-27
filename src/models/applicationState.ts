@@ -67,9 +67,9 @@ export const DefaultTrainOptions: ITrainFormat = {
 };
 
 export const DefaultExportOptions: IExportFormat = {
-    providerType: "pascalVOC",
+    providerType: "powerAi",
     providerOptions: {
-        assetState: ExportAssetState.Tagged,
+        assetState: ExportAssetState.All,
         testTrainSplit: 100,
         exportUnassigned: false,
     },
