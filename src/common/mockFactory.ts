@@ -606,6 +606,8 @@ export default class MockFactory {
     public static exportFormat(): IExportFormat {
         return {
             providerType: "pascalVOC",
+            belongToProject: null,
+            exportPath: null,
             providerOptions: {
                 assetState: ExportAssetState.Tagged,
             },

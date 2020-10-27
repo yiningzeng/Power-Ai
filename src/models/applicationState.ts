@@ -68,6 +68,8 @@ export const DefaultTrainOptions: ITrainFormat = {
 
 export const DefaultExportOptions: IExportFormat = {
     providerType: "powerAi",
+    belongToProject: null,
+    exportPath: null,
     providerOptions: {
         assetState: ExportAssetState.All,
         testTrainSplit: 100,
@@ -164,8 +166,8 @@ export interface IAppSettings {
     thumbnailSize?: ISize;
     deadline: string;
     zengyining?: boolean;
-    remoteHostList: IRemoteHostItem[];
-    projectList: IProjectItem[];
+    remoteHostList: IRemoteHostItem[]; // 首页远程主机列表
+    projectList: IProjectItem[]; // 首页项目列表
 }
 
 /**
@@ -203,8 +205,6 @@ export interface IProjectItem {
 export interface IProject {
     id: string;
     name: string;
-    remoteTag?: boolean;
-    remoteSaveFolder?: string;
     version: string;
     securityToken: string;
     description?: string;
@@ -351,7 +351,15 @@ export interface IExportProviderOptions extends IProviderOptions {
  */
 export interface IExportFormat {
     providerType: string;
+    belongToProject: IProjectItem; // 用于标识属于哪个项目，后面导出的时候要导出到项目文件夹
+    exportPath: string; // 导出存放的基本路径 MissData:pcb板号查询的图片标记保存的地址 CollectData: 打开远程的图片标记的保存的目录 AtuoTrainData:远程复制保存的目录
     providerOptions: IExportProviderOptions | ISecureString;
+}
+
+export enum ExportPath {
+    MissData = "MissData",
+    CollectData = "CollectData",
+    AtuoTrainData = "AtuoTrainData",
 }
 
 /**

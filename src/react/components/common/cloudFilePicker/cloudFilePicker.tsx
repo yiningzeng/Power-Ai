@@ -2,7 +2,7 @@ import React from "react";
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader,
     Input, Label, InputGroup, InputGroupAddon, InputGroupText} from "reactstrap";
 import { strings } from "../../../../common/strings";
-import {IConnection, IRemoteHostItem, StorageType} from "../../../../models/applicationState";
+import {IConnection, IProjectItem, IRemoteHostItem, StorageType} from "../../../../models/applicationState";
 import { StorageProviderFactory } from "../../../../providers/storage/storageProviderFactory";
 import CondensedList, { ListItem } from "../condensedList/condensedList";
 import {normalizeSlashes} from "../../../../common/utils";
@@ -24,8 +24,9 @@ import {LocalFileSystemProxy} from "../../../../providers/storage/localFileSyste
 export interface ICloudFilePickerProps {
     modalHeader: string;
     connections: IConnection[];
-    onSubmit: (content: string, copyList?: string[], savePath?: string) => void;
+    onSubmit: (success: boolean, content: string, belongToProject: IProjectItem, copyList?: string[]) => void;
     remoteHostList?: IRemoteHostItem[];
+    projectList?: IProjectItem[];
     onCancel?: () => void;
     fileExtension?: string;
     copy?: boolean;
@@ -49,8 +50,8 @@ export interface ICloudFilePickerState {
     cloudPath: string;
     username: string;
     password: string;
+    belongToProject: IProjectItem;
 
-    savePath?: string;
     copyList?: string[];
 }
 
@@ -75,7 +76,7 @@ export class CloudFilePicker extends React.Component<ICloudFilePickerProps, IClo
     }
 
     public render() {
-        const { remoteHostList } = this.props;
+        const { remoteHostList, projectList } = this.props;
         const closeBtn = <button className="close" onClick={this.close}>&times;</button>;
 
         return(
@@ -104,7 +105,7 @@ export class CloudFilePicker extends React.Component<ICloudFilePickerProps, IClo
                             <InputGroupAddon addonType="append">
                                 <InputGroupText>/</InputGroupText>
                             </InputGroupAddon>
-                            <Input name="path" id="path" defaultValue="NG" placeholder="共享的目录" onChange={(v) => {
+                            <Input name="path" id="path" defaultValue="work/ok" placeholder="共享的目录" onChange={(v) => {
                                 this.setState({
                                     ...this.state,
                                     cloudPath: v.target.value,
@@ -126,34 +127,31 @@ export class CloudFilePicker extends React.Component<ICloudFilePickerProps, IClo
                                 password: v.target.value,
                             });
                         }}/>
+                        <Label for="selectProject">所属项目</Label>
+                        <Input type="select" name="selectProject" id="selectProject" onChange={(v) => {
+                            this.setState({
+                                ...this.state,
+                                belongToProject: JSON.parse(v.target.value),
+                            });
+                        }}>
+                            {projectList && projectList.length > 0 && projectList.map((item) =>
+                                <option value={JSON.stringify(item)}>{item.name}</option>)}
+                        </Input>
                         {
                             this.props.copy && <div>
-                                <Label for="password">文件选项</Label>
-                                <InputGroup>
-                                    <InputGroupAddon addonType="prepend">
-                                        <Button onClick={async () => {
-                                            const fileFolder = await this.localFileSystem.copyRemoteContainer();
-                                            // alert(JSON.stringify(this.props.project));
-                                            if (!fileFolder) { return; }
-                                            this.setState({
-                                                ...this.state,
-                                                copyList: fileFolder as string[],
-                                            });
-                                        }
-                                        }>点击选择复制的文件</Button>
-                                    </InputGroupAddon>
-                                    {/*<InputGroupAddon addonType="append">*/}
-                                    {/*    <InputGroupText>保存的目录</InputGroupText>*/}
-                                    {/*</InputGroupAddon>*/}
-                                    <Input name="savePath" id="savePath" value={this.state.savePath} placeholder="输入复制保存的目录" onClick={async () => {
-                                        const fileFolder = await this.localFileSystem.saveEditContainer();
+                                <Label for="password">文件选择</Label>
+                                <div>
+                                    <Button style={{width: "100%"}} color="warning" onClick={async () => {
+                                        const fileFolder = await this.localFileSystem.copyRemoteContainer();
+                                        // alert(JSON.stringify(this.props.project));
                                         if (!fileFolder) { return; }
                                         this.setState({
                                             ...this.state,
-                                            savePath: fileFolder[0],
+                                            copyList: fileFolder as string[],
                                         });
-                                    }}/>
-                                </InputGroup>
+                                    }
+                                    }>选择源文件</Button>
+                                </div>
                                 </div>
                         }
                     </div>
@@ -162,7 +160,7 @@ export class CloudFilePicker extends React.Component<ICloudFilePickerProps, IClo
                     <Button
                         className="btn btn-success mr-1"
                         onClick={this.ok}>
-                        确定
+                        {this.props.copy ? "开始复制" : "连接数据"}
                     </Button>
                     <Button
                         onClick={this.close}>
@@ -212,22 +210,24 @@ export class CloudFilePicker extends React.Component<ICloudFilePickerProps, IClo
             platform: "Windows",
             ip: this.props.remoteHostList !== undefined && this.props.remoteHostList.length > 0 ?
                 this.props.remoteHostList[0].ip : "",
-            cloudPath: "NG",
+            cloudPath: "work/ok",
             username: "Everyone",
             password: "",
+            belongToProject: this.props.projectList !== undefined && this.props.projectList.length > 0 ?
+                this.props.projectList[0] : undefined,
         };
     }
 
     private async ok() {
         this.draggableDialog.current.open();
-        this.props.onSubmit("测试返回", this.state.copyList, this.state.savePath);
+        // this.props.onSubmit(true, "测试返回", this.state.belongToProject, this.state.copyList);
         if (this.state.ip === "" || this.state.ip === null) {
             this.draggableDialog.current.change("连接远程数据失败...",
                 `远程地址: \\\\${this.state.ip}\\${this.state.cloudPath}`, true);
             return;
         }
         this.draggableDialog.current.change("正在连接远程数据...",
-            `远程地址: \\\\${this.state.ip}\\${this.state.cloudPath}`, false, true);
+            `远程地址: \\\\${this.state.ip}\\${this.state.cloudPath}`, false, false);
         const aa = new Promise(async (resolve, reject) => {
             await IpcRendererProxy.send(`TrainingSystem:CloseRemoteAssets`, [this.state.ip, this.state.cloudPath])
                 .then(() => {
@@ -240,19 +240,25 @@ export class CloudFilePicker extends React.Component<ICloudFilePickerProps, IClo
                 [this.state.ip, this.state.cloudPath, this.state.username, this.state.password])
                 .then((v) => {
                     toast.success("已经成功连接了远程数据");
+                    this.props.onSubmit(true, v.toString(), this.state.belongToProject, this.state.copyList);
+                    resolve("success"); // 成功
                     this.draggableDialog.current.close();
                     this.close();
-                    this.props.onSubmit(v.toString(), this.state.copyList, this.state.savePath);
-                    resolve("success"); // 成功
                 })
                 .catch(() => {
                     this.draggableDialog.current.change("连接远程数据失败...",
                         // tslint:disable-next-line:max-line-length
                         `远程地址: \\\\${this.state.ip}\\${this.state.cloudPath.replace(new RegExp("/", "g"), "\\")}`, true);
                     // this.props.onSubmit("连接失败");
+                    this.props.onSubmit(false, "连接失败", this.state.belongToProject);
                     reject("fail");        // 失败
                 });
-        }).catch(() => console.log("加载失败lala"));
+        }).catch(() => {
+            this.draggableDialog.current.change("连接远程数据失败...",
+                // tslint:disable-next-line:max-line-length
+                `远程地址: \\\\${this.state.ip}\\${this.state.cloudPath.replace(new RegExp("/", "g"), "\\")}`, true);
+            this.props.onSubmit(false, "连接失败", this.state.belongToProject);
+        });
         pTimeout(aa, 10000, () => {
             this.draggableDialog.current.change("连接远程数据超时！",
                 `连接超时，请检查配置信息是否正确\n远程地址: \\\\${this.state.ip}\\${this.state.cloudPath.replace(new RegExp("/", "g"), "\\")}`, true);

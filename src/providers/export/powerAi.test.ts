@@ -31,6 +31,8 @@ describe("VoTT Json Export Provider", () => {
         },
         exportFormat: {
             providerType: "json",
+            belongToProject: null,
+            exportPath: null,
             providerOptions: {
                 assetState: ExportAssetState.All,
             },

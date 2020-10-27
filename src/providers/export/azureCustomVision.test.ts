@@ -64,6 +64,8 @@ describe("Azure Custom Vision Export Provider", () => {
             },
             exportFormat: {
                 providerType: "azureCustomVision",
+                belongToProject: null,
+                exportPath: null,
                 providerOptions: {
                     assetState: ExportAssetState.All,
                     projectId: "azure-custom-vision-project-1",

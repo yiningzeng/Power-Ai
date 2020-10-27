@@ -7,8 +7,9 @@ import { strings, interpolate } from "../../../../common/strings";
 import IProjectActions, * as projectActions from "../../../../redux/actions/projectActions";
 import IApplicationActions, * as applicationActions from "../../../../redux/actions/applicationActions";
 import { CloudFilePicker } from "../../common/cloudFilePicker/cloudFilePicker";
-import { RemoteHostAddModal } from "../../common/RemoteHostAddModal/remoteHostAddModal";
+import { ModalRemoteHostAdd } from "../../common/modalRemoteHostAdd/modalRemoteHostAdd";
 import { ModalHomePageAddProject } from "../../common/modalHomePageAddProject/modalHomePageAddProject";
+import { ModalSearchPcb } from "../../common/modalSearchPcb/modalSearchPcb";
 import CondensedList from "../../common/condensedList/condensedList";
 import Confirm from "../../common/confirm/confirm";
 import FilePicker from "../../common/filePicker/filePicker";
@@ -28,7 +29,13 @@ import {
     IProviderOptions,
     IExportFormat,
     IExportProviderOptions,
-    ISecureString, DefaultActiveLearningSettings, DefaultExportOptions, DefaultTrainOptions, ModelPathType, ITag,
+    ISecureString,
+    DefaultActiveLearningSettings,
+    DefaultExportOptions,
+    DefaultTrainOptions,
+    ModelPathType,
+    ITag,
+    IProjectItem, ExportPath,
 } from "../../../../models/applicationState";
 import ImportService from "../../../../services/importService";
 import { IAssetMetadata } from "../../../../models/applicationState";
@@ -45,7 +52,6 @@ import {ExportAssetState} from "../../../../providers/export/exportProvider";
 import {appInfo} from "../../../../common/appInfo";
 import DraggableDialog from "../../common/draggableDialog/draggableDialog";
 import RemoteHostItem from "./remoteHostItem";
-import {SearchPcb} from "../../common/searchPcb/searchPcb";
 import SourceItem from "../../common/condensedList/sourceItem";
 import {TagInput} from "../../common/tagInput/tagInput";
 import ProjectItem from "./projectItem";
@@ -93,8 +99,8 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
     private deleteProjectListConfirm: React.RefObject<Confirm> = React.createRef();
     private cloudFilePickerModal: React.RefObject<CloudFilePicker> = React.createRef();
     private copyRemoteAssetsModal: React.RefObject<CloudFilePicker> = React.createRef();
-    private inputCodeTagAssetsModal: React.RefObject<SearchPcb> = React.createRef();
-    private remoteHostAddModal: React.RefObject<RemoteHostAddModal> = React.createRef();
+    private inputCodeTagAssetsModal: React.RefObject<ModalSearchPcb> = React.createRef();
+    private ModalRemoteHostAdd: React.RefObject<ModalRemoteHostAdd> = React.createRef();
     private modalHomePageAddProject: React.RefObject<ModalHomePageAddProject> = React.createRef();
     private importConfirm: React.RefObject<Confirm> = React.createRef();
     private draggableDialog: React.RefObject<DraggableDialog> = React.createRef();
@@ -154,7 +160,7 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                         Component={RemoteHostItem}
                         items={this.props.appSettings.remoteHostList}
                         // onClick={(item) => toast.info(`主机名: ${item.name} 主机IP: ${item.ip}`)}
-                        onAddClick={() => this.remoteHostAddModal.current.open()}
+                        onAddClick={() => this.ModalRemoteHostAdd.current.open()}
                         onDelete={(item) => this.deleteRemoteHostConfirm.current.open(item)}
                         showToolbar={true}
                         home={true}/>
@@ -166,8 +172,8 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                         onDelete={(item) => this.deleteProjectListConfirm.current.open(item)}
                         showToolbar={true}
                         home={true}/>
-                    <RemoteHostAddModal
-                        ref={this.remoteHostAddModal}
+                    <ModalRemoteHostAdd
+                        ref={this.ModalRemoteHostAdd}
                         onSubmit={(platform, name, ip) => {
                             let hostList = [];
                             if (this.props.appSettings.remoteHostList !== undefined) {
@@ -191,7 +197,7 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                                 remoteHostList: hostList,
                             };
                             this.props.applicationActions.saveAppSettings(newAppSettings);
-                            this.remoteHostAddModal.current.close();
+                            this.ModalRemoteHostAdd.current.close();
                             toast.success("新增主机成功");
                             console.log(JSON.stringify(this.props.appSettings));
                         }}
@@ -281,8 +287,11 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                                 modalHeader={strings.homePage.openCloudProject.title}
                                 connections={this.props.connections}
                                 remoteHostList={this.props.appSettings.remoteHostList}
-                                onSubmit={(content) => {
-                                    this.loadProject(content, true);
+                                projectList={this.props.appSettings.projectList}
+                                onSubmit={(success, content, belongToProject) => {
+                                    if (success) {
+                                        this.loadProject(content, belongToProject, ExportPath.CollectData);
+                                    }
                                 }}
                                 fileExtension={constants.projectFileExtension}
                             />
@@ -298,8 +307,9 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                                 modalHeader={strings.homePage.copyRemoteAssets.title}
                                 connections={this.props.connections}
                                 remoteHostList={this.props.appSettings.remoteHostList}
-                                onSubmit={(content, copyList, savePath) => {
-                                    console.log(`结果: ${copyList}\n ${savePath}`);
+                                projectList={this.props.appSettings.projectList}
+                                onSubmit={(success, content, belongToProject, copyList) => {
+                                    console.log(`结果: ${copyList}\n ${JSON.stringify(belongToProject)}`);
                                 }}
                                 fileExtension={constants.projectFileExtension}
                                 copy
@@ -311,13 +321,16 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                                 <i className="fas fa-search fa-9x"></i>
                                 <h6 style={{marginTop: "10px"}}>{strings.homePage.inputCodeTagAssets.title}</h6>
                             </a>
-                            <SearchPcb
+                            <ModalSearchPcb
                                 ref={this.inputCodeTagAssetsModal}
                                 modalHeader={strings.homePage.inputCodeTagAssets.title}
                                 connections={this.props.connections}
                                 remoteHostList={this.props.appSettings.remoteHostList}
-                                onSubmit={(content) => {
-                                    this.loadProject(content, true);
+                                projectList={this.props.appSettings.projectList}
+                                onSubmit={(success, content, belongToProject) => {
+                                    if (success) {
+                                        this.loadProject(content, belongToProject, ExportPath.MissData);
+                                    }
                                 }}
                                 fileExtension={constants.projectFileExtension}
                             />
@@ -419,7 +432,7 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
         modal.open();
     }
 
-    private loadProject = async (fileFolder: string, remoteTag: boolean) => {
+    private loadProject = async (fileFolder: string, belongToProject?: IProjectItem, exportPath?: string) => {
         this.draggableDialog.current.open();
         const idd = normalizeSlashes(fileFolder).lastIndexOf("/");
         // const randId = shortid.generate();
@@ -438,12 +451,14 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
         let projectJson: IProject = {
             id: folderName,
             name: folderName,
-            remoteTag,
-            remoteSaveFolder: fileFolder,
             version: "3.0.0",
             activeLearningSettings: DefaultActiveLearningSettings,
             autoSave: true,
-            exportFormat: DefaultExportOptions,
+            exportFormat: {
+                ...DefaultExportOptions,
+                belongToProject,
+                exportPath,
+            },
             securityToken: folderName,
             sourceConnection: connection,
             sourceListConnection: [],
@@ -453,6 +468,7 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
             videoSettings: {frameExtractionRate: 15},
             assets: {},
         };
+        await this.props.actions.saveProject(projectJson);
         const dataTemp = await this.props.actions.loadAssetsWithFolderAndTags(projectJson, fileFolder);
         const rootProjectAssets = _.values(projectJson.assets)
             .filter((asset) => !asset.parent);
@@ -475,7 +491,7 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
         const fileFolder = await this.localFileSystem.importTaggedContainer();
         // alert(JSON.stringify(this.props.project));
         if (!fileFolder) { return; }
-        this.loadProject(fileFolder[0], false);
+        this.loadProject(fileFolder[0]);
     }
 
     private onProjectFileUpload = async (e, project) => {

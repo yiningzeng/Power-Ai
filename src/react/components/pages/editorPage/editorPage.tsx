@@ -1477,48 +1477,32 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
     }
 
     private reloadProject = async (selectAssetId?: string, deltetTag?: string) => {
-
         // console.log(`exportPage: homepage: ${JSON.stringify(this.props.project)}`);
         this.loadingDialog.current.open();
         this.loadingDialog.current.change("正在重新加载数据集", "请耐心等待");
         const par: IProviderOptions = this.props.project.sourceConnection.providerOptions;
-        // console.log(`fucking ${par["folderPath"]}`);
         const fileFolder = par["folderPath"];
-        // alert(JSON.stringify(this.props.project));
-        if (!fileFolder) { return; }
-        const idd = normalizeSlashes(fileFolder).lastIndexOf("/");
-        // const randId = shortid.generate();
-        // console.log(`homePage>openDir: idd ${idd}`);
-        const folderName = normalizeSlashes(fileFolder).substring(idd + 1);
-        // console.log(`homePage>openDir: folderName ${folderName}`);
-        // console.log(`homePage>openDir: normalizeSlashes(fileFolder[0]) ${normalizeSlashes(fileFolder)}`);
-        const connection: IConnection = {
-            id: folderName,
-            name: folderName,
-            providerType: "localFileSystemProxy",
-            providerOptions: {
-                folderPath: normalizeSlashes(fileFolder),
-            },
-            providerOptionsOthers: [{
-                folderPath: normalizeSlashes(fileFolder),
-            }],
-        };
+        // // alert(JSON.stringify(this.props.project));
+        // if (!fileFolder) { return; }
+        // const idd = normalizeSlashes(fileFolder).lastIndexOf("/");
+        // // const randId = shortid.generate();
+        // // console.log(`homePage>openDir: idd ${idd}`);
+        // const folderName = normalizeSlashes(fileFolder).substring(idd + 1);
+        // // console.log(`homePage>openDir: folderName ${folderName}`);
+        // // console.log(`homePage>openDir: normalizeSlashes(fileFolder[0]) ${normalizeSlashes(fileFolder)}`);
+        // const connection: IConnection = {
+        //     id: folderName,
+        //     name: folderName,
+        //     providerType: "localFileSystemProxy",
+        //     providerOptions: {
+        //         folderPath: normalizeSlashes(fileFolder),
+        //     },
+        //     providerOptionsOthers: [{
+        //         folderPath: normalizeSlashes(fileFolder),
+        //     }],
+        // };
         let projectJson: IProject = {
-            id: folderName,
-            name: folderName,
-            version: "3.0.0",
-            remoteTag: this.props.project.remoteTag,
-            remoteSaveFolder: this.props.project.remoteSaveFolder,
-            activeLearningSettings: DefaultActiveLearningSettings,
-            autoSave: true,
-            exportFormat: DefaultExportOptions,
-            securityToken: folderName,
-            sourceConnection: connection,
-            sourceListConnection: [],
-            tags: [],
-            targetConnection: connection,
-            trainFormat: DefaultTrainOptions,
-            videoSettings: { frameExtractionRate: 15 },
+            ...this.props.project,
             assets: {},
             lastVisitedAssetId: selectAssetId,
         };
@@ -1550,7 +1534,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         };
         // console.log(`merge tags: ${JSON.stringify(finalTags)}`);
         // console.log(`homePage:merge tags: ${JSON.stringify(projectJson)}`);
-        connectionActions.saveConnection(connection);
+        connectionActions.saveConnection(projectJson.sourceConnection);
 
         await this.props.actions.loadProject(projectJson);
         // console.log(`homePage:merge tags: fufufufufufufufufufuufuf`);
@@ -1566,19 +1550,6 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
 
     private uploadTestAssets = async () => {
         this.draggableDialog.current.open();
-
-        const projectToUpdate: IProject = {
-            ...this.props.project,
-            exportFormat: {
-                providerOptions: {
-                    assetState: ExportAssetState.Tagged,
-                    testTrainSplit: 100,
-                    exportUnassigned: false,
-                },
-                providerType: "pascalVOC",
-            },
-        };
-        await this.props.actions.saveProject(projectToUpdate);
         this.draggableDialog.current.change("导出数据集", "请耐心等待，去喝杯咖啡再来吧");
         const results = await this.props.actions.exportProject(this.props.project);
         // toast.dismiss(infoId);

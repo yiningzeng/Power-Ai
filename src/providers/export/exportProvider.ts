@@ -7,6 +7,8 @@ import { IStorageProvider, StorageProviderFactory } from "../storage/storageProv
 import { IAssetProvider, AssetProviderFactory } from "../storage/assetProviderFactory";
 import _ from "lodash";
 import { AssetService } from "../../services/assetService";
+import {normalizeSlashes} from "../../common/utils";
+import path from "path";
 
 /**
  * @name - TF Pascal VOC Records Export Asset State
@@ -130,6 +132,10 @@ export abstract class ExportProvider
             .mapAsync(async (asset) => await this.assetService.getAssetMetadata(asset));
     }
 
+    protected get getSaveAsDateFolder(): boolean {
+        // 保存为单独的文件夹？新建然后把导出的素材保存在这
+        return (this.project.exportFormat.exportPath && this.project.exportFormat.belongToProject) ? true : false;
+    }
     /**
      * Gets the storage provider for the current project
      */
@@ -137,12 +143,31 @@ export abstract class ExportProvider
         if (this.storageProviderInstance) {
             return this.storageProviderInstance;
         }
-
-        this.storageProviderInstance = StorageProviderFactory.create(
-            this.project.targetConnection.providerType,
-            this.project.targetConnection.providerOptions,
-        );
-
+        // 这里主要判断是不是远程的标注！如果是的话就保存在本地的项目目录下
+        if (this.project.exportFormat.exportPath && this.project.exportFormat.belongToProject) {
+            const folder = path.join(this.project.exportFormat.belongToProject.baseFolder,
+                this.project.exportFormat.belongToProject.projectFolder,
+                this.project.exportFormat.exportPath);
+            const options = {
+                    ...this.project.targetConnection.providerOptions,
+                    folderPath: normalizeSlashes(folder),
+                    providerOptions: {
+                        folderPath: normalizeSlashes(folder),
+                    },
+                    providerOptionsOthers: [{
+                        folderPath: normalizeSlashes(folder),
+                    }],
+                };
+            this.storageProviderInstance = StorageProviderFactory.create(
+                this.project.targetConnection.providerType,
+                options,
+            );
+        } else { // 不是远程的项目
+            this.storageProviderInstance = StorageProviderFactory.create(
+                this.project.targetConnection.providerType,
+                this.project.targetConnection.providerOptions,
+            );
+        }
         return this.storageProviderInstance;
     }
 

@@ -91,7 +91,9 @@ describe("Project Service", () => {
         };
 
         const expectedExportFormat: IExportFormat = {
-            providerType: "vottJson",
+            providerType: "powerAi",
+            belongToProject: null,
+            exportPath: null,
             providerOptions: vottJsonExportProviderOptions,
         };
 
@@ -123,6 +125,8 @@ describe("Project Service", () => {
     it("Save calls configured export provider save when defined", async () => {
         testProject.exportFormat = {
             providerType: "azureCustomVision",
+            belongToProject: null,
+            exportPath: null,
             providerOptions: null,
         };
 

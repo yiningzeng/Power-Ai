@@ -2,7 +2,7 @@ import React from "react";
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader,
     Input, Label, InputGroup, InputGroupAddon, InputGroupText} from "reactstrap";
 import { strings } from "../../../../common/strings";
-import {IConnection, IRemoteHostItem, StorageType} from "../../../../models/applicationState";
+import {IConnection, IProjectItem, IRemoteHostItem, StorageType} from "../../../../models/applicationState";
 import { StorageProviderFactory } from "../../../../providers/storage/storageProviderFactory";
 import CondensedList, { ListItem } from "../condensedList/condensedList";
 import {normalizeSlashes} from "../../../../common/utils";
@@ -23,8 +23,9 @@ import {IpcRendererProxy} from "../../../../common/ipcRendererProxy";
 export interface ICloudFilePickerProps {
     modalHeader: string;
     connections: IConnection[];
-    onSubmit: (content: string) => void;
+    onSubmit: (success: boolean, content: string, belongToProject: IProjectItem) => void;
     remoteHostList?: IRemoteHostItem[];
+    projectList: IProjectItem[];
     onCancel?: () => void;
     fileExtension?: string;
 }
@@ -47,6 +48,8 @@ export interface ICloudFilePickerState {
     cloudPath: string;
     username: string;
     password: string;
+
+    belongToProject: IProjectItem;
 }
 
 /**
@@ -54,18 +57,6 @@ export interface ICloudFilePickerState {
  * @description - Modal to choose and read file from cloud connections
  */
 export class ModalSearchPcb extends React.Component<ICloudFilePickerProps, ICloudFilePickerState> {
-
-    /**
-     * 等待指定的时间
-     * @param ms
-     */
-    public async sleep(ms: number) {
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                resolve("");
-            }, ms);
-        });
-    }
 
     private draggableDialog: React.RefObject<DraggableDialog> = React.createRef();
     constructor(props) {
@@ -81,8 +72,20 @@ export class ModalSearchPcb extends React.Component<ICloudFilePickerProps, IClou
         this.state = this.getInitialState();
     }
 
+    /**
+     * 等待指定的时间
+     * @param ms
+     */
+    public async sleep(ms: number) {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                resolve("");
+            }, ms);
+        });
+    }
+
     public render() {
-        const { remoteHostList } = this.props;
+        const { remoteHostList, projectList } = this.props;
         const closeBtn = <button className="close" onClick={this.close}>&times;</button>;
 
         return(
@@ -92,6 +95,16 @@ export class ModalSearchPcb extends React.Component<ICloudFilePickerProps, IClou
                 </ModalHeader>
                 <ModalBody>
                     <div>
+                        <Label for="selectProject">所属项目</Label>
+                        <Input type="select" name="selectProject" id="selectProject" onChange={(v) => {
+                            this.setState({
+                                ...this.state,
+                                belongToProject: JSON.parse(v.target.value),
+                            });
+                        }}>
+                            {projectList && projectList.length > 0 && projectList.map((item) =>
+                                <option value={JSON.stringify(item)}>{item.name}</option>)}
+                        </Input>
                         <Label for="pcbCode">PCB编号</Label>
                         <Input id="pcbCode" placeholder="请输入需要查询的PCB编号" onChange={(v) => {
                             this.setState({
@@ -158,6 +171,8 @@ export class ModalSearchPcb extends React.Component<ICloudFilePickerProps, IClou
             cloudPath: "NG",
             username: "Everyone",
             password: "",
+            belongToProject: this.props.projectList !== undefined && this.props.projectList.length > 0 ?
+                this.props.projectList[0] : undefined,
         };
     }
 
@@ -167,47 +182,7 @@ export class ModalSearchPcb extends React.Component<ICloudFilePickerProps, IClou
         this.draggableDialog.current.change("未查询到相关的数据...",
             // tslint:disable-next-line:max-line-length
             `未找到PCB编号相关的数据，请确认板号是否有误`, true);
-        // this.props.onSubmit("连接失败");
-        // reject("fail");        // 失败
-        // if (this.state.ip === "" || this.state.ip === null) {
-        //     this.draggableDialog.current.change("连接远程数据失败...",
-        //         `远程地址: \\\\${this.state.ip}\\${this.state.cloudPath}`, true);
-        //     return;
-        // }
-        // this.draggableDialog.current.change("正在连接远程数据...",
-        //     `远程地址: \\\\${this.state.ip}\\${this.state.cloudPath}`, false, true);
-        // const aa = new Promise(async (resolve, reject) => {
-        //     await IpcRendererProxy.send(`TrainingSystem:CloseRemoteAssets`, [this.state.ip, this.state.cloudPath])
-        //         .then(() => {
-        //             console.log("关闭成功");
-        //         })
-        //         .catch(() => {
-        //             console.log("关闭失败");
-        //         });
-        //     await IpcRendererProxy.send(`TrainingSystem:LoadRemoteAssets`,
-        //         [this.state.ip, this.state.cloudPath, this.state.username, this.state.password])
-        //         .then((v) => {
-        //             toast.success("已经成功连接了远程数据");
-        //             this.draggableDialog.current.close();
-        //             this.close();
-        //             this.props.onSubmit(v.toString());
-        //             resolve("success"); // 成功
-        //         })
-        //         .catch(() => {
-        //             this.draggableDialog.current.change("连接远程数据失败...",
-        //                 // tslint:disable-next-line:max-line-length
-        //                 `远程地址: \\\\${this.state.ip}\\${this.state.cloudPath.replace(new RegExp("/", "g"), "\\")}`, true);
-        //             // this.props.onSubmit("连接失败");
-        //             reject("fail");        // 失败
-        //         });
-        // }).catch(() => console.log("加载失败lala"));
-        // pTimeout(aa, 10000, () => {
-        //     this.draggableDialog.current.change("连接远程数据超时！",
-        //         `连接超时，请检查配置信息是否正确\n远程地址: \\\\${this.state.ip}\\${this.state.cloudPath.replace(new RegExp("/", "g"), "\\")}`, true);
-        // }).then(() => {
-        //     // 执行结束了,这里做善后工作
-        //     // toast.success("执行结束了");
-        // });
+        this.props.onSubmit(false, "查询失败", this.state.belongToProject);
     }
 
     private back() {
