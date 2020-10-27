@@ -13,6 +13,7 @@ describe("App Settings Form", () => {
         securityTokens: [],
         deadline: null,
         remoteHostList: [],
+        projectList: [],
     };
 
     function createComponent(props: IAppSettingsFormProps = null)
@@ -48,6 +49,7 @@ describe("App Settings Form", () => {
             ],
             deadline: null,
             remoteHostList: [],
+            projectList: [],
         };
         const props = createProps(appSettings);
         wrapper = createComponent(props);
@@ -66,6 +68,7 @@ describe("App Settings Form", () => {
             ],
             deadline: null,
             remoteHostList: [],
+            projectList: [],
         };
 
         wrapper.setProps({ appSettings: updatedAppSettings });

@@ -10,6 +10,7 @@ describe("Application Reducer", () => {
             securityTokens: [],
             deadline: null,
             remoteHostList: [],
+            projectList: [],
         };
 
         const action = toggleDevToolsAction(true);
@@ -25,6 +26,7 @@ describe("Application Reducer", () => {
             securityTokens: [],
             deadline: null,
             remoteHostList: [],
+            projectList: [],
         };
 
         const action = refreshApplicationAction();
@@ -38,6 +40,7 @@ describe("Application Reducer", () => {
             securityTokens: [],
             deadline: null,
             remoteHostList: [],
+            projectList: [],
         };
 
         const payload: IAppSettings = {
@@ -49,6 +52,7 @@ describe("Application Reducer", () => {
             ],
             deadline: null,
             remoteHostList: [],
+            projectList: [],
         };
 
         const action = saveAppSettingsAction(payload);
@@ -64,6 +68,7 @@ describe("Application Reducer", () => {
             securityTokens: [],
             deadline: null,
             remoteHostList: [],
+            projectList: [],
         };
 
         const action = anyOtherAction();

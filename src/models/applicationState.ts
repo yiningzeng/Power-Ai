@@ -164,13 +164,26 @@ export interface IAppSettings {
     thumbnailSize?: ISize;
     deadline: string;
     zengyining?: boolean;
-    remoteHostList: IRemoteHost[];
+    remoteHostList: IRemoteHostItem[];
+    projectList: IProjectItem[];
 }
 
-export interface IRemoteHost {
+/**
+ * 远程主机单台信息类
+ */
+export interface IRemoteHostItem {
     ip: string;
     name: string;
     platform: string;
+}
+
+/**
+ * 项目库的单个项目类
+ */
+export interface IProjectItem {
+    name: string;
+    baseFolder: string;
+    projectFolder: string;
 }
 
 /**

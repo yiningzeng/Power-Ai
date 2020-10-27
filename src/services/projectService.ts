@@ -39,6 +39,45 @@ export interface IProjectService {
  * @description - Functions for dealing with projects
  */
 export default class ProjectService implements IProjectService {
+
+    /**
+     * 用于首页的项目库的文件夹创建
+     * @param baseFolder
+     * @param createFolder
+     */
+    public async createFolder(baseFolder: string, createFolder: string): Promise<void> {
+        const provider: ILocalFileSystemProxyOptions = {
+            folderPath: baseFolder,
+        };
+        const newSource: IConnection = {
+            id: new Date().getTime().toString(),
+            name: new Date().getTime().toString(),
+            providerType: "localFileSystemProxy",
+            providerOptions: provider,
+        };
+        const storageProvider = StorageProviderFactory.createFromConnection(newSource);
+        await storageProvider.createContainer(createFolder);
+    }
+
+    /**
+     * 用于首页的项目库的文件夹删除
+     * @param baseFolder
+     * @param createFolder
+     */
+    public async deleteFolder(baseFolder: string, deleteFolder: string): Promise<void> {
+        const provider: ILocalFileSystemProxyOptions = {
+            folderPath: baseFolder,
+        };
+        const newSource: IConnection = {
+            id: new Date().getTime().toString(),
+            name: new Date().getTime().toString(),
+            providerType: "localFileSystemProxy",
+            providerOptions: provider,
+        };
+        const storageProvider = StorageProviderFactory.createFromConnection(newSource);
+        await storageProvider.deleteContainer(deleteFolder);
+    }
+
     /**
      * Loads a project
      * @param project The project JSON to load

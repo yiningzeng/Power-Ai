@@ -277,6 +277,7 @@ describe("Homepage Component", () => {
                 securityTokens: [],
                 deadline: null,
                 remoteHostList: [],
+                projectList: [],
             },
             match: {
                 params: {},

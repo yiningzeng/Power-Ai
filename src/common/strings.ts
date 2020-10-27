@@ -32,6 +32,7 @@ export interface IAppStrings {
     };
     homePage: {
         newProject: string;
+        projectList: string;
         remoteHost: {
             title: string;
         },

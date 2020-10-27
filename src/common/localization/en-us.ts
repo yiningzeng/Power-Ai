@@ -29,6 +29,7 @@ export const english: IAppStrings = {
     },
     homePage: {
         newProject: "New Project",
+        projectList: "Project list",
         remoteHost: {
             title: "远程主机",
         },

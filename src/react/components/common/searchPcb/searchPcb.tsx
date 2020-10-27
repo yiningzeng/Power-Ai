@@ -2,7 +2,7 @@ import React from "react";
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader,
     Input, Label, InputGroup, InputGroupAddon, InputGroupText} from "reactstrap";
 import { strings } from "../../../../common/strings";
-import {IConnection, IRemoteHost, StorageType} from "../../../../models/applicationState";
+import {IConnection, IRemoteHostItem, StorageType} from "../../../../models/applicationState";
 import { StorageProviderFactory } from "../../../../providers/storage/storageProviderFactory";
 import CondensedList, { ListItem } from "../condensedList/condensedList";
 import {normalizeSlashes} from "../../../../common/utils";
@@ -24,7 +24,7 @@ export interface ICloudFilePickerProps {
     modalHeader: string;
     connections: IConnection[];
     onSubmit: (content: string) => void;
-    remoteHostList?: IRemoteHost[];
+    remoteHostList?: IRemoteHostItem[];
     onCancel?: () => void;
     fileExtension?: string;
 }

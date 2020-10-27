@@ -29,6 +29,7 @@ export const chinese: IAppStrings = {
     },
     homePage: {
         newProject: "打开标注的文件夹",
+        projectList: "项目库",
         remoteHost: {
             title: "远程主机",
         },

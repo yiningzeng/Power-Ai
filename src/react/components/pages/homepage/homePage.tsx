@@ -8,6 +8,7 @@ import IProjectActions, * as projectActions from "../../../../redux/actions/proj
 import IApplicationActions, * as applicationActions from "../../../../redux/actions/applicationActions";
 import { CloudFilePicker } from "../../common/cloudFilePicker/cloudFilePicker";
 import { RemoteHostAddModal } from "../../common/RemoteHostAddModal/remoteHostAddModal";
+import { ModalHomePageAddProject } from "../../common/modalHomePageAddProject/modalHomePageAddProject";
 import CondensedList from "../../common/condensedList/condensedList";
 import Confirm from "../../common/confirm/confirm";
 import FilePicker from "../../common/filePicker/filePicker";
@@ -27,7 +28,7 @@ import {
     IProviderOptions,
     IExportFormat,
     IExportProviderOptions,
-    ISecureString, DefaultActiveLearningSettings, DefaultExportOptions, DefaultTrainOptions, ModelPathType,
+    ISecureString, DefaultActiveLearningSettings, DefaultExportOptions, DefaultTrainOptions, ModelPathType, ITag,
 } from "../../../../models/applicationState";
 import ImportService from "../../../../services/importService";
 import { IAssetMetadata } from "../../../../models/applicationState";
@@ -43,8 +44,11 @@ import shortid from "shortid";
 import {ExportAssetState} from "../../../../providers/export/exportProvider";
 import {appInfo} from "../../../../common/appInfo";
 import DraggableDialog from "../../common/draggableDialog/draggableDialog";
-import RemoteHostItem from "./RemoteHostItem";
+import RemoteHostItem from "./remoteHostItem";
 import {SearchPcb} from "../../common/searchPcb/searchPcb";
+import SourceItem from "../../common/condensedList/sourceItem";
+import {TagInput} from "../../common/tagInput/tagInput";
+import ProjectItem from "./projectItem";
 // tslint:disable-next-line:no-var-requires
 const tagColors = require("../../common/tagColors.json");
 
@@ -86,10 +90,12 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
     private filePicker: React.RefObject<FilePicker> = React.createRef();
     private deleteConfirm: React.RefObject<Confirm> = React.createRef();
     private deleteRemoteHostConfirm: React.RefObject<Confirm> = React.createRef();
+    private deleteProjectListConfirm: React.RefObject<Confirm> = React.createRef();
     private cloudFilePickerModal: React.RefObject<CloudFilePicker> = React.createRef();
     private copyRemoteAssetsModal: React.RefObject<CloudFilePicker> = React.createRef();
     private inputCodeTagAssetsModal: React.RefObject<SearchPcb> = React.createRef();
     private remoteHostAddModal: React.RefObject<RemoteHostAddModal> = React.createRef();
+    private modalHomePageAddProject: React.RefObject<ModalHomePageAddProject> = React.createRef();
     private importConfirm: React.RefObject<Confirm> = React.createRef();
     private draggableDialog: React.RefObject<DraggableDialog> = React.createRef();
     constructor(props, context) {
@@ -122,6 +128,19 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
             };
             this.props.applicationActions.saveAppSettings(newAppSettings);
         }
+
+        if (this.props.appSettings.remoteHostList === undefined || this.props.appSettings.remoteHostList === null) {
+            this.props.applicationActions.saveAppSettings({
+                ...this.props.appSettings,
+                remoteHostList: [],
+            });
+        }
+        if (this.props.appSettings.projectList === undefined || this.props.appSettings.projectList === null) {
+            this.props.applicationActions.saveAppSettings({
+                ...this.props.appSettings,
+                projectList: [],
+            });
+        }
         // 正式版使用这个
     }
 
@@ -137,6 +156,14 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                         // onClick={(item) => toast.info(`主机名: ${item.name} 主机IP: ${item.ip}`)}
                         onAddClick={() => this.remoteHostAddModal.current.open()}
                         onDelete={(item) => this.deleteRemoteHostConfirm.current.open(item)}
+                        showToolbar={true}
+                        home={true}/>
+                    <CondensedList
+                        title={strings.homePage.projectList}
+                        Component={ProjectItem}
+                        items={this.props.appSettings.projectList}
+                        onAddClick={() => this.modalHomePageAddProject.current.open()}
+                        onDelete={(item) => this.deleteProjectListConfirm.current.open(item)}
                         showToolbar={true}
                         home={true}/>
                     <RemoteHostAddModal
@@ -166,6 +193,32 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                             this.props.applicationActions.saveAppSettings(newAppSettings);
                             this.remoteHostAddModal.current.close();
                             toast.success("新增主机成功");
+                            console.log(JSON.stringify(this.props.appSettings));
+                        }}
+                    />
+                    <ModalHomePageAddProject
+                        ref={this.modalHomePageAddProject}
+                        onSubmit={async (projectName) => {
+                            const projectList = [
+                                ...this.props.appSettings.projectList,
+                                {
+                                    name: projectName,
+                                    baseFolder: "/assets/Projects",
+                                    projectFolder: projectName,
+                                }];
+                            const newAppSettings = {
+                                ...this.props.appSettings,
+                                projectList,
+                            };
+                            await this.props.actions.createFolder("/assets/Projects", projectName);
+                            // this.props.actions.createFolder("/assets/Projects/" + projectName, "MissData");
+                            // 这里创建文件夹要合并，否则会出错, 加了await就正常了
+                            await this.props.actions.createFolder("/assets/Projects/" + projectName, "CollectData");
+                            await this.props.actions.createFolder("/assets/Projects/" + projectName, "MissData");
+                            await this.props.actions.createFolder("/assets/Projects/" + projectName, "AtuoTrainData");
+                            this.props.applicationActions.saveAppSettings(newAppSettings);
+                            this.modalHomePageAddProject.current.close();
+                            toast.success("项目新建成功");
                             console.log(JSON.stringify(this.props.appSettings));
                         }}
                     />
@@ -281,6 +334,20 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                         onDelete={(project) => this.deleteConfirm.current.open(project)} showToolbar={false}/>
                 </div>
                 }
+                <Confirm title="谨慎操作！！！"
+                         ref={this.deleteProjectListConfirm as any}
+                         message={(item) =>
+                             `删除项目会删除该项目下的所有素材和已经训练好的模型文件！！！请谨慎操作！！！确定要删除项目[${item.name}]么?`}
+                         confirmButtonColor="danger"
+                         onConfirm={(item) => {
+                             const newAppSettings = {
+                                 ...this.props.appSettings,
+                                 projectList: this.props.appSettings.projectList.filter((v) => v.name !== item.name),
+                             };
+                             this.props.applicationActions.saveAppSettings(newAppSettings);
+                             this.props.actions.deleteFolder("/assets/Projects", item.name);
+                             toast.success("已成功删除");
+                         }}/>
                 <Confirm title="删除主机"
                          ref={this.deleteRemoteHostConfirm as any}
                          message={(item) =>
