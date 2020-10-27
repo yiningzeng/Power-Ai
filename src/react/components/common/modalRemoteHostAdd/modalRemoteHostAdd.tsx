@@ -37,7 +37,7 @@ export interface ICloudFilePickerState {
  * @name - Cloud File Picker
  * @description - Modal to choose and read file from cloud connections
  */
-export class RemoteHostAddModal extends React.Component<ICloudFilePickerProps, ICloudFilePickerState> {
+export class ModalRemoteHostAdd extends React.Component<ICloudFilePickerProps, ICloudFilePickerState> {
 
     private draggableDialog: React.RefObject<DraggableDialog> = React.createRef();
     constructor(props) {

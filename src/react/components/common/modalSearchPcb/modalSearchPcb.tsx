@@ -53,7 +53,7 @@ export interface ICloudFilePickerState {
  * @name - Cloud File Picker
  * @description - Modal to choose and read file from cloud connections
  */
-export class SearchPcb extends React.Component<ICloudFilePickerProps, ICloudFilePickerState> {
+export class ModalSearchPcb extends React.Component<ICloudFilePickerProps, ICloudFilePickerState> {
 
     /**
      * 等待指定的时间
