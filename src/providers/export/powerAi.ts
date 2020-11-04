@@ -40,7 +40,7 @@ export class PowerAiExportProvider extends ExportProvider<IPowerAiExportProvider
         const results = await this.getAssetsForExport();
         let exportFolderName = "";
         if (this.getSaveAsDateFolder) {
-            exportFolderName = moment().format("YYYYMMDD");
+            exportFolderName = moment().format("YYYY-MM-DD");
         } else {
             exportFolderName = `${this.project.name.replace(/\s/g, "-")}-power-ai-export`;
             await this.storageProvider.deleteContainer(exportFolderName);

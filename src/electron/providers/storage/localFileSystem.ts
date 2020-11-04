@@ -50,13 +50,33 @@ export default class LocalFileSystem implements IStorageProvider {
         });
     }
 
-    public copyRemoteContainer(): Promise<object> {
+    public openRemoteContainer(defaultPath: string): Promise<object> {
         return new Promise<object>((resolve, reject) => {
             const filePaths = dialog.showOpenDialog({
-                defaultPath: "/Remote_Assets_Copy",
+                defaultPath,
+                title: strings.connections.providers.local.selectFolder,
+                buttonLabel: "确定打开远程文件夹",
+                properties: ["openDirectory", "showHiddenFiles"],
+            }).then((result) => {
+                if (result.canceled || !result.filePaths || result.filePaths.length === 0) {
+                    return reject();
+                }
+                console.log(result.canceled);
+                console.log(`选择的文件信息${result.filePaths}`);
+                resolve(result.filePaths);
+            }).catch((err) => {
+                console.log(err);
+            });
+        });
+    }
+
+    public copyRemoteContainer(defaultPath: string): Promise<object> {
+        return new Promise<object>((resolve, reject) => {
+            const filePaths = dialog.showOpenDialog({
+                defaultPath,
                 title: strings.connections.providers.local.selectFolder,
                 buttonLabel: "确定复制的文件",
-                properties: ["openDirectory", "createDirectory", "multiSelections"],
+                properties: ["openDirectory", "createDirectory", "multiSelections", "showHiddenFiles"],
             }).then((result) => {
                 if (result.canceled || !result.filePaths || result.filePaths.length === 0) {
                     return reject();

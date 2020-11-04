@@ -7,3 +7,7 @@ power-ai
 >* 打开远程文件夹 此处是需要人工手动标注的 所以默认都放到项目下的CollectData目录里
 >* 远程拷图 这里是不需要标注的 所有的素材都直接复制到AtuoTrainData目录
 >* 查找条码标图 根据查询的图片数据 标记后导出统一保存到MissData目录
+>### Linux下打开windows远程共享文件夹需要安装`cifs-utils`
+>```shell script
+>sudo apt install -y cifs-utils
+>```

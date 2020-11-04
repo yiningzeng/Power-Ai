@@ -55,6 +55,7 @@ import RemoteHostItem from "./remoteHostItem";
 import SourceItem from "../../common/condensedList/sourceItem";
 import {TagInput} from "../../common/tagInput/tagInput";
 import ProjectItem from "./projectItem";
+import {CloudFileCopyPicker} from "../../common/cloudFileCopyPicker/cloudFileCopyPicker";
 // tslint:disable-next-line:no-var-requires
 const tagColors = require("../../common/tagColors.json");
 
@@ -98,7 +99,7 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
     private deleteRemoteHostConfirm: React.RefObject<Confirm> = React.createRef();
     private deleteProjectListConfirm: React.RefObject<Confirm> = React.createRef();
     private cloudFilePickerModal: React.RefObject<CloudFilePicker> = React.createRef();
-    private copyRemoteAssetsModal: React.RefObject<CloudFilePicker> = React.createRef();
+    private copyRemoteAssetsModal: React.RefObject<CloudFileCopyPicker> = React.createRef();
     private inputCodeTagAssetsModal: React.RefObject<ModalSearchPcb> = React.createRef();
     private ModalRemoteHostAdd: React.RefObject<ModalRemoteHostAdd> = React.createRef();
     private modalHomePageAddProject: React.RefObject<ModalHomePageAddProject> = React.createRef();
@@ -222,6 +223,8 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                             await this.props.actions.createFolder("/assets/Projects/" + projectName, "CollectData");
                             await this.props.actions.createFolder("/assets/Projects/" + projectName, "MissData");
                             await this.props.actions.createFolder("/assets/Projects/" + projectName, "AtuoTrainData");
+                            await this.props.actions.createFolder("/assets/Projects/" + projectName, "model_release_history");
+                            await this.props.actions.createFolder("/assets/Projects/" + projectName, "model_release");
                             this.props.applicationActions.saveAppSettings(newAppSettings);
                             this.modalHomePageAddProject.current.close();
                             toast.success("项目新建成功");
@@ -298,17 +301,17 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                         </li>
                         <li>
                             <a href="#"  className="p-5 cloud-open-project"
-                               onClick={() => this.handleOpenCloudProjectClick(this.copyRemoteAssetsModal.current)}>
+                               onClick={() => this.handleOpenCloudCopyProjectClick(this.copyRemoteAssetsModal.current)}>
                                 <i className="fas fa-copy fa-9x"></i>
                                 <h6 style={{marginTop: "10px"}}>{strings.homePage.copyRemoteAssets.title}</h6>
                             </a>
-                            <CloudFilePicker
+                            <CloudFileCopyPicker
                                 ref={this.copyRemoteAssetsModal}
                                 modalHeader={strings.homePage.copyRemoteAssets.title}
                                 connections={this.props.connections}
                                 remoteHostList={this.props.appSettings.remoteHostList}
                                 projectList={this.props.appSettings.projectList}
-                                onSubmit={(success, content, belongToProject, copyList) => {
+                                onSubmit={(success, belongToProject, copyList) => {
                                     console.log(`结果: ${copyList}\n ${JSON.stringify(belongToProject)}`);
                                 }}
                                 fileExtension={constants.projectFileExtension}
@@ -350,9 +353,12 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                 <Confirm title="谨慎操作！！！"
                          ref={this.deleteProjectListConfirm as any}
                          message={(item) =>
-                             `删除项目会删除该项目下的所有素材和已经训练好的模型文件！！！请谨慎操作！！！确定要删除项目[${item.name}]么?`}
+                             `如果正在标注该项目的远程素材，那么项目会被关闭！并且删除项目会删除该项目下的所有素材和已经训练好的模型文件！！！请谨慎操作！！！确定要删除项目[${item.name}]么?`}
                          confirmButtonColor="danger"
                          onConfirm={(item) => {
+                             if (this.props.project.exportFormat.belongToProject.name === item.name) {
+                                 this.props.actions.closeProject();
+                             }
                              const newAppSettings = {
                                  ...this.props.appSettings,
                                  projectList: this.props.appSettings.projectList.filter((v) => v.name !== item.name),
@@ -424,6 +430,15 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
     }
 
     private handleOpenCloudProjectClick = (modal: CloudFilePicker) => {
+        const platform = global && global.process ? global.process.platform : "web";
+        if (platform !== PlatformType.Linux) {
+            toast.error("远程标注暂时不支持非linux系统");
+            return;
+        }
+        modal.open();
+    }
+
+    private handleOpenCloudCopyProjectClick = (modal: CloudFileCopyPicker) => {
         const platform = global && global.process ? global.process.platform : "web";
         if (platform !== PlatformType.Linux) {
             toast.error("远程标注暂时不支持非linux系统");

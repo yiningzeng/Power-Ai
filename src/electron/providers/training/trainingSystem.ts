@@ -247,10 +247,10 @@ export default class TrainingSystem {
     }
 
     // 复制远程图片到本机
-    public CopyRemoteAssets(remoteSaveFolder: string): Promise<string> {
+    public CopyRemoteAssets(sourcePath: string, savePath: string): Promise<string> {
         return new Promise<string>((resolve, reject) => {
             const passwordFile = process.cwd() + "/sudo.txt";
-            const cmdStr = `echo \`cat "${passwordFile}"\` | sudo -S mkdir -p /assets/PowerAi_Assets && sudo cp -r ${remoteSaveFolder} /assets/PowerAi_Assets && sudo chmod -R 777 /assets/PowerAi_Assets`;
+            const cmdStr = `echo \`cat "${passwordFile}"\` | sudo -S cp -r ${sourcePath} ${savePath} && sudo chmod -R 777 ${savePath}`;
             console.log(cmdStr);
             workerProcess = exec(cmdStr);
             // 不受child_process默认的缓冲区大小的使用方法，没参数也要写上{}：workerProcess = exec(cmdStr, {})
@@ -265,8 +265,12 @@ export default class TrainingSystem {
             // 退出之后的输出
             workerProcess.on("close", (code) => {
                 console.log("out code：" + code);
+                if (code === 0) {
+                    resolve("success");
+                } else {
+                    reject("fail");
+                }
             });
-            resolve(remoteSaveFolder.replace("Remote_Assets", "PowerAi_Assets"));
         });
     }
 
