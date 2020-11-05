@@ -4,10 +4,10 @@ import Align from "rc-align";
 import { randomIntInRange } from "../../../../common/utils";
 import { IRegion, ITag } from "../../../../models/applicationState";
 import { ColorPicker } from "../colorPicker";
-import "./tagInput.scss";
+import "./sortInput.scss";
 import "../condensedList/condensedList.scss";
-import TagInputItem, { ITagInputItemProps, ITagClickProps } from "./tagInputItem";
-import TagInputToolbar from "./tagInputToolbar";
+import SortInputItem, { ITagInputItemProps, ITagClickProps } from "./sortInputItem";
+import SortInputToolbar from "./sortInputToolbar";
 import { toast } from "react-toastify";
 import { strings } from "../../../../common/strings";
 import DraggableDialog from "../draggableDialog/draggableDialog";
@@ -59,7 +59,7 @@ function defaultDOMNode(): Element {
     return document.createElement("div");
 }
 
-export class TagInput extends React.Component<ITagInputProps, ITagInputState> {
+export class SortInput extends React.Component<ITagInputProps, ITagInputState> {
 
     public state: ITagInputState = {
         tags: this.props.tags || [],
@@ -74,15 +74,15 @@ export class TagInput extends React.Component<ITagInputProps, ITagInputState> {
         portalElement: defaultDOMNode(),
     };
     private loadingDialog: React.RefObject<DraggableDialog> = React.createRef();
-    private tagItemRefs: Map<string, RefObject<TagInputItem>> = new Map<string, RefObject<TagInputItem>>();
+    private tagItemRefs: Map<string, RefObject<SortInputItem>> = new Map<string, RefObject<SortInputItem>>();
     private portalDiv = document.createElement("div");
 
     public render() {
         return (
             <div className="tag-input condensed-list">
                 <h6 className="condensed-list-header tag-input-header bg-darker-2 p-2">
-                    <span className="condensed-list-title tag-input-title">标注-标签列表</span>
-                    <TagInputToolbar
+                    <span className="condensed-list-title tag-input-title">分类-标签列表</span>
+                    <SortInputToolbar
                         selectedTag={this.state.selectedTag}
                         onAddTags={() => this.setState({ addTags: !this.state.addTags })}
                         onSearchTags={() => this.setState({
@@ -341,7 +341,7 @@ export class TagInput extends React.Component<ITagInputProps, ITagInputState> {
         // console.log("taginput");
         // console.log("taginput" + JSON.stringify(props));
         return props.map((prop) => {
-            return  <TagInputItem
+            return  <SortInputItem
                 key={prop.tag.name}
                 ref={(item) => this.setTagItemRef(item, prop.tag)}
                 {...prop}

@@ -72,7 +72,8 @@ import {Rnd} from "powerai-react-rnd";
 import {constants} from "../../../../common/constants";
 import {DoubleTextSwitch} from "../../common/doubleTextSwitch/doubleTextSwitch";
 import {Divider} from "@material-ui/core";
-
+import ReactCardFlip from "react-card-flip";
+import {SortInput} from "../../common/sortInput/sortInput";
 // import "antd/lib/tree/style/css";
 
 function PaperComponent(props: PaperProps) {
@@ -115,6 +116,7 @@ export interface IEditorPageProps extends RouteComponentProps, React.Props<Edito
  * State for Editor Page
  */
 export interface IEditorPageState {
+    isFlipped: boolean;
     treeList: IProviderOptions[] | ISecureString[];
     /** Array of assets in project */
     assets: IAsset[];
@@ -178,6 +180,7 @@ function mapDispatchToProps(dispatch) {
 @connect(mapStateToProps, mapDispatchToProps)
 export default class EditorPage extends React.Component<IEditorPageProps, IEditorPageState> {
     public state: IEditorPageState = {
+        isFlipped: false,
         treeList: [],
         selectedTag: null,
         lockedTags: [],
@@ -514,18 +517,33 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                 rightText={"图像分类"}
                                 onChange={this.onTagModeChanged}/>
                             <Divider />
-                            <TagInput
-                                tags={this.props.project.tags}
-                                lockedTags={this.state.lockedTags}
-                                selectedRegions={this.state.selectedRegions}
-                                onChange={this.onTagsChanged}
-                                onLockedTagsChange={this.onLockedTagsChanged}
-                                onTagClick={this.onTagClicked}
-                                onTagSearched={this.onTagSearched}
-                                onCtrlTagClick={this.onCtrlTagClicked}
-                                onTagRenamed={this.confirmTagRenamed}
-                                onTagDeleted={this.confirmTagDeleted}
-                            />
+                            <ReactCardFlip isFlipped={this.state.isFlipped} flipDirection="horizontal">
+                                <TagInput
+                                    tags={this.props.project.tags}
+                                    lockedTags={this.state.lockedTags}
+                                    selectedRegions={this.state.selectedRegions}
+                                    onChange={this.onTagsChanged}
+                                    onLockedTagsChange={this.onLockedTagsChanged}
+                                    onTagClick={this.onTagClicked}
+                                    onTagSearched={this.onTagSearched}
+                                    onCtrlTagClick={this.onCtrlTagClicked}
+                                    onTagRenamed={this.confirmTagRenamed}
+                                    onTagDeleted={this.confirmTagDeleted}
+                                />
+
+                                <SortInput
+                                    tags={this.props.project.tags}
+                                    lockedTags={this.state.lockedTags}
+                                    selectedRegions={this.state.selectedRegions}
+                                    onChange={this.onTagsChanged}
+                                    onLockedTagsChange={this.onLockedTagsChanged}
+                                    onTagClick={this.onTagClicked}
+                                    onTagSearched={this.onTagSearched}
+                                    onCtrlTagClick={this.onCtrlTagClicked}
+                                    onTagRenamed={this.confirmTagRenamed}
+                                    onTagDeleted={this.confirmTagDeleted}
+                                />
+                            </ReactCardFlip>
                         </div>
                         <EditorSideBar
                             ref={this.editorSideBar}
@@ -803,7 +821,10 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
      */
     private onTagModeChanged = (isSort: boolean) => {
         console.log(isSort);
-
+        this.setState({
+            ...this.state,
+            isFlipped: isSort,
+        });
     }
 
     private onPageClick = () => {
