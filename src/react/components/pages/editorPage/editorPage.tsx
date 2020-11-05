@@ -70,6 +70,8 @@ import {normalizeSlashes, randomIntInRange} from "../../../../common/utils";
 import tagColors from "../../common/tagColors.json";
 import {Rnd} from "powerai-react-rnd";
 import {constants} from "../../../../common/constants";
+import {DoubleTextSwitch} from "../../common/doubleTextSwitch/doubleTextSwitch";
+import {Divider} from "@material-ui/core";
 
 // import "antd/lib/tree/style/css";
 
@@ -506,6 +508,12 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                     // await this.props.actions.saveProject(project);
                                 }}
                                 showToolbar={false}/>
+                            <Divider />
+                            <DoubleTextSwitch
+                                leftText={"图像标注"}
+                                rightText={"图像分类"}
+                                onChange={this.}/>
+                            <Divider />
                             <TagInput
                                 tags={this.props.project.tags}
                                 lockedTags={this.state.lockedTags}
@@ -775,11 +783,11 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                     onCancel={() => this.loadingDialog.current.close()}
                 />
                 <Drawer anchor="right" open={this.state.showProjectMetrics} onClose={() => {
-                    this.setState({
-                        ...this.state,
-                        showProjectMetrics: !this.state.showProjectMetrics,
-                    });
-                }}>
+                        this.setState({
+                            ...this.state,
+                            showProjectMetrics: !this.state.showProjectMetrics,
+                        });
+                    }}>
                     <div className="project-settings-page-metrics bg-lighter-1" style={{background: "#454545"}}>
                         <ProjectMetrics project={this.props.project}/>
                     </div>
@@ -787,6 +795,10 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
 
             </div>
         );
+    }
+
+    private onTagModeChanged = () => {
+
     }
 
     private onPageClick = () => {

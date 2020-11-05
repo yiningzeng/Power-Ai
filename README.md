@@ -11,3 +11,4 @@ power-ai
 >```shell script
 >sudo apt install -y cifs-utils
 >```
+>### 快捷键操作可以搜索`KeyboardBinding`
