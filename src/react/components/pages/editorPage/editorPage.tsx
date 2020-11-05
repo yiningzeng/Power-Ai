@@ -512,7 +512,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                             <DoubleTextSwitch
                                 leftText={"图像标注"}
                                 rightText={"图像分类"}
-                                onChange={this.}/>
+                                onChange={this.onTagModeChanged}/>
                             <Divider />
                             <TagInput
                                 tags={this.props.project.tags}
@@ -797,7 +797,12 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         );
     }
 
-    private onTagModeChanged = () => {
+    /**
+     * 标注模式切换事件
+     * @param isSort
+     */
+    private onTagModeChanged = (isSort: boolean) => {
+        console.log(isSort);
 
     }
 
