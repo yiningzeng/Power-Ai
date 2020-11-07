@@ -1,5 +1,5 @@
 import React, { MouseEvent } from "react";
-import { ITag } from "../../../../models/applicationState";
+import { ISort } from "../../../../models/applicationState";
 import { SketchPicker } from "react-color";
 import {Button, Popover} from "@material-ui/core";
 
@@ -8,7 +8,7 @@ export enum TagEditMode {
     Name = "name",
 }
 
-export interface ITagClickProps {
+export interface ISortClickProps {
     ctrlKey?: boolean;
     altKey?: boolean;
     clickedColor?: boolean;
@@ -17,9 +17,9 @@ export interface ITagClickProps {
 /**
  * Properties for tag input item
  */
-export interface ITagInputItemProps {
+export interface ISortInputItemProps {
     /** Tag represented by item */
-    tag: ITag;
+    tag: ISort;
     /** Index of tag within tags array */
     index: number;
     /** Tag is currently being edited */
@@ -31,12 +31,12 @@ export interface ITagInputItemProps {
     /** Tag is currently applied to one of the selected regions */
     appliedToSelectedRegions: boolean;
     /** Function to call upon clicking item */
-    onClick: (tag: ITag, props: ITagClickProps) => void;
+    onClick: (tag: ISort, props: ISortClickProps) => void;
     /** Apply updates to tag */
-    onChange: (oldTag: ITag, newTag: ITag) => void;
+    onChange: (oldTag: ISort, newTag: ISort) => void;
 }
 
-export interface ITagInputItemState {
+export interface ISortInputItemState {
     /** Tag is currently being edited */
     isBeingEdited: boolean;
     /** Tag is currently locked for application */
@@ -47,8 +47,8 @@ export interface ITagInputItemState {
     anchorEl: Element;
 }
 
-export default class SortInputItem extends React.Component<ITagInputItemProps, ITagInputItemState> {
-    public state: ITagInputItemState = {
+export default class SortInputItem extends React.Component<ISortInputItemProps, ISortInputItemState> {
+    public state: ISortInputItemState = {
         isBeingEdited: false,
         isLocked: false,
         tagEditMode: null,
@@ -134,7 +134,7 @@ export default class SortInputItem extends React.Component<ITagInputItemProps, I
         );
     }
 
-    public componentDidUpdate(prevProps: ITagInputItemProps) {
+    public componentDidUpdate(prevProps: ISortInputItemProps) {
         if (prevProps.isBeingEdited !== this.props.isBeingEdited) {
             this.setState({
                 isBeingEdited: this.props.isBeingEdited,

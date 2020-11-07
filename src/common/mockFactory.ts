@@ -285,6 +285,7 @@ export default class MockFactory {
             sourceListConnection: [],
             targetConnection: connection,
             tags: MockFactory.createTestTags(tagCount),
+            sorts: MockFactory.createTestTags(tagCount),
             videoSettings: MockFactory.createVideoSettings(),
             activeLearningSettings: {
                 modelPathType: ModelPathType.Coco,
@@ -705,6 +706,7 @@ export default class MockFactory {
     public static createTestCanvas(project: IProject = null) {
         const canvasProps: ICanvasProps = {
             project,
+            enable: true,
             selectedAsset: this.createTestAssetMetadata(this.createTestAsset("test-asset")),
             onAssetMetadataChanged: jest.fn(),
             editorMode: EditorMode.Rectangle,

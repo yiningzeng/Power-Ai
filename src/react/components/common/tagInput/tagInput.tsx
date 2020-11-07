@@ -408,7 +408,6 @@ export class TagInput extends React.Component<ITagInputProps, ITagInputState> {
             const inEditMode = editingTag && tag.name === editingTag.name;
             const alreadySelected = selectedTag && selectedTag.name === tag.name;
             const newEditingTag = inEditMode ? null : editingTag;
-
             this.setState({
                 editingTag: newEditingTag,
                 editingTagNode: this.getTagNode(newEditingTag),
@@ -416,7 +415,7 @@ export class TagInput extends React.Component<ITagInputProps, ITagInputState> {
                 clickedColor: props.clickedColor,
                 showColorPicker: false,
             });
-
+            // this.props.onTagClick(tag);
             // Only fire click event if a region is selected
             // if (this.props.selectedRegions &&
             //     this.props.selectedRegions.length > 0 &&

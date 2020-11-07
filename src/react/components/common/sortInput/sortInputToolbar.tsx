@@ -1,27 +1,27 @@
 import React, { SyntheticEvent } from "react";
 import { strings } from "../../../../common/strings";
-import { ITag } from "../../../../models/applicationState";
+import { ISort } from "../../../../models/applicationState";
 import "./sortInput.scss";
 
-/** Properties for tag input toolbar */
-export interface ITagInputToolbarProps {
-    /** Currently selected tag */
-    selectedTag: ITag;
-    /** Function to call when add tags button is clicked */
-    onAddTags: () => void;
-    /** Function to call when search tags button is clicked */
-    onSearchTags: () => void;
-    /** Function to call when lock tags button is clicked */
-    onLockTag: (tag: ITag) => void;
-    /** Function to call when edit tag button is clicked */
-    onEditTag: (tag: ITag) => void;
+/** Properties for Sort input toolbar */
+export interface ISortInputToolbarProps {
+    /** Currently selected Sort */
+    selectedSort: ISort;
+    /** Function to call when add Sorts button is clicked */
+    onAddSorts: () => void;
+    /** Function to call when search Sorts button is clicked */
+    onSearchSorts: () => void;
+    /** Function to call when lock Sorts button is clicked */
+    onLockSort: (Sort: ISort) => void;
+    /** Function to call when edit Sort button is clicked */
+    onEditSort: (Sort: ISort) => void;
     /** Function to call when delete button is clicked */
-    onDelete: (tag: ITag) => void;
+    onDelete: (Sort: ISort) => void;
     /** Function to call when one of the re-order buttons is clicked */
-    onReorder: (tag: ITag, displacement: number) => void;
+    onReorder: (Sort: ISort, displacement: number) => void;
 }
 
-interface ITagInputToolbarItemProps {
+interface ISortInputToolbarItemProps {
     displayName: string;
     className: string;
     icon: string;
@@ -29,15 +29,15 @@ interface ITagInputToolbarItemProps {
     accelerators?: string[];
 }
 
-export default class SortInputToolbar extends React.Component<ITagInputToolbarProps> {
+export default class SortInputToolbar extends React.Component<ISortInputToolbarProps> {
     public render() {
         return (
-            <div className="tag-input-toolbar">
+            <div className="Sort-input-toolbar">
                 {
                     this.getToolbarItems().map((itemConfig) =>
-                        <a title={itemConfig.displayName} key={itemConfig.displayName} className={`tag-input-toolbar-item ${itemConfig.className}`}
+                        <a title={itemConfig.displayName} key={itemConfig.displayName} className={`Sort-input-toolbar-item ${itemConfig.className}`}
                             onClick={(e) => this.onToolbarItemClick(e, itemConfig)}>
-                            <i className={`tag-input-toolbar-icon fas ${itemConfig.icon}`} />
+                            <i className={`Sort-input-toolbar-icon fas ${itemConfig.icon}`} />
                         </a>,
                     )
                 }
@@ -45,12 +45,12 @@ export default class SortInputToolbar extends React.Component<ITagInputToolbarPr
         );
     }
 
-    private onToolbarItemClick = (e: SyntheticEvent, itemConfig: ITagInputToolbarItemProps): void => {
+    private onToolbarItemClick = (e: SyntheticEvent, itemConfig: ISortInputToolbarItemProps): void => {
         e.stopPropagation();
         itemConfig.handler();
     }
 
-    private getToolbarItems = (): ITagInputToolbarItemProps[] => {
+    private getToolbarItems = (): ISortInputToolbarItemProps[] => {
         return [
             {
                 displayName: strings.tags.toolbar.add,
@@ -65,7 +65,7 @@ export default class SortInputToolbar extends React.Component<ITagInputToolbarPr
                 handler: this.handleSearch,
             },
             // {
-            //     displayName: strings.tags.toolbar.lock,
+            //     displayName: strings.Sorts.toolbar.lock,
             //     className: "lock",
             //     icon: "fa-lock",
             //     handler: this.handleLock,
@@ -98,30 +98,30 @@ export default class SortInputToolbar extends React.Component<ITagInputToolbarPr
     }
 
     private handleAdd = () => {
-        this.props.onAddTags();
+        this.props.onAddSorts();
     }
 
     private handleSearch = () => {
-        this.props.onSearchTags();
+        this.props.onSearchSorts();
     }
 
     private handleLock = () => {
-        this.props.onLockTag(this.props.selectedTag);
+        this.props.onLockSort(this.props.selectedSort);
     }
 
     private handleEdit = () => {
-        this.props.onEditTag(this.props.selectedTag);
+        this.props.onEditSort(this.props.selectedSort);
     }
 
     private handleArrowUp = () => {
-        this.props.onReorder(this.props.selectedTag, -1);
+        this.props.onReorder(this.props.selectedSort, -1);
     }
 
     private handleArrowDown = () => {
-        this.props.onReorder(this.props.selectedTag, 1);
+        this.props.onReorder(this.props.selectedSort, 1);
     }
 
     private handleDelete = () => {
-        this.props.onDelete(this.props.selectedTag);
+        this.props.onDelete(this.props.selectedSort);
     }
 }
