@@ -1287,6 +1287,14 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         this.setState({ selectedRegions });
     }
 
+    private onSortsChanged = async (sorts) => {
+        const project = {
+            ...this.props.project,
+            sorts,
+        };
+        await this.props.actions.saveProject(project);
+    }
+
     private onTagsChanged = async (tags) => {
         const project = {
             ...this.props.project,
