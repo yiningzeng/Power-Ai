@@ -465,6 +465,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                         ...projectJson,
                                         assets: _.keyBy(rootAssets, (asset) => asset.id),
                                         tags: finalTags.sort(),
+                                        sorts: dataTemp.sorts,
                                     };
                                     console.log(`merge tags: ${JSON.stringify(finalTags)}`);
                                     console.log(`homePage:merge tags: ${JSON.stringify(projectJson)}`);
@@ -1608,6 +1609,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
             ...projectJson,
             assets: _.keyBy(rootAssets, (asset) => asset.id),
             tags: finalTags.sort(),
+            sorts: dataTemp.sorts,
         };
         // console.log(`merge tags: ${JSON.stringify(finalTags)}`);
         // console.log(`homePage:merge tags: ${JSON.stringify(projectJson)}`);

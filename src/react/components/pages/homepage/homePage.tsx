@@ -495,6 +495,7 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
             ...projectJson,
             assets: _.keyBy(rootAssets, (asset) => asset.id),
             tags: dataTemp.tags,
+            sorts: dataTemp.sorts,
         };
         await this.props.actions.saveProject(projectJson);
         connectionActions.saveConnection(connection);

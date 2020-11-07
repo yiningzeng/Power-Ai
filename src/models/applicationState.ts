@@ -428,6 +428,7 @@ export interface IAssetVideoSettings {
 export interface IAssetsAndTags {
     assets: IAsset[];
     tags: ITag[];
+    sorts: ISort[];
 }
 
 /**
@@ -448,7 +449,7 @@ export interface IAsset {
     name: string;
     path: string;
     size: ISize;
-    sorts?: string[];
+    sorts?: ISort[];
     format?: string;
     timestamp?: number;
     parent?: IAsset;

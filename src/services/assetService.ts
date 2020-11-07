@@ -203,6 +203,7 @@ export class AssetService {
         }
         let res: IAssetsAndTags;
         let taggs = [];
+        const sorts: ISort[] = await this.getSortsColors();
         const finalTags: ITag[] = [];
         const exitsColor = await this.getTagsColors();
         const assets = await this.assetProviderInstance.getAssets();
@@ -225,6 +226,9 @@ export class AssetService {
                     } else {
                         taggs.push(assetMetadata.asset.tags);
                     }
+                }
+                if (assetMetadata.asset.sorts) {
+                    sorts.concat(assetMetadata.asset.sorts);
                 }
                 const newAsset = {
                     ...asset,
@@ -267,6 +271,7 @@ export class AssetService {
         res = {
             assets: finalAssets,
             tags: finalTags,
+            sorts: [...new Set(sorts)].sort(),
         };
         return res;
     }
