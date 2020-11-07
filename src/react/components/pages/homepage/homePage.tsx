@@ -485,7 +485,6 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
             assets: {},
         };
         const dataTemp = await this.props.actions.loadAssetsWithFolderAndTags(projectJson, fileFolder);
-        await this.props.actions.saveProject(projectJson);
         const rootProjectAssets = _.values(projectJson.assets)
             .filter((asset) => !asset.parent);
         const rootAssets = _(rootProjectAssets)
@@ -497,6 +496,7 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
             assets: _.keyBy(rootAssets, (asset) => asset.id),
             tags: dataTemp.tags,
         };
+        await this.props.actions.saveProject(projectJson);
         connectionActions.saveConnection(connection);
         this.draggableDialog.current.close();
         await this.loadSelectedProject(projectJson);
