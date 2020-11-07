@@ -203,7 +203,7 @@ export class AssetService {
         }
         let res: IAssetsAndTags;
         let taggs = [];
-        let finalTags: ITag[] = [];
+        const finalTags: ITag[] = [];
         const exitsColor = await this.getColors();
         const assets = await this.assetProviderInstance.getAssets();
         console.log(`获取到的颜色 ${JSON.stringify(finalTags)}`);
@@ -395,7 +395,7 @@ export class AssetService {
      */
     public async getColors(): Promise<ITag[]> {
         try {
-            const json = await this.storageProviderInstance.readText(constants.colorFileExtension);
+            const json = await this.storageProvider.readText(constants.colorFileExtension);
             return JSON.parse(json) as ITag[];
         } catch (err) {
             const taggs: ITag[] = [];
