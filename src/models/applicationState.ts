@@ -209,6 +209,7 @@ export interface IProject {
     securityToken: string;
     description?: string;
     tags: ITag[];
+    sorts: ISort[];
     sourceConnection: IConnection;
     sourceListConnection: string[];
     targetConnection: IConnection;
@@ -299,6 +300,14 @@ export interface IFileInfo {
  * @member color - User editable color associated to tag
  */
 export interface ITag {
+    name: string;
+    color: string;
+}
+
+/**
+ * Sort
+ */
+export interface ISort {
     name: string;
     color: string;
 }

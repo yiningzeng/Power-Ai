@@ -444,6 +444,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                         sourceConnection: connection,
                                         sourceListConnection: [],
                                         tags: [],
+                                        sorts: [],
                                         targetConnection: connection,
                                         trainFormat: DefaultTrainOptions,
                                         videoSettings: { frameExtractionRate: 15 },
@@ -530,18 +531,13 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                     onTagRenamed={this.confirmTagRenamed}
                                     onTagDeleted={this.confirmTagDeleted}
                                 />
-
                                 <SortInput
-                                    tags={this.props.project.tags}
-                                    lockedTags={this.state.lockedTags}
-                                    selectedRegions={this.state.selectedRegions}
-                                    onChange={this.onTagsChanged}
-                                    onLockedTagsChange={this.onLockedTagsChanged}
-                                    onTagClick={this.onTagClicked}
-                                    onTagSearched={this.onTagSearched}
-                                    onCtrlTagClick={this.onCtrlTagClicked}
-                                    onTagRenamed={this.confirmTagRenamed}
-                                    onTagDeleted={this.confirmTagDeleted}
+                                    sorts={this.props.project.sorts}
+                                    onChange={this.onSortsChanged}
+                                    onSortClick={this.onTagClicked}
+                                    onSortSearched={this.onTagSearched}
+                                    onSortRenamed={this.confirmTagRenamed}
+                                    onSortDeleted={this.confirmTagDeleted}
                                 />
                             </ReactCardFlip>
                         </div>

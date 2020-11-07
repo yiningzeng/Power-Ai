@@ -2,11 +2,11 @@ import React, { KeyboardEvent, RefObject } from "react";
 import ReactDOM from "react-dom";
 import Align from "rc-align";
 import { randomIntInRange } from "../../../../common/utils";
-import { IRegion, ITag } from "../../../../models/applicationState";
+import { IRegion, ISort } from "../../../../models/applicationState";
 import { ColorPicker } from "../colorPicker";
 import "./sortInput.scss";
 import "../condensedList/condensedList.scss";
-import SortInputItem, { ITagInputItemProps, ITagClickProps } from "./sortInputItem";
+import SortInputItem, { ISortInputItemProps, ISortClickProps } from "./sortInputItem";
 import SortInputToolbar from "./sortInputToolbar";
 import { toast } from "react-toastify";
 import { strings } from "../../../../common/strings";
@@ -14,67 +14,67 @@ import DraggableDialog from "../draggableDialog/draggableDialog";
 // tslint:disable-next-line:no-var-requires
 const tagColors = require("../../common/tagColors.json");
 
-export interface ITagInputProps {
+export interface ISortInputProps {
     /** Current list of tags */
-    tags: ITag[];
+    sorts: ISort[];
     /** Function called on tags change */
-    onChange: (tags: ITag[]) => void;
+    onChange: (sorts: ISort[]) => void;
     /** Currently selected regions in canvas */
     selectedRegions?: IRegion[];
-    /** Tags that are currently locked for editing experience */
-    lockedTags?: string[];
+    /** Sorts that are currently locked for editing experience */
+    lockedSorts?: string[];
     /** Updates to locked tags */
-    onLockedTagsChange?: (locked: string[]) => void;
+    onLockedSortsChange?: (locked: string[]) => void;
     /** Place holder for input text box */
     placeHolder?: string;
     /** Function to call on clicking individual tag */
-    onTagClick?: (tag: ITag) => void;
-    onTagSearched: (tags: ITag[], searchQuery: string) => void;
+    onSortClick?: (sort: ISort) => void;
+    onSortSearched: (sorts: ISort[], searchQuery: string) => void;
     /** Function to call on clicking individual tag while holding CTRL key */
-    onCtrlTagClick?: (tag: ITag) => void;
+    onCtrlSortClick?: (sort: ISort) => void;
     /** Function to call when tag is renamed */
-    onTagRenamed?: (tagName: string, newTagName: string) => void;
+    onSortRenamed?: (sortName: string, newSortName: string) => void;
     /** Function to call when tag is deleted */
-    onTagDeleted?: (tagName: string) => void;
+    onSortDeleted?: (sortName: string) => void;
     /** Always show tag input box */
-    showTagInputBox?: boolean;
+    showSortInputBox?: boolean;
     /** Always show tag search box */
     showSearchBox?: boolean;
 }
 
-export interface ITagInputState {
-    tags: ITag[];
+export interface ISortInputState {
+    sorts: ISort[];
     clickedColor: boolean;
     showColorPicker: boolean;
-    addTags: boolean;
-    searchTags: boolean;
+    addSorts: boolean;
+    searchSorts: boolean;
     searchQuery: string;
-    selectedTag: ITag;
-    editingTag: ITag;
+    selectedSort: ISort;
+    editingSort: ISort;
     portalElement: Element;
-    editingTagNode: Element;
+    editingSortNode: Element;
 }
 
 function defaultDOMNode(): Element {
     return document.createElement("div");
 }
 
-export class SortInput extends React.Component<ITagInputProps, ITagInputState> {
+export class SortInput extends React.Component<ISortInputProps, ISortInputState> {
 
-    public state: ITagInputState = {
-        tags: this.props.tags || [],
+    public state: ISortInputState = {
+        sorts: this.props.sorts || [],
         clickedColor: false,
         showColorPicker: false,
-        addTags: this.props.showTagInputBox,
-        searchTags: this.props.showSearchBox,
+        addSorts: this.props.showSortInputBox,
+        searchSorts: this.props.showSearchBox,
         searchQuery: "",
-        selectedTag: null,
-        editingTag: null,
-        editingTagNode: null,
+        selectedSort: null,
+        editingSort: null,
+        editingSortNode: null,
         portalElement: defaultDOMNode(),
     };
     private loadingDialog: React.RefObject<DraggableDialog> = React.createRef();
-    private tagItemRefs: Map<string, RefObject<SortInputItem>> = new Map<string, RefObject<SortInputItem>>();
+    private sortItemRefs: Map<string, RefObject<SortInputItem>> = new Map<string, RefObject<SortInputItem>>();
     private portalDiv = document.createElement("div");
 
     public render() {
@@ -83,21 +83,21 @@ export class SortInput extends React.Component<ITagInputProps, ITagInputState> {
                 <h6 className="condensed-list-header tag-input-header bg-darker-2 p-2">
                     <span className="condensed-list-title tag-input-title">分类-标签列表</span>
                     <SortInputToolbar
-                        selectedTag={this.state.selectedTag}
-                        onAddTags={() => this.setState({ addTags: !this.state.addTags })}
-                        onSearchTags={() => this.setState({
-                            searchTags: !this.state.searchTags,
+                        selectedSort={this.state.selectedSort}
+                        onAddSorts={() => this.setState({ addSorts: !this.state.addSorts })}
+                        onSearchSorts={() => this.setState({
+                            searchSorts: !this.state.searchSorts,
                             searchQuery: "",
                         })}
-                        onEditTag={this.onEditTag}
-                        onLockTag={this.onLockTag}
-                        onDelete={this.deleteTag}
+                        onEditSort={this.onEditSort}
+                        onLockSort={this.onLockSort}
+                        onDelete={this.deleteSort}
                         onReorder={this.onReOrder}
                     />
                 </h6>
                 <div className="condensed-list-body">
                     {
-                        this.state.searchTags &&
+                        this.state.searchSorts &&
                         <div className="tag-input-text-input-row search-input">
                             <input
                                 type="text"
@@ -115,15 +115,15 @@ export class SortInput extends React.Component<ITagInputProps, ITagInputState> {
                     }
                     {this.getColorPickerPortal()}
                     <div className="tag-input-items">
-                        {this.renderTagItems()}
+                        {this.renderSortItems()}
                     </div>
                     {
-                        this.state.addTags &&
+                        this.state.addSorts &&
                         <div className="tag-input-text-input-row new-tag-input">
                             <input
                                 className="tag-input-box"
                                 type="text"
-                                onKeyDown={this.onAddTagKeyDown}
+                                onKeyDown={this.onAddSortKeyDown}
                                 placeholder="新增标签名"
                                 autoFocus={true}
                             />
@@ -156,37 +156,37 @@ export class SortInput extends React.Component<ITagInputProps, ITagInputState> {
         document.body.removeChild(this.portalDiv);
     }
 
-    public componentDidUpdate(prevProps: ITagInputProps) {
-        if (prevProps.tags !== this.props.tags) {
+    public componentDidUpdate(prevProps: ISortInputProps) {
+        if (prevProps.sorts !== this.props.sorts) {
             this.setState({
-                tags: this.props.tags,
+                sorts: this.props.sorts,
             });
         }
 
         if (prevProps.selectedRegions !== this.props.selectedRegions && this.props.selectedRegions.length > 0) {
             this.setState({
-                selectedTag: null,
+                selectedSort: null,
             });
         }
     }
 
-    private getTagNode = (tag: ITag): Element => {
+    private getSortNode = (tag: ISort): Element => {
         if (!tag) {
             return defaultDOMNode();
         }
 
-        const itemRef = this.tagItemRefs.get(tag.name);
+        const itemRef = this.sortItemRefs.get(tag.name);
         return (itemRef ? ReactDOM.findDOMNode(itemRef.current) : defaultDOMNode()) as Element;
     }
 
-    private onEditTag = (tag: ITag) => {
+    private onEditSort = (tag: ISort) => {
         if (!tag) {
             return;
         }
-        const { editingTag } = this.state;
-        const newEditingTag = (editingTag && editingTag.name === tag.name) ? null : tag;
+        const { editingSort } = this.state;
+        const newEditingSort = (editingSort && editingSort.name === tag.name) ? null : tag;
         this.setState({
-            editingTag: newEditingTag,
+            editingSort: newEditingSort,
         });
         if (this.state.clickedColor) {
             this.setState({
@@ -195,75 +195,75 @@ export class SortInput extends React.Component<ITagInputProps, ITagInputState> {
         }
     }
 
-    private onLockTag = (tag: ITag) => {
+    private onLockSort = (tag: ISort) => {
         // alert(JSON.stringify(tag));
         if (!tag) {
             return;
         }
-        let lockedTags = [...this.props.lockedTags];
-        if (lockedTags.find((t) => t === tag.name)) {
-            lockedTags = lockedTags.filter((t) => t !== tag.name);
+        let lockedSorts = [...this.props.lockedSorts];
+        if (lockedSorts.find((t) => t === tag.name)) {
+            lockedSorts = lockedSorts.filter((t) => t !== tag.name);
         } else {
-            lockedTags.push(tag.name);
+            lockedSorts.push(tag.name);
         }
-        this.props.onLockedTagsChange(lockedTags);
+        this.props.onLockedSortsChange(lockedSorts);
     }
 
-    private onReOrder = (tag: ITag, displacement: number) => {
+    private onReOrder = (tag: ISort, displacement: number) => {
         if (!tag) {
             return;
         }
-        const tags = [...this.state.tags];
-        const currentIndex = tags.indexOf(tag);
+        const sorts = [...this.state.sorts];
+        const currentIndex = sorts.indexOf(tag);
         const newIndex = currentIndex + displacement;
-        if (newIndex < 0 || newIndex >= tags.length) {
+        if (newIndex < 0 || newIndex >= sorts.length) {
             return;
         }
-        tags.splice(currentIndex, 1);
-        tags.splice(newIndex, 0, tag);
+        sorts.splice(currentIndex, 1);
+        sorts.splice(newIndex, 0, tag);
         this.setState({
-            tags,
-        }, () => this.props.onChange(tags));
+            sorts,
+        }, () => this.props.onChange(sorts));
     }
 
     private handleColorChange = (color: string) => {
-        const tag = this.state.editingTag;
-        const tags = this.state.tags.map((t) => {
-            return (t.name === tag.name) ? { name: t.name, color } : t;
+        const sort = this.state.editingSort;
+        const sorts = this.state.sorts.map((t) => {
+            return (t.name === sort.name) ? { name: t.name, color } : t;
         });
         this.setState({
-            tags,
-            editingTag: null,
+            sorts,
+            editingSort: null,
             showColorPicker: false,
-        }, () => this.props.onChange(tags));
+        }, () => this.props.onChange(sorts));
     }
 
-    private updateTag = (tag: ITag, newTag: ITag) => {
-        if (tag === newTag) {
+    private updateSort = (tag: ISort, newSort: ISort) => {
+        if (tag === newSort) {
             return;
         }
-        if (!newTag.name.length) {
+        if (!newSort.name.length) {
             toast.warn(strings.tags.warnings.emptyName);
             return;
         }
-        const nameChange = tag.name !== newTag.name;
-        if (nameChange && this.state.tags.some((t) => t.name === newTag.name)) {
-            this.props.onTagRenamed(tag.name, newTag.name);
+        const nameChange = tag.name !== newSort.name;
+        if (nameChange && this.state.sorts.some((t) => t.name === newSort.name)) {
+            this.props.onSortRenamed(tag.name, newSort.name);
             return;
         }
-        if (nameChange && this.props.onTagRenamed) {
-            this.props.onTagRenamed(tag.name, newTag.name);
+        if (nameChange && this.props.onSortRenamed) {
+            this.props.onSortRenamed(tag.name, newSort.name);
             return;
         }
-        const tags = this.state.tags.map((t) => {
-            return (t.name === tag.name) ? newTag : t;
+        const sorts = this.state.sorts.map((t) => {
+            return (t.name === tag.name) ? newSort : t;
         });
         this.setState({
-            tags,
-            editingTag: null,
-            selectedTag: newTag,
+            sorts,
+            editingSort: null,
+            selectedSort: newSort,
         }, () => {
-            this.props.onChange(tags);
+            this.props.onChange(sorts);
         });
     }
 
@@ -277,7 +277,7 @@ export class SortInput extends React.Component<ITagInputProps, ITagInputState> {
                                 {
                                     this.state.showColorPicker &&
                                     <ColorPicker
-                                        color={this.state.editingTag && this.state.editingTag.color}
+                                        color={this.state.editingSort && this.state.editingSort.color}
                                         colors={tagColors}
                                         onEditColor={this.handleColorChange}
                                         show={this.state.showColorPicker}
@@ -292,7 +292,7 @@ export class SortInput extends React.Component<ITagInputProps, ITagInputState> {
     }
 
     private getAlignConfig = () => {
-        const coords = this.getEditingTagCoords();
+        const coords = this.getEditingSortCoords();
         const isNearBottom = coords && coords.top > (window.innerHeight / 2);
         const alignCorner = isNearBottom ? "b" : "t";
         const verticalOffset = isNearBottom ? 6 : -6;
@@ -308,32 +308,32 @@ export class SortInput extends React.Component<ITagInputProps, ITagInputState> {
         };
     }
 
-    private getEditingTagCoords = () => {
-        const node = this.state.editingTagNode;
+    private getEditingSortCoords = () => {
+        const node = this.state.editingSortNode;
         return (node) ? node.getBoundingClientRect() : null;
     }
 
     private getTarget = () => {
-        return this.state.editingTagNode || document;
+        return this.state.editingSortNode || document;
     }
 
     private doSearch = () => {
         this.loadingDialog.current.open();
         this.loadingDialog.current.change("正在搜索标签...", "请耐心等待");
-        let tags = this.state.tags;
+        let sorts = this.state.sorts;
         const query = this.state.searchQuery;
         if (query.length) {
-            tags = tags.filter((p) => p.name.toLowerCase().startsWith(query.toLowerCase()));
+            sorts = sorts.filter((p) => p.name.toLowerCase().startsWith(query.toLowerCase()));
         }
-        this.props.onTagSearched(tags, query);
+        this.props.onSortSearched(sorts, query);
         this.loadingDialog.current.close();
         // return tags;
     }
 
-    private renderTagItems = () => {
-        let props = this.createTagItemProps();
+    private renderSortItems = () => {
+        let props = this.createSortItemProps();
         const query = this.state.searchQuery;
-        this.tagItemRefs.clear();
+        this.sortItemRefs.clear();
 
         if (query.length) {
             props = props.filter((prop) => prop.tag.name.toLowerCase().startsWith(query.toLowerCase()));
@@ -343,36 +343,36 @@ export class SortInput extends React.Component<ITagInputProps, ITagInputState> {
         return props.map((prop) => {
             return  <SortInputItem
                 key={prop.tag.name}
-                ref={(item) => this.setTagItemRef(item, prop.tag)}
+                ref={(item) => this.setSortItemRef(item, prop.tag)}
                 {...prop}
             />;
         });
     }
 
-    private setTagItemRef = (item, tag) => {
-        this.tagItemRefs.set(tag.name, item);
+    private setSortItemRef = (item, tag) => {
+        this.sortItemRefs.set(tag.name, item);
         return item;
     }
 
-    private createTagItemProps = (): ITagInputItemProps[] => {
-        const tags = this.state.tags;
-        const selectedRegionTagSet = this.getSelectedRegionTagSet();
+    private createSortItemProps = (): ISortInputItemProps[] => {
+        const sorts = this.state.sorts;
+        const selectedRegionSortSet = this.getSelectedRegionSortSet();
 
-        return tags.map((tag) => (
+        return sorts.map((tag) => (
             {
                 tag,
-                index: tags.findIndex((t) => t.name === tag.name),
-                isLocked: this.props.lockedTags && this.props.lockedTags.findIndex((t) => t === tag.name) > -1,
-                isBeingEdited: this.state.editingTag && this.state.editingTag.name === tag.name,
-                isSelected: this.state.selectedTag && this.state.selectedTag.name === tag.name,
-                appliedToSelectedRegions: selectedRegionTagSet.has(tag.name),
+                index: sorts.findIndex((t) => t.name === tag.name),
+                isLocked: this.props.lockedSorts && this.props.lockedSorts.findIndex((t) => t === tag.name) > -1,
+                isBeingEdited: this.state.editingSort && this.state.editingSort.name === tag.name,
+                isSelected: this.state.selectedSort && this.state.selectedSort.name === tag.name,
+                appliedToSelectedRegions: selectedRegionSortSet.has(tag.name),
                 onClick: this.handleClick,
-                onChange: this.updateTag,
-            } as ITagInputItemProps
+                onChange: this.updateSort,
+            } as ISortInputItemProps
         ));
     }
 
-    private getSelectedRegionTagSet = (): Set<string> => {
+    private getSelectedRegionSortSet = (): Set<string> => {
         const result = new Set<string>();
         if (this.props.selectedRegions) {
             for (const region of this.props.selectedRegions) {
@@ -384,35 +384,35 @@ export class SortInput extends React.Component<ITagInputProps, ITagInputState> {
         return result;
     }
 
-    private onAltClick = (tag: ITag, clickedColor: boolean) => {
-        const { editingTag } = this.state;
-        const newEditingTag = editingTag && editingTag.name === tag.name ? null : tag;
+    private onAltClick = (tag: ISort, clickedColor: boolean) => {
+        const { editingSort } = this.state;
+        const newEditingSort = editingSort && editingSort.name === tag.name ? null : tag;
 
         this.setState({
-            editingTag: newEditingTag,
-            editingTagNode: this.getTagNode(newEditingTag),
+            editingSort: newEditingSort,
+            editingSortNode: this.getSortNode(newEditingSort),
             clickedColor,
             showColorPicker: !this.state.showColorPicker && clickedColor,
         });
     }
 
-    private handleClick = (tag: ITag, props: ITagClickProps) => {
+    private handleClick = (tag: ISort, props: ISortClickProps) => {
         // Lock tags
-        if (props.ctrlKey && this.props.onCtrlTagClick) {
-            this.props.onCtrlTagClick(tag);
+        if (props.ctrlKey && this.props.onCtrlSortClick) {
+            this.props.onCtrlSortClick(tag);
             this.setState({ clickedColor: props.clickedColor });
         } else if (props.altKey) { // Edit tag
             this.onAltClick(tag, props.clickedColor);
         } else { // Select tag
-            const { editingTag, selectedTag } = this.state;
-            const inEditMode = editingTag && tag.name === editingTag.name;
-            const alreadySelected = selectedTag && selectedTag.name === tag.name;
-            const newEditingTag = inEditMode ? null : editingTag;
+            const { editingSort, selectedSort } = this.state;
+            const inEditMode = editingSort && tag.name === editingSort.name;
+            const alreadySelected = selectedSort && selectedSort.name === tag.name;
+            const newEditingSort = inEditMode ? null : editingSort;
 
             this.setState({
-                editingTag: newEditingTag,
-                editingTagNode: this.getTagNode(newEditingTag),
-                selectedTag: (alreadySelected && !inEditMode) ? tag : tag,
+                editingSort: newEditingSort,
+                editingSortNode: this.getSortNode(newEditingSort),
+                selectedSort: (alreadySelected && !inEditMode) ? tag : tag,
                 clickedColor: props.clickedColor,
                 showColorPicker: false,
             });
@@ -420,63 +420,63 @@ export class SortInput extends React.Component<ITagInputProps, ITagInputState> {
             // Only fire click event if a region is selected
             // if (this.props.selectedRegions &&
             //     this.props.selectedRegions.length > 0 &&
-            //     this.props.onTagClick &&
+            //     this.props.onSortClick &&
             //     !inEditMode) {
-            //     this.props.onTagClick(tag);
+            //     this.props.onSortClick(tag);
             // }
         }
-        // alert(`啦啦${JSON.stringify(this.state.searchTags)}`);
+        // alert(`啦啦${JSON.stringify(this.state.searchSorts)}`);
     }
 
-    private deleteTag = (tag: ITag) => {
+    private deleteSort = (tag: ISort) => {
         if (!tag) {
             return;
         }
-        if (this.props.onTagDeleted) {
-            this.props.onTagDeleted(tag.name);
+        if (this.props.onSortDeleted) {
+            this.props.onSortDeleted(tag.name);
             return;
         }
 
-        const index = this.state.tags.indexOf(tag);
-        const tags = this.state.tags.filter((t) => t.name !== tag.name);
+        const index = this.state.sorts.indexOf(tag);
+        const sorts = this.state.sorts.filter((t) => t.name !== tag.name);
 
         this.setState({
-            tags,
-            selectedTag: this.getNewSelectedTag(tags, index),
-        }, () => this.props.onChange(tags));
+            sorts,
+            selectedSort: this.getNewSelectedSort(sorts, index),
+        }, () => this.props.onChange(sorts));
 
-        if (this.props.lockedTags.find((l) => l === tag.name)) {
-            this.props.onLockedTagsChange(
-                this.props.lockedTags.filter((lockedTag) => lockedTag !== tag.name),
+        if (this.props.lockedSorts.find((l) => l === tag.name)) {
+            this.props.onLockedSortsChange(
+                this.props.lockedSorts.filter((lockedSort) => lockedSort !== tag.name),
             );
         }
     }
 
-    private getNewSelectedTag = (tags: ITag[], previouIndex: number): ITag => {
+    private getNewSelectedSort = (tags: ISort[], previouIndex: number): ISort => {
         return (tags.length) ? tags[Math.min(tags.length - 1, previouIndex)] : null;
     }
 
     private onSearchKeyDown = (event: KeyboardEvent): void => {
         if (event.key === "Escape") {
             this.setState({
-                searchTags: false,
+                searchSorts: false,
             });
         } else if (event.key === "Enter") {
             this.doSearch();
         }
     }
 
-    private onAddTagKeyDown = (event) => {
+    private onAddSortKeyDown = (event) => {
         if (event.key === "Enter") {
             // validate and add
-            const newTag: ITag = {
+            const newSort: ISort = {
                 name: event.target.value,
                 color: this.getNextColor(),
             };
-            if (newTag.name.length && !this.state.tags.find((t) => t.name === newTag.name)) {
-                this.addTag(newTag);
+            if (newSort.name.length && !this.state.sorts.find((t) => t.name === newSort.name)) {
+                this.addSort(newSort);
                 event.target.value = "";
-            } else if (!newTag.name.length) {
+            } else if (!newSort.name.length) {
                 toast.warn(strings.tags.warnings.emptyName);
             } else {
                 toast.warn(strings.tags.warnings.existingName);
@@ -484,15 +484,15 @@ export class SortInput extends React.Component<ITagInputProps, ITagInputState> {
         }
         if (event.key === "Escape") {
             this.setState({
-                addTags: false,
+                addSorts: false,
             });
         }
     }
 
     private getNextColor = () => {
-        const tags = this.state.tags;
-        if (tags.length > 0) {
-            const lastColor = tags[tags.length - 1].color;
+        const sorts = this.state.sorts;
+        if (sorts.length > 0) {
+            const lastColor = sorts[sorts.length - 1].color;
             const lastIndex = tagColors.findIndex((color) => color === lastColor);
             let newIndex;
             if (lastIndex > -1) {
@@ -506,12 +506,12 @@ export class SortInput extends React.Component<ITagInputProps, ITagInputState> {
         }
     }
 
-    private addTag = (tag: ITag) => {
-        if (!this.state.tags.find((t) => t.name === tag.name)) {
-            const tags = [...this.state.tags, tag];
+    private addSort = (sort: ISort) => {
+        if (!this.state.sorts.find((t) => t.name === sort.name)) {
+            const sorts = [...this.state.sorts, sort];
             this.setState({
-                tags,
-            }, () => this.props.onChange(tags));
+                sorts,
+            }, () => this.props.onChange(sorts));
         }
     }
 }

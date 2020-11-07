@@ -39,7 +39,6 @@ export class KeyboardRegistrationManager {
             eventTypeRegistrations = {};
             this.registrations[keyEventType] = eventTypeRegistrations;
         }
-
         accelerators.forEach((keyCode) => {
             const currentBinding = this.registrations[keyEventType][keyCode];
             if (currentBinding) {

@@ -285,6 +285,7 @@ export default class MockFactory {
             sourceListConnection: [],
             targetConnection: connection,
             tags: MockFactory.createTestTags(tagCount),
+            sorts: MockFactory.createTestTags(tagCount),
             videoSettings: MockFactory.createVideoSettings(),
             activeLearningSettings: {
                 modelPathType: ModelPathType.Coco,
