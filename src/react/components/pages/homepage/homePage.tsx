@@ -478,6 +478,7 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
             sourceConnection: connection,
             sourceListConnection: [],
             tags: [],
+            sorts: [],
             targetConnection: connection,
             trainFormat: DefaultTrainOptions,
             videoSettings: {frameExtractionRate: 15},
