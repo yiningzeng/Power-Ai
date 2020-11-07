@@ -125,6 +125,12 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
         if (this.props.project.tags !== prevProps.project.tags) {
             this.updateCanvasToolsRegionTags();
         }
+        if (prevProps.enable !== this.state.enabled) {
+           this.setState({
+               ...this.state,
+               enabled: prevProps.enable,
+           });
+        }
         // this.positionCanvas(this.state.contentSource);
         // Handles when the canvas is enabled & disabled
         if (prevState.enabled !== this.state.enabled || prevProps.enable !== this.state.enabled) {

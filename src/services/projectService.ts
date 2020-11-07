@@ -174,7 +174,7 @@ export default class ProjectService implements IProjectService {
 
         await storageProvider.writeText(
             constants.colorFileExtension,
-            JSON.stringify(project.tags, null, "\t"),
+            JSON.stringify({tags: project.tags, sorts: project.sorts}, null, "\t"),
         );
         return project;
     }

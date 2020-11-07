@@ -21,6 +21,7 @@ describe("Editor Toolbar", () => {
 
     function createProps(): IEditorToolbarProps {
         return {
+            isSort: false,
             actions: MockFactory.projectActions(),
             project: MockFactory.createTestProject("TestProject"),
             items: ToolbarItemFactory.getToolbarItems(),
