@@ -43,6 +43,7 @@ describe("Editor Canvas", () => {
 
     function createProps() {
         const canvasProps: ICanvasProps = {
+            enable: true,
             selectedAsset: getAssetMetadata(),
             onAssetMetadataChanged: jest.fn(),
             onCanvasRendered: jest.fn(),

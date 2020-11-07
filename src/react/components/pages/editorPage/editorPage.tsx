@@ -74,7 +74,6 @@ import {DoubleTextSwitch} from "../../common/doubleTextSwitch/doubleTextSwitch";
 import {Divider} from "@material-ui/core";
 import ReactCardFlip from "react-card-flip";
 import {SortInput} from "../../common/sortInput/sortInput";
-// import "antd/lib/tree/style/css";
 
 function PaperComponent(props: PaperProps) {
     return (
@@ -116,7 +115,11 @@ export interface IEditorPageProps extends RouteComponentProps, React.Props<Edito
  * State for Editor Page
  */
 export interface IEditorPageState {
-    isFlipped: boolean;
+    editType: {
+        canvasEnable: boolean; //
+        hotkeyNumber: number;
+        isFlipped: boolean; // false：标注模式 true：分类模式
+    };
     treeList: IProviderOptions[] | ISecureString[];
     /** Array of assets in project */
     assets: IAsset[];
@@ -180,7 +183,11 @@ function mapDispatchToProps(dispatch) {
 @connect(mapStateToProps, mapDispatchToProps)
 export default class EditorPage extends React.Component<IEditorPageProps, IEditorPageState> {
     public state: IEditorPageState = {
-        isFlipped: false,
+        editType: {
+            canvasEnable: true,
+            hotkeyNumber: 10,
+            isFlipped: false,
+        },
         treeList: [],
         selectedTag: null,
         lockedTags: [],
@@ -311,30 +318,12 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         const handleClose = () => {
             this.setState({dialog: false});
         };
-
         // const folderPath = project.sourceConnection.providerOptions["folderPath"];
         // console.log("editorPage: render folderPath ", folderPath);
         // console.log("editorPage: render treeList ", treeList);
         return (
             <div className="editor-page">
-                {[...Array(10).keys()].map((index) => {
-                    return (<KeyboardBinding
-                        displayName={strings.editorPage.tags.hotKey.apply}
-                        key={index}
-                        keyEventType={KeyEventType.KeyDown}
-                        accelerators={[`${index}`]}
-                        icon={"fa-tag"}
-                        handler={this.handleTagHotKey}/>);
-                })}
-                {[...Array(10).keys()].map((index) => {
-                    return (<KeyboardBinding
-                        displayName={strings.editorPage.tags.hotKey.lock}
-                        key={index}
-                        keyEventType={KeyEventType.KeyDown}
-                        accelerators={[`CmdOrCtrl+${index}`]}
-                        icon={"fa-lock"}
-                        handler={this.handleCtrlTagHotKey}/>);
-                })}
+                {this.getKeyboardBindings([...Array(this.state.editType.hotkeyNumber).keys()])}
                 <SplitPane split="vertical"
                            defaultSize={this.state.thumbnailSize.width}
                            minSize={350}
@@ -518,7 +507,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                 rightText={"图像分类"}
                                 onChange={this.onTagModeChanged}/>
                             <Divider />
-                            <ReactCardFlip isFlipped={this.state.isFlipped} flipDirection="horizontal">
+                            <ReactCardFlip isFlipped={this.state.editType.isFlipped} flipDirection="horizontal">
                                 <TagInput
                                     tags={this.props.project.tags}
                                     lockedTags={this.state.lockedTags}
@@ -638,7 +627,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                     }}
                                     onMouseUp={(e) => {
                                         if (e.button === 2) {
-                                            this.canvas.current.enableCanvas(true);
+                                            this.doEnableCanvas(true);
                                         }
                                         console.log(e);
                                         console.log(`我是鼠标点x: ${e.clientX} 我是鼠标点y: ${e.clientY}`);
@@ -708,6 +697,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                 >
                                     <Canvas
                                         ref={this.canvas}
+                                        enable={this.state.editType.canvasEnable}
                                         selectedAsset={this.state.selectedAsset}
                                         onAssetMetadataChanged={this.onAssetMetadataChanged}
                                         onCanvasRendered={this.onCanvasRendered}
@@ -811,15 +801,59 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         );
     }
 
+    private getKeyboardBindings = (keysList: any[]) => {
+        return (<div>
+            {keysList.map((index) => {
+                return (<KeyboardBinding
+                    displayName={strings.editorPage.tags.hotKey.apply}
+                    key={index}
+                    keyEventType={KeyEventType.KeyDown}
+                    accelerators={[`${index}`]}
+                    icon={"fa-tag"}
+                    handler={this.handleTagHotKey}/>);
+            })}
+            {keysList.map((index) => {
+                return (<KeyboardBinding
+                    displayName={strings.editorPage.tags.hotKey.lock}
+                    key={index}
+                    keyEventType={KeyEventType.KeyDown}
+                    accelerators={[`CmdOrCtrl+${index}`]}
+                    icon={"fa-lock"}
+                    handler={this.handleCtrlTagHotKey}/>);
+            })}
+        </div>);
+    }
+
+    private doEnableCanvas = (enable: boolean) => {
+        if (enable && !this.state.editType.isFlipped) { // 开模式 只有在不是分类的模式下可以
+            this.canvas.current.enableCanvas(enable);
+        } else if (!enable) { // 判断是不是关闭标记
+            this.canvas.current.enableCanvas(enable);
+            this.canvas.current.refreshCanvas();
+        }
+    }
     /**
      * 标注模式切换事件
      * @param isSort
      */
     private onTagModeChanged = (isSort: boolean) => {
-        console.log(isSort);
+
+        let num = isSort ? this.props.project.sorts.length : this.props.project.tags.length;
+        num = num > 10 ? 10 : num;
         this.setState({
             ...this.state,
-            isFlipped: isSort,
+            editType: {
+                canvasEnable: !isSort,
+                hotkeyNumber: num,
+                isFlipped: isSort,
+            },
+        }, () => {
+            if (isSort) {
+                this.doEnableCanvas(false);
+            } else {
+                this.doEnableCanvas(true);
+            }
+            console.log(`fucker!! ${this.state.editType.hotkeyNumber}`);
         });
     }
 
@@ -1091,8 +1125,9 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
             }
         }
         this.loadingDialog.current.close();
-        this.canvas.current.enableCanvas(false);
-        this.canvas.current.enableCanvas(true);
+
+        this.doEnableCanvas(false);
+        this.doEnableCanvas(true);
     }
 
     /**
@@ -1325,7 +1360,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                 } else {
                     toast.warn("试用版本未开放");
                 }
-                this.canvas.current.enableCanvas(true);
+                this.doEnableCanvas(true);
                 // this.canvas.current.editor.AS.enable();
                 // this.canvas.current.editor.AS.show();
                 break;
@@ -1340,7 +1375,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                     },
                     isDrawPolygon2MinBox: false,
                 });
-                this.canvas.current.enableCanvas(true);
+                this.doEnableCanvas(true);
                 break;
             case ToolbarItemName.DrawPolygon:
                 this.setState({
@@ -1352,7 +1387,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                     },
                     isDrawPolygon2MinBox: false,
                 });
-                this.canvas.current.enableCanvas(true);
+                this.doEnableCanvas(true);
                 break;
             case ToolbarItemName.DrawPolygon2MinBox:
                 this.setState({
@@ -1364,7 +1399,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                     },
                     isDrawPolygon2MinBox: true,
                 });
-                this.canvas.current.enableCanvas(true);
+                this.doEnableCanvas(true);
                 break;
             case ToolbarItemName.CopyRectangle:
                 this.setState({
@@ -1372,7 +1407,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                     editorMode: EditorMode.CopyRect,
                     isDrawPolygon2MinBox: false,
                 });
-                this.canvas.current.enableCanvas(true);
+                this.doEnableCanvas(true);
                 break;
             case ToolbarItemName.ShowAllRegions:
                 break;
@@ -1388,7 +1423,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                     },
                     isDrawPolygon2MinBox: false,
                 });
-                this.canvas.current.enableCanvas(false);
+                this.doEnableCanvas(false);
                 break;
             case ToolbarItemName.ZoomOutAsset: // 缩小
                 w = document.getElementById("ct-zone").offsetWidth;
@@ -1423,11 +1458,9 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                 break;
             case ToolbarItemName.PreviousAsset:
                 await this.goToRootAsset(-1);
-                // this.canvas.current.enableCanvas(true);
                 break;
             case ToolbarItemName.NextAsset:
                 await this.goToRootAsset(1);
-                // this.canvas.current.enableCanvas(true);
                 break;
             case ToolbarItemName.DeleteAsset:
                 this.onAssetDeleted();
@@ -1441,9 +1474,9 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                 });
                 break;
             case ToolbarItemName.CopyRegions:
-                this.canvas.current.enableCanvas(true);
-                this.canvas.current.copyRegions();
-                this.canvas.current.pasteRegions();
+                this.doEnableCanvas(true);
+                await this.canvas.current.copyRegions();
+                await this.canvas.current.pasteRegions();
                 break;
             // case ToolbarItemName.CutRegions:
             //     this.canvas.current.cutRegions();
