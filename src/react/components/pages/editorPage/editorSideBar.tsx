@@ -154,6 +154,7 @@ export default class EditorSideBar extends React.Component<IEditorSideBarProps, 
                 }}
             >
                 <div className="asset-item-image">
+                    {this.renderSortBadges(asset)}
                     {this.renderBadges(asset)}
                     <AssetPreview asset={asset} />
                 </div>
@@ -167,6 +168,19 @@ export default class EditorSideBar extends React.Component<IEditorSideBarProps, 
                 </div>
             </div>
         );
+    }
+
+    private renderSortBadges = (asset: IAsset): JSX.Element => {
+        if (asset.tags) {
+                return (
+                    <span title={strings.editorPage.tagged}
+                          className="badge badge-sorted">
+                        {"已分类"}
+                    </span>
+                );
+        } else {
+            return null;
+        }
     }
 
     private renderBadges = (asset: IAsset): JSX.Element => {
