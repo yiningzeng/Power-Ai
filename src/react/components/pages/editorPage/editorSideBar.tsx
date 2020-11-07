@@ -175,7 +175,7 @@ export default class EditorSideBar extends React.Component<IEditorSideBarProps, 
                 return (
                     <span title={strings.editorPage.tagged}
                           className="badge badge-sorted">
-                        已分类
+                        {"已分类"}
                     </span>
                 );
         } else {
