@@ -25,6 +25,7 @@ import RotatingCalipers from "rotating-calipers";
 import getBounds from "bound-points";
 
 export interface ICanvasProps extends React.Props<Canvas> {
+    enable?: boolean;
     selectedAsset: IAssetMetadata;
     editorMode: EditorMode;
     selectionMode: SelectionMode;
@@ -46,6 +47,7 @@ export interface ICanvasState {
 
 export default class Canvas extends React.Component<ICanvasProps, ICanvasState> {
     public static defaultProps: ICanvasProps = {
+        enable: true,
         selectionMode: SelectionMode.NONE,
         editorMode: EditorMode.Select,
         selectedAsset: null,
@@ -123,6 +125,12 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
         if (this.props.project.tags !== prevProps.project.tags) {
             this.updateCanvasToolsRegionTags();
         }
+        if (prevProps.enable !== this.state.enabled) {
+           this.setState({
+               ...this.state,
+               enabled: prevProps.enable,
+           });
+        }
         // this.positionCanvas(this.state.contentSource);
         // Handles when the canvas is enabled & disabled
         if (prevState.enabled !== this.state.enabled) {
@@ -170,6 +178,10 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
            ...this.state,
            enabled: b,
        });
+    }
+
+    public refreshCanvas = (): void => {
+        this.refreshCanvasToolsRegions();
     }
 
     public drawPolygon2MinBox = (minPoint: Point2D, maxPoint: Point2D, points: Point2D[]) => {
