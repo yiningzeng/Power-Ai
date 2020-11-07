@@ -23,6 +23,7 @@ export interface IToolbarItemMetadata {
     type: ToolbarItemType;
     accelerators?: string[];
     isInput?: boolean;
+    isSort?: boolean;
 }
 
 /**

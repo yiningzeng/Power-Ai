@@ -448,6 +448,7 @@ export interface IAsset {
     name: string;
     path: string;
     size: ISize;
+    sorts?: string[];
     format?: string;
     timestamp?: number;
     parent?: IAsset;

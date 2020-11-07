@@ -304,7 +304,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         // }
         const {project} = this.props;
         const {treeList, assets, selectedAsset} = this.state;
-        const rootAssets = assets.filter((asset) => !asset.parent);
+        // const rootAssets = assets.filter((asset) => !asset.parent);
         // console.log("editorPage: render project ", project);
         // console.log("editorPage: render rootAssets ", JSON.stringify(rootAssets));
         // console.log("editorPage: render selectedAsset ", selectedAsset);
@@ -321,6 +321,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         // const folderPath = project.sourceConnection.providerOptions["folderPath"];
         // console.log("editorPage: render folderPath ", folderPath);
         // console.log("editorPage: render treeList ", treeList);
+        // @ts-ignore
         return (
             <div className="editor-page">
                 {this.getKeyboardBindings([...Array(this.state.editType.hotkeyNumber).keys()])}
@@ -546,6 +547,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                 <EditorToolbar project={this.props.project}
                                                items={this.toolbarItems}
                                                actions={this.props.actions}
+                                               isSort={this.state.editType.isFlipped}
                                                onToolbarItemSelected={this.onToolbarItemSelected}/>
                             </div>
                             <div className="editor-page-content-main-body">

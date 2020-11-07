@@ -17,6 +17,7 @@ export interface IEditorToolbarProps {
     project: IProject;
     actions: IProjectActions;
     items: IToolbarItemRegistration[];
+    isSort: boolean;
     onToolbarItemSelected: (toolbarItem: ToolbarItem, searchQuery: string) => void;
 }
 
@@ -57,8 +58,12 @@ export class EditorToolbar extends React.Component<IEditorToolbarProps, IEditorT
                                 onClick: this.onToolbarItemSelected,
                             };
                             const ToolbarItem = registration.component;
-
-                            return <ToolbarItem key={toolbarItemProps.name} {...toolbarItemProps} />;
+                            if (this.props.isSort === false) {
+                                return <ToolbarItem key={toolbarItemProps.name} {...toolbarItemProps} />;
+                            }
+                            if (this.props.isSort === toolbarItemProps.isSort) {
+                                return <ToolbarItem key={toolbarItemProps.name} {...toolbarItemProps} />;
+                            }
                         })}
                     </div>,
                 )}

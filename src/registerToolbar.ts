@@ -172,6 +172,7 @@ export default function registerToolbar() {
         group: ToolbarItemGroup.Zoom,
         type: ToolbarItemType.Action,
         accelerators: ["O", "o"],
+        isSort: true,
     });
 
     ToolbarItemFactory.register({
@@ -181,6 +182,7 @@ export default function registerToolbar() {
         group: ToolbarItemGroup.Zoom,
         type: ToolbarItemType.Action,
         accelerators: ["I", "i"],
+        isSort: true,
     });
 
     // 缩放回归正常
@@ -191,6 +193,7 @@ export default function registerToolbar() {
         group: ToolbarItemGroup.Zoom,
         type: ToolbarItemType.Action,
         accelerators: ["C", "c"],
+        isSort: true,
     });
 
     ToolbarItemFactory.register({
@@ -200,6 +203,7 @@ export default function registerToolbar() {
         group: ToolbarItemGroup.Navigation,
         type: ToolbarItemType.Action,
         accelerators: ["ArrowUp", "W", "w"],
+        isSort: true,
     });
 
     ToolbarItemFactory.register({
@@ -209,6 +213,7 @@ export default function registerToolbar() {
         group: ToolbarItemGroup.Navigation,
         type: ToolbarItemType.Action,
         accelerators: ["ArrowDown", "S", "s"],
+        isSort: true,
     });
 
     ToolbarItemFactory.register({
@@ -218,6 +223,7 @@ export default function registerToolbar() {
         group: ToolbarItemGroup.Navigation,
         type: ToolbarItemType.Action,
         accelerators: ["D", "d"],
+        isSort: true,
     });
     ToolbarItemFactory.register({
         name: ToolbarItemName.GlobalPositioningAsset,
@@ -226,6 +232,7 @@ export default function registerToolbar() {
         group: ToolbarItemGroup.Navigation,
         type: ToolbarItemType.Action,
         accelerators: ["CmdOrCtrl+F", "CmdOrCtrl+f"],
+        isSort: true,
     });
     // ToolbarItemFactory.register({
     //     name: ToolbarItemName.SaveProject,
@@ -260,6 +267,7 @@ export default function registerToolbar() {
         group: ToolbarItemGroup.Project,
         type: ToolbarItemType.Action,
         accelerators: ["CmdOrCtrl+E", "CmdOrCtrl+e"],
+        isSort: true,
     });
     // ToolbarItemFactory.register({
     //     name: ToolbarItemName.TransferProject,
@@ -307,6 +315,7 @@ export default function registerToolbar() {
         group: ToolbarItemGroup.Others,
         type: ToolbarItemType.Action,
         accelerators: ["CmdOrCtrl+R", "CmdOrCtrl+r"],
+        isSort: true,
     });
     // ToolbarItemFactory.register({
     //     name: ToolbarItemName.RemoteTrainAi,
