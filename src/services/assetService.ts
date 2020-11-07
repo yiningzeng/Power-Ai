@@ -9,7 +9,7 @@ import {
     IAssetMetadata,
     IAssetsAndTags,
     IProject,
-    IRegion,
+    IRegion, ISort,
     ITag,
     ITFRecordMetadata,
     RegionType,
@@ -204,7 +204,7 @@ export class AssetService {
         let res: IAssetsAndTags;
         let taggs = [];
         const finalTags: ITag[] = [];
-        const exitsColor = await this.getColors();
+        const exitsColor = await this.getTagsColors();
         const assets = await this.assetProviderInstance.getAssets();
         console.log(`获取到的颜色 ${JSON.stringify(finalTags)}`);
         const updates = await assets.mapAsync(async (asset) => {
@@ -393,12 +393,22 @@ export class AssetService {
      * Get metadata for asset
      * @param asset - Asset for which to retrieve metadata
      */
-    public async getColors(): Promise<ITag[]> {
+    public async getTagsColors(): Promise<ITag[]> {
         try {
             const json = await this.storageProvider.readText(constants.colorFileExtension);
-            return JSON.parse(json) as ITag[];
+            return JSON.parse(json)["tags"] as ITag[];
         } catch (err) {
             const taggs: ITag[] = [];
+            return taggs;
+        }
+    }
+
+    public async getSortsColors(): Promise<ISort[]> {
+        try {
+            const json = await this.storageProvider.readText(constants.colorFileExtension);
+            return JSON.parse(json)["sorts"] as ISort[];
+        } catch (err) {
+            const taggs: ISort[] = [];
             return taggs;
         }
     }
