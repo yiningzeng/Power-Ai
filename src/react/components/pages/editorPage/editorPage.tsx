@@ -841,7 +841,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
     private onTagModeChanged = (isSort: boolean) => {
 
         let num = isSort ? this.props.project.sorts.length : this.props.project.tags.length;
-        num = num > 10 ? 10 : num;
+        num = num > 10 ? 10 : num + 1;
         this.setState({
             ...this.state,
             editType: {
