@@ -401,7 +401,11 @@ export class AssetService {
     public async getTagsColors(): Promise<ITag[]> {
         try {
             const json = await this.storageProvider.readText(constants.colorFileExtension);
-            return JSON.parse(json)["tags"] as ITag[];
+            if (JSON.parse(json)["tags"]) {
+                return JSON.parse(json)["tags"] as ITag[];
+            } else {
+                return [];
+            }
         } catch (err) {
             const taggs: ITag[] = [];
             return taggs;
@@ -411,7 +415,11 @@ export class AssetService {
     public async getSortsColors(): Promise<ISort[]> {
         try {
             const json = await this.storageProvider.readText(constants.colorFileExtension);
-            return JSON.parse(json)["sorts"] as ISort[];
+            if (JSON.parse(json)["sorts"]) {
+                return JSON.parse(json)["sorts"] as ITag[];
+            } else {
+                return [];
+            }
         } catch (err) {
             const taggs: ISort[] = [];
             return taggs;
