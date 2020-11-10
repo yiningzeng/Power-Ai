@@ -23,6 +23,7 @@ import {FeatureType} from "../providers/export/tensorFlowRecords/tensorFlowBuild
 import {appInfo} from "../common/appInfo";
 import {encodeFileURI, randomIntInRange} from "../common/utils";
 import {LocalFileSystemProxy} from "../providers/storage/localFileSystemProxy";
+import {sort} from "../../node_modules-bak/@types/semver";
 // tslint:disable-next-line:no-var-requires
 const tagColors = require("../react/components/common/tagColors.json");
 /**
@@ -206,6 +207,7 @@ export class AssetService {
         const sorts: ISort[] = await this.getSortsColors();
         const finalTags: ITag[] = [];
         const exitsColor = await this.getTagsColors();
+        console.log(`fucker: 已有分类: ${JSON.stringify(sorts)} 已有标签: ${JSON.stringify(exitsColor)}`);
         const assets = await this.assetProviderInstance.getAssets();
         console.log(`获取到的颜色 ${JSON.stringify(finalTags)}`);
         const updates = await assets.mapAsync(async (asset) => {
@@ -273,6 +275,7 @@ export class AssetService {
             tags: finalTags,
             sorts: [...new Set(sorts)].sort(),
         };
+        console.log(`fucker: res 已有分类: ${JSON.stringify(res.sorts)} 已有标签: ${JSON.stringify(res.tags)}`);
         return res;
     }
 
@@ -407,8 +410,7 @@ export class AssetService {
                 return [];
             }
         } catch (err) {
-            const taggs: ITag[] = [];
-            return taggs;
+            return [];
         }
     }
 
@@ -416,13 +418,12 @@ export class AssetService {
         try {
             const json = await this.storageProvider.readText(constants.colorFileExtension);
             if (JSON.parse(json)["sorts"]) {
-                return JSON.parse(json)["sorts"] as ITag[];
+                return JSON.parse(json)["sorts"] as ISort[];
             } else {
                 return [];
             }
         } catch (err) {
-            const taggs: ISort[] = [];
-            return taggs;
+            return [];
         }
     }
 

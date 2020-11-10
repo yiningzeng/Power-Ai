@@ -497,6 +497,7 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
             tags: dataTemp.tags,
             sorts: dataTemp.sorts,
         };
+        console.log(`fucker: 曹操 已有分类: ${JSON.stringify(dataTemp.sorts)} 已有标签: ${JSON.stringify(dataTemp.tags)}`);
         await this.props.actions.saveProject(projectJson);
         connectionActions.saveConnection(connection);
         this.draggableDialog.current.close();

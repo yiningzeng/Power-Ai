@@ -171,7 +171,7 @@ export default class EditorSideBar extends React.Component<IEditorSideBarProps, 
     }
 
     private renderSortBadges = (asset: IAsset): JSX.Element => {
-        if (asset.tags) {
+        if (asset.sorts) {
                 return (
                     <span title={strings.editorPage.tagged}
                           className="badge badge-sorted">

@@ -23,7 +23,7 @@ import {
     IProviderOptions,
     IRegion,
     ISecureString,
-    ISize,
+    ISize, ISort,
     ITag,
     IZoomMode,
 } from "../../../../models/applicationState";
@@ -117,8 +117,7 @@ export interface IEditorPageProps extends RouteComponentProps, React.Props<Edito
 export interface IEditorPageState {
     editType: {
         canvasEnable: boolean; //
-        hotkeyNumber: number;
-        isFlipped: boolean; // false：标注模式 true：分类模式
+        isSort: boolean; // false：标注模式 true：分类模式
     };
     treeList: IProviderOptions[] | ISecureString[];
     /** Array of assets in project */
@@ -185,8 +184,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
     public state: IEditorPageState = {
         editType: {
             canvasEnable: true,
-            hotkeyNumber: 10,
-            isFlipped: false,
+            isSort: false,
         },
         treeList: [],
         selectedTag: null,
@@ -324,7 +322,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         // @ts-ignore
         return (
             <div className="editor-page">
-                {this.getKeyboardBindings([...Array(this.state.editType.hotkeyNumber).keys()])}
+                {this.getKeyboardBindings([...Array(10).keys()])}
                 <SplitPane split="vertical"
                            defaultSize={this.state.thumbnailSize.width}
                            minSize={350}
@@ -509,7 +507,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                 rightText={"图像分类"}
                                 onChange={this.onTagModeChanged}/>
                             <Divider />
-                            <ReactCardFlip isFlipped={this.state.editType.isFlipped} flipDirection="horizontal">
+                            <ReactCardFlip isFlipped={this.state.editType.isSort} flipDirection="horizontal">
                                 <TagInput
                                     tags={this.props.project.tags}
                                     lockedTags={this.state.lockedTags}
@@ -548,7 +546,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                 <EditorToolbar project={this.props.project}
                                                items={this.toolbarItems}
                                                actions={this.props.actions}
-                                               isSort={this.state.editType.isFlipped}
+                                               isSort={this.state.editType.isSort}
                                                onToolbarItemSelected={this.onToolbarItemSelected}/>
                             </div>
                             <div className="editor-page-content-main-body">
@@ -828,35 +826,32 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
     }
 
     private doEnableCanvas = (enable: boolean) => {
-        if (enable && !this.state.editType.isFlipped) { // 开模式 只有在不是分类的模式下可以
+        if (enable && !this.state.editType.isSort) { // 开模式 只有在不是分类的模式下可以
             this.canvas.current.enableCanvas(enable);
         } else if (!enable) { // 判断是不是关闭标记
             this.canvas.current.enableCanvas(enable);
-            this.canvas.current.refreshCanvas();
         }
+        this.canvas.current.refreshCanvas();
     }
     /**
      * 标注模式切换事件
      * @param isSort
      */
     private onTagModeChanged = (isSort: boolean) => {
-
-        let num = isSort ? this.props.project.sorts.length : this.props.project.tags.length;
-        num = num > 10 ? 10 : num + 1;
         this.setState({
             ...this.state,
             editType: {
                 canvasEnable: !isSort,
-                hotkeyNumber: num,
-                isFlipped: isSort,
+                isSort,
             },
         }, () => {
             if (isSort) {
+                this.doEnableCanvas(true);
                 this.doEnableCanvas(false);
             } else {
+                this.doEnableCanvas(false);
                 this.doEnableCanvas(true);
             }
-            console.log(`fucker!! ${this.state.editType.hotkeyNumber}`);
         });
     }
 
@@ -1158,6 +1153,22 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         // this.reloadProject(this.state.selectedAsset.asset.id, tagName);
     }
 
+    private onSortClicked = (sort: ISort): void => {
+        console.log("editorPage: onSortClicked: " + JSON.stringify(sort));
+        this.setState({
+            ...this.state,
+            selectedAsset: {
+                ...this.state.selectedAsset,
+                asset: {
+                    ...this.state.selectedAsset.asset,
+                    sorts: [sort],
+                },
+            },
+        }, async () => {
+            await this.props.actions.saveAssetMetadata(this.props.project, this.state.selectedAsset);
+        });
+    }
+
     private onCtrlTagClicked = (tag: ITag): void => {
         const locked = this.state.lockedTags;
         this.setState({
@@ -1166,7 +1177,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         }, () => this.canvas.current.applyTag(tag.name));
     }
 
-    private getTagFromKeyboardEvent = (event: KeyboardEvent): ITag => {
+    private getLabelFromKeyboardEvent = (event: KeyboardEvent): ITag | ISort => {
         let key = parseInt(event.key, 10);
         if (isNaN(key)) {
             try {
@@ -1176,14 +1187,27 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
             }
         }
         let index: number;
-        const tags = this.props.project.tags;
-        if (key === 0 && tags.length >= 10) {
-            index = 9;
-        } else if (key < 10) {
-            index = key - 1;
-        }
-        if (index < tags.length) {
-            return tags[index];
+
+        if (this.state.editType.isSort) {
+            const sorts = this.props.project.sorts;
+            if (key === 0 && sorts.length >= 10) {
+                index = 9;
+            } else if (key < 10) {
+                index = key - 1;
+            }
+            if (index < sorts.length) {
+                return sorts[index];
+            }
+        } else {
+            const tags = this.props.project.tags;
+            if (key === 0 && tags.length >= 10) {
+                index = 9;
+            } else if (key < 10) {
+                index = key - 1;
+            }
+            if (index < tags.length) {
+                return tags[index];
+            }
         }
         return null;
     }
@@ -1193,14 +1217,19 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
      * @param event KeyDown event
      */
     private handleTagHotKey = (event: KeyboardEvent): void => {
-        const tag = this.getTagFromKeyboardEvent(event);
+        const tag = this.getLabelFromKeyboardEvent(event);
         if (tag) {
-            this.onTagClicked(tag);
+            if (this.state.editType.isSort) {
+                this.onSortClicked(tag);
+                this.goToRootAsset(1);
+            } else {
+                this.onTagClicked(tag);
+            }
         }
     }
 
     private handleCtrlTagHotKey = (event: KeyboardEvent): void => {
-        const tag = this.getTagFromKeyboardEvent(event);
+        const tag = this.getLabelFromKeyboardEvent(event);
         if (tag) {
             this.onCtrlTagClicked(tag);
         }

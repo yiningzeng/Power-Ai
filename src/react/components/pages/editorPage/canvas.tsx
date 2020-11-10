@@ -150,7 +150,7 @@ export default class Canvas extends React.Component<ICanvasProps, ICanvasState> 
                 this.editor.AS.setSelectionMode(SelectionMode.NONE);
             }
         }
-        // this.positionCanvas(this.state.contentSource);
+        this.positionCanvas(this.state.contentSource);
     }
 
     public render = () => {
