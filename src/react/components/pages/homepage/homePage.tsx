@@ -483,8 +483,8 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
             videoSettings: {frameExtractionRate: 15},
             assets: {},
         };
-        await this.props.actions.saveProject(projectJson);
         const dataTemp = await this.props.actions.loadAssetsWithFolderAndTags(projectJson, fileFolder);
+        await this.props.actions.saveProject(projectJson);
         const rootProjectAssets = _.values(projectJson.assets)
             .filter((asset) => !asset.parent);
         const rootAssets = _(rootProjectAssets)

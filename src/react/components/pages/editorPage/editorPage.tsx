@@ -509,11 +509,6 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                 }}
                                 showToolbar={false}/>
                             <Divider />
-                            <DoubleTextSwitch
-                                leftText={"图像标注"}
-                                rightText={"图像分类"}
-                                onChange={this.}/>
-                            <Divider />
                             <TagInput
                                 tags={this.props.project.tags}
                                 lockedTags={this.state.lockedTags}
