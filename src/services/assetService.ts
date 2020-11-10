@@ -261,7 +261,7 @@ export class AssetService {
             if (index === -1) {
                 const newTag: ITag = {
                     name: val,
-                    color: this.getNextColor(exitsColor),
+                    color: this.getNextColor(finalTags),
                 };
                 finalTags.push(newTag);
             } else {
