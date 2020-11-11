@@ -27,6 +27,14 @@ export class StatusBarMetrics extends React.Component<IStatusBarMetricsProps> {
                     {/*<i className="fas fa-download"></i>*/}
                     {/*<span className="metric-target-connection-name">{project.targetConnection.name}</span>*/}
                 {/*</li>*/}
+                <li title={"所属项目"}>
+                    <i className="fas fa-project-diagram"></i>
+                    <span className="metric-source-connection-name">{
+                        project.exportFormat ?
+                            project.exportFormat.belongToProject ?
+                                project.exportFormat.belongToProject.name ?
+                                    project.exportFormat.belongToProject.name : "" : "" : ""}</span>
+                </li>
                 <li title={interpolate(strings.projectMetrics.taggedAssets, { count: taggedAssets.length })}>
                     <i className="fas fa-tag"></i>
                     <span className="metric-tagged-asset-count">{taggedAssets.length}</span>
@@ -34,10 +42,6 @@ export class StatusBarMetrics extends React.Component<IStatusBarMetricsProps> {
                 <li title={interpolate(strings.projectMetrics.visitedAssets, { count: visitedAssets.length })}>
                     <i className="fas fa-eye"></i>
                     <span className="metric-visited-asset-count">{visitedAssets.length}</span>
-                </li>
-                <li title={strings.common.displayName}>
-                    <i className="fas fa-project-diagram"></i>
-                    <span className="metric-source-connection-name">{project.name}</span>
                 </li>
                 <li title={strings.projectMetrics.currentAsset.name}>
                     <i className="fas fa-coffee"></i>
