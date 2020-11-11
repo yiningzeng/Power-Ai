@@ -56,6 +56,7 @@ import SourceItem from "../../common/condensedList/sourceItem";
 import {TagInput} from "../../common/tagInput/tagInput";
 import ProjectItem from "./projectItem";
 import {CloudFileCopyPicker} from "../../common/cloudFileCopyPicker/cloudFileCopyPicker";
+import {IpcRendererProxy} from "../../../../common/ipcRendererProxy";
 // tslint:disable-next-line:no-var-requires
 const tagColors = require("../../common/tagColors.json");
 
@@ -346,7 +347,12 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                         title={strings.homePage.recentProjects}
                         Component={RecentProjectItem}
                         items={this.props.recentProjects}
-                        onClick={this.loadSelectedProject}
+                        onClick={async (project: IProject) => {
+                            const pro = await this.props.actions.loadProject(project);
+                            this.loadProject(pro.sourceConnection.providerOptionsOthers[0]["folderPath"],
+                                pro.exportFormat.belongToProject,
+                                ExportPath.CollectData);
+                        }}
                         onDelete={(project) => this.deleteConfirm.current.open(project)} showToolbar={false}/>
                 </div>
                 }
@@ -452,6 +458,12 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
 
     private loadProject = async (fileFolder: string, belongToProject?: IProjectItem, exportPath?: string) => {
         this.draggableDialog.current.open();
+        // 先判断文件夹是否存在
+        const res = await IpcRendererProxy.send(`TrainingSystem:FileExist`, [fileFolder]);
+        if (!res) {
+            this.draggableDialog.current.change("出错了", "文件夹不存在", true);
+            return;
+        }
         const idd = normalizeSlashes(fileFolder).lastIndexOf("/");
         // const randId = shortid.generate();
         const folderName = normalizeSlashes(fileFolder).substring(idd + 1);

@@ -191,6 +191,14 @@ export default class TrainingSystem {
     }
     // endregion
 
+    // 判断文件是否存在
+    public FileExist(path: string): Promise<boolean> {
+        return new Promise<boolean>(async (resolve, reject) => {
+            const res = await fs.existsSync(path);
+            res ? resolve(true) : reject(false);
+        });
+    }
+
     // 加载远程图片集
     public LoadRemoteAssets(ip: string, remotePath: string, username: string, password: string): Promise<string> {
         return new Promise<string>((resolve, reject) => {
