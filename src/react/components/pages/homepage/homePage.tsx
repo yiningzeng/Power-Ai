@@ -356,8 +356,11 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                              `如果正在标注该项目的远程素材，那么项目会被关闭！并且删除项目会删除该项目下的所有素材和已经训练好的模型文件！！！请谨慎操作！！！确定要删除项目[${item.name}]么?`}
                          confirmButtonColor="danger"
                          onConfirm={(item) => {
-                             if (this.props.project.exportFormat.belongToProject.name === item.name) {
-                                 this.props.actions.closeProject();
+                             if (this.props.project) {
+                                 if (this.props.project.exportFormat.belongToProject.name !== undefined &&
+                                     this.props.project.exportFormat.belongToProject.name === item.name) {
+                                     this.props.actions.closeProject();
+                                 }
                              }
                              const newAppSettings = {
                                  ...this.props.appSettings,
