@@ -229,7 +229,7 @@ describe("Homepage Component", () => {
         const testProject = MockFactory.createTestProject("TestProject");
         const projectJson = JSON.stringify(testProject, null, 4);
         const cloudFilePicker = wrapper.find(CloudFilePicker) as ReactWrapper<ICloudFilePickerProps>;
-        cloudFilePicker.props().onSubmit(projectJson);
+        cloudFilePicker.props().onSubmit(false, projectJson, null);
 
         expect(openProjectSpy).toBeCalledWith(testProject);
     });
@@ -276,6 +276,8 @@ describe("Homepage Component", () => {
                 devToolsEnabled: false,
                 securityTokens: [],
                 deadline: null,
+                remoteHostList: [],
+                projectList: [],
             },
             match: {
                 params: {},

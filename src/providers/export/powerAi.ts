@@ -13,6 +13,7 @@ import { constants } from "../../common/constants";
 import HtmlFileReader from "../../common/htmlFileReader";
 import path from "path";
 import {Simulate} from "react-dom/test-utils";
+import moment from "moment";
 
 /**
  * VoTT Json Export Provider options
@@ -37,7 +38,14 @@ export class PowerAiExportProvider extends ExportProvider<IPowerAiExportProvider
      */
     public async export(): Promise<void> {
         const results = await this.getAssetsForExport();
-        const exportFolderName = `${this.project.name.replace(/\s/g, "-")}-power-ai-export`;
+        let exportFolderName = "";
+        if (this.getSaveAsDateFolder) {
+            exportFolderName = moment().format("YYYY-MM-DD");
+        } else {
+            exportFolderName = `${this.project.name.replace(/\s/g, "-")}-power-ai-export`;
+            await this.storageProvider.deleteContainer(exportFolderName);
+        }
+        await this.storageProvider.createContainer(exportFolderName);
         // tslint:disable-next-line:max-line-length
         let isSubdirectories = false;
         try {
@@ -45,9 +53,6 @@ export class PowerAiExportProvider extends ExportProvider<IPowerAiExportProvider
         } catch (e) {
             console.error(e);
         }
-        console.log(`是否分文件夹: ${isSubdirectories}`);
-        await this.storageProvider.deleteContainer(exportFolderName);
-        await this.storageProvider.createContainer(exportFolderName);
         // if (isSubdirectories) {
         //     console.log(`老子分文件夹，所以创建先`);
         //     await this.project.tags.mapAsync(async (v) => {
@@ -88,7 +93,7 @@ export class PowerAiExportProvider extends ExportProvider<IPowerAiExportProvider
                                 if (setTagType === "") {
                                     setTagType = `${v.tags[0]}/`;
                                 } else if (setTagType !== v.tags[0]) {
-                                    setTagType = "multi-tag/";
+                                    setTagType = "multilabel/";
                                 }
                             });
                         }
@@ -120,6 +125,10 @@ export class PowerAiExportProvider extends ExportProvider<IPowerAiExportProvider
                             assetFilePath = `${exportFolderName}/ok/${assetMetadata.asset.name}`;
                             setTagType = "ok";
                         }
+                        // region ok的数据也保存Json
+                        await this.storageProvider.writeText(`${exportFolderName}/${setTagType}${decodeURI(assetMetadata.asset.id)}${constants.assetMetadataFileExtension}`,
+                            JSON.stringify(assetMetadata, null, 4));
+                        // endregion
                     } else if (assetMetadata && assetMetadata.asset.state === AssetState.NotVisited) { // 这里保存未查看过的
                         if (isSubdirectories) {
                             assetFilePath = `${exportFolderName}/not-visited/${assetMetadata.asset.name}`;
@@ -158,38 +167,39 @@ export class PowerAiExportProvider extends ExportProvider<IPowerAiExportProvider
             if (!isSubdirectories) {
                 exportObject.assets = _.keyBy(finalResults, (asset) => asset.id) as any;
                 // We don't need these fields in the export JSON
-                const fileName = `${exportFolderName}/${constants.importFileExtension}`;
-                await this.storageProvider.writeText(fileName, JSON.stringify(exportObject, null, 4));
+                // const fileName = `${exportFolderName}/${constants.importFileExtension}`;
+                // await this.storageProvider.writeText(fileName, JSON.stringify(exportObject, null, 4));
             } else {
                 await this.project.tags.mapAsync(async (v) => {
                     const tempResult = finalResults.filter((asset) => asset.tagType === v.name);
                     exportObject.assets = _.keyBy(tempResult, (asset) => asset.id) as any;
-                    console.log(`导出啦 ${exportObject.assets.toLocaleString().length}`);
-                    console.log(`导出啦 ${JSON.stringify(exportObject.assets).length}`)
-                    if ( JSON.stringify(exportObject.assets).length > 2 ) {
-                        console.log("导出啦" + "\n" + JSON.stringify(exportObject.assets));
-                        const fileName = `${exportFolderName}/${v.name}/${constants.importFileExtension}`;
-                        await this.storageProvider.writeText(fileName, JSON.stringify(exportObject, null, 4));
-                    }
+                    // console.log(`导出啦 ${exportObject.assets.toLocaleString().length}`);
+                    // console.log(`导出啦 ${JSON.stringify(exportObject.assets).length}`)
+                    // if ( JSON.stringify(exportObject.assets).length > 2 ) {
+                    //     console.log("导出啦" + "\n" + JSON.stringify(exportObject.assets));
+                    //     const fileName = `${exportFolderName}/${v.name}/${constants.importFileExtension}`;
+                    //     await this.storageProvider.writeText(fileName, JSON.stringify(exportObject, null, 4));
+                    // }
                 });
 
                 exportObject.assets = _.keyBy(
                     finalResults.filter((asset) => asset.tagType !== undefined && asset.tagType === "ok"),
                     (asset) => asset.id) as any;
-                await this.storageProvider.writeText(`${exportFolderName}/ok/${constants.importFileExtension}`,
-                    JSON.stringify(exportObject, null, 4));
+                // await this.storageProvider.writeText(`${exportFolderName}/ok/${constants.importFileExtension}`,
+                //     JSON.stringify(exportObject, null, 4));
 
                 exportObject.assets = _.keyBy(
                     finalResults.filter((asset) => asset.tagType !== undefined && asset.tagType === "not-visited"),
                     (asset) => asset.id) as any;
-                await this.storageProvider.writeText(`${exportFolderName}/not-visited/${constants.importFileExtension}`,
-                    JSON.stringify(exportObject, null, 4));
+                // await this.storageProvider.writeText(`${exportFolderName}/not-visited/${constants.importFileExtension}`,
+                //     JSON.stringify(exportObject, null, 4));
 
                 exportObject.assets = _.keyBy(
-                    finalResults.filter((asset) => asset.tagType !== undefined && asset.tagType === "multi-tag"),
+                    finalResults.filter((asset) => asset.tagType !== undefined && asset.tagType === "multilabel"),
                     (asset) => asset.id) as any;
-                await this.storageProvider.writeText(`${exportFolderName}/multi-tag/${constants.importFileExtension}`,
-                    JSON.stringify(exportObject, null, 4));
+                // await this.storageProvider.writeText(`${exportFolderName}/multilabel/${constants.importFileExtension}`,
+                //     JSON.stringify(exportObject, null, 4));
+
                 //region 根目录生成import.power-ai文件
                 // exportObject.name = "isSubdirectories";
                 // delete exportObject.assets;

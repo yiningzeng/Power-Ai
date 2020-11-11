@@ -22,7 +22,7 @@ export default class LocalFileSystem implements IStorageProvider {
                 if (result.canceled || !result.filePaths || result.filePaths.length === 0) {
                     return reject();
                 }
-                console.log(result.canceled);
+                console.log(`选择的文件${result.canceled}`);
                 console.log(result.filePaths);
                 resolve(result.filePaths[0]);
             }).catch((err) => {
@@ -35,14 +35,74 @@ export default class LocalFileSystem implements IStorageProvider {
         return new Promise<object>((resolve, reject) => {
             const filePaths = dialog.showOpenDialog({
                 title: strings.connections.providers.local.selectFolder,
-                buttonLabel: strings.connections.providers.local.chooseFolder,
-                properties: ["openDirectory", "multiSelections"],
+                buttonLabel: "开始标注",
+                properties: ["openDirectory"],
             }).then((result) => {
                 if (result.canceled || !result.filePaths || result.filePaths.length === 0) {
                     return reject();
                 }
                 console.log(result.canceled);
-                console.log(result.filePaths);
+                console.log(`选择的文件信息${result.filePaths}`);
+                resolve(result.filePaths);
+            }).catch((err) => {
+                console.log(err);
+            });
+        });
+    }
+
+    public openRemoteContainer(defaultPath: string): Promise<object> {
+        return new Promise<object>((resolve, reject) => {
+            const filePaths = dialog.showOpenDialog({
+                defaultPath,
+                title: strings.connections.providers.local.selectFolder,
+                buttonLabel: "确定打开远程文件夹",
+                properties: ["openDirectory", "showHiddenFiles"],
+            }).then((result) => {
+                if (result.canceled || !result.filePaths || result.filePaths.length === 0) {
+                    return reject();
+                }
+                console.log(result.canceled);
+                console.log(`选择的文件信息${result.filePaths}`);
+                resolve(result.filePaths);
+            }).catch((err) => {
+                console.log(err);
+            });
+        });
+    }
+
+    public copyRemoteContainer(defaultPath: string): Promise<object> {
+        return new Promise<object>((resolve, reject) => {
+            const filePaths = dialog.showOpenDialog({
+                defaultPath,
+                title: strings.connections.providers.local.selectFolder,
+                buttonLabel: "确定复制的文件",
+                properties: ["openDirectory", "createDirectory", "multiSelections", "showHiddenFiles"],
+            }).then((result) => {
+                if (result.canceled || !result.filePaths || result.filePaths.length === 0) {
+                    return reject();
+                }
+                console.log(result.canceled);
+                console.log(`选择的文件信息${result.filePaths}`);
+                resolve(result.filePaths);
+            }).catch((err) => {
+                console.log(err);
+            });
+        });
+    }
+
+    public saveEditContainer(): Promise<object> {
+        return new Promise<object>((resolve, reject) => {
+            const filePaths = dialog.showOpenDialog({
+                title: strings.connections.providers.local.selectFolder,
+                defaultPath: "/assets",
+                buttonLabel: "确认保存",
+                properties: ["openDirectory", "createDirectory"],
+            }).then((result) => {
+                if (result.canceled || !result.filePaths || result.filePaths.length === 0) {
+                    return reject();
+                }
+                console.log(result.canceled);
+                console.log(`选择的文件信息${result.filePaths}`);
                 resolve(result.filePaths);
             }).catch((err) => {
                 console.log(err);

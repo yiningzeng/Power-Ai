@@ -30,7 +30,7 @@ describe("Export Form Component", () => {
     const onSubmitHandler = jest.fn();
 
     it("State is initialized without export settings", () => {
-        const defaultExportType = "vottJson";
+        const defaultExportType = "powerAi";
         const props: IExportFormProps = {
             settings: null,
             onSubmit: onSubmitHandler,
@@ -49,7 +49,9 @@ describe("Export Form Component", () => {
     it("State is initialized with export settings", () => {
         const props: IExportFormProps = {
             settings: {
-                providerType: "vottJson",
+                providerType: "powerAi",
+                belongToProject: null,
+                exportPath: null,
                 providerOptions: {
                     assetState: ExportAssetState.Tagged,
                     includeImages: true,
@@ -71,7 +73,9 @@ describe("Export Form Component", () => {
     it("Form renders correctly", () => {
         const props: IExportFormProps = {
             settings: {
-                providerType: "vottJson",
+                providerType: "powerAi",
+                belongToProject: null,
+                exportPath: null,
                 providerOptions: {
                     assetState: ExportAssetState.Tagged,
                 },
@@ -93,7 +97,9 @@ describe("Export Form Component", () => {
         };
 
         const defaultExportSettings: IExportFormat = {
-            providerType: "vottJson",
+            providerType: "powerAi",
+            belongToProject: null,
+            exportPath: null,
             providerOptions: jsonExportProviderOptions,
         };
 

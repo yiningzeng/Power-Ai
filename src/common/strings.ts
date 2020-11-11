@@ -32,6 +32,10 @@ export interface IAppStrings {
     };
     homePage: {
         newProject: string;
+        projectList: string;
+        remoteHost: {
+            title: string;
+        },
         openLocalProject: {
             title: string;
         },
@@ -41,6 +45,12 @@ export interface IAppStrings {
         openCloudProject: {
             title: string;
             selectConnection: string;
+        },
+        copyRemoteAssets: {
+            title: string;
+        },
+        inputCodeTagAssets: {
+            title: string;
         },
         deleteProject: {
             title: string;

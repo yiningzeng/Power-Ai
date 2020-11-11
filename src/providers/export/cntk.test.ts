@@ -53,6 +53,8 @@ describe("CNTK Export Provider", () => {
             assets: _.keyBy(testAssets, (a) => a.id),
             exportFormat: {
                 providerType: "cntk",
+                belongToProject: null,
+                exportPath: null,
                 providerOptions: defaultOptions,
             },
         };

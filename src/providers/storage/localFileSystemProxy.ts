@@ -45,6 +45,26 @@ export class LocalFileSystemProxy implements IStorageProvider, IAssetProvider {
     }
 
     /**
+     * 打开远程拷贝的文件夹
+     */
+    public openRemoteContainer(defaultPath: string): Promise<object> {
+        return IpcRendererProxy.send(`${PROXY_NAME}:openRemoteContainer`, [defaultPath]);
+    }
+
+    /**
+     * 打开远程拷贝的文件夹
+     */
+    public copyRemoteContainer(defaultPath: string): Promise<object> {
+        return IpcRendererProxy.send(`${PROXY_NAME}:copyRemoteContainer`, [defaultPath]);
+    }
+
+    /**
+     * 保存的文件管理器操作
+     */
+    public saveEditContainer(): Promise<object> {
+        return IpcRendererProxy.send(`${PROXY_NAME}:saveEditContainer`);
+    }
+    /**
      * Read text from file
      * @param fileName - Name of file from which to read text
      */

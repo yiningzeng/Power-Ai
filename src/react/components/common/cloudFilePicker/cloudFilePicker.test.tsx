@@ -27,6 +27,7 @@ describe("CloudFilePicker", () => {
         const onCancel = jest.fn();
         const onSubmit = jest.fn();
         const wrapper = createComponent({
+            modalHeader: "",
             connections,
             onCancel,
             onSubmit,
@@ -42,6 +43,7 @@ describe("CloudFilePicker", () => {
         const onCancel = jest.fn();
         const onSubmit = jest.fn();
         const wrapper = createComponent({
+            modalHeader: "",
             connections,
             onCancel,
             onSubmit,
@@ -54,6 +56,7 @@ describe("CloudFilePicker", () => {
         const onCancel = jest.fn();
         const onSubmit = jest.fn();
         const wrapper = createComponent({
+            modalHeader: "",
             connections,
             onCancel,
             onSubmit,
@@ -70,6 +73,7 @@ describe("CloudFilePicker", () => {
         const onCancel = jest.fn();
         const onSubmit = jest.fn();
         const wrapper = createComponent({
+            modalHeader: "",
             connections,
             onCancel,
             onSubmit,
@@ -96,6 +100,7 @@ describe("CloudFilePicker", () => {
         const onCancel = jest.fn();
         const onSubmit = jest.fn();
         const wrapper = createComponent({
+            modalHeader: "",
             connections,
             onCancel,
             onSubmit,
@@ -127,6 +132,7 @@ describe("CloudFilePicker", () => {
         const onCancel = jest.fn();
         const onSubmit = jest.fn();
         const wrapper = createComponent({
+            modalHeader: "",
             connections,
             onCancel,
             onSubmit,
@@ -156,6 +162,7 @@ describe("CloudFilePicker", () => {
         const onCancel = jest.fn();
         const onSubmit = jest.fn();
         const wrapper = createComponent({
+            modalHeader: "",
             connections,
             onCancel,
             onSubmit,
@@ -184,6 +191,7 @@ describe("CloudFilePicker", () => {
         const onCancel = jest.fn();
         const onSubmit = jest.fn();
         const wrapper = createComponent({
+            modalHeader: "",
             connections,
             onCancel,
             onSubmit,

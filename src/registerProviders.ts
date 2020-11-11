@@ -61,15 +61,20 @@ export default function registerProviders() {
         factory: (project, options) => new PascalVOCExportProvider(project, options),
     });
     // ExportProviderFactory.register({
+    //     name: "powerAi",
+    //     displayName: strings.export.providers.pascalVoc.displayName,
+    //     factory: (project, options) => new PascalVOCExportProvider(project, options),
+    // });
+    // ExportProviderFactory.register({
     //     name: "tensorFlowRecords",
     //     displayName: strings.export.providers.tfRecords.displayName,
     //     factory: (project, options) => new TFRecordsExportProvider(project, options),
     // });
-    // ExportProviderFactory.register({
-    //     name: "powerAi",
-    //     displayName: strings.export.providers.powerAi.displayName,
-    //     factory: (project, options) => new PowerAiExportProvider(project, options),
-    // });
+    ExportProviderFactory.register({
+        name: "powerAi",
+        displayName: strings.export.providers.powerAi.displayName,
+        factory: (project, options) => new PowerAiExportProvider(project, options),
+    });
     // TestProviderFactory.register({
     //     name: "azureCustomVision",
     //     displayName: strings.export.providers.azureCV.displayName,

@@ -33,6 +33,8 @@ import TestService from "../../services/testService";
  * Actions to be performed in relation to projects
  */
 export default interface IProjectActions {
+    createFolder(baseFolder: string, createFolder: string): Promise<void>;
+    deleteFolder(baseFolder: string, deleteFolder: string): Promise<void>;
     loadProject(project: IProject): Promise<IProject>;
     saveProject(project: IProject): Promise<IProject>;
     deleteProject(project: IProject): Promise<void>;
@@ -57,6 +59,32 @@ export default interface IProjectActions {
     updateProjectTag(project: IProject, oldTagName: string, newTagName: string): Promise<IAssetMetadata[]>;
     deleteProjectTag(project: IProject, tagName): Promise<IAssetMetadata[]>;
     test(): void;
+}
+
+/**
+ * 用于首页的项目库的文件夹创建
+ * @param baseFolder
+ * @param createFolder
+ */
+export function createFolder(baseFolder: string, createFolder: string)
+    : (dispatch: Dispatch, getState: () => IApplicationState) => Promise<void> {
+    return async (dispatch: Dispatch, getState: () => IApplicationState) => {
+        const projectService = new ProjectService();
+        await projectService.createFolder(baseFolder, createFolder);
+    };
+}
+
+/**
+ * 用于首页的项目库的文件夹删除
+ * @param baseFolder
+ * @param createFolder
+ */
+export function deleteFolder(baseFolder: string, deleteFolder: string)
+    : (dispatch: Dispatch, getState: () => IApplicationState) => Promise<void> {
+    return async (dispatch: Dispatch, getState: () => IApplicationState) => {
+        const projectService = new ProjectService();
+        await projectService.deleteFolder(baseFolder, deleteFolder);
+    };
 }
 
 export function test(): (dispatch: Dispatch) => void {
@@ -357,24 +385,23 @@ export function deleteProjectTag(project: IProject, tagName)
     return async (dispatch: Dispatch, getState: () => IApplicationState) => {
         // Find tags to rename
         const assetService = new AssetService(project);
-        const assetUpdates = await assetService.deleteTag(tagName);
+        await assetService.deleteTag(tagName);
 
         // Save updated assets
-        await assetUpdates.forEachAsync(async (assetMetadata) => {
-            await saveAssetMetadata(project, assetMetadata)(dispatch);
-        });
+        // await assetUpdates.forEachAsync(async (assetMetadata) => {
+        //     await saveAssetMetadata(project, assetMetadata)(dispatch);
+        // });
 
-        const currentProject = getState().currentProject;
-        const updatedProject = {
-            ...currentProject,
-            tags: project.tags.filter((t) => t.name !== tagName),
-        };
-
-        // Save updated project tags
-        await saveProject(updatedProject)(dispatch, getState);
-        dispatch(deleteProjectTagAction(updatedProject));
-
-        return assetUpdates;
+        // const currentProject = getState().currentProject;
+        // const updatedProject = {
+        //     ...currentProject,
+        //     tags: project.tags.filter((t) => t.name !== tagName),
+        // };
+        //
+        // // Save updated project tags
+        // await saveProject(updatedProject)(dispatch, getState);
+        // dispatch(deleteProjectTagAction(updatedProject));
+        return null;
     };
 }
 

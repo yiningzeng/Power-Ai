@@ -24,7 +24,7 @@ export default class Manage extends React.Component {
     public render() {
         return (
             <div style={{height: "100%", width: "100%"}}>
-                <Iframe url="http://192.168.31.75"
+                <Iframe url="http://localhost"
                         width="100%"
                         height="100%"
                         id="myId"

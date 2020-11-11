@@ -29,6 +29,10 @@ export const english: IAppStrings = {
     },
     homePage: {
         newProject: "New Project",
+        projectList: "Project list",
+        remoteHost: {
+            title: "远程主机",
+        },
         openLocalProject: {
             title: "Open Local Project",
         },
@@ -38,6 +42,12 @@ export const english: IAppStrings = {
         openCloudProject: {
             title: "Open Cloud Project",
             selectConnection: "Select a Connection",
+        },
+        copyRemoteAssets: {
+            title: "远程拷图",
+        },
+        inputCodeTagAssets: {
+            title: "查找条码标图",
         },
         recentProjects: "Recent Projects",
         deleteProject: {
@@ -428,7 +438,7 @@ export const english: IAppStrings = {
                 displayName: "PowerAi",
                 subdirectories: {
                     title: "classify by tag name",
-                    description: "If a material contains more than one tag name, it will be assigned to the multi-tag folder.",
+                    description: "If a material contains more than one tag name, it will be assigned to the multilabel folder.",
                 },
             },
         },

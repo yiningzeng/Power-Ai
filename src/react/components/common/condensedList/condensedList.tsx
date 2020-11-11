@@ -2,6 +2,7 @@ import React, { SyntheticEvent } from "react";
 import "./condensedList.scss";
 import { Link } from "react-router-dom";
 import FolderSideBarToolbar from "./folderSideBarToolbar";
+import HostSideBarToolbar from "./hostSideBarToolbar";
 
 /**
  * Properties for Condensed List Component
@@ -17,6 +18,7 @@ interface ICondensedListProps {
     Component: any;
     items: any[];
     showToolbar: boolean;
+    home?: boolean;
     newLinkTo?: string;
     onClick?: (item) => void;
     onDelete?: (item) => void;
@@ -43,15 +45,19 @@ export default class CondensedList extends React.Component<ICondensedListProps> 
     }
 
     public render() {
-        const { title, items, newLinkTo, showToolbar, Component, onAddClick, onImportTaggedAssetsFolder } = this.props;
+        // tslint:disable-next-line:max-line-length
+        const { title, items, newLinkTo, showToolbar, home, Component, onAddClick, onImportTaggedAssetsFolder } = this.props;
 
         return (
             <div className="condensed-list">
                 <h6 className="condensed-list-header bg-darker-2 p-2">
                     <span>{title}</span>
-                    {showToolbar &&
+                    {showToolbar && !home &&
                         <FolderSideBarToolbar onAddFolder={onAddClick}
+
                                               onImportTaggedAssetsFolder={onImportTaggedAssetsFolder}/>}
+                    {showToolbar && home &&
+                    <HostSideBarToolbar onAddFolder={onAddClick}/>}
                     {newLinkTo &&
                         <Link to={newLinkTo} className="float-right">
                             <i className="fas fa-plus-square" />

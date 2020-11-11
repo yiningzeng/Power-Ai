@@ -606,6 +606,8 @@ export default class MockFactory {
     public static exportFormat(): IExportFormat {
         return {
             providerType: "pascalVOC",
+            belongToProject: null,
+            exportPath: null,
             providerOptions: {
                 assetState: ExportAssetState.Tagged,
             },
@@ -815,6 +817,8 @@ export default class MockFactory {
      */
     public static projectActions(): IProjectActions {
         return {
+            createFolder: jest.fn(() => Promise.resolve()),
+            deleteFolder: jest.fn(() => Promise.resolve()),
             loadProject: jest.fn(() => Promise.resolve()),
             saveProject: jest.fn(() => Promise.resolve()),
             deleteProject: jest.fn(() => Promise.resolve()),
@@ -865,6 +869,8 @@ export default class MockFactory {
                 MockFactory.createSecurityToken("TestProject"),
                 MockFactory.createSecurityToken("test"),
             ],
+            remoteHostList: [],
+            projectList: [],
             deadline: "2019-11-16",
         };
     }

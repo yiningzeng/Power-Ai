@@ -29,6 +29,10 @@ export const chinese: IAppStrings = {
     },
     homePage: {
         newProject: "打开标注的文件夹",
+        projectList: "项目库",
+        remoteHost: {
+            title: "远程主机",
+        },
         openLocalProject: {
             title: "打开本地文件夹",
         },
@@ -38,6 +42,12 @@ export const chinese: IAppStrings = {
         openCloudProject: {
             title: "打开远程文件夹",
             selectConnection: "选择连接",
+        },
+        copyRemoteAssets: {
+            title: "远程拷图",
+        },
+        inputCodeTagAssets: {
+            title: "查找条码标图",
         },
         recentProjects: "最近文件夹",
         deleteProject: {
@@ -423,10 +433,10 @@ export const chinese: IAppStrings = {
                 displayName: "CoCo",
             },
             powerAi: {
-                displayName: "PowerAi(可导入到其他项目)",
+                displayName: "原始数据",
                 subdirectories: {
                     title: "根据标签名分文件夹",
-                    description: "如果一个素材包含多个标签名会被分到multi-tag文件夹",
+                    description: "如果一个素材包含多个标签名会被分到multilabel文件夹",
                 },
             },
         },
