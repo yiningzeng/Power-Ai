@@ -111,14 +111,14 @@ export class CloudFilePicker extends React.Component<ICloudFilePickerProps, IClo
                                 this.draggableDialog.current.open();
                                 if (this.state.ip === "" || this.state.ip === null) {
                                     this.draggableDialog.current.change("连接远程数据失败...",
-                                        `远程地址: \\\\${this.state.ip}\\Power-Ftp`, true);
+                                        `远程地址: \\\\${this.state.ip}\\${this.state.cloudPath}`, true);
                                     return;
                                 }
                                 this.draggableDialog.current.change("正在连接远程数据...",
-                                    `远程地址: \\\\${this.state.ip}\\Power-Ftp`, false, false);
+                                    `远程地址: \\\\${this.state.ip}\\${this.state.cloudPath}`, false, false);
                                 const aa = new Promise(async (resolve, reject) => {
                                     await IpcRendererProxy.send(`TrainingSystem:CloseRemoteAssets`,
-                                        [this.state.ip, "Power-Ftp"])
+                                        [this.state.ip, this.state.cloudPath])
                                         .then(() => {
                                             console.log("关闭成功");
                                         })
@@ -127,7 +127,7 @@ export class CloudFilePicker extends React.Component<ICloudFilePickerProps, IClo
                                         });
                                     await IpcRendererProxy.send(`TrainingSystem:LoadRemoteAssets`,
                                         [this.state.ip,
-                                            "Power-Ftp",
+                                            this.state.cloudPath,
                                             this.state.username,
                                             this.state.password])
                                         .then(async (v) => {
@@ -137,30 +137,30 @@ export class CloudFilePicker extends React.Component<ICloudFilePickerProps, IClo
                                         .catch(() => {
                                             this.draggableDialog.current.change("连接远程数据失败...",
                                                 // tslint:disable-next-line:max-line-length
-                                                `远程地址: \\\\${this.state.ip}\\${"Power-Ftp".replace(new RegExp("/", "g"), "\\")}`, true);
+                                                `远程地址: \\\\${this.state.ip}\\${this.state.cloudPath.replace(new RegExp("/", "g"), "\\")}`, true);
                                             // this.props.onSubmit("连接失败");
                                             reject("fail");        // 失败
                                         });
                                 }).catch(() => {
                                     this.draggableDialog.current.change("连接远程数据失败...",
                                         // tslint:disable-next-line:max-line-length
-                                        `远程地址: \\\\${this.state.ip}\\${"Power-Ftp".replace(new RegExp("/", "g"), "\\")}`, true);
+                                        `远程地址: \\\\${this.state.ip}\\${this.state.cloudPath.replace(new RegExp("/", "g"), "\\")}`, true);
                                 });
                                 pTimeout(aa, 10000, () => {
                                     this.draggableDialog.current.change("连接远程数据超时！",
-                                        `连接超时，请检查配置信息是否正确\n远程地址: \\\\${this.state.ip}\\${"Power-Ftp".replace(new RegExp("/", "g"), "\\")}`, true);
+                                        `连接超时，请检查配置信息是否正确\n远程地址: \\\\${this.state.ip}\\${this.state.cloudPath.replace(new RegExp("/", "g"), "\\")}`, true);
                                 }).then(async (val) => {
                                     if (val === "success") {
                                         this.draggableDialog.current.close();
                                         // // tslint:disable-next-line:max-line-length
-                                        const defaultPath = `/assets/Remote_Assets/${this.state.ip}-${"Power-Ftp".replace(new RegExp("/", "g"), "-")}`;
+                                        const defaultPath = `/assets/Remote_Assets/${this.state.ip}-${this.state.cloudPath.replace(new RegExp("/", "g"), "-")}`;
                                         // tslint:disable-next-line:max-line-length
                                         const fileFolder = await this.localFileSystem.openRemoteContainer(defaultPath);
                                         // alert(JSON.stringify(this.props.project));
                                         if (!fileFolder) { return; }
                                         this.setState({
                                             ...this.state,
-                                            cloudPath: (fileFolder[0] + "").replace(`/assets/Remote_Assets/${this.state.ip}-Power-Ftp`, "Power-Ftp"),
+                                            cloudPath: (fileFolder[0] + "").replace(`/assets/Remote_Assets/${this.state.ip}-${this.state.cloudPath}`, `${this.state.cloudPath}`),
                                         });
                                         // this.close();
                                         // tslint:disable-next-line:max-line-length
