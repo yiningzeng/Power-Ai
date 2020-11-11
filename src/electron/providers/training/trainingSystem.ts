@@ -194,7 +194,7 @@ export default class TrainingSystem {
         return new Promise<string>((resolve, reject) => {
             const passwordFile = process.cwd() + "/sudo.txt";
             const localPath = `/assets/Remote_Assets/${ip}-${this.replaceAll("/", "-", remotePath)}`;
-            const cmdStr = `echo \`cat "${passwordFile}"\` | sudo -S mkdir -p ${localPath} && sudo mount -t cifs -o user=${username},password=${password},dir_mode=0777,file_mode=0777 //${ip}/${remotePath} ${localPath}`;
+            const cmdStr = `echo \`cat "${passwordFile}"\` | sudo -S mkdir -p "${localPath}" && sudo mount -t cifs -o user=${username},password=${password},dir_mode=0777,file_mode=0777 "//${ip}/${remotePath}" "${localPath}"`;
             console.log(cmdStr);
             workerProcess = exec(cmdStr);
             // 不受child_process默认的缓冲区大小的使用方法，没参数也要写上{}：workerProcess = exec(cmdStr, {})
@@ -226,7 +226,7 @@ export default class TrainingSystem {
         return new Promise<string>((resolve, reject) => {
             const passwordFile = process.cwd() + "/sudo.txt";
             const localPath = `/assets/Remote_Assets/${ip}-${this.replaceAll("/", "-", remotePath)}`;
-            const cmdStr = `echo \`cat "${passwordFile}"\` | sudo -S umount ${localPath}`;
+            const cmdStr = `echo \`cat "${passwordFile}"\` | sudo -S umount -f "${localPath}"`;
             console.log(cmdStr);
             workerProcess = exec(cmdStr);
             // 不受child_process默认的缓冲区大小的使用方法，没参数也要写上{}：workerProcess = exec(cmdStr, {})
@@ -250,7 +250,7 @@ export default class TrainingSystem {
     public CopyRemoteAssets(sourcePath: string, savePath: string): Promise<string> {
         return new Promise<string>((resolve, reject) => {
             const passwordFile = process.cwd() + "/sudo.txt";
-            const cmdStr = `echo \`cat "${passwordFile}"\` | sudo -S cp -r ${sourcePath} ${savePath} && sudo chmod -R 777 ${savePath}`;
+            const cmdStr = `echo \`cat "${passwordFile}"\` | sudo -S cp -r "${sourcePath}" "${savePath}" && sudo chmod -R 777 "${savePath}"`;
             console.log(cmdStr);
             workerProcess = exec(cmdStr);
             // 不受child_process默认的缓冲区大小的使用方法，没参数也要写上{}：workerProcess = exec(cmdStr, {})
