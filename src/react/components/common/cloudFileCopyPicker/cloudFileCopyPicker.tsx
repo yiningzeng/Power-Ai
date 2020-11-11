@@ -207,6 +207,7 @@ export class CloudFileCopyPicker extends React.Component<ICloudFilePickerProps, 
                                         });
                                     }
                                     }>选择源文件</Button>
+                                    <Label>已经选择了{this.state.copyList ? this.state.copyList.length : 0}个文件夹</Label>
                                 </div>
                                 </div>
                         }
