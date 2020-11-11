@@ -105,7 +105,9 @@ export class CloudFilePicker extends React.Component<ICloudFilePickerProps, IClo
                             <InputGroupAddon addonType="append">
                                 <InputGroupText>/</InputGroupText>
                             </InputGroupAddon>
-                            <Input name="path" id="path" value={this.state.cloudPath} placeholder="共享的目录" onClick={() => {
+                            <Input name="path" id="path" value={this.state.cloudPath} placeholder="共享的目录"
+                                   onClick={() => {
+                                console.log(`fucker: open ${JSON.stringify(this.state)}`);
                                 this.draggableDialog.current.open();
                                 if (this.state.ip === "" || this.state.ip === null) {
                                     this.draggableDialog.current.change("连接远程数据失败...",

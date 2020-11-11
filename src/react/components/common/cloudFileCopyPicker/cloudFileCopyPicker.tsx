@@ -154,28 +154,28 @@ export class CloudFileCopyPicker extends React.Component<ICloudFilePickerProps, 
                                         const aa = new Promise(async (resolve, reject) => {
                                             await IpcRendererProxy.send(`TrainingSystem:CloseRemoteAssets`,
                                                 [this.state.ip, this.state.cloudPath])
-                                                .then(() => {
+                                                .then(async () => {
                                                     console.log("关闭成功");
+                                                    await IpcRendererProxy.send(`TrainingSystem:LoadRemoteAssets`,
+                                                        [this.state.ip,
+                                                            this.state.cloudPath,
+                                                            this.state.username,
+                                                            this.state.password])
+                                                        .then(async (v) => {
+                                                            toast.success("已经成功连接了远程数据");
+                                                            resolve("success"); // 成功
+                                                        })
+                                                        .catch(() => {
+                                                            this.draggableDialog.current.change("连接远程数据失败...",
+                                                                // tslint:disable-next-line:max-line-length
+                                                                `远程地址: \\\\${this.state.ip}\\${this.state.cloudPath.replace(new RegExp("/", "g"), "\\")}`, true);
+                                                            // this.props.onSubmit("连接失败");
+                                                            this.props.onSubmit(false, this.state.belongToProject);
+                                                            reject("fail");        // 失败
+                                                        });
                                                 })
                                                 .catch(() => {
                                                     console.log("关闭失败");
-                                                });
-                                            await IpcRendererProxy.send(`TrainingSystem:LoadRemoteAssets`,
-                                                [this.state.ip,
-                                                    this.state.cloudPath,
-                                                    this.state.username,
-                                                    this.state.password])
-                                                .then(async (v) => {
-                                                    toast.success("已经成功连接了远程数据");
-                                                    resolve("success"); // 成功
-                                                })
-                                                .catch(() => {
-                                                    this.draggableDialog.current.change("连接远程数据失败...",
-                                                        // tslint:disable-next-line:max-line-length
-                                                        `远程地址: \\\\${this.state.ip}\\${this.state.cloudPath.replace(new RegExp("/", "g"), "\\")}`, true);
-                                                    // this.props.onSubmit("连接失败");
-                                                    this.props.onSubmit(false, this.state.belongToProject);
-                                                    reject("fail");        // 失败
                                                 });
                                         }).catch(() => {
                                             this.draggableDialog.current.change("连接远程数据失败...",
@@ -283,7 +283,7 @@ export class CloudFileCopyPicker extends React.Component<ICloudFilePickerProps, 
             num = num++;
             this.draggableDialog.current.change("正在拷贝...",
                 `正在拷贝 ${num}/${this.state.copyList.length} 请耐心等待`, false, false);
-            await IpcRendererProxy.send(`TrainingSystem:CopyRemoteAssets`, [val, this.state.belongToProject.baseFolder + "/" +this.state.belongToProject.projectFolder + "/CollectData/"]);
+            await IpcRendererProxy.send(`TrainingSystem:CopyRemoteAssets`, [val, this.state.belongToProject.baseFolder + "/" + this.state.belongToProject.projectFolder + "/CollectData/"]);
         });
         this.draggableDialog.current.change("拷贝完成",
             `已经全部拷贝完成!`, true, false);

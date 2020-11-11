@@ -19,7 +19,6 @@ const exec = child_process.exec;
 
 // 执行cmd命令的目录，如果使用cd xx && 上面的命令，这种将会无法正常退出子进程
 // 子进程名称
-let workerProcess;
 export default class TrainingSystem {
 
     constructor(private browserWindow: BrowserWindow) { }
@@ -30,6 +29,7 @@ export default class TrainingSystem {
                 resolve(this.remoteTrain(project));
                 return;
             }
+            let workerProcess;
             const passwordFile = process.cwd() + "/password.txt";
             const sourcePath = `${project.targetConnection.providerOptions["folderPath"]}/coco-json-export/`;
             const filePath = path.normalize(sourcePath);
@@ -84,6 +84,7 @@ export default class TrainingSystem {
                 resolve(this.remoteTrain(project));
                 return;
             }
+            let workerProcess;
             const passwordFile = process.cwd() + "/password.txt";
             const sourcePath = `${project.targetConnection.providerOptions["folderPath"]}/coco-json-export/`;
             const filePath = path.normalize(sourcePath);
@@ -138,6 +139,7 @@ export default class TrainingSystem {
                 resolve(this.remoteTrain(project));
                 return;
             }
+            let workerProcess;
             const passwordFile = process.cwd() + "/password.txt";
             const sourcePath = project.targetConnection.providerOptions["folderPath"] + "/"
                 + project.name.replace(/\s/g, "-") + "-PascalVOC-export/";
@@ -192,30 +194,31 @@ export default class TrainingSystem {
     // 加载远程图片集
     public LoadRemoteAssets(ip: string, remotePath: string, username: string, password: string): Promise<string> {
         return new Promise<string>((resolve, reject) => {
+            let workerProcess;
+            console.log("\n--------------start加载远程文件夹-----------------");
+            console.log(remotePath);
             const passwordFile = process.cwd() + "/sudo.txt";
             const localPath = `/assets/Remote_Assets/${ip}-${this.replaceAll("/", "-", remotePath)}`;
             const cmdStr = `echo \`cat "${passwordFile}"\` | sudo -S mkdir -p "${localPath}" && sudo mount -t cifs -o user=${username},password=${password},dir_mode=0777,file_mode=0777 "//${ip}/${remotePath}" "${localPath}"`;
             console.log(cmdStr);
-            workerProcess = exec(cmdStr);
-            // 不受child_process默认的缓冲区大小的使用方法，没参数也要写上{}：workerProcess = exec(cmdStr, {})
-            // 打印正常的后台可执行程序输出
-            workerProcess.stdout.on("data", (data) => {
-                console.log("stdout: " + data);
-            });
-            // 打印错误的后台可执行程序输出
-            workerProcess.stderr.on("data", (data) => {
-                console.log("stderr: " + data);
+            workerProcess = child_process.exec(cmdStr, (error, stdout, stderr) => {
+                if (error) {
+                    console.error(`执行的错误: ${error}`);
+                    return;
+                }
+                console.log(`stdout: ${stdout}`);
+                console.error(`stderr: ${stderr}`);
             });
             // 退出之后的输出
             workerProcess.on("close", (code) => {
                 console.log("out code：" + code);
+                console.log("\n--------------end加载远程文件夹-----------------\n");
+                console.log("*");
+                console.log("*");
                 if (code === 0) {
-                    console.log("执行成功");
                     resolve(localPath);
                 } else {
-                    console.log("执行失败");
-                    reject("执行失败");
-                    workerProcess = exec(`echo \`cat "${passwordFile}"\` | sudo -S rm -r ${localPath}`);
+                    reject("fail");
                 }
             });
         });
@@ -224,31 +227,45 @@ export default class TrainingSystem {
     // 关闭远程图片集
     public CloseRemoteAssets(ip: string, remotePath: string): Promise<string> {
         return new Promise<string>((resolve, reject) => {
+            let workerProcess;
+            console.log("\n--------------start关闭远程文件夹-----------------");
             const passwordFile = process.cwd() + "/sudo.txt";
             const localPath = `/assets/Remote_Assets/${ip}-${this.replaceAll("/", "-", remotePath)}`;
             const cmdStr = `echo \`cat "${passwordFile}"\` | sudo -S umount -f "${localPath}"`;
             console.log(cmdStr);
-            workerProcess = exec(cmdStr);
-            // 不受child_process默认的缓冲区大小的使用方法，没参数也要写上{}：workerProcess = exec(cmdStr, {})
-            // 打印正常的后台可执行程序输出
-            workerProcess.stdout.on("data", (data) => {
-                console.log("stdout: " + data);
-            });
-            // 打印错误的后台可执行程序输出
-            workerProcess.stderr.on("data", (data) => {
-                console.log("stderr: " + data);
+            workerProcess = child_process.exec(cmdStr, (error, stdout, stderr) => {
+                if (error) {
+                    console.error(`执行的错误: ${error}`);
+                    return;
+                }
+                console.log(`stdout: ${stdout}`);
+                console.error(`stderr: ${stderr}`);
             });
             // 退出之后的输出
             workerProcess.on("close", (code) => {
                 console.log("out code：" + code);
+                let res = false;
+                if (code === 0) {
+                    console.log("执行成功");
+                    workerProcess = exec(`echo \`cat "${passwordFile}"\` | sudo -S rm -r ${localPath}`);
+                    console.log(`\n执行成功后删除文件夹-${localPath}`);
+                    res = true;
+                } else {
+                    console.log("执行失败");
+                }
+                console.log("\n--------------end关闭远程文件夹-----------------\n");
+                console.log("*");
+                console.log("*");
+                res ? resolve(localPath) : reject("执行失败");
             });
-            resolve(localPath);
         });
     }
 
     // 复制远程图片到本机
     public CopyRemoteAssets(sourcePath: string, savePath: string): Promise<string> {
         return new Promise<string>((resolve, reject) => {
+            let workerProcess;
+            console.log("\n--------------start复制远程图片到本机-----------------");
             const passwordFile = process.cwd() + "/sudo.txt";
             const cmdStr = `echo \`cat "${passwordFile}"\` | sudo -S cp -r "${sourcePath}" "${savePath}" && sudo chmod -R 777 "${savePath}"`;
             console.log(cmdStr);
@@ -265,6 +282,9 @@ export default class TrainingSystem {
             // 退出之后的输出
             workerProcess.on("close", (code) => {
                 console.log("out code：" + code);
+                console.log("\n--------------end复制远程图片到本机-----------------\n");
+                console.log("*");
+                console.log("*");
                 if (code === 0) {
                     resolve("success");
                 } else {
