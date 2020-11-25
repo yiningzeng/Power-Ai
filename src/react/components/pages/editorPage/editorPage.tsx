@@ -333,9 +333,9 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                         handler={this.handleCtrlTagHotKey}/>);
                 })}
                 <SplitPane split="vertical"
-                           defaultSize={this.state.thumbnailSize.width}
-                           minSize={350}
-                           maxSize={500}
+                           defaultSize={300}
+                           minSize={300}
+                           maxSize={300}
                            paneStyle={{display: "flex"}}
                            onChange={this.onSideBarResize}
                            onDragFinished={this.onSideBarResizeComplete}>
@@ -522,15 +522,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                 onTagDeleted={this.confirmTagDeleted}
                             />
                         </div>
-                        <EditorSideBar
-                            ref={this.editorSideBar}
-                            assets={this.state.isFilter ? this.state.filterAssets : this.state.assets}
-                            selectedAsset={selectedAsset ? selectedAsset.asset : null}
-                            // selectedAsset={null}
-                            onBeforeAssetSelected={this.onBeforeAssetSelected}
-                            onAssetSelected={this.selectAsset}
-                            thumbnailSize={this.state.thumbnailSize}
-                        />
+
                     </div>
                     <div className="editor-page-content" onClick={this.onPageClick}>
                         <div className="editor-page-content-main">
@@ -542,173 +534,15 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                             </div>
                             <div className="editor-page-content-main-body">
                                 {selectedAsset &&
-                                <Rnd
-                                    id="fuck"
-                                    ref={this.myZoomDom}
-                                    // disableDragging={this.state.zoomMode.disableDrag}
-                                    size={{width: this.state.zoomMode.width, height: this.state.zoomMode.height}}
-                                    position={{x: this.state.zoomMode.x, y: this.state.zoomMode.y}}
-                                    onDragStop={(e, d) => {
-                                        console.log(`drag: ${d.x}, ${d.y} onDragStop`);
-                                        console.log(`drag: this.state.zoomMode.x ${this.state.zoomMode.x}, this.state.zoomMode.y ${this.state.zoomMode.y}`);
-                                        e.preventDefault();
-                                        this.setState({
-                                            zoomMode: {
-                                                ...this.state.zoomMode,
-                                                x: d.x,
-                                                y: d.y,
-                                            },
-                                        });
-                                    }}
-                                    onDragStart={(e) => {
-                                        e.preventDefault();
-                                    }}
-                                    onResize={(e, direction, ref, delta, position) => {
-                                        this.setState({
-                                            zoomMode: {
-                                                ...this.state.zoomMode,
-                                                ...position,
-                                                width: ref.offsetWidth,
-                                                height: ref.offsetHeight,
-                                                // zoomCenterX: ref.offsetWidth / 2,
-                                                // zoomCenterY: ref.offsetHeight / 2,
-                                            },
-                                        });
-                                    }}
-                                    onMouseDown={(e) => {
-                                        console.log(e.button);
-                                        // if (e.button === 0) {
-                                        //     // this.canvas.current.enableCanvas(true);
-                                        //     this.setState({
-                                        //         selectionMode: SelectionMode.RECT,
-                                        //         editorMode: EditorMode.Rectangle,
-                                        //         zoomMode: {
-                                        //             ...this.state.zoomMode,
-                                        //             disableDrag: true,
-                                        //         },
-                                        //         isDrawPolygon2MinBox: false,
-                                        //     });
-                                        //     // this.canvas.current.enableCanvas(true);
-                                        // } else
-                                        if (e.button === 2) {
-                                            e.stopPropagation();
-                                            // this.canvas.current.enableCanvas(false);
-                                            // this.setState({
-                                            //     selectionMode: SelectionMode.NONE,
-                                            //     editorMode: EditorMode.Select,
-                                            //     zoomMode: {
-                                            //         ...this.state.zoomMode,
-                                            //         disableDrag: false,
-                                            //     },
-                                            //     isDrawPolygon2MinBox: false,
-                                            // });
-                                        }
-                                        // const zone = document.getElementById("ct-zone");
-                                        // console.log(this.myZoomDom.current.getOffsetFromParent().left);
-                                        // console.log(this.myZoomDom.current.getSelfElement().offsetLeft);
-                                        // console.log(this.myZoomDom.current.getSelfElement().style.marginLeft);
-                                        // console.log(this.myZoomDom.current.getSelfElement().style.left);
-                                        // console.log(this.myZoomDom.current.getSelfElement().style.paddingLeft);
-                                        // this.setState({
-                                        //     zoomMode: {
-                                        //         ...this.state.zoomMode,
-                                        //         zoomCenterX: e.clientX,
-                                        //         zoomCenterY: e.clientY,
-                                        //     },
-                                        // });
-                                    }}
-                                    onMouseUp={(e) => {
-                                        if (e.button === 2) {
-                                            this.canvas.current.enableCanvas(true);
-                                        }
-                                        console.log(e);
-                                        console.log(`我是鼠标点x: ${e.clientX} 我是鼠标点y: ${e.clientY}`);
-                                        // this.setState({
-                                        //     ...this.state,
-                                        //     zoomMode: {
-                                        //         ...this.state.zoomMode,
-                                        //         zoomCenterX: e.clientX,
-                                        //         zoomCenterY: e.clientY,
-                                        //     },
-                                        // });
-                                    }}
-                                    onMouseMove={(e) => {
-                                        console.log(`我是图像左上角点x: ${this.myZoomDom.current.getDraggablePosition().x} 我是图像左上角点y: ${this.myZoomDom.current.getDraggablePosition().y}`);
-                                        console.log(`我是图像鼠标x: ${e.clientX} 我是图像鼠标Y: ${e.clientY}`);
-                                        // if (e.stopPropagation) e.stopPropagation();
-                                        // if (e.preventDefault) e.preventDefault();
-                                        // console.log(e);
-                                        // console.log(`drag: ${e.clientX}, ${e.clientY} onMouseMove`);
-                                        // this.setState({
-                                        //     ...this.state,
-                                        //     zoomMode: {
-                                        //         ...this.state.zoomMode,
-                                        //     },
-                                        // });
-                                    }}
-                                    onWheel={(e) => {
-                                        try {
-                                            const zone = document.getElementById("ct-zone");
-                                            let w = zone.offsetWidth;
-                                            let h = zone.offsetHeight;
-                                            if ((h - e.deltaY) < this.state.zoomMode.miniHeight) {
-                                                return;
-                                            }
-                                            const leftTopX = this.myZoomDom.current.getDraggablePosition().x;
-                                            const leftTopY = this.myZoomDom.current.getDraggablePosition().y;
-
-                                            const ratioL = (e.clientX - leftTopX) / w;
-                                            const ratioT = (e.clientY - leftTopY) / h;
-                                            const ratioDelta = e.deltaY < 0 ? 1 + 0.07 : 1 - 0.07;
-
-                                            // console.log(`我是图像鼠标滚轮ratioDelta: ${ratioDelta} `);
-                                            w = w * ratioDelta;
-                                            h = h * ratioDelta;
-                                            this.setState({
-                                                zoomMode: {
-                                                    ...this.state.zoomMode,
-                                                    width: w,
-                                                    height: h,
-                                                    x: Math.round(e.clientX - (w * ratioL)) - (e.deltaY / 4),
-                                                    y: Math.round(e.clientY - (h * ratioT)),
-                                                },
-                                            });
-                                            if (this.state.zoomMode.height === "auto") {
-                                                this.setState({
-                                                    zoomMode: {
-                                                        ...this.state.zoomMode,
-                                                        height: document.getElementById("ct-zone").offsetHeight,
-                                                    },
-                                                });
-                                            }
-                                        } catch (e) {
-                                            console.error(e);
-                                        }
-                                        e.stopPropagation();
-                                    }}
-                                >
-                                    <Canvas
-                                        ref={this.canvas}
-                                        selectedAsset={this.state.selectedAsset}
-                                        onAssetMetadataChanged={this.onAssetMetadataChanged}
-                                        onCanvasRendered={this.onCanvasRendered}
-                                        onSelectedRegionsChanged={this.onSelectedRegionsChanged}
-                                        editorMode={this.state.editorMode}
-                                        zoomModeChange={this.state.zoomMode.width}
-                                        selectionMode={this.state.selectionMode}
-                                        project={this.props.project}
-                                        isDrawPolygon2MinBox={this.state.isDrawPolygon2MinBox}
-                                        lockedTags={this.state.lockedTags}>
-                                        <AssetPreview
-                                            additionalSettings={this.state.additionalSettings}
-                                            autoPlay={true}
-                                            controlsEnabled={this.state.isValid}
-                                            onBeforeAssetChanged={this.onBeforeAssetSelected}
-                                            onChildAssetSelected={this.onChildAssetSelected}
-                                            asset={this.state.selectedAsset.asset}
-                                            childAssets={this.state.childAssets}/>
-                                    </Canvas>
-                                </Rnd>
+                                <EditorSideBar
+                                    ref={this.editorSideBar}
+                                    assets={this.state.isFilter ? this.state.filterAssets : this.state.assets}
+                                    selectedAsset={selectedAsset ? selectedAsset.asset : null}
+                                    // selectedAsset={null}
+                                    onBeforeAssetSelected={this.onBeforeAssetSelected}
+                                    onAssetSelected={this.selectAsset}
+                                    thumbnailSize={this.state.thumbnailSize}
+                                />
                                 }
                             </div>
                         </div>
@@ -943,12 +777,12 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
      * @param newWidth The new sidebar width
      */
     private onSideBarResize = (newWidth: number) => {
-        this.setState({
-            thumbnailSize: {
-                width: newWidth,
-                height: newWidth / (4 / 3),
-            },
-        }, () => this.canvas.current.forceResize());
+        // this.setState({
+        //     thumbnailSize: {
+        //         width: newWidth,
+        //         height: newWidth / (4 / 3),
+        //     },
+        // }, () => this.canvas.current.forceResize());
     }
 
     /**

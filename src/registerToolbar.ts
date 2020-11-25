@@ -61,14 +61,14 @@ export default function registerToolbar() {
     //     accelerators: ["Z", "z"],
     // });
 
-    ToolbarItemFactory.register({
-        name: ToolbarItemName.DrawRectangle,
-        tooltip: strings.editorPage.toolbar.drawRectangle,
-        icon: "fa-vector-square",
-        group: ToolbarItemGroup.Canvas,
-        type: ToolbarItemType.State,
-        accelerators: ["Q", "q"],
-    });
+    // ToolbarItemFactory.register({
+    //     name: ToolbarItemName.DrawRectangle,
+    //     tooltip: strings.editorPage.toolbar.drawRectangle,
+    //     icon: "fa-vector-square",
+    //     group: ToolbarItemGroup.Canvas,
+    //     type: ToolbarItemType.State,
+    //     accelerators: ["Q", "q"],
+    // });
     // ToolbarItemFactory.register({
     //     name: ToolbarItemName.DrawWithPencil,
     //     tooltip: strings.editorPage.toolbar.drawWithPencil,
@@ -77,30 +77,30 @@ export default function registerToolbar() {
     //     type: ToolbarItemType.State,
     //     accelerators: ["P", "p"],
     // });
-    ToolbarItemFactory.register({
-        name: ToolbarItemName.DrawPolygon,
-        tooltip: strings.editorPage.toolbar.drawPolygon,
-        icon: "fa-draw-polygon",
-        group: ToolbarItemGroup.Canvas,
-        type: ToolbarItemType.State,
-        accelerators: ["E", "e"],
-    });
-    ToolbarItemFactory.register({
-        name: ToolbarItemName.DrawPolygon2MinBox,
-        tooltip: strings.editorPage.toolbar.drawPolygon2MinBox,
-        icon: "fa-border-none",
-        group: ToolbarItemGroup.Canvas,
-        type: ToolbarItemType.State,
-        accelerators: ["R", "r"],
-    });
-    ToolbarItemFactory.register({
-        name: ToolbarItemName.CopyRectangle,
-        tooltip: strings.editorPage.toolbar.copyRectangle,
-        icon: "far fa-chess-king",
-        group: ToolbarItemGroup.Regions,
-        type: ToolbarItemType.State,
-        accelerators: ["CmdOrCtrl+W", "CmdOrCtrl+w"],
-    });
+    // ToolbarItemFactory.register({
+    //     name: ToolbarItemName.DrawPolygon,
+    //     tooltip: strings.editorPage.toolbar.drawPolygon,
+    //     icon: "fa-draw-polygon",
+    //     group: ToolbarItemGroup.Canvas,
+    //     type: ToolbarItemType.State,
+    //     accelerators: ["E", "e"],
+    // });
+    // ToolbarItemFactory.register({
+    //     name: ToolbarItemName.DrawPolygon2MinBox,
+    //     tooltip: strings.editorPage.toolbar.drawPolygon2MinBox,
+    //     icon: "fa-border-none",
+    //     group: ToolbarItemGroup.Canvas,
+    //     type: ToolbarItemType.State,
+    //     accelerators: ["R", "r"],
+    // });
+    // ToolbarItemFactory.register({
+    //     name: ToolbarItemName.CopyRectangle,
+    //     tooltip: strings.editorPage.toolbar.copyRectangle,
+    //     icon: "far fa-chess-king",
+    //     group: ToolbarItemGroup.Regions,
+    //     type: ToolbarItemType.State,
+    //     accelerators: ["CmdOrCtrl+W", "CmdOrCtrl+w"],
+    // });
 
     // ToolbarItemFactory.register({
     //     name: ToolbarItemName.CopyRegions,
@@ -146,15 +146,15 @@ export default function registerToolbar() {
     //     type: ToolbarItemType.Action,
     //     accelerators: ["CmdOrCtrl+W", "CmdOrCtrl+w"],
     // });
-
-    ToolbarItemFactory.register({
-        name: ToolbarItemName.RemoveAllRegions,
-        tooltip: strings.editorPage.toolbar.removeAllRegions,
-        icon: "fa-ban",
-        group: ToolbarItemGroup.Regions,
-        type: ToolbarItemType.Action,
-        accelerators: ["X", "x"],
-    });
+    //
+    // ToolbarItemFactory.register({
+    //     name: ToolbarItemName.RemoveAllRegions,
+    //     tooltip: strings.editorPage.toolbar.removeAllRegions,
+    //     icon: "fa-ban",
+    //     group: ToolbarItemGroup.Regions,
+    //     type: ToolbarItemType.Action,
+    //     accelerators: ["X", "x"],
+    // });
 
     // ToolbarItemFactory.register({
     //     name: ToolbarItemName.ActiveLearning,
@@ -165,33 +165,33 @@ export default function registerToolbar() {
     //     accelerators: ["CmdOrCtrl+D", "CmdOrCtrl+d"],
     // });
 
-    ToolbarItemFactory.register({
-        name: ToolbarItemName.ZoomOutAsset,
-        tooltip: "缩小",
-        icon: "fas fa-search-minus",
-        group: ToolbarItemGroup.Zoom,
-        type: ToolbarItemType.Action,
-        accelerators: ["O", "o"],
-    });
-
-    ToolbarItemFactory.register({
-        name: ToolbarItemName.ZoomInAsset,
-        tooltip: "放大",
-        icon: "fas fa-search-plus",
-        group: ToolbarItemGroup.Zoom,
-        type: ToolbarItemType.Action,
-        accelerators: ["I", "i"],
-    });
+    // ToolbarItemFactory.register({
+    //     name: ToolbarItemName.ZoomOutAsset,
+    //     tooltip: "缩小",
+    //     icon: "fas fa-search-minus",
+    //     group: ToolbarItemGroup.Zoom,
+    //     type: ToolbarItemType.Action,
+    //     accelerators: ["O", "o"],
+    // });
+    //
+    // ToolbarItemFactory.register({
+    //     name: ToolbarItemName.ZoomInAsset,
+    //     tooltip: "放大",
+    //     icon: "fas fa-search-plus",
+    //     group: ToolbarItemGroup.Zoom,
+    //     type: ToolbarItemType.Action,
+    //     accelerators: ["I", "i"],
+    // });
 
     // 缩放回归正常
-    ToolbarItemFactory.register({
-        name: ToolbarItemName.ZoomNormolAsset,
-        tooltip: "正常",
-        icon: "fa-expand",
-        group: ToolbarItemGroup.Zoom,
-        type: ToolbarItemType.Action,
-        accelerators: ["C", "c"],
-    });
+    // ToolbarItemFactory.register({
+    //     name: ToolbarItemName.ZoomNormolAsset,
+    //     tooltip: "正常",
+    //     icon: "fa-expand",
+    //     group: ToolbarItemGroup.Zoom,
+    //     type: ToolbarItemType.Action,
+    //     accelerators: ["C", "c"],
+    // });
 
     ToolbarItemFactory.register({
         name: ToolbarItemName.PreviousAsset,
@@ -235,14 +235,14 @@ export default function registerToolbar() {
     //     type: ToolbarItemType.Action,
     //     accelerators: ["CmdOrCtrl+S", "CmdOrCtrl+s"],
     // }, SaveProject);
-    ToolbarItemFactory.register({
-        name: ToolbarItemName.ProjectMetrics,
-        tooltip: "分析",
-        icon: "fa-chart-bar",
-        group: ToolbarItemGroup.Project,
-        type: ToolbarItemType.Action,
-        accelerators: ["CmdOrCtrl+M", "CmdOrCtrl+m"],
-    });
+    // ToolbarItemFactory.register({
+    //     name: ToolbarItemName.ProjectMetrics,
+    //     tooltip: "分析",
+    //     icon: "fa-chart-bar",
+    //     group: ToolbarItemGroup.Project,
+    //     type: ToolbarItemType.Action,
+    //     accelerators: ["CmdOrCtrl+M", "CmdOrCtrl+m"],
+    // });
 
     // ToolbarItemFactory.register({
     //     name: ToolbarItemName.SaveProject,

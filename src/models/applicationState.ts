@@ -445,6 +445,7 @@ export interface IAsset {
     predicted?: boolean;
     tagType?: string;
     tags?: string;
+    sort?: string;
 }
 
 /**

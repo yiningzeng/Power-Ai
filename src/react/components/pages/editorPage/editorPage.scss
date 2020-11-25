@@ -14,7 +14,7 @@
 
     &-tree {
         flex-basis: 20vw;
-        min-width: 250px;
+        min-width: 300px;
         max-width: 300px;
         &-item {
             background: #757f89;
@@ -22,6 +22,7 @@
     }
 
     &-nav {
+      margin: 0 auto;
       width: 60%;
 
       .asset-list {
@@ -314,13 +315,13 @@ canvas {
   color: #fff;
   position: absolute;
   z-index: 2;
-  right: 0.5em;
+  left: 0.5em;
   top: 0.5em;
   text-shadow: 0px 0px 4px #000;
 }
 
 .badge-tagged {
-    background-color: rgba(red, 0.9);
+    background-color: rgba(LightSkyBlue, 0.9);
     border: 1px solid $lighter-2;
 }
 

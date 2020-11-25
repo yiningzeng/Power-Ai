@@ -203,7 +203,7 @@ export class AssetService {
         }
         let res: IAssetsAndTags;
         let taggs = [];
-        let finalTags: ITag[] = [];
+        const finalTags: ITag[] = [];
         const exitsColor = await this.getColors();
         const assets = await this.assetProviderInstance.getAssets();
         console.log(`获取到的颜色 ${JSON.stringify(finalTags)}`);
@@ -220,14 +220,17 @@ export class AssetService {
             }
             if (assetMetadata.asset) {
                 if (assetMetadata.asset.tags) {
-                    if (assetMetadata.asset.tags.indexOf(",") > 0) {
+                if (assetMetadata.asset.sort) {
                         taggs = taggs.concat(assetMetadata.asset.tags.split(","));
+                    if (assetMetadata.asset.sort.indexOf(",") > 0) {
+                        taggs = taggs.concat(assetMetadata.asset.sort.split(","));
                     } else {
-                        taggs.push(assetMetadata.asset.tags);
+                        taggs.push(assetMetadata.asset.sort);
                     }
                 }
                 const newAsset = {
                     ...asset,
+                    ...assetMetadata.asset,
                     path: `file:${folder}/${asset.name}`,
                     size: assetMetadata.asset.size,
                     state: assetMetadata.asset.state,
@@ -410,6 +413,7 @@ export class AssetService {
      */
     public compareVersion(assetsVersion: string, compareVersion: string): number {
         Guard.null(assetsVersion);
+        if (assetsVersion.includes("sort")) { return 0; }
         if (assetsVersion === compareVersion) { return 0; }
         if (compareVersion.indexOf("-") > 0) {
             compareVersion = compareVersion.substring(0, compareVersion.indexOf("-"));

@@ -106,9 +106,9 @@ export default class EditorSideBar extends React.Component<IEditorSideBarProps, 
             multipleSelect,
             originalIndex,
         }, () => {
-            console.log(`sidebar: this.state: ${JSON.stringify(this.state)}`);
-            console.log(`sidebar: originalIndex: ${originalIndex}`);
-            console.log(`sidebar: multipleSelect: ${multipleSelect}`);
+            // console.log(`sidebar: this.state: ${JSON.stringify(this.state)}`);
+            // console.log(`sidebar: originalIndex: ${originalIndex}`);
+            // console.log(`sidebar: multipleSelect: ${multipleSelect}`);
             this.onAssetClicked(asset);
         });
     }
@@ -175,7 +175,8 @@ export default class EditorSideBar extends React.Component<IEditorSideBarProps, 
                 return (
                     <span title={strings.editorPage.tagged}
                           className="badge badge-tagged">
-                        <i className="fas fa-tags"></i>
+                        <i className="fas fa-flag"></i>
+                        {` ${asset.sort === undefined ? "" : asset.sort}`}
                     </span>
                 );
             case AssetState.Visited:
@@ -183,13 +184,6 @@ export default class EditorSideBar extends React.Component<IEditorSideBarProps, 
                     <span title={strings.editorPage.visited}
                           className="badge badge-visited">
                         <i className="fas fa-eye"></i>
-                    </span>
-                );
-            case AssetState.OkTagged:
-                return (
-                    <span title={strings.editorPage.tagged}
-                          className="badge badge-ok-tagged">
-                        <i className="fas fa-check"></i>
                     </span>
                 );
             default:
