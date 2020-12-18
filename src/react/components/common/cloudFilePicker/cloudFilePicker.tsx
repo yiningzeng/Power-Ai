@@ -12,6 +12,8 @@ import pTimeout from "p-timeout";
 import delay from "delay";
 import {IpcRendererProxy} from "../../../../common/ipcRendererProxy";
 import {LocalFileSystemProxy} from "../../../../providers/storage/localFileSystemProxy";
+import {SelectionMode} from "powerai-ct/lib/js/CanvasTools/Interface/ISelectorSettings";
+import {ICanvasProps, ICanvasState} from "../../pages/editorPage/canvas";
 // const delay = require('delay');
 // const pTimeout = require('p-timeout');
 /**
@@ -51,7 +53,6 @@ export interface ICloudFilePickerState {
     username: string;
     password: string;
     belongToProject: IProjectItem;
-
     copyList?: string[];
 }
 
@@ -73,6 +74,19 @@ export class CloudFilePicker extends React.Component<ICloudFilePickerProps, IClo
         this.back = this.back.bind(this);
 
         this.state = this.getInitialState();
+    }
+
+    // tslint:disable-next-line:max-line-length
+    public componentDidUpdate = async (prevProps: Readonly<ICloudFilePickerProps>, prevState: Readonly<ICloudFilePickerState>) => {
+        // Handles asset changing
+        // this.positionCanvas(this.state.contentSource);
+        if (this.props.remoteHostList !== prevProps.remoteHostList) {
+            this.setState({
+                ...this.state,
+                ip: this.props.remoteHostList !== undefined && this.props.remoteHostList.length > 0 ?
+                    this.props.remoteHostList[0].ip : "",
+            });
+        }
     }
 
     public render() {

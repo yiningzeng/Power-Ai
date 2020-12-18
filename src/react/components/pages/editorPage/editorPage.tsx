@@ -72,6 +72,7 @@ import {Rnd} from "powerai-react-rnd";
 import {constants} from "../../../../common/constants";
 import {DoubleTextSwitch} from "../../common/doubleTextSwitch/doubleTextSwitch";
 import {Divider} from "@material-ui/core";
+import {IpcRendererProxy} from "../../../../common/ipcRendererProxy";
 
 // import "antd/lib/tree/style/css";
 
@@ -1513,39 +1514,20 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
             assets: {},
             lastVisitedAssetId: selectAssetId,
         };
-        const dataTemp = await this.props.actions.loadAssetsWithFolderAndTags(projectJson,
-            fileFolder);
-        const rootProjectAssets = _.values(projectJson.assets)
-            .filter((asset) => !asset.parent);
-        const rootAssets = _(rootProjectAssets)
-            .concat(dataTemp.assets)
-            .uniqBy((asset) => asset.id)
-            .value();
-        // region 查询重复的标签
-        const finalTags = this.props.project.tags.filter((v) => v.name !== deltetTag);
-        dataTemp.tags.map((val) => {
-            if (!finalTags.some((v) => v.name === val.name)) {
-                const newTag: ITag = {
-                    name: val.name,
-                    color: this.getNextColor(finalTags),
-                };
-                finalTags.push(newTag);
-            }
-        });
-        // endregion
 
-        projectJson = {
-            ...projectJson,
-            assets: _.keyBy(rootAssets, (asset) => asset.id),
-            tags: finalTags.sort(),
-        };
-        // console.log(`merge tags: ${JSON.stringify(finalTags)}`);
-        // console.log(`homePage:merge tags: ${JSON.stringify(projectJson)}`);
-        connectionActions.saveConnection(projectJson.sourceConnection);
-
-        await this.props.actions.loadProject(projectJson);
-        // console.log(`homePage:merge tags: fufufufufufufufufufuufuf`);
-        // console.log(`exportPage: homepage2222: ${JSON.stringify(this.props.project)}`);
+        const yiningzengAssets = fileFolder + "/.yiningzeng.assets";
+        const llll = await IpcRendererProxy.send(`TrainingSystem:FileExist`, [yiningzengAssets]);
+        if (llll) {
+            const yiNingZengAssets = await this.props.actions.getAssetsByYiNingZengAssets(projectJson);
+            const yiNingZengTags = await this.props.actions.getAssetsByYiNingZengColorTags(projectJson);
+            console.log(yiningzengAssets);
+            projectJson = {
+                ...projectJson,
+                assets: yiNingZengAssets,
+                tags: yiNingZengTags,
+            };
+            await this.props.actions.saveProject(projectJson);
+        }
         this.loadingDialog.current.close();
         this.props.history.push(`/projects/${projectJson.id}/edit`);
         this.loadingProjectAssets = false;

@@ -53,6 +53,8 @@ export default interface IProjectActions {
     loadAssetsWithFolder(project: IProject, folder: string): Promise<IAsset[]>;
     loadAssetsWithFolderAndTags(project: IProject, folder: string): Promise<IAssetsAndTags>;
     loadAssetMetadata(project: IProject, asset: IAsset): Promise<IAssetMetadata>;
+    getAssetsByYiNingZengAssets(project: IProject): Promise<{ [index: string]: IAsset }>;
+    getAssetsByYiNingZengColorTags(project: IProject): Promise<ITag[]>;
     saveAssetMetadata(project: IProject, assetMetadata: IAssetMetadata): Promise<IAssetMetadata>;
     deleteAsset(project: IProject, selectAsset: IAsset): Promise<IProject>;
     deleteAssetBatch(assetService: AssetService, selectAsset: IAsset): Promise<void>;
@@ -241,6 +243,20 @@ export function loadAssetsWithFolderAndTags(project: IProject, folder: string):
         const rest = await assetService.getAssetsWithFolderMain(folder);
         dispatch(loadProjectAssetsAction(rest.assets));
         return rest;
+    };
+}
+
+export function getAssetsByYiNingZengAssets(project: IProject): (dispatch: Dispatch) => Promise<{ [index: string]: IAsset }> {
+    return async (dispatch: Dispatch) => {
+        const assetService = new AssetService(project);
+        return await assetService.getYiNingZengAssets();
+    };
+}
+
+export function getAssetsByYiNingZengColorTags(project: IProject): (dispatch: Dispatch) => Promise<ITag[]> {
+    return async (dispatch: Dispatch) => {
+        const assetService = new AssetService(project);
+        return await assetService.getYiNingZengColorTags();
     };
 }
 

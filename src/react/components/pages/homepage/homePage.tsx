@@ -35,7 +35,7 @@ import {
     DefaultTrainOptions,
     ModelPathType,
     ITag,
-    IProjectItem, ExportPath,
+    IProjectItem, ExportPath, IRemoteHostItem,
 } from "../../../../models/applicationState";
 import ImportService from "../../../../services/importService";
 import { IAssetMetadata } from "../../../../models/applicationState";
@@ -57,6 +57,7 @@ import {TagInput} from "../../common/tagInput/tagInput";
 import ProjectItem from "./projectItem";
 import {CloudFileCopyPicker} from "../../common/cloudFileCopyPicker/cloudFileCopyPicker";
 import {IpcRendererProxy} from "../../../../common/ipcRendererProxy";
+import HtmlFileReader from "../../../../common/htmlFileReader";
 // tslint:disable-next-line:no-var-requires
 const tagColors = require("../../common/tagColors.json");
 
@@ -249,9 +250,6 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                                     <i className="fas fa-folder-open fa-9x"></i>
                                     <h6 style={{marginTop: "10px"}}>{strings.homePage.openLocalProject.title}</h6>
                                 </a>
-                                <FilePicker ref={this.filePicker}
-                                            onChange={this.onProjectFileUpload}
-                                            onError={this.onProjectFileUploadError}/>
                             </li>
                         }
                         {/*{isElectron() &&*/}
@@ -272,7 +270,7 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                         {/*       onClick={() => this.filePicker.current.upload()}>*/}
                         {/*        <i className="fas fa-file-import fa-9x"></i>*/}
                         {/*        <h6 style={{marginTop: "10px", marginLeft: "10px"}}>*/}
-                        {/*            {strings.homePage.openTransferProject.title}</h6>*/}
+                        {/*            ！！！！！！！！！！！！</h6>*/}
                         {/*    </a>*/}
                         {/*    <FilePicker ref={this.filePicker}*/}
                         {/*                onChange={this.onProjectFileUpload}*/}
@@ -498,22 +496,25 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
             videoSettings: {frameExtractionRate: 15},
             assets: {},
         };
-        const dataTemp = await this.props.actions.loadAssetsWithFolderAndTags(projectJson, fileFolder);
-        await this.props.actions.saveProject(projectJson);
-        const rootProjectAssets = _.values(projectJson.assets)
-            .filter((asset) => !asset.parent);
-        const rootAssets = _(rootProjectAssets)
-            .concat(dataTemp.assets)
-            .uniqBy((asset) => asset.id)
-            .value();
-        projectJson = {
-            ...projectJson,
-            assets: _.keyBy(rootAssets, (asset) => asset.id),
-            tags: dataTemp.tags,
-        };
-        connectionActions.saveConnection(connection);
-        this.draggableDialog.current.close();
-        await this.loadSelectedProject(projectJson);
+        const yiningzengAssets = fileFolder + "/.yiningzeng.assets";
+        const monkeySun = await IpcRendererProxy.send(`TrainingSystem:MonkeySun`, [fileFolder, 100]);
+        console.log(monkeySun);
+        const llll = await IpcRendererProxy.send(`TrainingSystem:FileExist`, [yiningzengAssets]);
+        if (llll) {
+            const yiNingZengAssets = await this.props.actions.getAssetsByYiNingZengAssets(projectJson);
+            const yiNingZengTags = await this.props.actions.getAssetsByYiNingZengColorTags(projectJson);
+            console.log(yiningzengAssets);
+            console.log(yiNingZengTags);
+            projectJson = {
+                ...projectJson,
+                assets: yiNingZengAssets,
+                tags: yiNingZengTags,
+            };
+            await this.props.actions.saveProject(projectJson);
+            connectionActions.saveConnection(connection);
+            this.draggableDialog.current.close();
+            await this.loadSelectedProject(projectJson);
+        }
     }
 
     private  onOpenDirectory = async () => {
@@ -529,7 +530,7 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
         let projectJson: IProject;
         try {
             projectJson = JSON.parse(project.content);
-            // alert(JSON.stringify(project.content));
+            alert(JSON.stringify(project));
         } catch (error) {
             throw new AppError(ErrorCode.ProjectInvalidJson, "Error parsing JSON");
         }

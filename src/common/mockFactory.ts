@@ -837,6 +837,8 @@ export default class MockFactory {
             trainPackageProject: jest.fn(() => Promise.resolve()),
             trainUploadProject: jest.fn(() => Promise.resolve()),
             loadAssetMetadata: jest.fn(() => Promise.resolve()),
+            getAssetsByYiNingZengAssets: jest.fn(() => Promise.resolve()),
+            getAssetsByYiNingZengColorTags: jest.fn(() => Promise.resolve()),
             saveAssetMetadata: jest.fn(() => Promise.resolve()),
             deleteAsset: jest.fn(() => Promise.resolve()),
             deleteAssetBatch: jest.fn(() => Promise.resolve()),

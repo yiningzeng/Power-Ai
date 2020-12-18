@@ -364,6 +364,28 @@ export class AssetService {
      * Get metadata for asset
      * @param asset - Asset for which to retrieve metadata
      */
+    public async getYiNingZengAssets(): Promise<{ [index: string]: IAsset }> {
+        // console.log(`assets_map: ${fileName}:`);
+        try {
+            const json = await this.storageProvider.readText(".yiningzeng.assets");
+            return JSON.parse(json)["assets"] as { [index: string]: IAsset };
+        } catch (err) {
+           return null;
+        }
+    }
+    public async getYiNingZengColorTags(): Promise<ITag[]> {
+        // console.log(`assets_map: ${fileName}:`);
+        try {
+            const json = await this.storageProvider.readText("colors.color");
+            return JSON.parse(json) as ITag[];
+        } catch (err) {
+            return [];
+        }
+    }
+    /**
+     * Get metadata for asset
+     * @param asset - Asset for which to retrieve metadata
+     */
     public async getAssetMetadata(asset: IAsset): Promise<IAssetMetadata> {
         Guard.null(asset);
 

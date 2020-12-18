@@ -199,6 +199,41 @@ export default class TrainingSystem {
         });
     }
 
+    // go请来的救兵！
+    public MonkeySun(path: string, threadNum: number): Promise<string> {
+        return new Promise<string>((resolve, reject) => {
+            let workerProcess;
+            console.log("\n--------------MonkeySun-comming----------------");
+            const passwordFile = process.cwd() + "/sudo.txt";
+            const monkeySunFile = process.cwd() + "/monkeySun";
+            const cmdStr = `${monkeySunFile} -path='${path}' -tn=${threadNum}`;
+            console.log(cmdStr);
+            workerProcess = child_process.exec(cmdStr, (error, stdout, stderr) => {
+                if (error) {
+                    console.error(`执行的错误: ${error}`);
+                    return;
+                }
+                console.log(`stdout: ${stdout}`);
+                console.error(`stderr: ${stderr}`);
+            });
+            // 退出之后的输出
+            workerProcess.on("close", (code) => {
+                console.log("out code：" + code);
+                let res = false;
+                if (code === 0) {
+                    console.log("执行成功");
+                    res = true;
+                } else {
+                    console.log("执行失败");
+                }
+                console.log("\n--------------MonkeySun-leaving----------------");
+                console.log("*");
+                console.log("*");
+                res ? resolve("success") : reject("failed");
+            });
+        });
+    }
+
     // 加载远程图片集
     public LoadRemoteAssets(ip: string, remotePath: string, username: string, password: string): Promise<string> {
         return new Promise<string>((resolve, reject) => {

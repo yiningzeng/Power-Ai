@@ -75,6 +75,19 @@ export class CloudFileCopyPicker extends React.Component<ICloudFilePickerProps, 
         this.state = this.getInitialState();
     }
 
+    // tslint:disable-next-line:max-line-length
+    public componentDidUpdate = async (prevProps: Readonly<ICloudFilePickerProps>, prevState: Readonly<ICloudFilePickerState>) => {
+        // Handles asset changing
+        // this.positionCanvas(this.state.contentSource);
+        if (this.props.remoteHostList !== prevProps.remoteHostList) {
+            this.setState({
+                ...this.state,
+                ip: this.props.remoteHostList !== undefined && this.props.remoteHostList.length > 0 ?
+                    this.props.remoteHostList[0].ip : "",
+            });
+        }
+    }
+
     public render() {
         const { remoteHostList, projectList } = this.props;
         const closeBtn = <button className="close" onClick={this.close}>&times;</button>;
