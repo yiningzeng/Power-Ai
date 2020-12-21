@@ -242,16 +242,26 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                         {/*        <h6 style={{marginTop: "10px"}}>{strings.homePage.newProject}</h6>*/}
                         {/*    </a>*/}
                         {/*</li>*/}
-                        {
-                            isElectron() &&
-                            <li>
-                                <a href="#" className="p-5 file-upload"
-                                   onClick={this.onOpenDirectory}>
-                                    <i className="fas fa-folder-open fa-9x"></i>
-                                    <h6 style={{marginTop: "10px"}}>{strings.homePage.openLocalProject.title}</h6>
-                                </a>
-                            </li>
-                        }
+                        <li>
+                            <a href="#"  className="app-homepage-main-a-groupRed p-5 cloud-open-project"
+                               onClick={() => this.inputCodeTagAssetsModal.current.open()}>
+                                <i className="fas fa-search fa-9x"></i>
+                                <h6 style={{marginTop: "10px"}}>{strings.homePage.inputCodeTagAssets.title}</h6>
+                            </a>
+                            <ModalSearchPcb
+                                ref={this.inputCodeTagAssetsModal}
+                                modalHeader={strings.homePage.inputCodeTagAssets.title}
+                                connections={this.props.connections}
+                                remoteHostList={this.props.appSettings.remoteHostList}
+                                projectList={this.props.appSettings.projectList}
+                                onSubmit={(success, content, belongToProject) => {
+                                    if (success) {
+                                        this.loadProject(content, belongToProject, ExportPath.MissData);
+                                    }
+                                }}
+                                fileExtension={constants.projectFileExtension}
+                            />
+                        </li>
                         {/*{isElectron() &&*/}
                         {/*<li>*/}
                         {/*    <a href="#" className="p-5 file-upload"*/}
@@ -279,7 +289,7 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                         {/*}*/}
 
                         <li>
-                            <a href="#"  className="p-5 cloud-open-project"
+                            <a href="#"  className="app-homepage-main-a-groupRed p-5 cloud-open-project"
                                onClick={() => this.handleOpenCloudProjectClick(this.cloudFilePickerModal.current)}>
                                 <i className="fas fa-cloud fa-9x"></i>
                                 <h6 style={{marginTop: "10px"}}>{strings.homePage.openCloudProject.title}</h6>
@@ -298,8 +308,18 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                                 fileExtension={constants.projectFileExtension}
                             />
                         </li>
+                        {
+                            isElectron() &&
+                            <li>
+                                <a href="#" className="app-homepage-main-a-groupBlue p-5 file-upload"
+                                   onClick={this.onOpenDirectory}>
+                                    <i className="fas fa-folder-open fa-9x"></i>
+                                    <h6 style={{marginTop: "10px"}}>{strings.homePage.openLocalProject.title}</h6>
+                                </a>
+                            </li>
+                        }
                         <li>
-                            <a href="#"  className="p-5 cloud-open-project"
+                            <a href="#"  className="app-homepage-main-a-groupBlue p-5 cloud-open-project"
                                onClick={() => this.handleOpenCloudCopyProjectClick(this.copyRemoteAssetsModal.current)}>
                                 <i className="fas fa-copy fa-9x"></i>
                                 <h6 style={{marginTop: "10px"}}>{strings.homePage.copyRemoteAssets.title}</h6>
@@ -315,26 +335,6 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                                 }}
                                 fileExtension={constants.projectFileExtension}
                                 copy
-                            />
-                        </li>
-                        <li>
-                            <a href="#"  className="p-5 cloud-open-project"
-                               onClick={() => this.inputCodeTagAssetsModal.current.open()}>
-                                <i className="fas fa-search fa-9x"></i>
-                                <h6 style={{marginTop: "10px"}}>{strings.homePage.inputCodeTagAssets.title}</h6>
-                            </a>
-                            <ModalSearchPcb
-                                ref={this.inputCodeTagAssetsModal}
-                                modalHeader={strings.homePage.inputCodeTagAssets.title}
-                                connections={this.props.connections}
-                                remoteHostList={this.props.appSettings.remoteHostList}
-                                projectList={this.props.appSettings.projectList}
-                                onSubmit={(success, content, belongToProject) => {
-                                    if (success) {
-                                        this.loadProject(content, belongToProject, ExportPath.MissData);
-                                    }
-                                }}
-                                fileExtension={constants.projectFileExtension}
                             />
                         </li>
                     </ul>

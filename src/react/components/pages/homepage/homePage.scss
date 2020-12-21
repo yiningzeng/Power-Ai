@@ -9,7 +9,24 @@
     &-main {
         display: flex;
         flex-grow: 1;
-
+        &-a-groupBlue {
+            display: inline-block;
+            background-color: #4dabf7;
+            &.active, &:hover {
+                color: #fff;
+                background-color: $lighter-2;
+                text-decoration: none;
+            }
+        }
+        &-a-groupRed {
+            display: inline-block;
+            background-color: $color-red2;
+            &.active, &:hover {
+                color: #fff;
+                background-color: $lighter-2;
+                text-decoration: none;
+            }
+        }
         ul {
             display: flex;
             flex-direction: row;
@@ -23,16 +40,6 @@
             li {
                 list-style-type: none;
                 text-align: center;
-
-                a {
-                    display: inline-block;
-
-                    &.active, &:hover {
-                        color: #fff;
-                        background-color: $lighter-2;
-                        text-decoration: none;
-                    }
-                }
             }
         }
     }
