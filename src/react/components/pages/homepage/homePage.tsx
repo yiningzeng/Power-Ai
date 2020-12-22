@@ -243,7 +243,7 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                         {/*    </a>*/}
                         {/*</li>*/}
                         <li>
-                            <a href="#"  className="app-homepage-main-a-groupRed p-5 cloud-open-project"
+                            <a href="#"  className="app-homepage-main-a-group1 p-5 cloud-open-project"
                                onClick={() => this.inputCodeTagAssetsModal.current.open()}>
                                 <i className="fas fa-search fa-9x"></i>
                                 <h6 style={{marginTop: "10px"}}>{strings.homePage.inputCodeTagAssets.title}</h6>
@@ -289,7 +289,7 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                         {/*}*/}
 
                         <li>
-                            <a href="#"  className="app-homepage-main-a-groupRed p-5 cloud-open-project"
+                            <a href="#"  className="app-homepage-main-a-group1 p-5 cloud-open-project"
                                onClick={() => this.handleOpenCloudProjectClick(this.cloudFilePickerModal.current)}>
                                 <i className="fas fa-cloud fa-9x"></i>
                                 <h6 style={{marginTop: "10px"}}>{strings.homePage.openCloudProject.title}</h6>
@@ -311,7 +311,7 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                         {
                             isElectron() &&
                             <li>
-                                <a href="#" className="app-homepage-main-a-groupBlue p-5 file-upload"
+                                <a href="#" className="app-homepage-main-a-group2 p-5 file-upload"
                                    onClick={this.onOpenDirectory}>
                                     <i className="fas fa-folder-open fa-9x"></i>
                                     <h6 style={{marginTop: "10px"}}>{strings.homePage.openLocalProject.title}</h6>
@@ -319,7 +319,7 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                             </li>
                         }
                         <li>
-                            <a href="#"  className="app-homepage-main-a-groupBlue p-5 cloud-open-project"
+                            <a href="#"  className="app-homepage-main-a-group2 p-5 cloud-open-project"
                                onClick={() => this.handleOpenCloudCopyProjectClick(this.copyRemoteAssetsModal.current)}>
                                 <i className="fas fa-copy fa-9x"></i>
                                 <h6 style={{marginTop: "10px"}}>{strings.homePage.copyRemoteAssets.title}</h6>

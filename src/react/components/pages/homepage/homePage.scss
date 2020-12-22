@@ -9,18 +9,18 @@
     &-main {
         display: flex;
         flex-grow: 1;
-        &-a-groupBlue {
+        &-a-group1 {
             display: inline-block;
-            background-color: #4dabf7;
+            background-color: $color-SteelBlue;
             &.active, &:hover {
                 color: #fff;
                 background-color: $lighter-2;
                 text-decoration: none;
             }
         }
-        &-a-groupRed {
+        &-a-group2 {
             display: inline-block;
-            background-color: $color-red2;
+            background-color: $color-DimGray;
             &.active, &:hover {
                 color: #fff;
                 background-color: $lighter-2;
