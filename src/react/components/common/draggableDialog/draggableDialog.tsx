@@ -6,12 +6,18 @@ import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import Paper, { PaperProps } from "@material-ui/core/Paper";
 import Draggable from "powerai-react-draggable-v2";
-import LinearProgress from "@material-ui/core/LinearProgress";
+import LinearProgress, {LinearProgressProps} from "@material-ui/core/LinearProgress";
 import Button from "@material-ui/core/Button";
+import {toast} from "react-toastify";
+import {IpcRendererProxy} from "../../../../common/ipcRendererProxy";
+import {Box} from "@material-ui/core";
+import Typography from "@material-ui/core/Typography";
 
 export interface IDraggableDialogProps {
     title?: string;
     content?: string;
+    showProgress?: boolean;
+    interval?: number;
     disableBackdropClick?: boolean;
     disableEscapeKeyDown?: boolean;
     fullWidth?: boolean;
@@ -23,6 +29,8 @@ export interface IDraggableDialogState {
     open: boolean;
     done: boolean;
     change: boolean;
+    nowValue?: number;
+    allNum?: number;
     title?: string;
     content?: string;
     showCancel?: boolean;
@@ -36,8 +44,23 @@ function PaperComponent(props: PaperProps) {
 );
 }
 
-export default class DraggableDialog extends React.Component<IDraggableDialogProps, IDraggableDialogState> {
+function LinearProgressWithLabel(props: LinearProgressProps & { value: number }) {
+    return (
+        <Box display="flex" alignItems="center">
+            <Box width="100%" mr={1}>
+                <LinearProgress variant="determinate" {...props} />
+            </Box>
+            <Box minWidth={35}>
+                <Typography variant="body2" color="textSecondary">{`${Math.round(
+                    props.value,
+                )}%`}</Typography>
+            </Box>
+        </Box>
+    );
+}
 
+export default class DraggableDialog extends React.Component<IDraggableDialogProps, IDraggableDialogState> {
+    private timer;
     constructor(props, context) {
         super(props, context);
 
@@ -73,11 +96,19 @@ export default class DraggableDialog extends React.Component<IDraggableDialogPro
                             this.props.title === undefined ? "请耐心等待" : this.props.title}
                     </DialogTitle>
                     <DialogContent>
-                        {this.state.done ? undefined : <LinearProgress />}
+                        {
+                            this.props.showProgress ?
+                                <LinearProgressWithLabel value={this.state.nowValue * 100 / this.state.allNum} /> :
+                                this.state.done ? undefined : <LinearProgress />
+                        }
                         <DialogContentText style={{marginTop: "20px"}}>
                             {this.state.change ?
                                 this.state.content === undefined ? "已经处理完成，确定返回上一页" : this.state.content :
-                                this.props.content === undefined ? "正在处理" : this.props.content}
+                                this.props.content === undefined ?
+                                    "正在处理" : this.props.showProgress ?
+                                    this.state.nowValue === this.state.allNum ? `已处理完成${this.state.allNum}个素材，正在跳转标注中心...` :
+                                    this.props.content + `(${this.state.nowValue}/${this.state.allNum})` :
+                                    this.props.content}
                         </DialogContentText>
                     </DialogContent>
                     <DialogActions>
@@ -93,8 +124,25 @@ export default class DraggableDialog extends React.Component<IDraggableDialogPro
         );
     }
 
-    public open = () => {
-        this.setState({open: true, done: false, change: false});
+    public open = async (path?: string) => {
+        if (this.props.showProgress) {
+            this.setState({
+                change: true,
+                content: "正在计算素材数量...",
+                nowValue: 0,
+                allNum: 100,
+            }, async () => {
+                const cal = await IpcRendererProxy.send(`TrainingSystem:CalProgress`, [path]);
+                this.setState({open: true, done: false, change: false});
+                if (cal === "success") {
+                    const allNum = await IpcRendererProxy.send(`TrainingSystem:GetProgress`, ["allNum.txt"]);
+                    this.doProgress();
+                    this.setState({open: true, done: false, change: false, allNum: Number(allNum)});
+                }
+            });
+        } else {
+            this.setState({open: true, done: false, change: false});
+        }
     }
 
     public change = (title, content, done = false, showCancel= false, change= true) => {
@@ -109,5 +157,22 @@ export default class DraggableDialog extends React.Component<IDraggableDialogPro
 
     public close = () => {
         this.setState({open: false});
+        if (this.props.showProgress) {
+            this.clearProgress();
+        }
+    }
+
+    private doProgress() {
+        this.timer = setInterval(async () => {
+            const pro = await IpcRendererProxy.send(`TrainingSystem:GetProgress`, ["now.txt"]);
+            this.setState({...this.state, open: true, done: false, change: false, nowValue: Number(pro)}, () => {
+                if (this.state.allNum === this.state.nowValue) {
+                    this.clearProgress();
+                }
+            });
+        }, this.props.interval === undefined ? 150 : this.props.interval);
+    }
+    private clearProgress() {
+        clearInterval(this.timer);
     }
 }

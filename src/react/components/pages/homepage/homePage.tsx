@@ -402,7 +402,9 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                 <DraggableDialog
                     title={"正在加载..."}
                     ref={this.draggableDialog}
-                    content={"请耐心等待"}
+                    content={"处理中"}
+                    interval={50}
+                    showProgress={true}
                     disableBackdropClick={true}
                     disableEscapeKeyDown={true}
                     fullWidth={true}
@@ -455,7 +457,7 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
     }
 
     private loadProject = async (fileFolder: string, belongToProject?: IProjectItem, exportPath?: string) => {
-        this.draggableDialog.current.open();
+        await this.draggableDialog.current.open(fileFolder);
         // 先判断文件夹是否存在
         const res = await IpcRendererProxy.send(`TrainingSystem:FileExist`, [fileFolder]);
         if (!res) {

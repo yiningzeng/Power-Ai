@@ -199,14 +199,100 @@ export default class TrainingSystem {
         });
     }
 
+    public CalProgress(path: string): Promise<string> {
+        return new Promise<string>((resolve, reject) => {
+            let workerProcess;
+            const allNumFile = process.cwd() + "/allNum.txt";
+            const jsonListFile = process.cwd() + "/jsonList.txt";
+            const cmdStr = `echo 0 > now.txt && ls ${path} | grep ".json" > ${jsonListFile} && ls ${path} | grep ".json" |wc -l > ${allNumFile}`;
+            workerProcess = child_process.exec(cmdStr, (error, stdout, stderr) => {
+                if (error) {
+                    console.error(`执行的错误: ${error}`);
+                    return;
+                }
+                console.log(`stdout: ${stdout}`);
+                console.error(`stderr: ${stderr}`);
+            });
+            // 退出之后的输出
+            workerProcess.on("close", (code) => {
+                console.log("out code：" + code);
+                let res = false;
+                if (code === 0) {
+                    console.log("执行成功");
+                    res = true;
+                } else {
+                    console.log("执行失败");
+                }
+                res ? resolve("success") : reject("计算文件数目出错");
+            });
+        });
+    }
+
+    public ClearProgress(): Promise<string> {
+        return new Promise<string>((resolve, reject) => {
+            let workerProcess;
+            const nowFile = process.cwd() + "/now.txt";
+            const allNumFile = process.cwd() + "/allNum.txt";
+            const cmdStr = `rm '${nowFile}' && rm '${allNumFile}'`;
+            console.log(cmdStr);
+            workerProcess = child_process.exec(cmdStr, (error, stdout, stderr) => {
+                if (error) {
+                    console.error(`执行的错误: ${error}`);
+                    return;
+                }
+            });
+            // 退出之后的输出
+            workerProcess.on("close", (code) => {
+                console.log("out code：" + code);
+                let res = false;
+                if (code === 0) {
+                    console.log("执行成功");
+                    res = true;
+                } else {
+                    console.log("执行失败");
+                }
+                res ? resolve("success") : reject("failed");
+            });
+        });
+    }
+
+    public GetProgress(fileName: string): Promise<string> {
+        return new Promise<string>((resolve, reject) => {
+            let workerProcess;
+            const nowFile = process.cwd() + "/" + fileName;
+            const cmdStr = `cat '${nowFile}'`;
+            console.log(cmdStr);
+            let resStr = "";
+            workerProcess = child_process.exec(cmdStr, (error, stdout, stderr) => {
+                if (error) {
+                    console.error(`执行的错误: ${error}`);
+                    return;
+                }
+                console.error(`stderr: ${stderr}`);
+            });
+            workerProcess.stdout.on("data", (data) => {
+                resStr += data;
+            });
+            // 退出之后的输出
+            workerProcess.on("close", (code) => {
+                let res = false;
+                if (code === 0) {
+                    res = true;
+                } else {
+                }
+                res ? resolve(resStr) : reject("failed");
+            });
+        });
+    }
+
     // go请来的救兵！
     public MonkeySun(path: string, threadNum: number): Promise<string> {
         return new Promise<string>((resolve, reject) => {
             let workerProcess;
             console.log("\n--------------MonkeySun-comming----------------");
-            const passwordFile = process.cwd() + "/sudo.txt";
+            const threadNumFile = process.cwd() + "/threadNum.data";
             const monkeySunFile = process.cwd() + "/monkeySun";
-            const cmdStr = `${monkeySunFile} -path='${path}' -tn=${threadNum}`;
+            const cmdStr = `${monkeySunFile} -path='${path}' -tn=\`cat ${threadNumFile}\``;
             console.log(cmdStr);
             workerProcess = child_process.exec(cmdStr, (error, stdout, stderr) => {
                 if (error) {
