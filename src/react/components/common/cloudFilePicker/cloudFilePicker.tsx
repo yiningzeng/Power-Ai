@@ -204,16 +204,16 @@ export class CloudFilePicker extends React.Component<ICloudFilePickerProps, IClo
                                 password: v.target.value,
                             });
                         }}/>
-                        <Label for="selectProject">所属项目</Label>
-                        <Input type="select" name="selectProject" id="selectProject" onChange={(v) => {
-                            this.setState({
-                                ...this.state,
-                                belongToProject: JSON.parse(v.target.value),
-                            });
-                        }}>
-                            {projectList && projectList.length > 0 && projectList.map((item) =>
-                                <option value={JSON.stringify(item)}>{item.name}</option>)}
-                        </Input>
+                        {/*<Label for="selectProject">所属项目</Label>*/}
+                        {/*<Input type="select" name="selectProject" id="selectProject" onChange={(v) => {*/}
+                        {/*    this.setState({*/}
+                        {/*        ...this.state,*/}
+                        {/*        belongToProject: JSON.parse(v.target.value),*/}
+                        {/*    });*/}
+                        {/*}}>*/}
+                        {/*    {projectList && projectList.length > 0 && projectList.map((item) =>*/}
+                        {/*        <option value={JSON.stringify(item)}>{item.name}</option>)}*/}
+                        {/*</Input>*/}
                     </div>
                 </ModalBody>
                 <ModalFooter>
