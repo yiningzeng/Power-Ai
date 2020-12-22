@@ -497,6 +497,7 @@ export interface IRegion {
     id: string;
     type: RegionType;
     tags: string[];
+    confirmTags?: string[]; // 版本新增的数据
     points?: IPoint[];
     boundingBox?: IBoundingBox;
 }
