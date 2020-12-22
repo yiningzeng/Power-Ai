@@ -486,8 +486,8 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
             autoSave: true,
             exportFormat: {
                 ...DefaultExportOptions,
-                belongToProject,
-                exportPath,
+                // belongToProject,
+                // exportPath,
             },
             securityToken: folderName,
             sourceConnection: connection,
@@ -499,7 +499,7 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
             assets: {},
         };
         const yiningzengAssets = fileFolder + "/.yiningzeng.assets";
-        const monkeySun = await IpcRendererProxy.send(`TrainingSystem:MonkeySun`, [fileFolder, 100]);
+        const monkeySun = await IpcRendererProxy.send(`TrainingSystem:MonkeySun`, [fileFolder, 200]);
         console.log(monkeySun);
         const llll = await IpcRendererProxy.send(`TrainingSystem:FileExist`, [yiningzengAssets]);
         if (llll) {

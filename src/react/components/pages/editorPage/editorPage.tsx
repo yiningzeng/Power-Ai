@@ -26,6 +26,7 @@ import {
     ISize,
     ITag,
     IZoomMode,
+    ExportPath,
 } from "../../../../models/applicationState";
 import {IToolbarItemRegistration, ToolbarItemFactory} from "../../../../providers/toolbar/toolbarItemFactory";
 import IApplicationActions, * as applicationActions from "../../../../redux/actions/applicationActions";
@@ -73,6 +74,8 @@ import {constants} from "../../../../common/constants";
 import {DoubleTextSwitch} from "../../common/doubleTextSwitch/doubleTextSwitch";
 import {Divider} from "@material-ui/core";
 import {IpcRendererProxy} from "../../../../common/ipcRendererProxy";
+import {CloudFilePicker} from "../../common/cloudFilePicker/cloudFilePicker";
+import {ModelBelongPorject} from "../../common/modelBelongPorject/modelBelongPorject";
 
 // import "antd/lib/tree/style/css";
 
@@ -206,6 +209,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
     };
     private localFileSystem: LocalFileSystemProxy;
 
+    private modelBelongPorject: React.RefObject<ModelBelongPorject> = React.createRef();
     private activeLearningService: ActiveLearningService = null;
     private loadingProjectAssets: boolean = false;
     private toolbarItems: IToolbarItemRegistration[] = ToolbarItemFactory.getToolbarItems();
@@ -791,13 +795,28 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                         <ProjectMetrics project={this.props.project}/>
                     </div>
                 </Drawer>
-
+                <ModelBelongPorject
+                    ref={this.modelBelongPorject}
+                    modalHeader={"选择数据所属项目"}
+                    projectList={this.props.appSettings.projectList}
+                    onSubmit={async (belongToProject) => {
+                        const projectJson: IProject = {
+                            ...this.props.project,
+                                exportFormat: {
+                                    ...this.props.project.exportFormat,
+                                    belongToProject,
+                                    exportPath: ExportPath.CollectData,
+                            },
+                        };
+                        this.modelBelongPorject.current.close();
+                        await this.props.actions.saveProject(projectJson);
+                        await this.reloadProject();
+                        // toast.error("开始到处");
+                        this.props.history.push(`/projects/${projectId}/export`);
+                    }}
+                />
             </div>
         );
-    }
-
-    private onTagModeChanged = () => {
-
     }
 
     private onPageClick = () => {
@@ -1436,9 +1455,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                 await this.props.actions.saveProject(this.props.project);
                 break;
             case ToolbarItemName.ExportProject:
-                await this.reloadProject();
-                // toast.error("开始到处");
-                this.props.history.push(`/projects/${projectId}/export`);
+                this.modelBelongPorject.current.open();
                 break;
             case ToolbarItemName.TransferProject:
                 if (this.props.appSettings.zengyining) {
