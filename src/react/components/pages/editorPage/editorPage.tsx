@@ -73,9 +73,8 @@ import {Rnd} from "powerai-react-rnd";
 import {constants} from "../../../../common/constants";
 import {DoubleTextSwitch} from "../../common/doubleTextSwitch/doubleTextSwitch";
 import {Divider} from "@material-ui/core";
-import {IpcRendererProxy} from "../../../../common/ipcRendererProxy";
-import {CloudFilePicker} from "../../common/cloudFilePicker/cloudFilePicker";
 import {ModelBelongPorject} from "../../common/modelBelongPorject/modelBelongPorject";
+import {IpcRendererProxy} from "../../../../common/ipcRendererProxy";
 
 // import "antd/lib/tree/style/css";
 
@@ -810,7 +809,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                         };
                         this.modelBelongPorject.current.close();
                         await this.props.actions.saveProject(projectJson);
-                        await this.reloadProject();
+                        // await this.reloadProject();
                         // toast.error("开始到处");
                         this.props.history.push(`/projects/${projectId}/export`);
                     }}

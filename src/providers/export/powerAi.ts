@@ -6,7 +6,7 @@ import {
     IAssetMetadata,
     IAsset,
     AssetState,
-    AssetType,
+    AssetType, IProviderOptions,
 } from "../../models/applicationState";
 import Guard from "../../common/guard";
 import { constants } from "../../common/constants";
@@ -14,6 +14,7 @@ import HtmlFileReader from "../../common/htmlFileReader";
 import path from "path";
 import {Simulate} from "react-dom/test-utils";
 import moment from "moment";
+import {IpcRendererProxy} from "../../common/ipcRendererProxy";
 
 /**
  * VoTT Json Export Provider options
@@ -59,6 +60,16 @@ export class PowerAiExportProvider extends ExportProvider<IPowerAiExportProvider
         //         await this.storageProvider.createContainer(path.normalize(`${exportFolderName}/${v.name}`));
         //     });
         // }
+        if (!isSubdirectories) {
+            const folder = path.join(this.project.exportFormat.belongToProject.baseFolder,
+                this.project.exportFormat.belongToProject.projectFolder,
+                this.project.exportFormat.exportPath);
+            const par: IProviderOptions = this.project.sourceConnection.providerOptions;
+            const sourceFolder = par["folderPath"] + "/";
+            const targetFolder = `${folder}/${exportFolderName}/`;
+            await IpcRendererProxy.send(`TrainingSystem:ExportPowerAiAssets`, [sourceFolder, targetFolder]);
+            return;
+        }
         const finalResults: IAsset[] = [];
         // console.log(`数据:${JSON.stringify(results)}`);
         // await this.storageProvider.writeText(`${exportFolderName}/数据.json`, JSON.stringify(results, null, 4));

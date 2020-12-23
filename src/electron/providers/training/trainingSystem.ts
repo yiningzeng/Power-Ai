@@ -199,6 +199,37 @@ export default class TrainingSystem {
         });
     }
 
+    // 注意了这里sourcePath和targetPath都要已/结尾
+    public ExportPowerAiAssets(sourcePath: string, targetPath: string): Promise<string> {
+        return new Promise<string>((resolve, reject) => {
+            let workerProcess;
+
+            const passwordFile = process.cwd() + "/sudo.txt";
+            const cmdStr = `echo \`cat "${passwordFile}"\` | sudo -S rsync -aW --include="*.json" --include="*.gif" --include="*.jpg" --include="*.jpeg" --include="*.tif" --include="*.tiff" --include="*.png" --include="*.bmp" --exclude="*"  ${sourcePath} ${targetPath}`;
+            console.log(cmdStr);
+            workerProcess = child_process.exec(cmdStr, (error, stdout, stderr) => {
+                if (error) {
+                    console.error(`执行的错误: ${error}`);
+                    return;
+                }
+                console.log(`stdout: ${stdout}`);
+                console.error(`stderr: ${stderr}`);
+            });
+            // 退出之后的输出
+            workerProcess.on("close", (code) => {
+                console.log("out code：" + code);
+                let res = false;
+                if (code === 0) {
+                    console.log("执行成功");
+                    res = true;
+                } else {
+                    console.log("执行失败");
+                }
+                res ? resolve("success") : reject("导出失败");
+            });
+        });
+    }
+
     public CalProgress(path: string): Promise<string> {
         return new Promise<string>((resolve, reject) => {
             let workerProcess;
