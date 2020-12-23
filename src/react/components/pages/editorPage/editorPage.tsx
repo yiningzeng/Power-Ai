@@ -774,6 +774,9 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                 />
                 <DraggableDialog
                     ref={this.loadingDialog}
+                    content={"处理中"}
+                    interval={50}
+                    showProgress={false}
                     disableBackdropClick={true}
                     disableEscapeKeyDown={true}
                     fullWidth={true}
@@ -847,8 +850,8 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
      */
     private onAssetDeleted = async (): Promise<void> => {
         if (this.state.multipleSelectAssets.multipleSelect) {
-            this.loadingDialog.current.open();
-            this.loadingDialog.current.change("正在批量删除...", "请耐心等待");
+            this.draggableDialog.current.open();
+            this.draggableDialog.current.change("正在批量删除...", "请耐心等待");
             const assetService = new AssetService(this.props.project);
             // 这里还要区分是否是搜索的列表
             if (this.state.isFilter) { // 这里有个隐患！！！就是只是删除了搜索后的列表！
@@ -877,7 +880,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                         this.selectAsset(newAssets[index]);
                     }
                 });
-                this.loadingDialog.current.close();
+                this.draggableDialog.current.close();
             } else { // 这里是非搜索的批量删除
                 console.log("test");
 
@@ -1013,8 +1016,8 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
      */
     private onTagSearched = async (tags: ITag[], searchQuery: string): Promise<void>  => {
         if (searchQuery) {
-            // this.loadingDialog.current.open();
-            // this.loadingDialog.current.change("正在搜索标签...", "请耐心等待");
+            await this.draggableDialog.current.open();
+            this.draggableDialog.current.change("正在搜索标签...", "请耐心等待");
             console.log("dosearch editorpage + onTagSearched + taginput" + JSON.stringify(tags));
             const tagNames = [];
             tags.forEach((v, i, a) => {
@@ -1045,7 +1048,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
             });
             // 等待500毫秒后再执行同步
             // await this.sleep(500);
-            // this.loadingDialog.current.close();
+            this.draggableDialog.current.close();
         } else {
             this.setState({
                 ...this.state,
@@ -1073,8 +1076,8 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
      * @param newTagName New name of tag
      */
     private onTagRenamed = async (tagName: string, newTagName: string): Promise<void> => {
-        this.loadingDialog.current.open();
-        this.loadingDialog.current.change("正在重命名标签...", "请耐心等待");
+        this.draggableDialog.current.open();
+        this.draggableDialog.current.change("正在重命名标签...", "请耐心等待");
         const assetUpdates = await this.props.actions.updateProjectTag(this.props.project, tagName, newTagName);
         const selectedAsset = assetUpdates.find((am) => am.asset.id === this.state.selectedAsset.asset.id);
         await this.reloadProject();
@@ -1083,7 +1086,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                 this.setState({ selectedAsset });
             }
         }
-        this.loadingDialog.current.close();
+        this.draggableDialog.current.close();
         this.canvas.current.enableCanvas(false);
         this.canvas.current.enableCanvas(true);
     }
@@ -1100,8 +1103,8 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
      * @param tagName Name of tag to be deleted
      */
     private onTagDeleted = async (tagName: string): Promise<void> => {
-        this.loadingDialog.current.open();
-        this.loadingDialog.current.change("正在删除标签", "请耐心等待...");
+        this.draggableDialog.current.open();
+        this.draggableDialog.current.change("正在删除标签", "请耐心等待...");
         await this.props.actions.deleteProjectTag(this.props.project, tagName);
         // await this.goToRootAsset(1);
         // const selectedAsset = assetUpdates.find((am) => am.asset.id === this.state.selectedAsset.asset.id);
@@ -1109,7 +1112,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         // if (selectedAsset) {
         //     this.setState({ selectedAsset });
         // }
-        this.loadingDialog.current.change("删除完成", "抱歉！该版本删除后需要手动到首页重新打开文件夹!", true);
+        this.draggableDialog.current.change("删除完成", "抱歉！该版本删除后需要手动到首页重新打开文件夹!", true);
         // this.reloadProject(this.state.selectedAsset.asset.id, tagName);
     }
 
@@ -1503,10 +1506,10 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
 
     private reloadProject = async (selectAssetId?: string, deltetTag?: string) => {
         // console.log(`exportPage: homepage: ${JSON.stringify(this.props.project)}`);
-        this.loadingDialog.current.open();
-        this.loadingDialog.current.change("正在重新加载数据集", "请耐心等待");
         const par: IProviderOptions = this.props.project.sourceConnection.providerOptions;
         const fileFolder = par["folderPath"];
+        this.loadingDialog.current.open(fileFolder);
+        this.loadingDialog.current.change("正在重新加载数据集", "请耐心等待");
         // // alert(JSON.stringify(this.props.project));
         // if (!fileFolder) { return; }
         // const idd = normalizeSlashes(fileFolder).lastIndexOf("/");

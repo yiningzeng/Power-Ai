@@ -144,7 +144,9 @@ export default class CanvasHelpers {
         const tags = region.tags
             .map((tagName) => {
                 const projectTag = projectTags.find((projectTag) => projectTag.name === tagName);
-                return projectTag ? new Tag(projectTag.name, projectTag.color) : null;
+                return projectTag ? new Tag(projectTag.name, projectTag.color,
+                    (region.confirmTags !== undefined) ?
+                        (region.confirmTags[0] !== "TP") ? region.confirmTags[0] : undefined : undefined) : null;
             })
             .filter((tag) => tag !== null);
         console.log(`getTagsDescriptor tags:${JSON.stringify(tags)}`);

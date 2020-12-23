@@ -388,12 +388,13 @@ export class AssetService {
      */
     public async getAssetMetadata(asset: IAsset): Promise<IAssetMetadata> {
         Guard.null(asset);
-
         const fileName = `${asset.id}${constants.assetMetadataFileExtension}`;
         // console.log(`assets_map: ${fileName}:`);
         try {
             const json = await this.storageProvider.readText(fileName);
-            return JSON.parse(json) as IAssetMetadata;
+            const res = JSON.parse(json) as IAssetMetadata;
+            res.asset.path = asset.path;
+            return res;
         } catch (err) {
             if (asset.type === AssetType.TFRecord) {
                 return {
