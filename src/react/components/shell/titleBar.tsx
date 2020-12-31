@@ -1,15 +1,24 @@
 import React, { Fragment } from "react";
+import { connect } from "react-redux";
 import Menu, { MenuItem, SubMenu, Divider } from "rc-menu";
 import { PlatformType } from "../../../common/hostProcess";
 import "./titleBar.scss";
 import { strings } from "../../../common/strings";
-import {NavLink} from "react-router-dom";
+import {NavLink, RouteComponentProps} from "react-router-dom";
 import ConditionalNavLink from "../common/conditionalNavLink/conditionalNavLink";
+import {toast} from "react-toastify";
+import {IApplicationState, IAppSettings} from "../../../models/applicationState";
+import {bindActionCreators} from "redux";
+import * as appErrorActions from "../../../redux/actions/appErrorActions";
+import IApplicationActions, * as applicationActions from "../../../redux/actions/applicationActions";
 
 export interface ITitleBarProps extends React.Props<TitleBar> {
     icon?: string | JSX.Element;
     title?: string;
     projectId?: string;
+    titleBarSelectedKeys?: string;
+    appSettings?: IAppSettings;
+    applicationActions?: IApplicationActions;
 }
 
 export interface ITitleBarState {
@@ -20,6 +29,20 @@ export interface ITitleBarState {
     menu: Electron.Menu;
 }
 
+function mapStateToProps(state: IApplicationState) {
+    return {
+        appSettings: state.appSettings,
+        titleBarSelectedKeys: state.appSettings.titleBarSelectedKeys,
+    };
+}
+
+function mapDispatchToProps(dispatch) {
+    return {
+        applicationActions: bindActionCreators(applicationActions, dispatch),
+    };
+}
+
+@connect(mapStateToProps, mapDispatchToProps)
 export class TitleBar extends React.Component<ITitleBarProps, ITitleBarState> {
     public state: ITitleBarState = {
         isElectron: false,
@@ -75,7 +98,16 @@ export class TitleBar extends React.Component<ITitleBarProps, ITitleBarState> {
                 {/*}*/}
                 <div className="title-bar-menu">
                     <Menu mode="horizontal"
-                          selectable={true}>
+                          selectedKeys={[this.props.titleBarSelectedKeys]}
+                          selectable={true}
+                          onSelect={async (v) => {
+                              const newAppSettings = {
+                                  ...this.props.appSettings,
+                                  titleBarSelectedKeys: v.key,
+                              };
+                              this.props.applicationActions.saveAppSettings(newAppSettings);
+                          }}
+                    >
                         <MenuItem key={"首页"} disabled={false}>
                             <div className="menu-item-container">
                                 <NavLink title={"Home"} to={`/`}>
