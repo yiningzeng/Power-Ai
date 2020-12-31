@@ -127,17 +127,18 @@ export default class DraggableDialog extends React.Component<IDraggableDialogPro
     public open = async (path?: string) => {
         if (this.props.showProgress) {
             this.setState({
-                change: true,
+                open: true,
+                change: false,
+                done: false,
                 content: "正在计算素材数量...",
                 nowValue: 0,
                 allNum: 100,
             }, async () => {
                 const cal = await IpcRendererProxy.send(`TrainingSystem:CalProgress`, [path]);
-                this.setState({open: true, done: false, change: false});
                 if (cal === "success") {
                     const allNum = await IpcRendererProxy.send(`TrainingSystem:GetProgress`, ["allNum.txt"]);
                     this.doProgress();
-                    this.setState({open: true, done: false, change: false, allNum: Number(allNum)});
+                    this.setState({...this.state, allNum: Number(allNum)});
                 }
             });
         } else {

@@ -58,6 +58,7 @@ import ProjectItem from "./projectItem";
 import {CloudFileCopyPicker} from "../../common/cloudFileCopyPicker/cloudFileCopyPicker";
 import {IpcRendererProxy} from "../../../../common/ipcRendererProxy";
 import HtmlFileReader from "../../../../common/htmlFileReader";
+import path from "path";
 // tslint:disable-next-line:no-var-requires
 const tagColors = require("../../common/tagColors.json");
 
@@ -172,6 +173,12 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                         Component={ProjectItem}
                         items={this.props.appSettings.projectList}
                         onAddClick={() => this.modalHomePageAddProject.current.open()}
+                        onClick={ async (item) => {
+                            const fileFolder = await this.localFileSystem.importTaggedContainer(
+                                item.baseFolder + "/" + item.name);
+                            if (!fileFolder) { return; }
+                            this.loadProject(fileFolder[0]);
+                        }}
                         onDelete={(item) => this.deleteProjectListConfirm.current.open(item)}
                         showToolbar={true}
                         home={true}/>
@@ -212,21 +219,20 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                                 ...this.props.appSettings.projectList,
                                 {
                                     name: projectName,
-                                    baseFolder: "/assets/Projects",
+                                    baseFolder: "/qtingvisionfolder/Projects",
                                     projectFolder: projectName,
                                 }];
                             const newAppSettings = {
                                 ...this.props.appSettings,
                                 projectList,
                             };
-                            await this.props.actions.createFolder("/assets/Projects", projectName);
-                            // this.props.actions.createFolder("/assets/Projects/" + projectName, "MissData");
+                            await this.props.actions.createFolder("/qtingvisionfolder/Projects", projectName);
                             // 这里创建文件夹要合并，否则会出错, 加了await就正常了
-                            await this.props.actions.createFolder("/assets/Projects/" + projectName, "CollectData");
-                            await this.props.actions.createFolder("/assets/Projects/" + projectName, "MissData");
-                            await this.props.actions.createFolder("/assets/Projects/" + projectName, "AtuoTrainData");
-                            await this.props.actions.createFolder("/assets/Projects/" + projectName, "model_release_history");
-                            await this.props.actions.createFolder("/assets/Projects/" + projectName, "model_release");
+                            await this.props.actions.createFolder("/qtingvisionfolder/Projects/" + projectName, "CollectData");
+                            await this.props.actions.createFolder("/qtingvisionfolder/Projects/" + projectName, "MissData");
+                            await this.props.actions.createFolder("/qtingvisionfolder/Projects/" + projectName, "AtuoTrainData");
+                            await this.props.actions.createFolder("/qtingvisionfolder/Projects/" + projectName, "model_release");
+                            await this.props.actions.createFolder("/qtingvisionfolder/Projects/" + projectName, "training_data");
                             this.props.applicationActions.saveAppSettings(newAppSettings);
                             this.modalHomePageAddProject.current.close();
                             toast.success("项目新建成功");
@@ -371,7 +377,7 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                                  projectList: this.props.appSettings.projectList.filter((v) => v.name !== item.name),
                              };
                              this.props.applicationActions.saveAppSettings(newAppSettings);
-                             this.props.actions.deleteFolder("/assets/Projects", item.name);
+                             this.props.actions.deleteFolder("/qtingvisionfolder/Projects", item.name);
                              toast.success("已成功删除");
                          }}/>
                 <Confirm title="删除主机"

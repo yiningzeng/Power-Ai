@@ -31,9 +31,10 @@ export default class LocalFileSystem implements IStorageProvider {
         });
     }
 
-    public importTaggedContainer(): Promise<object> {
+    public importTaggedContainer(defaultPath?: string): Promise<object> {
         return new Promise<object>((resolve, reject) => {
             const filePaths = dialog.showOpenDialog({
+                defaultPath,
                 title: strings.connections.providers.local.selectFolder,
                 buttonLabel: "开始标注",
                 properties: ["openDirectory"],

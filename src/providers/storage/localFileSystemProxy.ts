@@ -40,8 +40,12 @@ export class LocalFileSystemProxy implements IStorageProvider, IAssetProvider {
     /**
      * 打开已经标记的素材文件夹，支持多选
      */
-    public importTaggedContainer(): Promise<object> {
-        return IpcRendererProxy.send(`${PROXY_NAME}:importTaggedContainer`);
+    public importTaggedContainer(defaultPath?: string): Promise<object> {
+        if (defaultPath === undefined) {
+            return IpcRendererProxy.send(`${PROXY_NAME}:importTaggedContainer`);
+        } else {
+            return IpcRendererProxy.send(`${PROXY_NAME}:importTaggedContainer`, [defaultPath]);
+        }
     }
 
     /**

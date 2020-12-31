@@ -15,6 +15,7 @@ import path from "path";
 import {Simulate} from "react-dom/test-utils";
 import moment from "moment";
 import {IpcRendererProxy} from "../../common/ipcRendererProxy";
+import {toast} from "react-toastify";
 
 /**
  * VoTT Json Export Provider options
@@ -39,14 +40,6 @@ export class PowerAiExportProvider extends ExportProvider<IPowerAiExportProvider
      */
     public async export(): Promise<void> {
         const results = await this.getAssetsForExport();
-        let exportFolderName = "";
-        if (this.getSaveAsDateFolder) {
-            exportFolderName = moment().format("YYYY-MM-DD");
-        } else {
-            exportFolderName = `${this.project.name.replace(/\s/g, "-")}-power-ai-export`;
-            await this.storageProvider.deleteContainer(exportFolderName);
-        }
-        await this.storageProvider.createContainer(exportFolderName);
         // tslint:disable-next-line:max-line-length
         let isSubdirectories = false;
         try {
@@ -60,12 +53,15 @@ export class PowerAiExportProvider extends ExportProvider<IPowerAiExportProvider
         //         await this.storageProvider.createContainer(path.normalize(`${exportFolderName}/${v.name}`));
         //     });
         // }
+        let exportFolderName = "";
         if (!isSubdirectories) {
             const folder = path.join(this.project.exportFormat.belongToProject.baseFolder,
                 this.project.exportFormat.belongToProject.projectFolder,
                 this.project.exportFormat.exportPath);
             const par: IProviderOptions = this.project.sourceConnection.providerOptions;
             const sourceFolder = par["folderPath"] + "/";
+            exportFolderName = path.basename(par["folderPath"].replace(new RegExp("\\|", "g"), "/"));
+            await this.storageProvider.createContainer(exportFolderName);
             const targetFolder = `${folder}/${exportFolderName}/`;
             await IpcRendererProxy.send(`TrainingSystem:ExportPowerAiAssets`, [sourceFolder, targetFolder]);
             return;
@@ -202,13 +198,11 @@ export class PowerAiExportProvider extends ExportProvider<IPowerAiExportProvider
                 exportObject.assets = _.keyBy(
                     finalResults.filter((asset) => asset.tagType !== undefined && asset.tagType === "not-visited"),
                     (asset) => asset.id) as any;
-                // await this.storageProvider.writeText(`${exportFolderName}/not-visited/${constants.importFileExtension}`,
                 //     JSON.stringify(exportObject, null, 4));
 
                 exportObject.assets = _.keyBy(
                     finalResults.filter((asset) => asset.tagType !== undefined && asset.tagType === "multilabel"),
                     (asset) => asset.id) as any;
-                // await this.storageProvider.writeText(`${exportFolderName}/multilabel/${constants.importFileExtension}`,
                 //     JSON.stringify(exportObject, null, 4));
 
                 //region 根目录生成import.power-ai文件

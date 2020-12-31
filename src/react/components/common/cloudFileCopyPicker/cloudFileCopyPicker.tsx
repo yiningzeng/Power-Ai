@@ -203,7 +203,7 @@ export class CloudFileCopyPicker extends React.Component<ICloudFilePickerProps, 
                                             if (val === "success") {
                                                 this.draggableDialog.current.close();
                                                 // // tslint:disable-next-line:max-line-length
-                                                const defaultPath = `/assets/Remote_Assets/${this.state.ip}-${this.state.cloudPath.replace(new RegExp("/", "g"), "-")}`;
+                                                const defaultPath = `/qtingvisionfolder/Remote_Assets/${this.state.ip}|${this.state.cloudPath.replace(new RegExp("/", "g"), "|")}`;
                                                 // tslint:disable-next-line:max-line-length
                                                 const fileFolder = await this.localFileSystem.copyRemoteContainer(defaultPath);
                                                 // alert(JSON.stringify(this.props.project));

@@ -47,3 +47,5 @@ er\.email
 *.txt
 
 monkeySun-bak
+
+log/

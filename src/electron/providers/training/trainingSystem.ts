@@ -205,7 +205,7 @@ export default class TrainingSystem {
             let workerProcess;
 
             const passwordFile = process.cwd() + "/sudo.txt";
-            const cmdStr = `echo \`cat "${passwordFile}"\` | sudo -S rsync -aW --include="*.json" --include="*.gif" --include="*.jpg" --include="*.jpeg" --include="*.tif" --include="*.tiff" --include="*.png" --include="*.bmp" --exclude="*"  ${sourcePath} ${targetPath}`;
+            const cmdStr = `echo \`cat "${passwordFile}"\` | sudo -S rsync -aW --include="*.json" --include="*.gif" --include="*.jpg" --include="*.jpeg" --include="*.tif" --include="*.tiff" --include="*.png" --include="*.bmp" --exclude="*"  "${sourcePath}" "${targetPath}"`;
             console.log(cmdStr);
             workerProcess = child_process.exec(cmdStr, (error, stdout, stderr) => {
                 if (error) {
@@ -235,7 +235,7 @@ export default class TrainingSystem {
             let workerProcess;
             const allNumFile = process.cwd() + "/allNum.txt";
             const jsonListFile = process.cwd() + "/jsonList.txt";
-            const cmdStr = `echo 0 > now.txt && ls ${path} | grep ".json" > ${jsonListFile} && ls ${path} | grep ".json" |wc -l > ${allNumFile}`;
+            const cmdStr = `echo 0 > now.txt && ls "${path}" | grep ".json" > "${jsonListFile}" && ls "${path}" | grep ".json" |wc -l > "${allNumFile}"`;
             workerProcess = child_process.exec(cmdStr, (error, stdout, stderr) => {
                 if (error) {
                     console.error(`执行的错误: ${error}`);
@@ -254,7 +254,7 @@ export default class TrainingSystem {
                 } else {
                     console.log("执行失败");
                 }
-                res ? resolve("success") : reject("计算文件数目出错");
+                res ? resolve("success") : reject("计算文件数目出错或者素材全部未标记过");
             });
         });
     }
@@ -358,7 +358,7 @@ export default class TrainingSystem {
             console.log("\n--------------start加载远程文件夹-----------------");
             console.log(remotePath);
             const passwordFile = process.cwd() + "/sudo.txt";
-            const localPath = `/assets/Remote_Assets/${ip}-${this.replaceAll("/", "-", remotePath)}`;
+            const localPath = `/qtingvisionfolder/Remote_Assets/${ip}|${this.replaceAll("/", "|", remotePath)}`;
             const cmdStr = `echo \`cat "${passwordFile}"\` | sudo -S mkdir -p "${localPath}" && sudo mount -t cifs -o user=${username},password=${password},dir_mode=0777,file_mode=0777 "//${ip}/${remotePath}" "${localPath}"`;
             console.log(cmdStr);
             workerProcess = child_process.exec(cmdStr, (error, stdout, stderr) => {
@@ -390,7 +390,7 @@ export default class TrainingSystem {
             let workerProcess;
             console.log("\n--------------start关闭远程文件夹-----------------");
             const passwordFile = process.cwd() + "/sudo.txt";
-            const localPath = `/assets/Remote_Assets/${ip}-${this.replaceAll("/", "-", remotePath)}`;
+            const localPath = `/qtingvisionfolder/Remote_Assets/${ip}|${this.replaceAll("/", "|", remotePath)}`;
             const cmdStr = `echo \`cat "${passwordFile}"\` | sudo -S umount -f "${localPath}"`;
             console.log(cmdStr);
             workerProcess = child_process.exec(cmdStr, (error, stdout, stderr) => {
@@ -407,7 +407,7 @@ export default class TrainingSystem {
                 let res = false;
                 if (code === 0) {
                     console.log("执行成功");
-                    workerProcess = exec(`echo \`cat "${passwordFile}"\` | sudo -S rm -r ${localPath}`);
+                    workerProcess = exec(`echo \`cat "${passwordFile}"\` | sudo -S rm -r "${localPath}"`);
                     console.log(`\n执行成功后删除文件夹-${localPath}`);
                     res = true;
                 } else {
