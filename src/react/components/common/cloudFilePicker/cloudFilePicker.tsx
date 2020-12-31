@@ -121,67 +121,7 @@ export class CloudFilePicker extends React.Component<ICloudFilePickerProps, IClo
                             </InputGroupAddon>
                             <Input name="path" id="path" value={this.state.cloudPath} placeholder="共享的目录"
                                    onClick={() => {
-                                console.log(`fucker: open ${JSON.stringify(this.state)}`);
-                                this.draggableDialog.current.open();
-                                if (this.state.ip === "" || this.state.ip === null) {
-                                    this.draggableDialog.current.change("连接远程数据失败...",
-                                        `远程地址: \\\\${this.state.ip}\\${this.state.cloudPath}`, true);
-                                    return;
-                                }
-                                this.draggableDialog.current.change("正在连接远程数据...",
-                                    `远程地址: \\\\${this.state.ip}\\${this.state.cloudPath}`, false, false);
-                                const aa = new Promise(async (resolve, reject) => {
-                                    await IpcRendererProxy.send(`TrainingSystem:CloseRemoteAssets`,
-                                        [this.state.ip, this.state.cloudPath])
-                                        .then(() => {
-                                            console.log("关闭成功");
-                                        })
-                                        .catch(() => {
-                                            console.log("关闭失败");
-                                        });
-                                    await IpcRendererProxy.send(`TrainingSystem:LoadRemoteAssets`,
-                                        [this.state.ip,
-                                            this.state.cloudPath,
-                                            this.state.username,
-                                            this.state.password])
-                                        .then(async (v) => {
-                                            toast.success("已经成功连接了远程数据");
-                                            resolve("success"); // 成功
-                                        })
-                                        .catch(() => {
-                                            this.draggableDialog.current.change("连接远程数据失败...",
-                                                // tslint:disable-next-line:max-line-length
-                                                `远程地址: \\\\${this.state.ip}\\${this.state.cloudPath.replace(new RegExp("/", "g"), "\\")}`, true);
-                                            // this.props.onSubmit("连接失败");
-                                            reject("fail");        // 失败
-                                        });
-                                }).catch(() => {
-                                    this.draggableDialog.current.change("连接远程数据失败...",
-                                        // tslint:disable-next-line:max-line-length
-                                        `远程地址: \\\\${this.state.ip}\\${this.state.cloudPath.replace(new RegExp("/", "g"), "\\")}`, true);
-                                });
-                                pTimeout(aa, 10000, () => {
-                                    this.draggableDialog.current.change("连接远程数据超时！",
-                                        `连接超时，请检查配置信息是否正确\n远程地址: \\\\${this.state.ip}\\${this.state.cloudPath.replace(new RegExp("/", "g"), "\\")}`, true);
-                                }).then(async (val) => {
-                                    if (val === "success") {
-                                        this.draggableDialog.current.close();
-                                        // // tslint:disable-next-line:max-line-length
-                                        const defaultPath = `/qtingvisionfolder/Remote_Assets/${this.state.ip}|${this.state.cloudPath.replace(new RegExp("/", "g"), "|")}`;
-                                        // tslint:disable-next-line:max-line-length
-                                        const fileFolder = await this.localFileSystem.openRemoteContainer(defaultPath);
-                                        // alert(JSON.stringify(this.props.project));
-                                        if (!fileFolder) { return; }
-                                        this.setState({
-                                            ...this.state,
-                                            cloudPath: (fileFolder[0] + "").replace(`/qtingvisionfolder/Remote_Assets/${this.state.ip}|${this.state.cloudPath}`, `${this.state.cloudPath}`),
-                                        });
-                                        // this.close();
-                                        // tslint:disable-next-line:max-line-length
-                                    }
-                                    // 执行结束了,这里做善后工作
-                                    // toast.success("执行结束了" + val);
-                                });
+
                             }} onChange={(v) => {
                                 this.setState({
                                     ...this.state,
@@ -300,31 +240,46 @@ export class CloudFilePicker extends React.Component<ICloudFilePickerProps, IClo
                 [this.state.ip, this.state.cloudPath, this.state.username, this.state.password])
                 .then((v) => {
                     toast.success("已经成功连接了远程数据");
-                    this.props.onSubmit(true, v.toString(), this.state.belongToProject, this.state.copyList);
                     resolve("success"); // 成功
-                    this.draggableDialog.current.close();
-                    this.close();
                 })
                 .catch(() => {
                     this.draggableDialog.current.change("连接远程数据失败...",
                         // tslint:disable-next-line:max-line-length
                         `远程地址: \\\\${this.state.ip}\\${this.state.cloudPath.replace(new RegExp("/", "g"), "\\")}`, true);
                     // this.props.onSubmit("连接失败");
-                    this.props.onSubmit(false, "连接失败", this.state.belongToProject);
                     reject("fail");        // 失败
                 });
         }).catch(() => {
             this.draggableDialog.current.change("连接远程数据失败...",
                 // tslint:disable-next-line:max-line-length
                 `远程地址: \\\\${this.state.ip}\\${this.state.cloudPath.replace(new RegExp("/", "g"), "\\")}`, true);
-            this.props.onSubmit(false, "连接失败", this.state.belongToProject);
         });
         pTimeout(aa, 10000, () => {
             this.draggableDialog.current.change("连接远程数据超时！",
                 `连接超时，请检查配置信息是否正确\n远程地址: \\\\${this.state.ip}\\${this.state.cloudPath.replace(new RegExp("/", "g"), "\\")}`, true);
-        }).then(() => {
+        }).then(async (val) => {
+            if (val === "success") {
+                this.draggableDialog.current.close();
+                // // tslint:disable-next-line:max-line-length
+                const defaultPath = `/qtingvisionfolder/Remote_Assets/${this.state.ip}|${this.state.cloudPath.replace(new RegExp("/", "g"), "|")}`;
+                // tslint:disable-next-line:max-line-length
+                const fileFolder = await this.localFileSystem.openRemoteContainer(defaultPath);
+                // alert(JSON.stringify(this.props.project));
+                if (!fileFolder) { return; }
+                this.setState({
+                    ...this.state,
+                    cloudPath: (fileFolder[0] + "").replace(`/qtingvisionfolder/Remote_Assets/${this.state.ip}|${this.state.cloudPath}`, `${this.state.cloudPath}`),
+                });
+                this.props.onSubmit(true, fileFolder[0], this.state.belongToProject, this.state.copyList);
+                this.draggableDialog.current.close();
+                this.close();
+                // this.close();
+                // tslint:disable-next-line:max-line-length
+            } else {
+                this.props.onSubmit(false, "连接失败", this.state.belongToProject);
+            }
             // 执行结束了,这里做善后工作
-            // toast.success("执行结束了");
+            // toast.success("执行结束了" + val);
         });
     }
 
