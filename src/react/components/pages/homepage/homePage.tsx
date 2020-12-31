@@ -248,26 +248,6 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                         {/*        <h6 style={{marginTop: "10px"}}>{strings.homePage.newProject}</h6>*/}
                         {/*    </a>*/}
                         {/*</li>*/}
-                        <li>
-                            <a href="#"  className="app-homepage-main-a-group1 p-5 cloud-open-project"
-                               onClick={() => this.inputCodeTagAssetsModal.current.open()}>
-                                <i className="fas fa-search fa-9x"></i>
-                                <h6 style={{marginTop: "10px"}}>{strings.homePage.inputCodeTagAssets.title}</h6>
-                            </a>
-                            <ModalSearchPcb
-                                ref={this.inputCodeTagAssetsModal}
-                                modalHeader={strings.homePage.inputCodeTagAssets.title}
-                                connections={this.props.connections}
-                                remoteHostList={this.props.appSettings.remoteHostList}
-                                projectList={this.props.appSettings.projectList}
-                                onSubmit={(success, content, belongToProject) => {
-                                    if (success) {
-                                        this.loadProject(content, belongToProject, ExportPath.MissData);
-                                    }
-                                }}
-                                fileExtension={constants.projectFileExtension}
-                            />
-                        </li>
                         {/*{isElectron() &&*/}
                         {/*<li>*/}
                         {/*    <a href="#" className="p-5 file-upload"*/}
@@ -324,23 +304,43 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                                 </a>
                             </li>
                         }
+                        {/*<li>*/}
+                        {/*    <a href="#"  className="app-homepage-main-a-group2 p-5 cloud-open-project"*/}
+                        {/*       onClick={() => this.handleOpenCloudCopyProjectClick(this.copyRemoteAssetsModal.current)}>*/}
+                        {/*        <i className="fas fa-copy fa-9x"></i>*/}
+                        {/*        <h6 style={{marginTop: "10px"}}>{strings.homePage.copyRemoteAssets.title}</h6>*/}
+                        {/*    </a>*/}
+                        {/*    <CloudFileCopyPicker*/}
+                        {/*        ref={this.copyRemoteAssetsModal}*/}
+                        {/*        modalHeader={strings.homePage.copyRemoteAssets.title}*/}
+                        {/*        connections={this.props.connections}*/}
+                        {/*        remoteHostList={this.props.appSettings.remoteHostList}*/}
+                        {/*        projectList={this.props.appSettings.projectList}*/}
+                        {/*        onSubmit={(success, belongToProject, copyList) => {*/}
+                        {/*            console.log(`结果: ${copyList}\n ${JSON.stringify(belongToProject)}`);*/}
+                        {/*        }}*/}
+                        {/*        fileExtension={constants.projectFileExtension}*/}
+                        {/*        copy*/}
+                        {/*    />*/}
+                        {/*</li>*/}
                         <li>
-                            <a href="#"  className="app-homepage-main-a-group2 p-5 cloud-open-project"
-                               onClick={() => this.handleOpenCloudCopyProjectClick(this.copyRemoteAssetsModal.current)}>
-                                <i className="fas fa-copy fa-9x"></i>
-                                <h6 style={{marginTop: "10px"}}>{strings.homePage.copyRemoteAssets.title}</h6>
+                            <a href="#"  className="app-homepage-main-a-group1 p-5 cloud-open-project"
+                               onClick={() => this.inputCodeTagAssetsModal.current.open()}>
+                                <i className="fas fa-search fa-9x"></i>
+                                <h6 style={{marginTop: "10px"}}>{strings.homePage.inputCodeTagAssets.title}</h6>
                             </a>
-                            <CloudFileCopyPicker
-                                ref={this.copyRemoteAssetsModal}
-                                modalHeader={strings.homePage.copyRemoteAssets.title}
+                            <ModalSearchPcb
+                                ref={this.inputCodeTagAssetsModal}
+                                modalHeader={strings.homePage.inputCodeTagAssets.title}
                                 connections={this.props.connections}
                                 remoteHostList={this.props.appSettings.remoteHostList}
                                 projectList={this.props.appSettings.projectList}
-                                onSubmit={(success, belongToProject, copyList) => {
-                                    console.log(`结果: ${copyList}\n ${JSON.stringify(belongToProject)}`);
+                                onSubmit={async (success, content, belongToProject) => {
+                                    if (success) {
+                                        await this.loadProject(content, belongToProject, ExportPath.MissData);
+                                    }
                                 }}
                                 fileExtension={constants.projectFileExtension}
-                                copy
                             />
                         </li>
                     </ul>
@@ -487,6 +487,7 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
         let projectJson: IProject = {
             id: folderName,
             name: folderName,
+            activeKey: "标注中心",
             version: "3.0.0",
             activeLearningSettings: DefaultActiveLearningSettings,
             autoSave: true,
