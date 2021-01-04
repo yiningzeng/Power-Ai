@@ -98,16 +98,8 @@ export class TitleBar extends React.Component<ITitleBarProps, ITitleBarState> {
                 {/*}*/}
                 <div className="title-bar-menu">
                     <Menu mode="horizontal"
-                          selectedKeys={[this.props.titleBarSelectedKeys]}
-                          selectable={true}
-                          onSelect={async (v) => {
-                              const newAppSettings = {
-                                  ...this.props.appSettings,
-                                  titleBarSelectedKeys: v.key,
-                              };
-                              this.props.applicationActions.saveAppSettings(newAppSettings);
-                          }}
-                    >
+                          selectedKeys={[]}
+                          selectable={true}>
                         <MenuItem key={"首页"} disabled={false}>
                             <div className="menu-item-container">
                                 <NavLink title={"Home"} to={`/`}>
