@@ -487,7 +487,6 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
         let projectJson: IProject = {
             id: folderName,
             name: folderName,
-            activeKey: "标注中心",
             version: "3.0.0",
             activeLearningSettings: DefaultActiveLearningSettings,
             autoSave: true,
