@@ -75,6 +75,7 @@ export class TitleBar extends React.Component<ITitleBarProps, ITitleBarState> {
                 {/*}*/}
                 <div className="title-bar-menu">
                     <Menu mode="horizontal"
+                          selectedKeys={[]}
                           selectable={true}>
                         <MenuItem key={"首页"} disabled={false}>
                             <div className="menu-item-container">
