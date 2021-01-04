@@ -236,6 +236,7 @@ export default class TrainingSystem {
             const allNumFile = process.cwd() + "/allNum.txt";
             const jsonListFile = process.cwd() + "/jsonList.txt";
             const cmdStr = `echo 0 > now.txt && ls "${path}" | grep ".json" > "${jsonListFile}" && ls "${path}" | grep ".json" |wc -l > "${allNumFile}"`;
+            console.log(cmdStr);
             workerProcess = child_process.exec(cmdStr, (error, stdout, stderr) => {
                 if (error) {
                     console.error(`执行的错误: ${error}`);
@@ -292,7 +293,6 @@ export default class TrainingSystem {
             let workerProcess;
             const nowFile = process.cwd() + "/" + fileName;
             const cmdStr = `cat '${nowFile}'`;
-            console.log(cmdStr);
             let resStr = "";
             workerProcess = child_process.exec(cmdStr, (error, stdout, stderr) => {
                 if (error) {
@@ -303,6 +303,7 @@ export default class TrainingSystem {
             });
             workerProcess.stdout.on("data", (data) => {
                 resStr += data;
+                console.log(resStr);
             });
             // 退出之后的输出
             workerProcess.on("close", (code) => {
