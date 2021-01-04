@@ -210,10 +210,10 @@ export default class TrainingSystem {
             workerProcess = child_process.exec(cmdStr, (error, stdout, stderr) => {
                 if (error) {
                     console.error(`执行的错误: ${error}`);
+                    console.error(`stderr: ${stderr}`);
                     return;
                 }
                 console.log(`stdout: ${stdout}`);
-                console.error(`stderr: ${stderr}`);
             });
             // 退出之后的输出
             workerProcess.on("close", (code) => {
@@ -240,10 +240,10 @@ export default class TrainingSystem {
             workerProcess = child_process.exec(cmdStr, (error, stdout, stderr) => {
                 if (error) {
                     console.error(`执行的错误: ${error}`);
+                    console.error(`stderr: ${stderr}`);
                     return;
                 }
                 console.log(`stdout: ${stdout}`);
-                console.error(`stderr: ${stderr}`);
             });
             // 退出之后的输出
             workerProcess.on("close", (code) => {
@@ -270,6 +270,7 @@ export default class TrainingSystem {
             workerProcess = child_process.exec(cmdStr, (error, stdout, stderr) => {
                 if (error) {
                     console.error(`执行的错误: ${error}`);
+                    console.error(`stderr: ${stderr}`);
                     return;
                 }
             });
@@ -297,9 +298,9 @@ export default class TrainingSystem {
             workerProcess = child_process.exec(cmdStr, (error, stdout, stderr) => {
                 if (error) {
                     console.error(`执行的错误: ${error}`);
+                    console.error(`stderr: ${stderr}`);
                     return;
                 }
-                console.error(`stderr: ${stderr}`);
             });
             workerProcess.stdout.on("data", (data) => {
                 resStr += data;
@@ -329,10 +330,10 @@ export default class TrainingSystem {
             workerProcess = child_process.exec(cmdStr, (error, stdout, stderr) => {
                 if (error) {
                     console.error(`执行的错误: ${error}`);
+                    console.error(`stderr: ${stderr}`);
                     return;
                 }
                 console.log(`stdout: ${stdout}`);
-                console.error(`stderr: ${stderr}`);
             });
             // 退出之后的输出
             workerProcess.on("close", (code) => {
@@ -365,10 +366,10 @@ export default class TrainingSystem {
             workerProcess = child_process.exec(cmdStr, (error, stdout, stderr) => {
                 if (error) {
                     console.error(`执行的错误: ${error}`);
+                    console.error(`stderr: ${stderr}`);
                     return;
                 }
                 console.log(`stdout: ${stdout}`);
-                console.error(`stderr: ${stderr}`);
             });
             // 退出之后的输出
             workerProcess.on("close", (code) => {
@@ -397,10 +398,10 @@ export default class TrainingSystem {
             workerProcess = child_process.exec(cmdStr, (error, stdout, stderr) => {
                 if (error) {
                     console.error(`执行的错误: ${error}`);
+                    console.error(`stderr: ${stderr}`);
                     return;
                 }
                 console.log(`stdout: ${stdout}`);
-                console.error(`stderr: ${stderr}`);
             });
             // 退出之后的输出
             workerProcess.on("close", (code) => {
