@@ -173,7 +173,7 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                         Component={ProjectItem}
                         items={this.props.appSettings.projectList}
                         onAddClick={() => this.modalHomePageAddProject.current.open()}
-                        onClick={ async (item) => {
+                        onOpenDir={ async (item) => {
                             const fileFolder = await this.localFileSystem.importTaggedContainer(
                                 item.baseFolder + "/" + item.name);
                             if (!fileFolder) { return; }

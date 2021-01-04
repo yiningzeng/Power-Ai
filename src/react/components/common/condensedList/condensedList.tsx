@@ -21,6 +21,7 @@ interface ICondensedListProps {
     home?: boolean;
     newLinkTo?: string;
     onClick?: (item) => void;
+    onOpenDir?: (item) => void;
     onDelete?: (item) => void;
     onAddClick?: () => void;
     onImportTaggedAssetsFolder?: () => void;
@@ -76,10 +77,11 @@ export default class CondensedList extends React.Component<ICondensedListProps> 
                     {(items && items.length > 0) &&
                         <ul className="condensed-list-items">
                             {items.map((item) => <Component key={item.id}
-                                item={item}
-                                openDir={this.state.openDir}
-                                onClick={(e) => this.onItemClick(e, item)}
-                                onDelete={(e) => this.onItemDelete(e, item)} />)}
+                                                            item={item}
+                                                            openDir={this.state.openDir}
+                                                            onClick={(e) => this.onItemClick(e, item)}
+                                                            onOpenDir={(e) => this.onItemOpenDir(e, item)}
+                                                            onDelete={(e) => this.onItemDelete(e, item)} />)}
                         </ul>
                     }
                 </div>
@@ -93,6 +95,15 @@ export default class CondensedList extends React.Component<ICondensedListProps> 
             this.setState({
                 openDir: item,
             });
+        }
+    }
+
+    private onItemOpenDir = (e: SyntheticEvent, item) => {
+        e.stopPropagation();
+        e.preventDefault();
+
+        if (this.props.onOpenDir) {
+            this.props.onOpenDir(item);
         }
     }
 
