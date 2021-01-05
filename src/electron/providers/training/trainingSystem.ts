@@ -1,4 +1,4 @@
-import { BrowserWindow, dialog } from "electron";
+import { BrowserWindow, dialog, shell} from "electron";
 import fs from "fs";
 import ftp from "ftp";
 import got from "got";
@@ -190,6 +190,11 @@ export default class TrainingSystem {
         });
     }
     // endregion
+
+    // 判断文件是否存在
+    public OpenProjectDir(path: string): void {
+        shell.showItemInFolder(path);
+    }
 
     // 判断文件是否存在
     public FileExist(path: string): Promise<boolean> {

@@ -174,10 +174,14 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                         items={this.props.appSettings.projectList}
                         onAddClick={() => this.modalHomePageAddProject.current.open()}
                         onOpenDir={ async (item) => {
-                            const fileFolder = await this.localFileSystem.importTaggedContainer(
-                                item.baseFolder + "/" + item.name);
-                            if (!fileFolder) { return; }
-                            this.loadProject(fileFolder[0]);
+                            // tslint:disable-next-line:max-line-length
+                            const res = await IpcRendererProxy.send(`TrainingSystem:FileExist`, [item.baseFolder + "/" + item.name]);
+                            if (res) {
+                                // tslint:disable-next-line:max-line-length
+                                await IpcRendererProxy.send(`TrainingSystem:OpenProjectDir`, [item.baseFolder + "/" + item.name + "/CollectData/"]);
+                            } else {
+                                toast.error(`项目目录${item.baseFolder + "/" + item.name}不存在，请手动删除该项目`);
+                            }
                         }}
                         onDelete={(item) => this.deleteProjectListConfirm.current.open(item)}
                         showToolbar={true}
@@ -306,6 +310,7 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                         }
                         {/*<li>*/}
                         {/*    <a href="#"  className="app-homepage-main-a-group2 p-5 cloud-open-project"*/}
+                        {/* tslint:disable-next-line:max-line-length */}
                         {/*       onClick={() => this.handleOpenCloudCopyProjectClick(this.copyRemoteAssetsModal.current)}>*/}
                         {/*        <i className="fas fa-copy fa-9x"></i>*/}
                         {/*        <h6 style={{marginTop: "10px"}}>{strings.homePage.copyRemoteAssets.title}</h6>*/}
@@ -527,7 +532,7 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
 
     private  onOpenDirectory = async () => {
         // this.filePicker.current.upload()
-        const fileFolder = await this.localFileSystem.importTaggedContainer();
+        const fileFolder = await this.localFileSystem.importTaggedContainer("/qtingvisionfolder/Projects/");
         // alert(JSON.stringify(this.props.project));
         if (!fileFolder) { return; }
         this.loadProject(fileFolder[0]);
