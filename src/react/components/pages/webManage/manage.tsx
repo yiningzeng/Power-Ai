@@ -7,6 +7,7 @@ import { IApplicationState, IConnection } from "../../../../models/applicationSt
 import IConnectionActions, * as connectionActions from "../../../../redux/actions/connectionActions";
 import CondensedList from "../../common/condensedList/condensedList";
 import Iframe from "react-iframe";
+import moment from "moment";
 import { toast } from "react-toastify";
 
 /**
@@ -24,7 +25,7 @@ export default class Manage extends React.Component {
     public render() {
         return (
             <div style={{height: "100%", width: "100%"}}>
-                <Iframe url="http://localhost"
+                <Iframe url={`http://localhost?${moment(new Date()).valueOf()}`}
                         width="100%"
                         height="100%"
                         id="myId"
