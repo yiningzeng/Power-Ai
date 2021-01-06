@@ -158,92 +158,95 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
         // this.props.actions.test();
         return (
             <div className="app-homepage">
-                <div className="app-homepage-remoteHost bg-lighter-1">
-                    <CondensedList
-                        title={strings.homePage.remoteHost.title}
-                        Component={RemoteHostItem}
-                        items={this.props.appSettings.remoteHostList}
-                        // onClick={(item) => toast.info(`主机名: ${item.name} 主机IP: ${item.ip}`)}
-                        onAddClick={() => this.ModalRemoteHostAdd.current.open()}
-                        onDelete={(item) => this.deleteRemoteHostConfirm.current.open(item)}
-                        showToolbar={true}
-                        home={true}/>
-                    <CondensedList
-                        title={strings.homePage.projectList}
-                        Component={ProjectItem}
-                        items={this.props.appSettings.projectList}
-                        onAddClick={() => this.modalHomePageAddProject.current.open()}
-                        onOpenDir={ async (item) => {
-                            // tslint:disable-next-line:max-line-length
-                            const res = await IpcRendererProxy.send(`TrainingSystem:FileExist`, [item.baseFolder + "/" + item.name]);
-                            if (res) {
+                {
+                    global && global.process && global.process.platform === PlatformType.Linux &&
+                    <div className="app-homepage-remoteHost bg-lighter-1">
+                        <CondensedList
+                            title={strings.homePage.remoteHost.title}
+                            Component={RemoteHostItem}
+                            items={this.props.appSettings.remoteHostList}
+                            // onClick={(item) => toast.info(`主机名: ${item.name} 主机IP: ${item.ip}`)}
+                            onAddClick={() => this.ModalRemoteHostAdd.current.open()}
+                            onDelete={(item) => this.deleteRemoteHostConfirm.current.open(item)}
+                            showToolbar={true}
+                            home={true}/>
+                        <CondensedList
+                            title={strings.homePage.projectList}
+                            Component={ProjectItem}
+                            items={this.props.appSettings.projectList}
+                            onAddClick={() => this.modalHomePageAddProject.current.open()}
+                            onOpenDir={ async (item) => {
                                 // tslint:disable-next-line:max-line-length
-                                await IpcRendererProxy.send(`TrainingSystem:OpenProjectDir`, [item.baseFolder + "/" + item.name + "/CollectData/"]);
-                            } else {
-                                toast.error(`项目目录${item.baseFolder + "/" + item.name}不存在，请手动删除该项目`);
-                            }
-                        }}
-                        onDelete={(item) => this.deleteProjectListConfirm.current.open(item)}
-                        showToolbar={true}
-                        home={true}/>
-                    <ModalRemoteHostAdd
-                        ref={this.ModalRemoteHostAdd}
-                        onSubmit={(platform, name, ip) => {
-                            let hostList = [];
-                            if (this.props.appSettings.remoteHostList !== undefined) {
-                                hostList = [
-                                    ...this.props.appSettings.remoteHostList,
+                                const res = await IpcRendererProxy.send(`TrainingSystem:FileExist`, [item.baseFolder + "/" + item.name]);
+                                if (res) {
+                                    // tslint:disable-next-line:max-line-length
+                                    await IpcRendererProxy.send(`TrainingSystem:OpenProjectDir`, [item.baseFolder + "/" + item.name + "/CollectData/"]);
+                                } else {
+                                    toast.error(`项目目录${item.baseFolder + "/" + item.name}不存在，请手动删除该项目`);
+                                }
+                            }}
+                            onDelete={(item) => this.deleteProjectListConfirm.current.open(item)}
+                            showToolbar={true}
+                            home={true}/>
+                        <ModalRemoteHostAdd
+                            ref={this.ModalRemoteHostAdd}
+                            onSubmit={(platform, name, ip) => {
+                                let hostList = [];
+                                if (this.props.appSettings.remoteHostList !== undefined) {
+                                    hostList = [
+                                        ...this.props.appSettings.remoteHostList,
+                                        {
+                                            name,
+                                            ip,
+                                            platform,
+                                        }];
+                                } else {
+                                    hostList =  [
+                                        {
+                                            name,
+                                            ip,
+                                            platform,
+                                        }];
+                                }
+                                const newAppSettings = {
+                                    ...this.props.appSettings,
+                                    remoteHostList: hostList,
+                                };
+                                this.props.applicationActions.saveAppSettings(newAppSettings);
+                                this.ModalRemoteHostAdd.current.close();
+                                toast.success("新增主机成功");
+                                console.log(JSON.stringify(this.props.appSettings));
+                            }}
+                        />
+                        <ModalHomePageAddProject
+                            ref={this.modalHomePageAddProject}
+                            onSubmit={async (projectName) => {
+                                const projectList = [
+                                    ...this.props.appSettings.projectList,
                                     {
-                                        name,
-                                        ip,
-                                        platform,
+                                        name: projectName,
+                                        baseFolder: "/qtingvisionfolder/Projects",
+                                        projectFolder: projectName,
                                     }];
-                            } else {
-                                hostList =  [
-                                    {
-                                        name,
-                                        ip,
-                                        platform,
-                                    }];
-                            }
-                            const newAppSettings = {
-                                ...this.props.appSettings,
-                                remoteHostList: hostList,
-                            };
-                            this.props.applicationActions.saveAppSettings(newAppSettings);
-                            this.ModalRemoteHostAdd.current.close();
-                            toast.success("新增主机成功");
-                            console.log(JSON.stringify(this.props.appSettings));
-                        }}
-                    />
-                    <ModalHomePageAddProject
-                        ref={this.modalHomePageAddProject}
-                        onSubmit={async (projectName) => {
-                            const projectList = [
-                                ...this.props.appSettings.projectList,
-                                {
-                                    name: projectName,
-                                    baseFolder: "/qtingvisionfolder/Projects",
-                                    projectFolder: projectName,
-                                }];
-                            const newAppSettings = {
-                                ...this.props.appSettings,
-                                projectList,
-                            };
-                            await this.props.actions.createFolder("/qtingvisionfolder/Projects", projectName);
-                            // 这里创建文件夹要合并，否则会出错, 加了await就正常了
-                            await this.props.actions.createFolder("/qtingvisionfolder/Projects/" + projectName, "CollectData");
-                            await this.props.actions.createFolder("/qtingvisionfolder/Projects/" + projectName, "MissData");
-                            await this.props.actions.createFolder("/qtingvisionfolder/Projects/" + projectName, "AtuoTrainData");
-                            await this.props.actions.createFolder("/qtingvisionfolder/Projects/" + projectName, "model_release");
-                            await this.props.actions.createFolder("/qtingvisionfolder/Projects/" + projectName, "training_data");
-                            this.props.applicationActions.saveAppSettings(newAppSettings);
-                            this.modalHomePageAddProject.current.close();
-                            toast.success("项目新建成功");
-                            console.log(JSON.stringify(this.props.appSettings));
-                        }}
-                    />
-                </div>
+                                const newAppSettings = {
+                                    ...this.props.appSettings,
+                                    projectList,
+                                };
+                                await this.props.actions.createFolder("/qtingvisionfolder/Projects", projectName);
+                                // 这里创建文件夹要合并，否则会出错, 加了await就正常了
+                                await this.props.actions.createFolder("/qtingvisionfolder/Projects/" + projectName, "CollectData");
+                                await this.props.actions.createFolder("/qtingvisionfolder/Projects/" + projectName, "MissData");
+                                await this.props.actions.createFolder("/qtingvisionfolder/Projects/" + projectName, "AtuoTrainData");
+                                await this.props.actions.createFolder("/qtingvisionfolder/Projects/" + projectName, "model_release");
+                                await this.props.actions.createFolder("/qtingvisionfolder/Projects/" + projectName, "training_data");
+                                this.props.applicationActions.saveAppSettings(newAppSettings);
+                                this.modalHomePageAddProject.current.close();
+                                toast.success("项目新建成功");
+                                console.log(JSON.stringify(this.props.appSettings));
+                            }}
+                        />
+                    </div>
+                }
                 <div className="app-homepage-main">
                     <ul>
                         {/*<li>*/}
@@ -278,26 +281,29 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                         {/*</li>*/}
                         {/*}*/}
 
-                        <li>
-                            <a href="#"  className="app-homepage-main-a-group1 p-5 cloud-open-project"
-                               onClick={() => this.handleOpenCloudProjectClick(this.cloudFilePickerModal.current)}>
-                                <i className="fas fa-cloud fa-9x"></i>
-                                <h6 style={{marginTop: "10px"}}>{strings.homePage.openCloudProject.title}</h6>
-                            </a>
-                            <CloudFilePicker
-                                ref={this.cloudFilePickerModal}
-                                modalHeader={strings.homePage.openCloudProject.title}
-                                connections={this.props.connections}
-                                remoteHostList={this.props.appSettings.remoteHostList}
-                                projectList={this.props.appSettings.projectList}
-                                onSubmit={(success, content, belongToProject) => {
-                                    if (success) {
-                                        this.loadProject(content, belongToProject, ExportPath.CollectData);
-                                    }
-                                }}
-                                fileExtension={constants.projectFileExtension}
-                            />
-                        </li>
+                        {
+                            global && global.process && global.process.platform === PlatformType.Linux &&
+                            <li>
+                                <a href="#"  className="app-homepage-main-a-group1 p-5 cloud-open-project"
+                                   onClick={() => this.handleOpenCloudProjectClick(this.cloudFilePickerModal.current)}>
+                                    <i className="fas fa-cloud fa-9x"></i>
+                                    <h6 style={{marginTop: "10px"}}>{strings.homePage.openCloudProject.title}</h6>
+                                </a>
+                                <CloudFilePicker
+                                    ref={this.cloudFilePickerModal}
+                                    modalHeader={strings.homePage.openCloudProject.title}
+                                    connections={this.props.connections}
+                                    remoteHostList={this.props.appSettings.remoteHostList}
+                                    projectList={this.props.appSettings.projectList}
+                                    onSubmit={(success, content, belongToProject) => {
+                                        if (success) {
+                                            this.loadProject(content, belongToProject, ExportPath.CollectData);
+                                        }
+                                    }}
+                                    fileExtension={constants.projectFileExtension}
+                                />
+                            </li>
+                        }
                         {
                             isElectron() &&
                             <li>
@@ -328,26 +334,29 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                         {/*        copy*/}
                         {/*    />*/}
                         {/*</li>*/}
-                        <li>
-                            <a href="#"  className="app-homepage-main-a-group1 p-5 cloud-open-project"
-                               onClick={() => this.inputCodeTagAssetsModal.current.open()}>
-                                <i className="fas fa-search fa-9x"></i>
-                                <h6 style={{marginTop: "10px"}}>{strings.homePage.inputCodeTagAssets.title}</h6>
-                            </a>
-                            <ModalSearchPcb
-                                ref={this.inputCodeTagAssetsModal}
-                                modalHeader={strings.homePage.inputCodeTagAssets.title}
-                                connections={this.props.connections}
-                                remoteHostList={this.props.appSettings.remoteHostList}
-                                projectList={this.props.appSettings.projectList}
-                                onSubmit={async (success, content, belongToProject) => {
-                                    if (success) {
-                                        await this.loadProject(content, belongToProject, ExportPath.MissData);
-                                    }
-                                }}
-                                fileExtension={constants.projectFileExtension}
-                            />
-                        </li>
+                        {
+                            global && global.process && global.process.platform === PlatformType.Linux &&
+                            <li>
+                                <a href="#"  className="app-homepage-main-a-group1 p-5 cloud-open-project"
+                                   onClick={() => this.inputCodeTagAssetsModal.current.open()}>
+                                    <i className="fas fa-search fa-9x"></i>
+                                    <h6 style={{marginTop: "10px"}}>{strings.homePage.inputCodeTagAssets.title}</h6>
+                                </a>
+                                <ModalSearchPcb
+                                    ref={this.inputCodeTagAssetsModal}
+                                    modalHeader={strings.homePage.inputCodeTagAssets.title}
+                                    connections={this.props.connections}
+                                    remoteHostList={this.props.appSettings.remoteHostList}
+                                    projectList={this.props.appSettings.projectList}
+                                    onSubmit={async (success, content, belongToProject) => {
+                                        if (success) {
+                                            await this.loadProject(content, belongToProject, ExportPath.MissData);
+                                        }
+                                    }}
+                                    fileExtension={constants.projectFileExtension}
+                                />
+                            </li>
+                        }
                     </ul>
                 </div>
                 {(this.props.recentProjects && this.props.recentProjects.length > 0) &&

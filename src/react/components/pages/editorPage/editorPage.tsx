@@ -1473,6 +1473,11 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                 await this.props.actions.saveProject(this.props.project);
                 break;
             case ToolbarItemName.ExportProject:
+                const platform = global && global.process ? global.process.platform : "web";
+                if (platform !== PlatformType.Linux) {
+                    toast.warn("非Linux主机无需导出，直接复制标注好的素材到Linux服务器即可");
+                    return;
+                }
                 this.modelBelongPorject.current.open();
                 break;
             case ToolbarItemName.TransferProject:
