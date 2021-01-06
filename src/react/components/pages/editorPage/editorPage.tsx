@@ -75,6 +75,7 @@ import {DoubleTextSwitch} from "../../common/doubleTextSwitch/doubleTextSwitch";
 import {Divider} from "@material-ui/core";
 import {ModelBelongPorject} from "../../common/modelBelongPorject/modelBelongPorject";
 import {IpcRendererProxy} from "../../../../common/ipcRendererProxy";
+import {PlatformType} from "../../../../common/hostProcess";
 
 // import "antd/lib/tree/style/css";
 
@@ -1522,56 +1523,118 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
     }
 
     private reloadProject = async (selectAssetId?: string, deltetTag?: string) => {
-        // console.log(`exportPage: homepage: ${JSON.stringify(this.props.project)}`);
-        const par: IProviderOptions = this.props.project.sourceConnection.providerOptions;
-        const fileFolder = par["folderPath"];
-        this.loadingDialog.current.open(fileFolder);
-        this.loadingDialog.current.change("正在重新加载数据集", "请耐心等待");
-        // // alert(JSON.stringify(this.props.project));
-        // if (!fileFolder) { return; }
-        // const idd = normalizeSlashes(fileFolder).lastIndexOf("/");
-        // // const randId = shortid.generate();
-        // // console.log(`homePage>openDir: idd ${idd}`);
-        // const folderName = normalizeSlashes(fileFolder).substring(idd + 1);
-        // // console.log(`homePage>openDir: folderName ${folderName}`);
-        // // console.log(`homePage>openDir: normalizeSlashes(fileFolder[0]) ${normalizeSlashes(fileFolder)}`);
-        // const connection: IConnection = {
-        //     id: folderName,
-        //     name: folderName,
-        //     providerType: "localFileSystemProxy",
-        //     providerOptions: {
-        //         folderPath: normalizeSlashes(fileFolder),
-        //     },
-        //     providerOptionsOthers: [{
-        //         folderPath: normalizeSlashes(fileFolder),
-        //     }],
-        // };
-        let projectJson: IProject = {
-            ...this.props.project,
-            assets: {},
-            lastVisitedAssetId: selectAssetId,
-        };
+        const platform = global && global.process ? global.process.platform : "web";
+        if (platform !== PlatformType.Linux) {
+// console.log(`exportPage: homepage: ${JSON.stringify(this.props.project)}`);
+            const par: IProviderOptions = this.props.project.sourceConnection.providerOptions;
+            const fileFolder = par["folderPath"];
+            this.loadingDialog.current.open(fileFolder);
+            this.loadingDialog.current.change("正在重新加载数据集", "请耐心等待");
+            let projectJson: IProject = {
+                ...this.props.project,
+                assets: {},
+                lastVisitedAssetId: selectAssetId,
+            };
+            const yiningzengAssets = fileFolder + "/.yiningzeng.assets";
+            const llll = await IpcRendererProxy.send(`TrainingSystem:FileExist`, [yiningzengAssets]);
+            if (llll) {
+                const yiNingZengAssets = await this.props.actions.getAssetsByYiNingZengAssets(projectJson);
+                const yiNingZengTags = await this.props.actions.getAssetsByYiNingZengColorTags(projectJson);
+                console.log(yiningzengAssets);
+                projectJson = {
+                    ...projectJson,
+                    assets: yiNingZengAssets,
+                    tags: yiNingZengTags,
+                };
+                await this.props.actions.saveProject(projectJson);
+            }
+            this.loadingDialog.current.close();
+            this.props.history.push(`/projects/${projectJson.id}/edit`);
+            this.loadingProjectAssets = false;
+            this.setState({
+                assets: [],
+            });
+            this.loadProjectAssets();
+        } else {
+            this.loadingDialog.current.open();
+            this.loadingDialog.current.change("正在重新加载数据集", "请耐心等待");
+            const par: IProviderOptions = this.props.project.sourceConnection.providerOptions;
+            console.log(`fucking ${par["folderPath"]}`);
+            const fileFolder = par["folderPath"];
+            // alert(JSON.stringify(this.props.project));
+            if (!fileFolder) { return; }
+            const idd = normalizeSlashes(fileFolder).lastIndexOf("/");
+            // const randId = shortid.generate();
+            console.log(`homePage>openDir: idd ${idd}`);
+            const folderName = normalizeSlashes(fileFolder).substring(idd + 1);
+            console.log(`homePage>openDir: folderName ${folderName}`);
+            console.log(`homePage>openDir: normalizeSlashes(fileFolder[0]) ${normalizeSlashes(fileFolder)}`);
+            const connection: IConnection = {
+                id: folderName,
+                name: folderName,
+                providerType: "localFileSystemProxy",
+                providerOptions: {
+                    folderPath: normalizeSlashes(fileFolder),
+                },
+                providerOptionsOthers: [{
+                    folderPath: normalizeSlashes(fileFolder),
+                }],
+            };
+            let projectJson: IProject = {
+                id: folderName,
+                name: folderName,
+                version: "3.0.0",
+                activeLearningSettings: DefaultActiveLearningSettings,
+                autoSave: true,
+                exportFormat: DefaultExportOptions,
+                securityToken: folderName,
+                sourceConnection: connection,
+                sourceListConnection: [],
+                tags: [],
+                targetConnection: connection,
+                trainFormat: DefaultTrainOptions,
+                videoSettings: { frameExtractionRate: 15 },
+                assets: {},
+            };
+            const dataTemp = await this.props.actions.loadAssetsWithFolderAndTags(projectJson,
+                fileFolder);
+            const rootProjectAssets = _.values(projectJson.assets)
+                .filter((asset) => !asset.parent);
+            const rootAssets = _(rootProjectAssets)
+                .concat(dataTemp.assets)
+                .uniqBy((asset) => asset.id)
+                .value();
+            // region 查询重复的标签
+            const finalTags = this.props.project.tags;
+            dataTemp.tags.map((val) => {
+                if (!finalTags.some((v) => v.name === val.name)) {
+                    const newTag: ITag = {
+                        name: val.name,
+                        color: this.getNextColor(finalTags),
+                    };
+                    finalTags.push(newTag);
+                }
+            });
+            // endregion
 
-        const yiningzengAssets = fileFolder + "/.yiningzeng.assets";
-        const llll = await IpcRendererProxy.send(`TrainingSystem:FileExist`, [yiningzengAssets]);
-        if (llll) {
-            const yiNingZengAssets = await this.props.actions.getAssetsByYiNingZengAssets(projectJson);
-            const yiNingZengTags = await this.props.actions.getAssetsByYiNingZengColorTags(projectJson);
-            console.log(yiningzengAssets);
             projectJson = {
                 ...projectJson,
-                assets: yiNingZengAssets,
-                tags: yiNingZengTags,
+                assets: _.keyBy(rootAssets, (asset) => asset.id),
+                tags: finalTags.sort(),
             };
-            await this.props.actions.saveProject(projectJson);
+            console.log(`merge tags: ${JSON.stringify(finalTags)}`);
+            console.log(`homePage:merge tags: ${JSON.stringify(projectJson)}`);
+            connectionActions.saveConnection(connection);
+
+            await this.props.actions.loadProject(projectJson);
+            this.loadingDialog.current.close();
+            this.props.history.push(`/projects/${projectJson.id}/edit`);
+            this.loadingProjectAssets = false;
+            this.setState({
+                assets: [],
+            });
+            this.loadProjectAssets();
         }
-        this.loadingDialog.current.close();
-        this.props.history.push(`/projects/${projectJson.id}/edit`);
-        this.loadingProjectAssets = false;
-        this.setState({
-            assets: [],
-        });
-        this.loadProjectAssets();
     }
 
     private uploadTestAssets = async () => {

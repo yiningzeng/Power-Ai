@@ -509,21 +509,41 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
             videoSettings: {frameExtractionRate: 15},
             assets: {},
         };
-        const yiningzengAssets = fileFolder + "/.yiningzeng.assets";
-        const monkeySun = await IpcRendererProxy.send(`TrainingSystem:MonkeySun`, [fileFolder, 200]);
-        console.log(monkeySun);
-        const llll = await IpcRendererProxy.send(`TrainingSystem:FileExist`, [yiningzengAssets]);
-        if (llll) {
-            const yiNingZengAssets = await this.props.actions.getAssetsByYiNingZengAssets(projectJson);
-            const yiNingZengTags = await this.props.actions.getAssetsByYiNingZengColorTags(projectJson);
-            console.log(yiningzengAssets);
-            console.log(yiNingZengTags);
+
+        const platform = global && global.process ? global.process.platform : "web";
+        if (platform !== PlatformType.Linux) {
+            const yiningzengAssets = fileFolder + "/.yiningzeng.assets";
+            const monkeySun = await IpcRendererProxy.send(`TrainingSystem:MonkeySun`, [fileFolder, 200]);
+            console.log(monkeySun);
+            const llll = await IpcRendererProxy.send(`TrainingSystem:FileExist`, [yiningzengAssets]);
+            if (llll) {
+                const yiNingZengAssets = await this.props.actions.getAssetsByYiNingZengAssets(projectJson);
+                const yiNingZengTags = await this.props.actions.getAssetsByYiNingZengColorTags(projectJson);
+                console.log(yiningzengAssets);
+                console.log(yiNingZengTags);
+                projectJson = {
+                    ...projectJson,
+                    assets: yiNingZengAssets,
+                    tags: yiNingZengTags,
+                };
+                await this.props.actions.saveProject(projectJson);
+                connectionActions.saveConnection(connection);
+                this.draggableDialog.current.close();
+                await this.loadSelectedProject(projectJson);
+            }
+        } else {
+            const dataTemp = await this.props.actions.loadAssetsWithFolderAndTags(projectJson, fileFolder[0]);
+            const rootProjectAssets = _.values(projectJson.assets)
+                .filter((asset) => !asset.parent);
+            const rootAssets = _(rootProjectAssets)
+                .concat(dataTemp.assets)
+                .uniqBy((asset) => asset.id)
+                .value();
             projectJson = {
                 ...projectJson,
-                assets: yiNingZengAssets,
-                tags: yiNingZengTags,
+                assets: _.keyBy(rootAssets, (asset) => asset.id),
+                tags: dataTemp.tags,
             };
-            await this.props.actions.saveProject(projectJson);
             connectionActions.saveConnection(connection);
             this.draggableDialog.current.close();
             await this.loadSelectedProject(projectJson);
