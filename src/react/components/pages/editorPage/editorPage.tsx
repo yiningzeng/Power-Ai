@@ -1529,12 +1529,12 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
 
     private reloadProject = async (selectAssetId?: string, deltetTag?: string) => {
         const platform = global && global.process ? global.process.platform : "web";
-        if (platform !== PlatformType.Linux) {
+        if (platform === PlatformType.Linux) {
 // console.log(`exportPage: homepage: ${JSON.stringify(this.props.project)}`);
             const par: IProviderOptions = this.props.project.sourceConnection.providerOptions;
             const fileFolder = par["folderPath"];
             this.loadingDialog.current.open(fileFolder);
-            this.loadingDialog.current.change("正在重新加载数据集", "请耐心等待");
+            this.loadingDialog.current.change("正在重新加载数据集", "请耐心等待...");
             let projectJson: IProject = {
                 ...this.props.project,
                 assets: {},

@@ -108,6 +108,7 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
     private modalHomePageAddProject: React.RefObject<ModalHomePageAddProject> = React.createRef();
     private importConfirm: React.RefObject<Confirm> = React.createRef();
     private draggableDialog: React.RefObject<DraggableDialog> = React.createRef();
+    private draggableDialogNormal: React.RefObject<DraggableDialog> = React.createRef();
     constructor(props, context) {
         super(props, context);
         this.localFileSystem = new LocalFileSystemProxy();
@@ -433,6 +434,18 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                     }}
                     onCancel={() => this.draggableDialog.current.close()}
                 />
+                <DraggableDialog
+                    title={"正在加载..."}
+                    ref={this.draggableDialogNormal}
+                    content={"正在加载请等待..."}
+                    disableBackdropClick={true}
+                    disableEscapeKeyDown={true}
+                    fullWidth={true}
+                    onDone={() => {
+                        this.draggableDialog.current.close();
+                    }}
+                    onCancel={() => this.draggableDialog.current.close()}
+                />
             </div>
         );
     }
@@ -477,50 +490,49 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
     }
 
     private loadProject = async (fileFolder: string, belongToProject?: IProjectItem, exportPath?: string) => {
-        await this.draggableDialog.current.open(fileFolder);
-        // 先判断文件夹是否存在
-        const res = await IpcRendererProxy.send(`TrainingSystem:FileExist`, [fileFolder]);
-        if (!res) {
-            this.draggableDialog.current.change("出错了", "文件夹不存在", true);
-            return;
-        }
-        const idd = normalizeSlashes(fileFolder).lastIndexOf("/");
-        // const randId = shortid.generate();
-        const folderName = normalizeSlashes(fileFolder).substring(idd + 1);
-        const connection: IConnection = {
-            id: folderName,
-            name: folderName,
-            providerType: "localFileSystemProxy",
-            providerOptions: {
-                folderPath: normalizeSlashes(fileFolder),
-            },
-            providerOptionsOthers: [{
-                folderPath: normalizeSlashes(fileFolder),
-            }],
-        };
-        let projectJson: IProject = {
-            id: folderName,
-            name: folderName,
-            version: "3.0.0",
-            activeLearningSettings: DefaultActiveLearningSettings,
-            autoSave: true,
-            exportFormat: {
-                ...DefaultExportOptions,
-                // belongToProject,
-                // exportPath,
-            },
-            securityToken: folderName,
-            sourceConnection: connection,
-            sourceListConnection: [],
-            tags: [],
-            targetConnection: connection,
-            trainFormat: DefaultTrainOptions,
-            videoSettings: {frameExtractionRate: 15},
-            assets: {},
-        };
-
         const platform = global && global.process ? global.process.platform : "web";
-        if (platform !== PlatformType.Linux) {
+        if (platform === PlatformType.Linux) {
+            await this.draggableDialog.current.open(fileFolder);
+            // 先判断文件夹是否存在
+            const res = await IpcRendererProxy.send(`TrainingSystem:FileExist`, [fileFolder]);
+            if (!res) {
+                this.draggableDialog.current.change("出错了", "文件夹不存在", true);
+                return;
+            }
+            const idd = normalizeSlashes(fileFolder).lastIndexOf("/");
+            // const randId = shortid.generate();
+            const folderName = normalizeSlashes(fileFolder).substring(idd + 1);
+            const connection: IConnection = {
+                id: folderName,
+                name: folderName,
+                providerType: "localFileSystemProxy",
+                providerOptions: {
+                    folderPath: normalizeSlashes(fileFolder),
+                },
+                providerOptionsOthers: [{
+                    folderPath: normalizeSlashes(fileFolder),
+                }],
+            };
+            let projectJson: IProject = {
+                id: folderName,
+                name: folderName,
+                version: "3.0.0",
+                activeLearningSettings: DefaultActiveLearningSettings,
+                autoSave: true,
+                exportFormat: {
+                    ...DefaultExportOptions,
+                    // belongToProject,
+                    // exportPath,
+                },
+                securityToken: folderName,
+                sourceConnection: connection,
+                sourceListConnection: [],
+                tags: [],
+                targetConnection: connection,
+                trainFormat: DefaultTrainOptions,
+                videoSettings: {frameExtractionRate: 15},
+                assets: {},
+            };
             const yiningzengAssets = fileFolder + "/.yiningzeng.assets";
             const monkeySun = await IpcRendererProxy.send(`TrainingSystem:MonkeySun`, [fileFolder, 200]);
             console.log(monkeySun);
@@ -541,7 +553,38 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                 await this.loadSelectedProject(projectJson);
             }
         } else {
-            const dataTemp = await this.props.actions.loadAssetsWithFolderAndTags(projectJson, fileFolder[0]);
+            await this.draggableDialogNormal.current.open();
+            const idd = normalizeSlashes(fileFolder).lastIndexOf("/");
+            // const randId = shortid.generate();
+            const folderName = normalizeSlashes(fileFolder).substring(idd + 1);
+            const connection: IConnection = {
+                id: folderName,
+                name: folderName,
+                providerType: "localFileSystemProxy",
+                providerOptions: {
+                    folderPath: normalizeSlashes(fileFolder),
+                },
+                providerOptionsOthers: [{
+                    folderPath: normalizeSlashes(fileFolder),
+                }],
+            };
+            let projectJson: IProject = {
+                id: folderName,
+                name: folderName,
+                version: "3.0.0",
+                activeLearningSettings: DefaultActiveLearningSettings,
+                autoSave: true,
+                exportFormat: DefaultExportOptions,
+                securityToken: folderName,
+                sourceConnection: connection,
+                sourceListConnection: [],
+                tags: [],
+                targetConnection: connection,
+                trainFormat: DefaultTrainOptions,
+                videoSettings: { frameExtractionRate: 15 },
+                assets: {},
+            };
+            const dataTemp = await this.props.actions.loadAssetsWithFolderAndTags(projectJson, fileFolder);
             const rootProjectAssets = _.values(projectJson.assets)
                 .filter((asset) => !asset.parent);
             const rootAssets = _(rootProjectAssets)
@@ -554,7 +597,7 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                 tags: dataTemp.tags,
             };
             connectionActions.saveConnection(connection);
-            this.draggableDialog.current.close();
+            this.draggableDialogNormal.current.close();
             await this.loadSelectedProject(projectJson);
         }
     }
