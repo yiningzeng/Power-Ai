@@ -94,8 +94,8 @@ const emptyZoomMode: IZoomMode = {
     y: 0,
     miniWidth: 500,
     miniHeight: 500,
-    width: 1000,
-    height: "auto",
+    width: 850,
+    height: 850,
     zoomCenterX: 0,
     zoomCenterY: 0,
 };
@@ -258,6 +258,13 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         });
         // console.log("editorPage: project" + JSON.stringify(this.props.project));
         this.activeLearningService = new ActiveLearningService(this.props.project.activeLearningSettings);
+        window.addEventListener("resize", () => this.calRndSize(false));
+        // 重置编辑框尺寸
+        this.calRndSize(false);
+    }
+
+    public componentWillUnmount() {
+        window.removeEventListener("resize", () => this.calRndSize(false));
     }
 
     public async componentDidUpdate(prevProps: Readonly<IEditorPageProps>) {
@@ -544,7 +551,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                                actions={this.props.actions}
                                                onToolbarItemSelected={this.onToolbarItemSelected}/>
                             </div>
-                            <div className="editor-page-content-main-body">
+                            <div id="yining" className="editor-page-content-main-body">
                                 {selectedAsset &&
                                 <Rnd
                                     id="fuck"
@@ -677,14 +684,6 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                                                     y: Math.round(e.clientY - (h * ratioT)),
                                                 },
                                             });
-                                            if (this.state.zoomMode.height === "auto") {
-                                                this.setState({
-                                                    zoomMode: {
-                                                        ...this.state.zoomMode,
-                                                        height: document.getElementById("ct-zone").offsetHeight,
-                                                    },
-                                                });
-                                            }
                                         } catch (e) {
                                             console.error(e);
                                         }
@@ -816,6 +815,31 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                 />
             </div>
         );
+    }
+
+    private calRndSize = (reSet?: boolean) => {
+        const w = document.getElementById("yining").offsetWidth;
+        const h = document.getElementById("yining").offsetHeight;
+        const len = h < w ? h : w;
+        if (reSet) {
+            this.setState({
+                ...this.state,
+                zoomMode: {
+                    ...emptyZoomMode,
+                    width: len,
+                    height: len,
+                    disableDrag: this.state.zoomMode.disableDrag,
+                },
+            });
+        } else {
+            this.setState({
+                zoomMode: {
+                    ...this.state.zoomMode,
+                    width: len,
+                    height: len,
+                },
+            });
+        }
     }
 
     private onPageClick = () => {
@@ -1400,13 +1424,7 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                 });
                 break;
             case ToolbarItemName.ZoomNormolAsset: // 正常
-                this.setState({
-                    ...this.state,
-                    zoomMode: {
-                        ...emptyZoomMode,
-                        disableDrag: this.state.zoomMode.disableDrag,
-                    },
-                });
+                this.calRndSize(true);
                 break;
             case ToolbarItemName.PreviousAsset:
                 await this.goToRootAsset(-1);
@@ -1651,7 +1669,6 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
         const assets = this.state.isFilter ? this.state.filterAssets : this.state.assets;
         const currentIndex = assets
             .findIndex((asset) => asset.id === selectedRootAsset.id);
-        console.log(`fuck your son:currentIndex ${currentIndex}`);
         if (direction > 0) {
             await this.selectAsset(assets[Math.min(assets.length - 1, currentIndex + 1)]);
         } else {

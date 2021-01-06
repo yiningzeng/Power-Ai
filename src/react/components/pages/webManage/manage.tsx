@@ -18,6 +18,7 @@ export default class Manage extends React.Component {
         super(props, context);
     }
 
+    // tslint:disable-next-line:no-empty
     public async componentDidMount() {
 
     }
