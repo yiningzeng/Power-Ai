@@ -167,8 +167,6 @@ export interface IAppSettings {
     thumbnailSize?: ISize;
     deadline: string;
     zengyining?: boolean;
-    remoteHostList: IRemoteHostItem[]; // 首页远程主机列表
-    projectList: IProjectItem[]; // 首页项目列表
 }
 
 /**
@@ -187,6 +185,8 @@ export interface IProjectItem {
     name: string;
     baseFolder: string;
     projectFolder: string;
+    exportPath?: string;
+    imageSize?: [number, number];
 }
 
 /**
@@ -358,6 +358,7 @@ export interface IExportFormat {
 }
 
 export enum ExportPath {
+    TestData = "TestData",
     MissData = "MissData",
     CollectData = "CollectData",
     AtuoTrainData = "AtuoTrainData",

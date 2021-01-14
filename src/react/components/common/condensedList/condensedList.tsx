@@ -76,7 +76,7 @@ export default class CondensedList extends React.Component<ICondensedListProps> 
                     }
                     {(items && items.length > 0) &&
                         <ul className="condensed-list-items">
-                            {items.map((item) => <Component key={item.id}
+                            {items.map((item) => <Component key={item.name}
                                                             item={item}
                                                             openDir={this.state.openDir}
                                                             onClick={(e) => this.onItemClick(e, item)}

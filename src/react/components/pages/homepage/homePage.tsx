@@ -73,6 +73,8 @@ export interface IHomePageProps extends RouteComponentProps, React.Props<HomePag
 
 export interface IHomePageState {
     cloudPickerOpen: boolean;
+    remoteHostList: IRemoteHostItem[]; // 首页远程主机列表
+    projectList: IProjectItem[]; // 首页项目列表
 }
 
 function mapStateToProps(state: IApplicationState) {
@@ -95,6 +97,8 @@ function mapDispatchToProps(dispatch) {
 export default class HomePage extends React.Component<IHomePageProps, IHomePageState> {
     public state: IHomePageState = {
         cloudPickerOpen: false,
+        remoteHostList: [],
+        projectList: [],
     };
     private localFileSystem: LocalFileSystemProxy;
     private filePicker: React.RefObject<FilePicker> = React.createRef();
@@ -139,24 +143,36 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
             };
             this.props.applicationActions.saveAppSettings(newAppSettings);
         }
-
-        if (this.props.appSettings.remoteHostList === undefined || this.props.appSettings.remoteHostList === null) {
-            this.props.applicationActions.saveAppSettings({
-                ...this.props.appSettings,
-                remoteHostList: [],
-            });
-        }
-        if (this.props.appSettings.projectList === undefined || this.props.appSettings.projectList === null) {
-            this.props.applicationActions.saveAppSettings({
-                ...this.props.appSettings,
-                projectList: [],
-            });
-        }
+        this.loadRemoteHostList();
+        this.loadProjectList();
         // 正式版使用这个
     }
 
+    // 加载远程主机
+    public loadRemoteHostList() {
+        IpcRendererProxy.send(`TrainingSystem:JsonRead`, [constants.remoteHostFileName]).then((txt) => {
+            this.setState({
+                ...this.state,
+                remoteHostList: _.values(JSON.parse(txt.toString())),
+            }, () => {
+                console.log(JSON.stringify(this.state.remoteHostList));
+            });
+        });
+    }
+
+    // 加载项目
+    public loadProjectList() {
+        IpcRendererProxy.send(`TrainingSystem:JsonRead`, [constants.projectFileName]).then((txt) => {
+            this.setState({
+                ...this.state,
+                projectList: _.values(JSON.parse(txt.toString())),
+            }, () => {
+                console.log(JSON.stringify(this.state.projectList));
+            });
+        });
+    }
+
     public render() {
-        // this.props.actions.test();
         return (
             <div className="app-homepage">
                 {
@@ -165,7 +181,7 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                         <CondensedList
                             title={strings.homePage.remoteHost.title}
                             Component={RemoteHostItem}
-                            items={this.props.appSettings.remoteHostList}
+                            items={this.state.remoteHostList}
                             // onClick={(item) => toast.info(`主机名: ${item.name} 主机IP: ${item.ip}`)}
                             onAddClick={() => this.ModalRemoteHostAdd.current.open()}
                             onDelete={(item) => this.deleteRemoteHostConfirm.current.open(item)}
@@ -174,7 +190,7 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                         <CondensedList
                             title={strings.homePage.projectList}
                             Component={ProjectItem}
-                            items={this.props.appSettings.projectList}
+                            items={this.state.projectList}
                             onAddClick={() => this.modalHomePageAddProject.current.open()}
                             onOpenDir={ async (item) => {
                                 // tslint:disable-next-line:max-line-length
@@ -191,59 +207,65 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                             home={true}/>
                         <ModalRemoteHostAdd
                             ref={this.ModalRemoteHostAdd}
-                            onSubmit={(platform, name, ip) => {
-                                let hostList = [];
-                                if (this.props.appSettings.remoteHostList !== undefined) {
-                                    hostList = [
-                                        ...this.props.appSettings.remoteHostList,
-                                        {
-                                            name,
-                                            ip,
-                                            platform,
-                                        }];
-                                } else {
-                                    hostList =  [
-                                        {
-                                            name,
-                                            ip,
-                                            platform,
-                                        }];
-                                }
-                                const newAppSettings = {
-                                    ...this.props.appSettings,
-                                    remoteHostList: hostList,
+                            onSubmit={ async (platform, name, ip) => {
+                                const hostList: IRemoteHostItem = {
+                                    name,
+                                    ip,
+                                    platform,
                                 };
-                                this.props.applicationActions.saveAppSettings(newAppSettings);
-                                this.ModalRemoteHostAdd.current.close();
-                                toast.success("新增主机成功");
-                                console.log(JSON.stringify(this.props.appSettings));
+                                // tslint:disable-next-line:max-line-length
+                                const res = await IpcRendererProxy.send(`TrainingSystem:RemoteHostEdit`, [hostList, false]);
+                                if (res) {
+                                    this.loadRemoteHostList();
+                                    this.ModalRemoteHostAdd.current.close();
+                                    toast.success("新增主机成功");
+                                } else {
+                                    toast.error("新增主机失败");
+                                }
                             }}
                         />
                         <ModalHomePageAddProject
                             ref={this.modalHomePageAddProject}
-                            onSubmit={async (projectName) => {
-                                const projectList = [
-                                    ...this.props.appSettings.projectList,
-                                    {
-                                        name: projectName,
-                                        baseFolder: "/qtingvisionfolder/Projects",
-                                        projectFolder: projectName,
-                                    }];
-                                const newAppSettings = {
-                                    ...this.props.appSettings,
-                                    projectList,
+                            onSubmit={async (projectName, imageSize) => {
+
+                                // region 项目保存到本地路径库里
+                                const projectItem: IProjectItem =  {
+                                    name: projectName,
+                                    baseFolder: "/qtingvisionfolder/Projects",
+                                    projectFolder: projectName,
+                                    exportPath: ExportPath.CollectData,
+                                    imageSize,
                                 };
-                                await this.props.actions.createFolder("/qtingvisionfolder/Projects", projectName);
-                                // 这里创建文件夹要合并，否则会出错, 加了await就正常了
-                                await this.props.actions.createFolder("/qtingvisionfolder/Projects/" + projectName, "CollectData");
-                                await this.props.actions.createFolder("/qtingvisionfolder/Projects/" + projectName, "MissData");
-                                await this.props.actions.createFolder("/qtingvisionfolder/Projects/" + projectName, "AtuoTrainData");
-                                await this.props.actions.createFolder("/qtingvisionfolder/Projects/" + projectName, "model_release");
-                                await this.props.actions.createFolder("/qtingvisionfolder/Projects/" + projectName, "training_data");
-                                this.props.applicationActions.saveAppSettings(newAppSettings);
-                                this.modalHomePageAddProject.current.close();
-                                toast.success("项目新建成功");
-                                console.log(JSON.stringify(this.props.appSettings));
+                                // tslint:disable-next-line:max-line-length
+                                const pRes = await IpcRendererProxy.send(`TrainingSystem:ProjectEdit`, [projectItem]);
+                                if (pRes) {
+                                    this.loadProjectList();
+                                    // region 新建项目的其他文件
+                                    await this.props.actions.createFolder("/qtingvisionfolder/Projects", projectName);
+                                    // 这里创建文件夹要合并，否则会出错, 加了await就正常了
+                                    await this.props.actions.createFolder("/qtingvisionfolder/Projects/" + projectName, "CollectData");
+                                    await this.props.actions.createFolder("/qtingvisionfolder/Projects/" + projectName, "MissData");
+                                    await this.props.actions.createFolder("/qtingvisionfolder/Projects/" + projectName, "TestData");
+                                    await this.props.actions.createFolder("/qtingvisionfolder/Projects/" + projectName, "AtuoTrainData");
+                                    await this.props.actions.createFolder("/qtingvisionfolder/Projects/" + projectName, "model_release");
+                                    await this.props.actions.createFolder("/qtingvisionfolder/Projects/" + projectName, "training_data");
+                                    // tslint:disable-next-line:max-line-length
+                                    const projectPath = path.join("/qtingvisionfolder/Projects/" + projectName, constants.projectConfigFileName);
+                                    // tslint:disable-next-line:max-line-length
+                                    // const res = await IpcRendererProxy.send(`TrainingSystem:JsonRead`, [projectPath]);
+                                    // let writeStr = {imageSize};
+                                    // if (res !== undefined) {
+                                    //     writeStr = JSON.parse(res.toString());
+                                    //     writeStr["imageSize"] = imageSize;
+                                    // }
+                                    await IpcRendererProxy.send(`TrainingSystem:JsonSave`, [projectPath, projectItem]);
+                                    // endregion
+                                    this.modalHomePageAddProject.current.close();
+                                    toast.success("项目新建成功");
+                                } else {
+                                    toast.error("项目新建失败");
+                                }
+                                // endregion
                             }}
                         />
                     </div>
@@ -294,8 +316,8 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                                     ref={this.cloudFilePickerModal}
                                     modalHeader={strings.homePage.openCloudProject.title}
                                     connections={this.props.connections}
-                                    remoteHostList={this.props.appSettings.remoteHostList}
-                                    projectList={this.props.appSettings.projectList}
+                                    remoteHostList={this.state.remoteHostList}
+                                    projectList={this.state.projectList}
                                     onSubmit={(success, content, belongToProject) => {
                                         if (success) {
                                             this.loadProject(content, belongToProject, ExportPath.CollectData);
@@ -347,8 +369,8 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                                     ref={this.inputCodeTagAssetsModal}
                                     modalHeader={strings.homePage.inputCodeTagAssets.title}
                                     connections={this.props.connections}
-                                    remoteHostList={this.props.appSettings.remoteHostList}
-                                    projectList={this.props.appSettings.projectList}
+                                    remoteHostList={this.state.remoteHostList}
+                                    projectList={this.state.projectList}
                                     onSubmit={async (success, content, belongToProject) => {
                                         if (success) {
                                             await this.loadProject(content, belongToProject, ExportPath.MissData);
@@ -380,33 +402,43 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                          message={(item) =>
                              `如果正在标注该项目的远程素材，那么项目会被关闭！并且删除项目会删除该项目下的所有素材和已经训练好的模型文件！！！请谨慎操作！！！确定要删除项目[${item.name}]么?`}
                          confirmButtonColor="danger"
-                         onConfirm={(item) => {
-                             if (this.props.project) {
-                                 if (this.props.project.exportFormat.belongToProject.name !== undefined &&
-                                     this.props.project.exportFormat.belongToProject.name === item.name) {
-                                     this.props.actions.closeProject();
+                         onConfirm={async (item) => {
+                             await this.draggableDialogNormal.current.open();
+                             // tslint:disable-next-line:max-line-length
+                             const res = await IpcRendererProxy.send(`TrainingSystem:RootDeletePath`, [path.join(item.baseFolder, item.projectFolder)]);
+                             if (res) {
+                                 // tslint:disable-next-line:max-line-length
+                                 await IpcRendererProxy.send(`TrainingSystem:ProjectEdit`, [item, true]);
+                                 this.loadProjectList();
+
+                                 if (this.props.project) {
+                                     if (this.props.project.exportFormat.belongToProject.name !== undefined &&
+                                         this.props.project.exportFormat.belongToProject.name === item.name) {
+                                         this.props.actions.closeProject();
+                                     }
                                  }
+                                 this.deleteProjectListConfirm.current.close();
+                                 toast.success("已成功删除");
+                             } else {
+                                 toast.error("删除失败");
                              }
-                             const newAppSettings = {
-                                 ...this.props.appSettings,
-                                 projectList: this.props.appSettings.projectList.filter((v) => v.name !== item.name),
-                             };
-                             this.props.applicationActions.saveAppSettings(newAppSettings);
-                             this.props.actions.deleteFolder("/qtingvisionfolder/Projects", item.name);
-                             toast.success("已成功删除");
+                             await this.draggableDialogNormal.current.close();
                          }}/>
                 <Confirm title="删除主机"
                          ref={this.deleteRemoteHostConfirm as any}
                          message={(item) =>
                              `确定要删除主机[${item.name}]么?`}
                          confirmButtonColor="danger"
-                         onConfirm={(item) => {
-                             const newAppSettings = {
-                                 ...this.props.appSettings,
-                                 remoteHostList: this.props.appSettings.remoteHostList.filter((v) => v.ip !== item.ip),
-                             };
-                             this.props.applicationActions.saveAppSettings(newAppSettings);
-                             toast.success("已成功删除");
+                         onConfirm={async (item) => {
+                             // tslint:disable-next-line:max-line-length
+                             const res = await IpcRendererProxy.send(`TrainingSystem:RemoteHostEdit`, [item, true]);
+                             if (res) {
+                                 this.loadRemoteHostList();
+                                 this.ModalRemoteHostAdd.current.close();
+                                 toast.success("已成功删除");
+                             } else {
+                                 toast.error("删除主机失败");
+                             }
                          }}/>
                 <Confirm title="Delete Project"
                          ref={this.deleteConfirm as any}

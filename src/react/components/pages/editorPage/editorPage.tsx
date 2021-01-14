@@ -26,7 +26,7 @@ import {
     ISize,
     ITag,
     IZoomMode,
-    ExportPath,
+    ExportPath, IProjectItem,
 } from "../../../../models/applicationState";
 import {IToolbarItemRegistration, ToolbarItemFactory} from "../../../../providers/toolbar/toolbarItemFactory";
 import IApplicationActions, * as applicationActions from "../../../../redux/actions/applicationActions";
@@ -797,17 +797,17 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                 <ModelBelongPorject
                     ref={this.modelBelongPorject}
                     modalHeader={"选择数据所属项目"}
-                    projectList={this.props.appSettings.projectList}
                     onSubmit={async (belongToProject) => {
+                        console.log(JSON.stringify(belongToProject));
                         const projectJson: IProject = {
                             ...this.props.project,
                                 exportFormat: {
                                     ...this.props.project.exportFormat,
                                     belongToProject,
-                                    exportPath: ExportPath.CollectData,
+                                    exportPath: belongToProject.exportPath,
                             },
                         };
-                        this.modelBelongPorject.current.close();
+                        await this.modelBelongPorject.current.close();
                         await this.props.actions.saveProject(projectJson);
                         // await this.reloadProject();
                         // toast.error("开始到处");

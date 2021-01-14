@@ -2,18 +2,21 @@ import { BrowserWindow, dialog, shell} from "electron";
 import fs from "fs";
 import ftp from "ftp";
 import got from "got";
+import util from "util";
+import path from "path";
+import yaml from "js-yaml";
 import archiver from "archiver";
 import hddserial from "hddserial";
 import FormData from "form-data";
 // const Client = require("ftp");
-import path from "path";
-import {IProject} from "../../../models/applicationState";
+import {IProject, IProjectItem, IRemoteHostItem} from "../../../models/applicationState";
 import child_process from "child_process";
 import has = Reflect.has;
 import {IStartTrainResults} from "../../../providers/export/exportProvider";
 import Guard from "../../../common/guard";
 import {toast} from "react-toastify";
-
+import _ from "lodash";
+import {constants} from "../../../common/constants";
 const exec = child_process.exec;
 // 任何你期望执行的cmd命令，ls都可以
 
@@ -191,6 +194,170 @@ export default class TrainingSystem {
     }
     // endregion
 
+    // 首页远程主机的操作
+    public RemoteHostEdit(oneHost: IRemoteHostItem, remove?: boolean): Promise<boolean> {
+        return new Promise<boolean>(async (resolve, reject) => {
+            if (remove) {
+                console.log("删除");
+                fs.readFile(constants.remoteHostFileName, "utf-8", (err, data) => {
+                    if (err) {
+                        reject(false);
+                    } else {
+                        let jsonList: IRemoteHostItem[] = _.values(JSON.parse(data));
+                        jsonList = jsonList.filter((v) => v.name !== oneHost.name);
+                        // tslint:disable-next-line:max-line-length
+                        fs.writeFileSync(constants.remoteHostFileName, JSON.stringify(_.keyBy(jsonList, (v) => v.name), null, 4), "utf8");
+                        resolve(true);
+                    }
+                });
+            } else { // 新增
+                console.log("新增");
+                try {
+                    fs.statSync(constants.remoteHostFileName);
+                    // 如果能执行到这里，那么表示savePath文件存在
+                    fs.readFile(constants.remoteHostFileName, "utf-8", (err, data) => {
+                        if (err) {
+                            reject(false);
+                        } else {
+                            const jsonList = JSON.parse(data);
+                            jsonList[oneHost.name] = oneHost;
+                            fs.writeFileSync(constants.remoteHostFileName, JSON.stringify(jsonList, null, 4), "utf8");
+                            resolve(true);
+                        }
+                    });
+                } catch (e) { // 这里是新增
+                    fs.writeFileSync(constants.remoteHostFileName, `{"${oneHost.name}": ${JSON.stringify(oneHost)}}`, "utf8");
+                    resolve(true);
+                }
+            }
+        });
+    }
+
+    // 首页项目的操作
+    public ProjectEdit(projectItem: IProjectItem, remove?: boolean): Promise<boolean> {
+        return new Promise<boolean>(async (resolve, reject) => {
+            if (remove) {
+                console.log("删除");
+                fs.readFile(constants.projectFileName, "utf-8", (err, data) => {
+                    if (err) {
+                        reject(false);
+                    } else {
+                        let jsonList: IRemoteHostItem[] = _.values(JSON.parse(data));
+                        jsonList = jsonList.filter((v) => v.name !== projectItem.name);
+                        // tslint:disable-next-line:max-line-length
+                        fs.writeFileSync(constants.projectFileName, JSON.stringify(_.keyBy(jsonList, (v) => v.name), null, 4), "utf8");
+                        resolve(true);
+                    }
+                });
+            } else { // 新增
+                console.log("新增");
+                try {
+                    fs.statSync(constants.projectFileName);
+                    // 如果能执行到这里，那么表示savePath文件存在
+                    fs.readFile(constants.projectFileName, "utf-8", (err, data) => {
+                        if (err) {
+                            reject(false);
+                        } else {
+                            const jsonList = JSON.parse(data);
+                            jsonList[projectItem.name] = projectItem;
+                            fs.writeFileSync(constants.projectFileName, JSON.stringify(jsonList, null, 4), "utf8");
+                            resolve(true);
+                        }
+                    });
+                } catch (e) { // 这里是新增
+                    fs.writeFileSync(constants.projectFileName, `{"${projectItem.name}": ${JSON.stringify(projectItem)}}`, "utf8");
+                    resolve(true);
+                }
+            }
+        });
+    }
+
+    // 注意了这里sourcePath和targetPath都要已/结尾
+    public RootDeletePath(delPath: string): Promise<boolean> {
+        return new Promise<boolean>((resolve, reject) => {
+            let workerProcess;
+
+            const passwordFile = process.cwd() + "/sudo.txt";
+            const cmdStr = `echo \`cat "${passwordFile}"\` | sudo -S  rm -r "${delPath}"`;
+            console.log(cmdStr);
+            workerProcess = child_process.exec(cmdStr, (error, stdout, stderr) => {
+                if (error) {
+                    console.error(`执行的错误: ${error}`);
+                    console.error(`stderr: ${stderr}`);
+                }
+                console.log(`stdout: ${stdout}`);
+            });
+            // 退出之后的输出
+            workerProcess.on("close", (code) => {
+                console.log("out code：" + code);
+                let res = false;
+                if (code === 0) {
+                    console.log("执行成功");
+                    res = true;
+                } else {
+                    console.log("执行失败");
+                }
+                res ? resolve(true) : reject(false);
+            });
+        });
+    }
+
+    public YamlSave(filePath: string, str: string): Promise<boolean> {
+        return new Promise<boolean>(async (resolve, reject) => {
+            try {
+                fs.writeFileSync(filePath, yaml.dump(str), "utf8");
+                resolve(true);
+            } catch (e) {
+                console.log(e);
+                reject(false);
+            }
+        });
+    }
+
+    public YamlRead(filePath: string): Promise<string> {
+        return new Promise<string>(async (resolve, reject) => {
+            try {
+                fs.statSync(filePath);
+                // 如果能执行到这里，那么表示savePath文件存在
+                resolve(yaml.load(fs.readFileSync(filePath, "utf8")));
+            } catch (e) {
+                console.log(e);
+                reject("");
+            }
+        });
+    }
+
+    public JsonSave(filePath: string, str: string): Promise<boolean> {
+        return new Promise<boolean>(async (resolve, reject) => {
+            try {
+                fs.writeFileSync(filePath, JSON.stringify(str, null, 4), "utf8");
+                resolve(true);
+            } catch (e) {
+                console.log(e);
+                reject(false);
+            }
+        });
+    }
+
+    public JsonRead(filePath: string): Promise<string> {
+        return new Promise<string>(async (resolve, reject) => {
+            try {
+                fs.statSync(filePath);
+                // 如果能执行到这里，那么表示savePath文件存在
+                fs.readFile(filePath, "utf-8", (err, data) => {
+                    if (err) {
+                        resolve("{}");
+                    } else {
+                        resolve(data);
+                    }
+                });
+            } catch (e) {
+                console.log(e);
+                resolve("{}");
+            }
+        });
+    }
+
     // 判断文件是否存在
     public OpenProjectDir(path: string): void {
         shell.showItemInFolder(path);
@@ -317,6 +484,7 @@ export default class TrainingSystem {
                 if (code === 0) {
                     res = true;
                 } else {
+                    res = false;
                 }
                 res ? resolve(resStr) : reject("failed");
             });

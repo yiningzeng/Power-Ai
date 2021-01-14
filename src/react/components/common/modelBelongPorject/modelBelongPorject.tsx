@@ -2,7 +2,7 @@ import React from "react";
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader,
     Input, Label, InputGroup, InputGroupAddon, InputGroupText} from "reactstrap";
 import { strings } from "../../../../common/strings";
-import {IConnection, IProjectItem, IRemoteHostItem, StorageType} from "../../../../models/applicationState";
+import {ExportPath, IConnection, IProjectItem, IRemoteHostItem, StorageType} from "../../../../models/applicationState";
 import { StorageProviderFactory } from "../../../../providers/storage/storageProviderFactory";
 import CondensedList, { ListItem } from "../condensedList/condensedList";
 import {normalizeSlashes} from "../../../../common/utils";
@@ -14,6 +14,8 @@ import {IpcRendererProxy} from "../../../../common/ipcRendererProxy";
 import {LocalFileSystemProxy} from "../../../../providers/storage/localFileSystemProxy";
 import {SelectionMode} from "powerai-ct/lib/js/CanvasTools/Interface/ISelectorSettings";
 import {ICanvasProps, ICanvasState} from "../../pages/editorPage/canvas";
+import {constants} from "../../../../common/constants";
+import _ from "lodash";
 // const delay = require('delay');
 // const pTimeout = require('p-timeout');
 /**
@@ -26,7 +28,6 @@ import {ICanvasProps, ICanvasState} from "../../pages/editorPage/canvas";
 export interface ICloudFilePickerProps {
     modalHeader: string;
     onSubmit: (belongToProject: IProjectItem) => void;
-    projectList?: IProjectItem[];
     onCancel?: () => void;
 }
 
@@ -44,6 +45,7 @@ export interface ICloudFilePickerState {
     isOpen: boolean;
     modalHeader: string;
     belongToProject: IProjectItem;
+    projectList: IProjectItem[]; // 首页项目列表
 }
 
 /**
@@ -67,7 +69,6 @@ export class ModelBelongPorject extends React.Component<ICloudFilePickerProps, I
     }
 
     public render() {
-        const { projectList } = this.props;
         const closeBtn = <button className="close" onClick={this.close}>&times;</button>;
 
         return(
@@ -84,8 +85,23 @@ export class ModelBelongPorject extends React.Component<ICloudFilePickerProps, I
                                 belongToProject: JSON.parse(v.target.value),
                             });
                         }}>
-                            {projectList && projectList.length > 0 && projectList.map((item) =>
+                            {/* tslint:disable-next-line:max-line-length */}
+                            {this.state.projectList && this.state.projectList.length > 0 && this.state.projectList.map((item) =>
                                 <option value={JSON.stringify(item)}>{item.name}</option>)}
+                        </Input>
+                        <Label for="dataType">素材类型</Label>
+                        {/* tslint:disable-next-line:max-line-length */}
+                        <Input type="select" name="selectProjectExportPath" id="selectProjectExportPath" onChange={(v) => {
+                            this.setState({
+                                ...this.state,
+                                belongToProject: {
+                                    ...this.state.belongToProject,
+                                    exportPath: v.target.value,
+                                },
+                            });
+                        }}>
+                            <option value={ExportPath.CollectData}>训练集</option>
+                            <option value={ExportPath.TestData}>测试集</option>
                         </Input>
                     </div>
                 </ModalBody>
@@ -125,11 +141,19 @@ export class ModelBelongPorject extends React.Component<ICloudFilePickerProps, I
     }
 
     private getInitialState(): ICloudFilePickerState {
+        IpcRendererProxy.send(`TrainingSystem:JsonRead`, [constants.projectFileName]).then((txt) => {
+            const projects = _.values(JSON.parse(txt.toString()));
+            this.setState({
+                ...this.state,
+                projectList: projects,
+                belongToProject: projects !== undefined && projects.length > 0 ?
+                    projects[0] : undefined,
+            });
+        });
         return {
+            ...this.state,
             isOpen: false,
             modalHeader: this.props.modalHeader,
-            belongToProject: this.props.projectList !== undefined && this.props.projectList.length > 0 ?
-                this.props.projectList[0] : undefined,
         };
     }
 

@@ -54,6 +54,9 @@ export class PowerAiExportProvider extends ExportProvider<IPowerAiExportProvider
         //     });
         // }
         let exportFolderName = "";
+        console.log("二人若若若若若若");
+        console.log(JSON.stringify(this.project.exportFormat.belongToProject));
+        console.log(this.project.exportFormat.exportPath);
         if (!isSubdirectories) {
             const folder = path.join(this.project.exportFormat.belongToProject.baseFolder,
                 this.project.exportFormat.belongToProject.projectFolder,

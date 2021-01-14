@@ -49,3 +49,5 @@ er\.email
 monkeySun-bak
 
 log/
+
+*.db

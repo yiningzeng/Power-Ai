@@ -3,6 +3,7 @@ import { Button, Modal, ModalBody, ModalFooter, ModalHeader,
     Input, Label, InputGroup, InputGroupAddon, InputGroupText} from "reactstrap";
 import { IConnection, StorageType } from "../../../../models/applicationState";
 import DraggableDialog from "../draggableDialog/draggableDialog";
+import {toast} from "react-toastify";
 /**
  * Properties for Cloud File Picker
  * @member connections - Array of connections to choose from
@@ -11,7 +12,7 @@ import DraggableDialog from "../draggableDialog/draggableDialog";
  * @member fileExtension - Filter on files with extension
  */
 export interface ICloudFilePickerProps {
-    onSubmit: (projectName: string) => void;
+    onSubmit: (projectName: string, imageSize: [number, number]) => void;
     onCancel?: () => void;
 }
 
@@ -29,6 +30,7 @@ export interface ICloudFilePickerState {
     isOpen: boolean;
     modalHeader: string;
     projectName: string;
+    imageSize: [number, number];
 }
 
 /**
@@ -66,6 +68,20 @@ export class ModalHomePageAddProject extends React.Component<ICloudFilePickerPro
                             this.setState({
                                 ...this.state,
                                 projectName: v.target.value,
+                            });
+                        }}/>
+                        <Label for="projectName">网络图像宽度(px)-必须是32的整数倍</Label>
+                        <Input id="projectName" placeholder="请输入网络图像宽度" min={32} type="number" onChange={(v) => {
+                            this.setState({
+                                ...this.state,
+                                imageSize: [Number(v.target.value), this.state.imageSize[1]],
+                            });
+                        }}/>
+                        <Label for="projectName">网络图像高度度(px)-必须是32的整数倍</Label>
+                        <Input id="projectName" placeholder="请输入网络图像高度度" min={32} type="number" onChange={(v) => {
+                            this.setState({
+                                ...this.state,
+                                imageSize: [this.state.imageSize[0], Number(v.target.value)],
                             });
                         }}/>
                     </div>
@@ -110,11 +126,16 @@ export class ModalHomePageAddProject extends React.Component<ICloudFilePickerPro
             isOpen: false,
             modalHeader: "新增项目",
             projectName: "",
+            imageSize: [512, 512],
         };
     }
 
     private async ok() {
-        this.props.onSubmit(this.state.projectName);
+        if (Number(this.state.imageSize[0]) % 32 !== 0 || Number(this.state.imageSize[1])  % 32 !== 0 ) {
+            toast.error("网络图像宽高必须是32的整数倍");
+            return;
+        }
+        this.props.onSubmit(this.state.projectName, this.state.imageSize);
     }
 
     private back() {
