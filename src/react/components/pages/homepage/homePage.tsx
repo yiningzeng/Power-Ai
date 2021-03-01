@@ -57,11 +57,9 @@ import {TagInput} from "../../common/tagInput/tagInput";
 import ProjectItem from "./projectItem";
 import {CloudFileCopyPicker} from "../../common/cloudFileCopyPicker/cloudFileCopyPicker";
 import {IpcRendererProxy} from "../../../../common/ipcRendererProxy";
-import HtmlFileReader from "../../../../common/htmlFileReader";
 import path from "path";
 // tslint:disable-next-line:no-var-requires
 const tagColors = require("../../common/tagColors.json");
-
 export interface IHomePageProps extends RouteComponentProps, React.Props<HomePage> {
     recentProjects: IProject[];
     connections: IConnection[];
@@ -92,7 +90,6 @@ function mapDispatchToProps(dispatch) {
         applicationActions: bindActionCreators(applicationActions, dispatch),
     };
 }
-
 @connect(mapStateToProps, mapDispatchToProps)
 export default class HomePage extends React.Component<IHomePageProps, IHomePageState> {
     public state: IHomePageState = {
@@ -192,7 +189,7 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                             Component={ProjectItem}
                             items={this.state.projectList}
                             onAddClick={() => this.modalHomePageAddProject.current.open()}
-                            onOpenDir={ async (item) => {
+                            onOpenDir={async (item) => {
                                 // tslint:disable-next-line:max-line-length
                                 const res = await IpcRendererProxy.send(`TrainingSystem:FileExist`, [item.baseFolder + "/" + item.name]);
                                 if (res) {
@@ -207,7 +204,7 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                             home={true}/>
                         <ModalRemoteHostAdd
                             ref={this.ModalRemoteHostAdd}
-                            onSubmit={ async (platform, name, ip) => {
+                            onSubmit={async (platform, name, ip) => {
                                 const hostList: IRemoteHostItem = {
                                     name,
                                     ip,
@@ -229,7 +226,7 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                             onSubmit={async (projectName, imageSize) => {
 
                                 // region 项目保存到本地路径库里
-                                const projectItem: IProjectItem =  {
+                                const projectItem: IProjectItem = {
                                     name: projectName,
                                     baseFolder: "/qtingvisionfolder/Projects",
                                     projectFolder: projectName,
@@ -307,7 +304,7 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                         {
                             global && global.process && global.process.platform === PlatformType.Linux &&
                             <li>
-                                <a href="#"  className="app-homepage-main-a-group1 p-5 cloud-open-project"
+                                <a href="#" className="app-homepage-main-a-group1 p-5 cloud-open-project"
                                    onClick={() => this.handleOpenCloudProjectClick(this.cloudFilePickerModal.current)}>
                                     <i className="fas fa-cloud fa-9x"></i>
                                     <h6 style={{marginTop: "10px"}}>{strings.homePage.openCloudProject.title}</h6>
@@ -360,7 +357,7 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                         {
                             global && global.process && global.process.platform === PlatformType.Linux &&
                             <li>
-                                <a href="#"  className="app-homepage-main-a-group1 p-5 cloud-open-project"
+                                <a href="#" className="app-homepage-main-a-group1 p-5 cloud-open-project"
                                    onClick={() => this.inputCodeTagAssetsModal.current.open()}>
                                     <i className="fas fa-search fa-9x"></i>
                                     <h6 style={{marginTop: "10px"}}>{strings.homePage.inputCodeTagAssets.title}</h6>

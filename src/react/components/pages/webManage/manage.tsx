@@ -26,7 +26,7 @@ export default class Manage extends React.Component {
     public render() {
         return (
             <div style={{height: "100%", width: "100%"}}>
-                <Iframe url={`http://localhost?${moment(new Date()).valueOf()}`}
+                <Iframe url={`http://localhost:8080/manage?${moment(new Date()).valueOf()}`}
                         width="100%"
                         height="100%"
                         id="myId"
