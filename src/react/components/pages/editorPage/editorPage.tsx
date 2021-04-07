@@ -797,7 +797,6 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                     ref={this.modelBelongPorject}
                     modalHeader={"选择数据所属项目"}
                     onSubmit={async (belongToProject) => {
-                        console.log(JSON.stringify(belongToProject));
                         const projectJson: IProject = {
                             ...this.props.project,
                                 exportFormat: {
@@ -818,27 +817,31 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
     }
 
     private calRndSize = (reSet?: boolean) => {
-        const w = document.getElementById("yining").offsetWidth;
-        const h = document.getElementById("yining").offsetHeight;
-        const len = h < w ? h : w;
-        if (reSet) {
-            this.setState({
-                ...this.state,
-                zoomMode: {
-                    ...emptyZoomMode,
-                    width: len,
-                    height: len,
-                    disableDrag: this.state.zoomMode.disableDrag,
-                },
-            });
-        } else {
-            this.setState({
-                zoomMode: {
-                    ...this.state.zoomMode,
-                    width: len,
-                    height: len,
-                },
-            });
+        try {
+            const w = document.getElementById("yining").offsetWidth;
+            const h = document.getElementById("yining").offsetHeight;
+            const len = h < w ? h : w;
+            if (reSet) {
+                this.setState({
+                    ...this.state,
+                    zoomMode: {
+                        ...emptyZoomMode,
+                        width: len,
+                        height: len,
+                        disableDrag: this.state.zoomMode.disableDrag,
+                    },
+                });
+            } else {
+                this.setState({
+                    zoomMode: {
+                        ...this.state.zoomMode,
+                        width: len,
+                        height: len,
+                    },
+                });
+            }
+        } catch (e) {
+            console.error(e);
         }
     }
 
