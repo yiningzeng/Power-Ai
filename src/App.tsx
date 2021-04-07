@@ -74,7 +74,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
     constructor(props, context) {
         super(props, context);
         this.checkUpdate();
-        this.timer = setInterval(async () => this.checkUpdate(), 60000);
+        this.timer = setInterval(async () => this.checkUpdate(), 1800000); // 这里的这个检查更新由于需要显示那个啥提醒控件，会造成页面刷新
     }
 
     public componentDidCatch(error: Error) {

@@ -17,6 +17,7 @@ import Guard from "../../../common/guard";
 import {toast} from "react-toastify";
 import _ from "lodash";
 import {constants} from "../../../common/constants";
+import axios from "axios";
 const exec = child_process.exec;
 // 任何你期望执行的cmd命令，ls都可以
 
@@ -243,7 +244,7 @@ export default class TrainingSystem {
                         reject(false);
                     } else {
                         let jsonList: IRemoteHostItem[] = _.values(JSON.parse(data));
-                        jsonList = jsonList.filter((v) => v.name !== projectItem.name);
+                        jsonList = jsonList.filter((v) => v.name !== projectItem.ProjectName);
                         // tslint:disable-next-line:max-line-length
                         fs.writeFileSync(constants.projectFileName, JSON.stringify(_.keyBy(jsonList, (v) => v.name), null, 4), "utf8");
                         resolve(true);
@@ -259,13 +260,13 @@ export default class TrainingSystem {
                             reject(false);
                         } else {
                             const jsonList = JSON.parse(data);
-                            jsonList[projectItem.name] = projectItem;
+                            jsonList[projectItem.ProjectName] = projectItem;
                             fs.writeFileSync(constants.projectFileName, JSON.stringify(jsonList, null, 4), "utf8");
                             resolve(true);
                         }
                     });
                 } catch (e) { // 这里是新增
-                    fs.writeFileSync(constants.projectFileName, `{"${projectItem.name}": ${JSON.stringify(projectItem)}}`, "utf8");
+                    fs.writeFileSync(constants.projectFileName, `{"${projectItem.ProjectName}": ${JSON.stringify(projectItem)}}`, "utf8");
                     resolve(true);
                 }
             }
@@ -402,6 +403,7 @@ export default class TrainingSystem {
         });
     }
 
+    // 弃用
     public CalProgress(path: string): Promise<string> {
         return new Promise<string>((resolve, reject) => {
             let workerProcess;
@@ -461,32 +463,14 @@ export default class TrainingSystem {
         });
     }
 
-    public GetProgress(fileName: string): Promise<string> {
-        return new Promise<string>((resolve, reject) => {
-            let workerProcess;
-            const nowFile = process.cwd() + "/" + fileName;
-            const cmdStr = `cat '${nowFile}'`;
-            let resStr = "";
-            workerProcess = child_process.exec(cmdStr, (error, stdout, stderr) => {
-                if (error) {
-                    console.error(`执行的错误: ${error}`);
-                    console.error(`stderr: ${stderr}`);
-                    return;
-                }
-            });
-            workerProcess.stdout.on("data", (data) => {
-                resStr += data;
-                console.log(resStr);
-            });
-            // 退出之后的输出
-            workerProcess.on("close", (code) => {
-                let res = false;
-                if (code === 0) {
-                    res = true;
+    public GetProgress(): Promise<number> {
+        return new Promise<number>(async (resolve, reject) => {
+            await axios.get("http://localhost:1121/v1/monkeySun/now").then(async (response) => {
+                if (response.data["Code"] === 200 ) {
+                    resolve(response.data["Data"]);
                 } else {
-                    res = false;
+                    reject(0);
                 }
-                res ? resolve(resStr) : reject("failed");
             });
         });
     }

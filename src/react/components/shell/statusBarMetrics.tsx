@@ -32,8 +32,8 @@ export class StatusBarMetrics extends React.Component<IStatusBarMetricsProps> {
                     <span className="metric-source-connection-name">{
                         project.exportFormat ?
                             project.exportFormat.belongToProject ?
-                                project.exportFormat.belongToProject.name ?
-                                    project.exportFormat.belongToProject.name : "" : "" : ""}</span>
+                                project.exportFormat.belongToProject.ProjectName ?
+                                    project.exportFormat.belongToProject.ProjectName : "" : "" : ""}</span>
                 </li>
                 <li title={interpolate(strings.projectMetrics.taggedAssets, { count: taggedAssets.length })}>
                     <i className="fas fa-tag"></i>

@@ -1,6 +1,6 @@
 {
     "name": "Power-Ai",
-    "version": "7.3.9-beta",
+    "version": "7.7.18-beta",
     "author": {
         "name": "宁波轻蜓视觉科技有限公司",
         "url": "https://github.com/yiningzeng/Power-Ai.git"
@@ -21,7 +21,7 @@
         "build-win32-nsis": "electron-builder --win --ia32 nsis",
         "build-win64-nsis": "electron-builder --win --x64 nsis",
         "build-mac-dmg": "electron-builder --mac zip",
-        "build-linux-deb-snap-tar": "electron-builder --linux deb",
+        "build-linux-deb": "electron-builder --linux deb",
         "compile": "tsc",
         "build": "react-scripts build",
         "webpack:dev": "webpack --config ./config/webpack.dev.js",
@@ -229,6 +229,14 @@
             "vendor": "宁波轻蜓科技技术有限公司",
             "category": "Development",
             "desktop": "Power Ai"
+        },
+        "linux": {
+            "target": "deb",
+            "icon": "app-icons/ico.png",
+            "maintainer": "yiningzeng",
+            "vendor": "宁波轻蜓科技技术有限公司",
+            "category": "Development",
+            "desktop": "训练中心"
         },
         "electronDownload": {
             "mirror": "https://npm.taobao.org/mirrors/electron/"

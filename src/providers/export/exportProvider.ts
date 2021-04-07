@@ -9,6 +9,8 @@ import _ from "lodash";
 import { AssetService } from "../../services/assetService";
 import {normalizeSlashes} from "../../common/utils";
 import path from "path";
+import axios from "axios";
+import moment from "moment";
 
 /**
  * @name - TF Pascal VOC Records Export Asset State
@@ -94,6 +96,30 @@ export abstract class ExportProvider
 
     public abstract export(): Promise<void> | Promise<IExportResults>;
 
+    public async saveProjectInfoToMariaDb(): Promise<string> {
+        await this.project.tags.mapAsync(async (v) => {
+            axios.post("http://localhost:8080/v1/qt_labels/", {
+                CreateTime: moment().format("YYYY-MM-DD HH:mm:ss"),
+                LabelName: v.name,
+                ProjectId: {
+                    Id: this.project.exportFormat.belongToProject.Id,
+                    ProjectName: this.project.exportFormat.belongToProject.ProjectName,
+                },
+                Remarks: v.color,
+            }).then((response) => {
+                // alert(JSON.stringify(response));
+                // if (response.data["Code"] === 200 ) {
+                // } else {
+                // }
+            }).catch((error) => {
+                // handle error
+                console.log(error);
+            }).then(() => {
+                // always executed
+            });
+        });
+        return "aa";
+    }
     /**
      * Gets the assets that are configured to be exported based on the configured asset state
      */
@@ -145,8 +171,7 @@ export abstract class ExportProvider
         }
         // 这里主要判断是不是远程的标注！如果是的话就保存在本地的项目目录下
         if (this.project.exportFormat.exportPath && this.project.exportFormat.belongToProject) {
-            const folder = path.join(this.project.exportFormat.belongToProject.baseFolder,
-                this.project.exportFormat.belongToProject.projectFolder,
+            const folder = path.join(this.project.exportFormat.belongToProject.AssetsPath,
                 this.project.exportFormat.exportPath);
             const options = {
                     ...this.project.targetConnection.providerOptions,

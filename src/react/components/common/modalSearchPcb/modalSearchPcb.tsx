@@ -103,7 +103,7 @@ export class ModalSearchPcb extends React.Component<ICloudFilePickerProps, IClou
                             });
                         }}>
                             {projectList && projectList.length > 0 && projectList.map((item) =>
-                                <option value={JSON.stringify(item)}>{item.name}</option>)}
+                                <option value={JSON.stringify(item)}>{item.ProjectName}</option>)}
                         </Input>
                         <Label for="pcbCode">PCB编号</Label>
                         <Input id="pcbCode" placeholder="请输入需要查询的PCB编号" onChange={(v) => {

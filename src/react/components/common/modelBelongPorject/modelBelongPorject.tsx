@@ -16,6 +16,7 @@ import {SelectionMode} from "powerai-ct/lib/js/CanvasTools/Interface/ISelectorSe
 import {ICanvasProps, ICanvasState} from "../../pages/editorPage/canvas";
 import {constants} from "../../../../common/constants";
 import _ from "lodash";
+import axios from "axios";
 // const delay = require('delay');
 // const pTimeout = require('p-timeout');
 /**
@@ -87,7 +88,7 @@ export class ModelBelongPorject extends React.Component<ICloudFilePickerProps, I
                         }}>
                             {/* tslint:disable-next-line:max-line-length */}
                             {this.state.projectList && this.state.projectList.length > 0 && this.state.projectList.map((item) =>
-                                <option value={JSON.stringify(item)}>{item.name}</option>)}
+                                <option value={JSON.stringify(item)}>{item.ProjectName}</option>)}
                         </Input>
                         <Label for="dataType">素材类型</Label>
                         {/* tslint:disable-next-line:max-line-length */}
@@ -141,14 +142,25 @@ export class ModelBelongPorject extends React.Component<ICloudFilePickerProps, I
     }
 
     private getInitialState(): ICloudFilePickerState {
-        IpcRendererProxy.send(`TrainingSystem:JsonRead`, [constants.projectFileName]).then((txt) => {
-            const projects = _.values(JSON.parse(txt.toString()));
-            this.setState({
-                ...this.state,
-                projectList: projects,
-                belongToProject: projects !== undefined && projects.length > 0 ?
-                    projects[0] : undefined,
-            });
+        axios.get("http://localhost:8080/v1/qt_projects/?limit=1000")
+            .then((response) => {
+                if (response.data["Code"] === 200 ) {
+                    const projects = response.data["Data"];
+                    const aa = projects !== undefined && projects.length > 0 ? projects[0] : undefined;
+                    this.setState({
+                        ...this.state,
+                        projectList: projects,
+                        belongToProject: {
+                            ...aa,
+                            exportPath: ExportPath.CollectData,
+                        },
+                    });
+                }
+            }).catch((error) => {
+            // handle error
+            console.log(error);
+        }).then(() => {
+            // always executed
         });
         return {
             ...this.state,

@@ -148,7 +148,7 @@ export class CloudFileCopyPicker extends React.Component<ICloudFilePickerProps, 
                             });
                         }}>
                             {projectList && projectList.length > 0 && projectList.map((item) =>
-                                <option value={JSON.stringify(item)}>{item.name}</option>)}
+                                <option value={JSON.stringify(item)}>{item.ProjectName}</option>)}
                         </Input>
                         {
                             this.props.copy && <div>
@@ -297,7 +297,7 @@ export class CloudFileCopyPicker extends React.Component<ICloudFilePickerProps, 
             num = num++;
             this.draggableDialog.current.change("正在拷贝...",
                 `正在拷贝 ${num}/${this.state.copyList.length} 请耐心等待`, false, false);
-            await IpcRendererProxy.send(`TrainingSystem:CopyRemoteAssets`, [val, this.state.belongToProject.baseFolder + "/" + this.state.belongToProject.projectFolder + "/CollectData/"]);
+            await IpcRendererProxy.send(`TrainingSystem:CopyRemoteAssets`, [val, this.state.belongToProject.AssetsPath + "/CollectData/"]);
         });
         this.draggableDialog.current.change("拷贝完成",
             `已经全部拷贝完成!`, true, false);

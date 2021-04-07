@@ -182,11 +182,17 @@ export interface IRemoteHostItem {
  * 项目库的单个项目类
  */
 export interface IProjectItem {
-    name: string;
-    baseFolder: string;
-    projectFolder: string;
+    // name: string;
+    // baseFolder: string;
+    // projectFolder: string;
+
+    AssetsPath: string; // 项目路径
+    Id?: number;
+    ImageHeight: number;
+    ImageWidth: number;
+    CreateTime: string;
+    ProjectName: string;
     exportPath?: string;
-    imageSize?: [number, number];
 }
 
 /**

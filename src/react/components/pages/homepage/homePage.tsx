@@ -58,6 +58,7 @@ import ProjectItem from "./projectItem";
 import {CloudFileCopyPicker} from "../../common/cloudFileCopyPicker/cloudFileCopyPicker";
 import {IpcRendererProxy} from "../../../../common/ipcRendererProxy";
 import path from "path";
+import axios from "axios";
 // tslint:disable-next-line:no-var-requires
 const tagColors = require("../../common/tagColors.json");
 export interface IHomePageProps extends RouteComponentProps, React.Props<HomePage> {
@@ -159,13 +160,21 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
 
     // 加载项目
     public loadProjectList() {
-        IpcRendererProxy.send(`TrainingSystem:JsonRead`, [constants.projectFileName]).then((txt) => {
-            this.setState({
-                ...this.state,
-                projectList: _.values(JSON.parse(txt.toString())),
-            }, () => {
-                console.log(JSON.stringify(this.state.projectList));
-            });
+        axios.get("http://localhost:8080/v1/qt_projects/?limit=1000")
+            .then((response) => {
+                if (response.data["Code"] === 200 ) {
+                    this.setState({
+                        ...this.state,
+                        projectList: response.data["Data"],
+                    }, () => {
+                        console.log(JSON.stringify(this.state.projectList));
+                    });
+                }
+            }).catch((error) => {
+            // handle error
+            console.log(error);
+        }).then(() => {
+            // always executed
         });
     }
 
@@ -191,12 +200,12 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                             onAddClick={() => this.modalHomePageAddProject.current.open()}
                             onOpenDir={async (item) => {
                                 // tslint:disable-next-line:max-line-length
-                                const res = await IpcRendererProxy.send(`TrainingSystem:FileExist`, [item.baseFolder + "/" + item.name]);
+                                const res = await IpcRendererProxy.send(`TrainingSystem:FileExist`, [item.AssetsPath]);
                                 if (res) {
                                     // tslint:disable-next-line:max-line-length
-                                    await IpcRendererProxy.send(`TrainingSystem:OpenProjectDir`, [item.baseFolder + "/" + item.name + "/CollectData/"]);
+                                    await IpcRendererProxy.send(`TrainingSystem:OpenProjectDir`, [item.AssetsPath + "/" + item.exportPath]);
                                 } else {
-                                    toast.error(`项目目录${item.baseFolder + "/" + item.name}不存在，请手动删除该项目`);
+                                    toast.error(`项目目录${item.AssetsPath}不存在，请手动删除该项目`);
                                 }
                             }}
                             onDelete={(item) => this.deleteProjectListConfirm.current.open(item)}
@@ -227,42 +236,45 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
 
                                 // region 项目保存到本地路径库里
                                 const projectItem: IProjectItem = {
-                                    name: projectName,
-                                    baseFolder: "/qtingvisionfolder/Projects",
-                                    projectFolder: projectName,
+                                    ProjectName: projectName,
+                                    AssetsPath: "/qtingvisionfolder/Projects/" + projectName,
                                     exportPath: ExportPath.CollectData,
-                                    imageSize,
+                                    ImageWidth: imageSize[0],
+                                    ImageHeight: imageSize[1],
+                                    CreateTime: moment().format("YYYY-MM-DD HH:mm:ss"),
                                 };
-                                // tslint:disable-next-line:max-line-length
-                                const pRes = await IpcRendererProxy.send(`TrainingSystem:ProjectEdit`, [projectItem]);
-                                if (pRes) {
-                                    this.loadProjectList();
-                                    // region 新建项目的其他文件
-                                    await this.props.actions.createFolder("/qtingvisionfolder/Projects", projectName);
-                                    // 这里创建文件夹要合并，否则会出错, 加了await就正常了
-                                    await this.props.actions.createFolder("/qtingvisionfolder/Projects/" + projectName, "CollectData");
-                                    await this.props.actions.createFolder("/qtingvisionfolder/Projects/" + projectName, "MissData");
-                                    await this.props.actions.createFolder("/qtingvisionfolder/Projects/" + projectName, "TestData");
-                                    await this.props.actions.createFolder("/qtingvisionfolder/Projects/" + projectName, "AtuoTrainData");
-                                    await this.props.actions.createFolder("/qtingvisionfolder/Projects/" + projectName, "model_release");
-                                    await this.props.actions.createFolder("/qtingvisionfolder/Projects/" + projectName, "training_data");
-                                    // tslint:disable-next-line:max-line-length
-                                    const projectPath = path.join("/qtingvisionfolder/Projects/" + projectName, constants.projectConfigFileName);
-                                    // tslint:disable-next-line:max-line-length
-                                    // const res = await IpcRendererProxy.send(`TrainingSystem:JsonRead`, [projectPath]);
-                                    // let writeStr = {imageSize};
-                                    // if (res !== undefined) {
-                                    //     writeStr = JSON.parse(res.toString());
-                                    //     writeStr["imageSize"] = imageSize;
-                                    // }
-                                    await IpcRendererProxy.send(`TrainingSystem:JsonSave`, [projectPath, projectItem]);
-                                    // endregion
-                                    this.modalHomePageAddProject.current.close();
-                                    toast.success("项目新建成功");
-                                } else {
-                                    toast.error("项目新建失败");
-                                }
-                                // endregion
+                                axios.post("http://localhost:8080/v1/qt_projects/", {...projectItem})
+                                    .then(async (response) => {
+                                        if (response.data["Code"] === 200 ) {
+                                            this.loadProjectList();
+                                            // region 新建项目的其他文件
+                                            // tslint:disable-next-line:max-line-length
+                                            await this.props.actions.createFolder("/qtingvisionfolder/Projects",
+                                                projectName);
+                                            // 这里创建文件夹要合并，否则会出错, 加了await就正常了
+                                            // tslint:disable-next-line:max-line-length
+                                            await this.props.actions.createFolder(projectItem.AssetsPath, "CollectData");
+                                            // tslint:disable-next-line:max-line-length
+                                            await this.props.actions.createFolder(projectItem.AssetsPath, "MissData");
+                                            // tslint:disable-next-line:max-line-length
+                                            await this.props.actions.createFolder(projectItem.AssetsPath, "TestData");
+                                            await this.props.actions.createFolder(projectItem.AssetsPath, "AtuoTrainData");
+                                            await this.props.actions.createFolder(projectItem.AssetsPath, "model_release");
+                                            await this.props.actions.createFolder(projectItem.AssetsPath, "training_data");
+                                            this.modalHomePageAddProject.current.close();
+                                            toast.success("项目新建成功");
+                                            // endregion
+                                        } else {
+                                            // tslint:disable-next-line:max-line-length
+                                            const msg = String(response.data["Msg"]).includes("Error 1062") ? "项目名已存在" : String(response.data["Msg"]);
+                                            toast.error(msg);
+                                        }
+                                    }).catch((error) => {
+                                    // handle error
+                                    console.log(error);
+                                }).then(() => {
+                                    // always executed
+                                });
                             }}
                         />
                     </div>
@@ -397,29 +409,25 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                 <Confirm title="谨慎操作！！！"
                          ref={this.deleteProjectListConfirm as any}
                          message={(item) =>
-                             `如果正在标注该项目的远程素材，那么项目会被关闭！并且删除项目会删除该项目下的所有素材和已经训练好的模型文件！！！请谨慎操作！！！确定要删除项目[${item.name}]么?`}
+                             `如果正在标注该项目的远程素材，那么项目会被关闭！并且删除项目会删除该项目下的所有素材和已经训练好的模型文件！！！请谨慎操作！！！确定要删除项目[${item.ProjectName}]么?`}
                          confirmButtonColor="danger"
                          onConfirm={async (item) => {
-                             await this.draggableDialogNormal.current.open();
-                             // tslint:disable-next-line:max-line-length
-                             const res = await IpcRendererProxy.send(`TrainingSystem:RootDeletePath`, [path.join(item.baseFolder, item.projectFolder)]);
-                             if (res) {
-                                 // tslint:disable-next-line:max-line-length
-                                 await IpcRendererProxy.send(`TrainingSystem:ProjectEdit`, [item, true]);
-                                 this.loadProjectList();
-
-                                 if (this.props.project) {
-                                     if (this.props.project.exportFormat.belongToProject.name !== undefined &&
-                                         this.props.project.exportFormat.belongToProject.name === item.name) {
-                                         this.props.actions.closeProject();
-                                     }
+                             axios.delete(`http://localhost:8080/v1/qt_projects/${item.Id}`).then(async (response) => {
+                                 if (response.data["Code"] === 200 ) {
+                                     await this.draggableDialogNormal.current.open();
+                                     await IpcRendererProxy.send(`TrainingSystem:RootDeletePath`, [item.AssetsPath]);
+                                     this.loadProjectList();
+                                     this.deleteProjectListConfirm.current.close();
+                                     toast.success("已成功删除");
+                                     await this.draggableDialogNormal.current.close();
                                  }
-                                 this.deleteProjectListConfirm.current.close();
-                                 toast.success("已成功删除");
-                             } else {
+                             }).catch((error) => {
                                  toast.error("删除失败");
-                             }
-                             await this.draggableDialogNormal.current.close();
+                                 // handle error
+                                 console.log(error);
+                             }).then(() => {
+                                 // always executed
+                             });
                          }}/>
                 <Confirm title="删除主机"
                          ref={this.deleteRemoteHostConfirm as any}
@@ -453,7 +461,7 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                     title={"正在加载..."}
                     ref={this.draggableDialog}
                     content={"处理中"}
-                    interval={50}
+                    interval={200}
                     showProgress={true}
                     disableBackdropClick={true}
                     disableEscapeKeyDown={true}
@@ -528,6 +536,25 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                 this.draggableDialog.current.change("出错了", "文件夹不存在", true);
                 return;
             }
+            axios.post("http://localhost:1121/v1/monkeySun/", {
+                Path: fileFolder,
+                Sort: false,
+                ThreadNum: 100,
+            }).then(async (response) => {
+                    if (response.data["Code"] === 200 ) {
+                        toast.success("处理完成");
+                        // endregion
+                    } else {
+                        // tslint:disable-next-line:max-line-length
+                        toast.error("打开文件夹失败");
+                    }
+                }).catch((error) => {
+                // handle error
+                console.log(error);
+            }).then(() => {
+                // always executed
+            });
+
             const idd = normalizeSlashes(fileFolder).lastIndexOf("/");
             // const randId = shortid.generate();
             const folderName = normalizeSlashes(fileFolder).substring(idd + 1);
@@ -563,8 +590,6 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                 assets: {},
             };
             const yiningzengAssets = fileFolder + "/.yiningzeng.assets";
-            const monkeySun = await IpcRendererProxy.send(`TrainingSystem:MonkeySun`, [fileFolder, 200]);
-            console.log(monkeySun);
             const llll = await IpcRendererProxy.send(`TrainingSystem:FileExist`, [yiningzengAssets]);
             if (llll) {
                 const yiNingZengAssets = await this.props.actions.getAssetsByYiNingZengAssets(projectJson);

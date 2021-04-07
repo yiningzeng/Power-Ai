@@ -6,7 +6,7 @@ import {
     IAssetMetadata,
     IAsset,
     AssetState,
-    AssetType, IProviderOptions,
+    AssetType, IProviderOptions, ExportPath,
 } from "../../models/applicationState";
 import Guard from "../../common/guard";
 import { constants } from "../../common/constants";
@@ -39,6 +39,7 @@ export class PowerAiExportProvider extends ExportProvider<IPowerAiExportProvider
      * Export project to VoTT JSON format
      */
     public async export(): Promise<void> {
+        await this.saveProjectInfoToMariaDb();
         const results = await this.getAssetsForExport();
         // tslint:disable-next-line:max-line-length
         let isSubdirectories = false;
@@ -56,11 +57,11 @@ export class PowerAiExportProvider extends ExportProvider<IPowerAiExportProvider
         let exportFolderName = "";
         console.log("二人若若若若若若");
         console.log(JSON.stringify(this.project.exportFormat.belongToProject));
-        console.log(this.project.exportFormat.exportPath);
+        console.log(JSON.stringify(this.project.exportFormat.exportPath));
         if (!isSubdirectories) {
-            const folder = path.join(this.project.exportFormat.belongToProject.baseFolder,
-                this.project.exportFormat.belongToProject.projectFolder,
-                this.project.exportFormat.exportPath);
+            const folder = path.join(this.project.exportFormat.belongToProject.AssetsPath,
+                this.project.exportFormat.exportPath === undefined ?
+                    ExportPath.CollectData : this.project.exportFormat.exportPath);
             const par: IProviderOptions = this.project.sourceConnection.providerOptions;
             const sourceFolder = par["folderPath"] + "/";
             exportFolderName = path.basename(par["folderPath"].replace(new RegExp("\\|", "g"), "/"));
