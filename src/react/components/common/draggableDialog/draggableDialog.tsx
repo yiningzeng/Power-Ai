@@ -12,6 +12,7 @@ import {toast} from "react-toastify";
 import {IpcRendererProxy} from "../../../../common/ipcRendererProxy";
 import {Box} from "@material-ui/core";
 import Typography from "@material-ui/core/Typography";
+import axios from "axios";
 
 export interface IDraggableDialogProps {
     title?: string;
@@ -134,12 +135,23 @@ export default class DraggableDialog extends React.Component<IDraggableDialogPro
                 nowValue: 0,
                 allNum: 100,
             }, async () => {
-                const cal = await IpcRendererProxy.send(`TrainingSystem:CalProgress`, [path]);
-                if (cal === "success") {
-                    const allNum = await IpcRendererProxy.send(`TrainingSystem:GetProgress`, ["allNum.txt"]);
-                    this.doProgress();
-                    this.setState({...this.state, allNum: Number(allNum)});
-                }
+                axios.get("http://localhost:1122/v1/monkeySun/allNum/").then(async (response) => {
+                    if (response.data["Code"] === 200 ) {
+                        // tslint:disable-next-line:max-line-length
+                        this.setState({...this.state, allNum: Number(response.data["Data"])});
+                        // endregion
+                    } else {
+                        // tslint:disable-next-line:max-line-length
+                    }
+                });
+                this.doProgress();
+
+                // const cal = await IpcRendererProxy.send(`TrainingSystem:CalProgress`, [path]);
+                // if (cal === "success") {
+                //     const allNum = await IpcRendererProxy.send(`TrainingSystem:GetProgress`, ["allNum.txt"]);
+                //     this.doProgress();
+                //     this.setState({...this.state, allNum: Number(allNum)});
+                // }
             });
         } else {
             this.setState({open: true, done: false, change: false});
@@ -165,12 +177,20 @@ export default class DraggableDialog extends React.Component<IDraggableDialogPro
 
     private doProgress() {
         this.timer = setInterval(async () => {
-            const pro = await IpcRendererProxy.send(`TrainingSystem:GetProgress`, ["now.txt"]);
-            this.setState({...this.state, open: true, done: false, change: false, nowValue: Number(pro)}, () => {
-                if (this.state.allNum === this.state.nowValue) {
-                    this.clearProgress();
+            await axios.get("http://localhost:1122/v1/monkeySun/now").then(async (response) => {
+                if (response.data["Code"] === 200 ) {
+                    // tslint:disable-next-line:max-line-length
+                    this.setState({...this.state, open: true, done: false, change: false, nowValue: Number(response.data["Data"])}, () => {
+                        if (this.state.allNum <= this.state.nowValue) {
+                            this.clearProgress();
+                        }
+                    });
+                    // endregion
+                } else {
+                    // tslint:disable-next-line:max-line-length
                 }
             });
+            // tslint:disable-next-line:max-line-length
         }, this.props.interval === undefined ? 150 : this.props.interval);
     }
     private clearProgress() {

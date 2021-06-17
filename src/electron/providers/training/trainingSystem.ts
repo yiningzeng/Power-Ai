@@ -372,6 +372,55 @@ export default class TrainingSystem {
         });
     }
 
+// 检测端口是否被占用
+
+    public CheckServer(port: number): Promise<boolean> {
+        return new Promise<boolean>(async (resolve, reject) => {
+            const net = require("net");
+            // 创建服务并监听该端口
+            const server = net.createServer().listen(port);
+            server.on("listening", () => { // 执行这块代码说明端口未被占用
+                server.close(); // 关闭服务
+                console.log("The port【" + port + "】 is available."); // 控制台输出信息
+                resolve(true);
+            });
+            server.on("error", (err) => {
+                if (err.code === "EADDRINUSE") { // 端口已经被使用
+                    console.log("The port【" + port + "】 is occupied, please change other port.");
+                }
+                reject(false);
+            });
+        });
+    }
+
+    public StartServer(shellName: string): Promise<string> {
+        return new Promise<string>((resolve, reject) => {
+            let workerProcess;
+            const shellPath = process.cwd() + "/" + shellName;
+            const cmdStr = `sh ${shellPath}`;
+            console.log(cmdStr);
+            workerProcess = child_process.exec(cmdStr, (error, stdout, stderr) => {
+                if (error) {
+                    console.error(`执行的错误: ${error}`);
+                    console.error(`stderr: ${stderr}`);
+                    return;
+                }
+            });
+            // 退出之后的输出
+            workerProcess.on("close", (code) => {
+                console.log("out code：" + code);
+                let res = false;
+                if (code === 0) {
+                    console.log("执行成功");
+                    res = true;
+                } else {
+                    console.log("执行失败");
+                }
+                res ? resolve("success") : reject("failed");
+            });
+        });
+    }
+
     // 注意了这里sourcePath和targetPath都要已/结尾
     public ExportPowerAiAssets(sourcePath: string, targetPath: string): Promise<string> {
         return new Promise<string>((resolve, reject) => {
@@ -465,7 +514,7 @@ export default class TrainingSystem {
 
     public GetProgress(): Promise<number> {
         return new Promise<number>(async (resolve, reject) => {
-            await axios.get("http://localhost:1121/v1/monkeySun/now").then(async (response) => {
+            await axios.get("http://localhost:1122/v1/monkeySun/now").then(async (response) => {
                 if (response.data["Code"] === 200 ) {
                     resolve(response.data["Data"]);
                 } else {

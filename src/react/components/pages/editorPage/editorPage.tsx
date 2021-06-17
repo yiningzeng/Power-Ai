@@ -75,6 +75,7 @@ import {Divider} from "@material-ui/core";
 import {ModelBelongPorject} from "../../common/modelBelongPorject/modelBelongPorject";
 import {IpcRendererProxy} from "../../../../common/ipcRendererProxy";
 import {PlatformType} from "../../../../common/hostProcess";
+import axios from "axios";
 
 // import "antd/lib/tree/style/css";
 
@@ -1104,17 +1105,34 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
     private onTagRenamed = async (tagName: string, newTagName: string): Promise<void> => {
         this.draggableDialog.current.open();
         this.draggableDialog.current.change("正在重命名标签...", "请耐心等待");
-        const assetUpdates = await this.props.actions.updateProjectTag(this.props.project, tagName, newTagName);
-        const selectedAsset = assetUpdates.find((am) => am.asset.id === this.state.selectedAsset.asset.id);
-        await this.reloadProject();
-        if (selectedAsset) {
-            if (selectedAsset) {
-                this.setState({ selectedAsset });
+        await axios.put(`http://localhost:1122/v1/monkeySun`, {
+            NewName: newTagName,
+            OldName: tagName,
+        }).then(async (response) => {
+            if (response.data["Code"] === 200 ) {
+                toast.success("处理完成");
+                this.reloadProject(this.state.selectedAsset.asset.id);
+                this.draggableDialog.current.close();
+            } else {
+                // tslint:disable-next-line:max-line-length
+                toast.error("打开文件夹失败");
             }
-        }
-        this.draggableDialog.current.close();
-        this.canvas.current.enableCanvas(false);
-        this.canvas.current.enableCanvas(true);
+        }).catch((error) => {
+            // handle error
+            console.log(error);
+        }).then(() => {
+            // always executed
+        });
+
+        // const assetUpdates = await this.props.actions.updateProjectTag(this.props.project, tagName, newTagName);
+        // const selectedAsset = assetUpdates.find((am) => am.asset.id === this.state.selectedAsset.asset.id);
+        // await this.reloadProject();
+        // if (selectedAsset) {
+        //     if (selectedAsset) {
+        //         this.setState({ selectedAsset });
+        //     }
+        // }
+        // this.draggableDialog.current.close();
     }
 
     /**
@@ -1131,15 +1149,32 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
     private onTagDeleted = async (tagName: string): Promise<void> => {
         this.draggableDialog.current.open();
         this.draggableDialog.current.change("正在删除标签", "请耐心等待...");
-        await this.props.actions.deleteProjectTag(this.props.project, tagName);
-        // await this.goToRootAsset(1);
-        // const selectedAsset = assetUpdates.find((am) => am.asset.id === this.state.selectedAsset.asset.id);
-        //
-        // if (selectedAsset) {
-        //     this.setState({ selectedAsset });
-        // }
-        this.draggableDialog.current.change("删除完成", "抱歉！该版本删除后需要手动到首页重新打开文件夹!", true);
-        // this.reloadProject(this.state.selectedAsset.asset.id, tagName);
+
+        await axios.delete(`http://localhost:1122/v1/monkeySun/${tagName}`).then(async (response) => {
+            if (response.data["Code"] === 200 ) {
+                toast.success("处理完成");
+                this.reloadProject(this.state.selectedAsset.asset.id);
+                this.draggableDialog.current.close();
+            } else {
+                // tslint:disable-next-line:max-line-length
+                toast.error("打开文件夹失败");
+            }
+        }).catch((error) => {
+            // handle error
+            console.log(error);
+        }).then(() => {
+            // always executed
+        });
+
+        // await this.props.actions.deleteProjectTag(this.props.project, tagName);
+        // // await this.goToRootAsset(1);
+        // // const selectedAsset = assetUpdates.find((am) => am.asset.id === this.state.selectedAsset.asset.id);
+        // //
+        // // if (selectedAsset) {
+        // //     this.setState({ selectedAsset });
+        // // }
+        // this.draggableDialog.current.change("删除完成", "抱歉！该版本删除后需要手动到首页重新打开文件夹!", true);
+        // // this.reloadProject(this.state.selectedAsset.asset.id, tagName);
     }
 
     private onCtrlTagClicked = (tag: ITag): void => {
@@ -1554,8 +1589,14 @@ export default class EditorPage extends React.Component<IEditorPageProps, IEdito
                     tags: yiNingZengTags,
                 };
                 await this.props.actions.saveProject(projectJson);
+                await this.props.actions.loadProject(projectJson);
+                this.goToRootAsset(1);
+                this.canvas.current.enableCanvas(false);
+                this.canvas.current.enableCanvas(true);
+                this.goToRootAsset(-1);
             }
             this.loadingDialog.current.close();
+
             this.props.history.push(`/projects/${projectJson.id}/edit`);
             this.loadingProjectAssets = false;
             this.setState({

@@ -145,7 +145,7 @@ export default class CanvasHelpers {
             .map((tagName) => {
                 const projectTag = projectTags.find((projectTag) => projectTag.name === tagName);
                 return projectTag ? new Tag(projectTag.name, projectTag.color,
-                    (region.confirmTags !== undefined) ?
+                    (region.confirmTags !== null && region.confirmTags !== undefined ) ?
                         (region.confirmTags[0] !== "TP") ? region.confirmTags[0] : undefined : undefined) : null;
             })
             .filter((tag) => tag !== null);

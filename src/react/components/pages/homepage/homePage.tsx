@@ -59,6 +59,7 @@ import {CloudFileCopyPicker} from "../../common/cloudFileCopyPicker/cloudFileCop
 import {IpcRendererProxy} from "../../../../common/ipcRendererProxy";
 import path from "path";
 import axios from "axios";
+import delay from "delay";
 // tslint:disable-next-line:no-var-requires
 const tagColors = require("../../common/tagColors.json");
 export interface IHomePageProps extends RouteComponentProps, React.Props<HomePage> {
@@ -98,6 +99,8 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
         remoteHostList: [],
         projectList: [],
     };
+
+    private timer;
     private localFileSystem: LocalFileSystemProxy;
     private filePicker: React.RefObject<FilePicker> = React.createRef();
     private deleteConfirm: React.RefObject<Confirm> = React.createRef();
@@ -113,6 +116,7 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
     private draggableDialogNormal: React.RefObject<DraggableDialog> = React.createRef();
     constructor(props, context) {
         super(props, context);
+        this.checkServer();
         this.localFileSystem = new LocalFileSystemProxy();
         // 试用版本使用这个
         // if (this.props.appSettings.zengyining === undefined || this.props.appSettings.zengyining === null) {
@@ -163,12 +167,14 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
         axios.get("http://localhost:8080/v1/qt_projects/?limit=1000")
             .then((response) => {
                 if (response.data["Code"] === 200 ) {
+                    console.log("来获取项目了");
                     this.setState({
                         ...this.state,
                         projectList: response.data["Data"],
                     }, () => {
                         console.log(JSON.stringify(this.state.projectList));
                     });
+                    clearInterval(this.timer);
                 }
             }).catch((error) => {
             // handle error
@@ -525,7 +531,23 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
         }
         modal.open();
     }
-
+    private checkServer = async () => {
+        let res = await IpcRendererProxy.send(`TrainingSystem:CheckServer`, [1122]);
+        if (res) {
+            IpcRendererProxy.send(`TrainingSystem:StartServer`, ["StartComponent.sh"]);
+            toast.warn("已执行开启插件");
+        } else {
+            // toast.success("辅助插件已开启");
+        }
+        res = await IpcRendererProxy.send(`TrainingSystem:CheckServer`, [8080]);
+        if (res) {
+            IpcRendererProxy.send(`TrainingSystem:StartServer`, ["StartServer.sh"]);
+            this.timer = setInterval(async () => this.loadProjectList(), 1500); // 这里的这个检查更新由于需要显示那个啥提醒控件，会造成页面刷新
+            toast.warn("已开启训练中心服务");
+        } else {
+            // toast.success("训练中心服务正常");
+        }
+    }
     private loadProject = async (fileFolder: string, belongToProject?: IProjectItem, exportPath?: string) => {
         const platform = global && global.process ? global.process.platform : "web";
         if (platform === PlatformType.Linux) {
@@ -536,25 +558,6 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                 this.draggableDialog.current.change("出错了", "文件夹不存在", true);
                 return;
             }
-            axios.post("http://localhost:1121/v1/monkeySun/", {
-                Path: fileFolder,
-                Sort: false,
-                ThreadNum: 100,
-            }).then(async (response) => {
-                    if (response.data["Code"] === 200 ) {
-                        toast.success("处理完成");
-                        // endregion
-                    } else {
-                        // tslint:disable-next-line:max-line-length
-                        toast.error("打开文件夹失败");
-                    }
-                }).catch((error) => {
-                // handle error
-                console.log(error);
-            }).then(() => {
-                // always executed
-            });
-
             const idd = normalizeSlashes(fileFolder).lastIndexOf("/");
             // const randId = shortid.generate();
             const folderName = normalizeSlashes(fileFolder).substring(idd + 1);
@@ -590,6 +593,24 @@ export default class HomePage extends React.Component<IHomePageProps, IHomePageS
                 assets: {},
             };
             const yiningzengAssets = fileFolder + "/.yiningzeng.assets";
+            await axios.post("http://localhost:1122/v1/monkeySun/", {
+                Path: fileFolder,
+                Sort: false,
+                ThreadNum: 100,
+            }).then(async (response) => {
+                if (response.data["Code"] === 200 ) {
+                    toast.success("处理完成");
+                    // endregion
+                } else {
+                    // tslint:disable-next-line:max-line-length
+                    toast.error("打开文件夹失败");
+                }
+            }).catch((error) => {
+                // handle error
+                console.log(error);
+            }).then(() => {
+                // always executed
+            });
             const llll = await IpcRendererProxy.send(`TrainingSystem:FileExist`, [yiningzengAssets]);
             if (llll) {
                 const yiNingZengAssets = await this.props.actions.getAssetsByYiNingZengAssets(projectJson);
