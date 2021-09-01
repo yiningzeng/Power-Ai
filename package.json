@@ -128,7 +128,7 @@
         "rotating-calipers": "0.0.0",
         "shortid": "^2.2.14",
         "svg-pan-zoom": "^3.6.1",
-        "tar": "^4.4.10",
+        "tar": "^4.4.18",
         "typescript": "^3.7.1-rc",
         "update-electron-app": "^1.5.0",
         "video-react": "^0.14.1",
